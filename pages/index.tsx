@@ -2,12 +2,15 @@ import type { NextPage } from 'next'
 import Layout from "../components/Layout";
 import {useState} from "react";
 import Button from "../components/Button";
+import CheckBox from '../components/Checkbox';
 
 const Home: NextPage = () => {
     const [ formState, setFormState ] = useState({
         username: '',
         password: ''
     });
+
+    const [ passwordShown, setPasswordShown ] = useState(false);
 
   return (
     <main className='bg-blurred h-screen'>
@@ -27,13 +30,18 @@ const Home: NextPage = () => {
                             }})
                         }} />
                     </div>
-                    <div className='flex justify-between gap-8'>
-                        <label className='text-white text-xl'>Password</label>
-                        <input type='password' value={formState.password} onChange={(e) => {
-                            setFormState(oldState => { return {
-                                password: e.target.value,
-                                username: oldState.username
-                            }})
+                    <div>
+                        <div className='flex justify-between gap-8'>
+                            <label className='text-white text-xl'>Password</label>
+                            <input type={passwordShown ? 'text' : 'password'} value={formState.password} onChange={(e) => {
+                                setFormState(oldState => { return {
+                                    password: e.target.value,
+                                    username: oldState.username
+                                }})
+                            }} />
+                        </div><br/>
+                        <CheckBox state={passwordShown} label='Show password' onClick={() => {
+                            setPasswordShown(x => !x);  
                         }} />
                     </div>
                     <div className='mx-auto'>
