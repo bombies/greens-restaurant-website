@@ -10,7 +10,7 @@ const Layout = (props: Props) => {
   return (
       <>
           <Head>
-              <title>{`Green's Restaurant${props.title && ` - ${props.title}`}`}</title>
+              <title>{`Green's Restaurant${props.title ? ` - ${props.title}` : ''}`}</title>
           </Head>
           <nav className='flex bg-green-500 px-12'>
               <Link href='/'>
