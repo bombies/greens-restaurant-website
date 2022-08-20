@@ -7,6 +7,8 @@ import { UserData } from '../types/UserData';
 import Sidebar from '../components/sidebar/Sidebar';
 import SidebarItem from '../components/sidebar/SidebarItem';
 import Image from 'next/image';
+import NotificationTray from '../components/notifications/NotificationTray';
+import Notification from '../components/notifications/Notification';
 
 type Props = {
     userData : UserData
@@ -24,6 +26,11 @@ const Home: NextPage = (props: Props) => {
 
   return (
     <main className={`${props.userData ? '' : 'bg-blurred' } h-screen`}>
+        <NotificationTray>
+            <Notification type='info' description='Testing last' />
+            <Notification type='info' description='Testing second' />
+            <Notification type='info' description='Testing first' />
+        </NotificationTray>
         {
         props.userData ? 
             <div className='flex'>
