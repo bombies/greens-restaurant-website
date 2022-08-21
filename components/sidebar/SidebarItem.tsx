@@ -13,7 +13,7 @@ type Props = {
 const SidebarItem = (props: Props) => {
     return (
         <div className='hover:bg-neutral-800/25 rounded-sm transition-fast hover:cursor-pointer px-6 py-2'>
-            <Link href={props.link}>
+            <Link href={props.link} title={props.label}>
                 <div className={`flex gap-4 ${props.sidebarOpened ? 'justify-between' : 'justify-center'} transition-fast`}>
                     {
                         props.icon &&

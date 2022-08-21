@@ -102,7 +102,7 @@ const Notification = (props: NotificationProps) => {
             onMouseEnter={handlePauseProgressTimer}
             onMouseLeave={handleStartProgressTimer}
         >
-            <div className='flex gap-2'>
+            <div className='flex gap-2 mb-3'>
                 <div className='relative w-6 h-6 self-center'>
                     <Image src={typeObject.icon} alt='' layout='fill' />
                 </div>

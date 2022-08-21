@@ -7,7 +7,8 @@ module.exports = {
   theme: {
     animation: {
       'slide-left': 'slide-left-keyframe .4s forwards',
-      'slide-right': 'slide-right-keyframe .4s forwards'
+      'slide-right': 'slide-right-keyframe .4s forwards',
+      'spin': 'spin .75s linear infinite'
     },
     extend: {
       keyframes: {

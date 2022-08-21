@@ -7,6 +7,7 @@ type Props = {
     icon?: string,
     onClick: MouseEventHandler<HTMLDivElement>,
     isDisabled?: boolean,
+    isWorking?: boolean,
     type: ButtonType
 }
 
@@ -25,6 +26,10 @@ const Button = (props: Props) => {
             buttonType = 'bg-red-500 text-white';
             break;
         }
+        case ButtonType.DANGER_SECONDARY: {
+            buttonType = 'border-red-500 border-[1px] border-solid text-red-500';
+            break;
+        }
         case ButtonType.WARNING: {
             buttonType = 'bg-amber-600 text-white';
             break;
@@ -33,20 +38,33 @@ const Button = (props: Props) => {
 
     return (
         <div
-            onClick={props.onClick}
-            className={`${props.isDisabled && 'cursor-not-allowed pointer-events-none brightness-50'} 
-            w-40 max-h-32 rounded-xl text-lg p-2 ${buttonType} flex justify-center hover:cursor-pointer transition-faster hover:scale-105`}
+            onClick={props.isDisabled === true ? () => {} : props.onClick}
+            className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
+            w-42 h-16 rounded-xl text-lg p-2 ${buttonType} flex justify-center transition-faster shadow-md`}
         >
-            <button>
+            <button className='pointer-events-none'>
                 {
-                    props.icon &&
-                    <div className='relative h-12 w-12 self-center'>
-                        <Image src={props.icon} alt='' layout='fill' />
-                    </div>
-                }
-                {
-                    props.label &&
-                    <p className='self-center'>{props.label}</p>
+                    props.isWorking !== true ?
+                        (
+                            <div className='flex gap-2'>
+                                {
+                                    props.icon &&
+                                    <div className='relative h-5 w-5 self-center'>
+                                        <Image src={props.icon} alt='' layout='fill' />
+                                    </div>
+                                }
+                                {
+                                    props.label &&
+                                    <p className='self-center pointer-events-none'>{props.label}</p>
+                                }
+                            </div>
+                        )
+                        :
+                        (
+                            <div className='animate-spin relative w-5 h-5'>
+                                <Image src='https://i.imgur.com/oQkKuvH.png' alt='' layout='fill' />
+                            </div>
+                        )
                 }
             </button>
         </div>

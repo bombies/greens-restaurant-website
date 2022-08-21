@@ -9,9 +9,7 @@ import CheckBox from "../components/Checkbox";
 import Button from "../components/Button";
 import {ButtonType} from "../types/ButtonType";
 import {NotificationContext} from "../components/notifications/NotificationProvider";
-import {NotificationActionType} from "../components/notifications/NotificationTypes";
-import {v4} from "uuid";
-import {NotificationType} from "../types/NotificationType";
+import {UserPermissions} from "../types/UserPermissions";
 
 type Props = {
     userData : UserData
@@ -53,7 +51,7 @@ const Home: NextPage = (props: Props) => {
                         <h1 className='text-7xl font-bold self-center pointer-events-none'>Welcome back, <span className='text-green-400'>{props.userData.first_name}</span></h1>
                     </div>
                     <div>
-                        <h2 className='text-4xl font-bold text-neutral-800'>Overview</h2>
+                        <h2 className='text-4xl font-bold text-neutral-700'>Overview</h2>
                     </div>
                 </div>
             </div> 
@@ -109,7 +107,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
                 last_name: 'Green',
                 avatar: null,
                 creation_date: new Date().getTime(),
-                permissions: 1 << 1,
+                permissions: UserPermissions.ADMINISTRATOR,
             }
         }
     }

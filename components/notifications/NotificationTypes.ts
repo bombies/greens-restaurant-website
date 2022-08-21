@@ -25,17 +25,3 @@ export interface NotificationRemoveAction extends NotificationAction {
     id: string
 }
 
-export const NotificationRemoveAction = (id: string): NotificationRemoveAction => {
-    return {
-        type: NotificationActionType.NOTIFICATION_REMOVE,
-        id: id
-    }
-}
-
-export const NotificationAddAction = (notification: NotificationObject): NotificationAddAction => {
-    return {
-        type: NotificationActionType.NOTIFICATION_ADD,
-        payload: notification
-    }
-}
-
