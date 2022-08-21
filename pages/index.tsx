@@ -1,19 +1,23 @@
-import type { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next'
-import Layout from "../components/Layout";
-import {useState} from "react";
-import Button from "../components/Button";
-import CheckBox from '../components/Checkbox';
-import { UserData } from '../types/UserData';
+import type {GetServerSideProps, GetServerSidePropsContext, NextPage} from 'next'
+import {useContext, useState} from "react";
+import {UserData} from '../types/UserData';
 import Sidebar from '../components/sidebar/Sidebar';
 import SidebarItem from '../components/sidebar/SidebarItem';
 import Image from 'next/image';
-import NotificationTray from '../components/notifications/NotificationTray';
-import Notification from '../components/notifications/Notification';
+import Layout from "../components/Layout";
+import CheckBox from "../components/Checkbox";
+import Button from "../components/Button";
+import {ButtonType} from "../types/ButtonType";
+import {NotificationContext} from "../components/notifications/NotificationProvider";
+import {NotificationActionType} from "../components/notifications/NotificationTypes";
+import {v4} from "uuid";
+import {NotificationType} from "../types/NotificationType";
 
 type Props = {
     userData : UserData
 }
 
+// @ts-ignore
 const Home: NextPage = (props: Props) => {
     const [ formState, setFormState ] = useState({
         username: '',
@@ -24,17 +28,14 @@ const Home: NextPage = (props: Props) => {
     const [ sidebarOpened, setSideBarOpened ] = useState(true);
     const toggleSidebar = () => { setSideBarOpened(x => !x) };
 
+    const notificationDispatch = useContext(NotificationContext);
   return (
     <main className={`${props.userData ? '' : 'bg-blurred' } h-screen`}>
-        <NotificationTray>
-            <Notification type='info' description='Testing last' />
-            <Notification type='info' description='Testing second' />
-            <Notification type='info' description='Testing first' />
-        </NotificationTray>
+
         {
         props.userData ? 
             <div className='flex'>
-                <Sidebar 
+                <Sidebar
                     icon='https://i.imgur.com/V2taHx1.png'
                     color='bg-green-600'
                     sidebarOpened={sidebarOpened}
@@ -58,7 +59,7 @@ const Home: NextPage = (props: Props) => {
             </div> 
             : 
             <div>
-                <Layout/>
+                <Layout />
                 <div className='mx-auto mt-36 border-green-500 border-solid border-[1px] w-[30rem] p-12 rounded-2xl'>
                     <form onSubmit={e => {
                         e.preventDefault();
@@ -88,7 +89,7 @@ const Home: NextPage = (props: Props) => {
                             }} />
                         </div>
                         <div className='mx-auto'>
-                            <Button onClick={() => {}} type='primary' label='LOGIN' />
+                            <Button onClick={() => {}} type={ButtonType.PRIMARY} label='LOGIN' />
                         </div>
                     </form>
                 </div>

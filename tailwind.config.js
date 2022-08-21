@@ -5,7 +5,22 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    animation: {
+      'slide-left': 'slide-left-keyframe .4s forwards',
+      'slide-right': 'slide-right-keyframe .4s forwards'
+    },
+    extend: {
+      keyframes: {
+        'slide-left-keyframe': {
+          '0%': { 'margin-left': '120%' },
+          '100%': { 'margin-left': '0%' }
+        },
+        'slide-right-keyframe': {
+          '0%': { 'margin-left': '0%' },
+          '100%': { 'margin-left': '120%' }
+        }
+      }
+    },
   },
   plugins: [],
 }
