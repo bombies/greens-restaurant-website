@@ -17,7 +17,7 @@ const SidebarItem = (props: Props) => {
                 <div className={`flex gap-4 ${props.sidebarOpened ? 'justify-between' : 'justify-center'} transition-fast`}>
                     {
                         props.icon &&
-                        <div className='relative w-10 h-10 self-center transition-fast'>
+                        <div className={`relative ${!props.sidebarOpened ? 'w-8 h-8' : 'w-10 h-10'} self-center transition-fast`}>
                             <Image src={props.icon} alt='' layout='fill' />
                         </div>
                     }
