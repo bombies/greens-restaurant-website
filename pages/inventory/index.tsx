@@ -1,7 +1,7 @@
 import {GetServerSideProps, GetServerSidePropsContext, NextPage} from "next";
 import SidebarItem from "../../components/sidebar/SidebarItem";
 import Sidebar from "../../components/sidebar/Sidebar";
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import {UserData} from "../../types/UserData";
 import {useRouter} from "next/router";
 import {UserPermissions} from "../../types/UserPermissions";
@@ -14,6 +14,7 @@ import {GenerateGenericModalAddAction} from "../../components/modals/ModalTypes"
 import {v4} from "uuid";
 import {useDispatch, useSelector} from "react-redux";
 import {toggleSidebarState} from "../../utils/redux/SidebarSlice";
+import TextBox from "../../components/TextBox";
 
 type Props = {
     userData : UserData,
@@ -28,6 +29,8 @@ const Index: NextPage = (props: Props) => {
     const reduxDispatch = useDispatch();
     const dispatchNotification = useContext(NotificationContext);
     const dispatchModal = useContext(ModalContext);
+
+    const [ newCategoryName, setNewCategoryName ] = useState('');
 
     if (!props.userData) {
         router.push('/');
@@ -61,7 +64,18 @@ const Index: NextPage = (props: Props) => {
                             <Button onClick={() => {
                                 if (!dispatchModal)
                                     return;
-                                dispatchModal(GenerateGenericModalAddAction(v4(), 'Testing 123', '⚠️ Test Title'))
+                                dispatchModal(
+                                    GenerateGenericModalAddAction(
+                                        v4(),
+                                        'Testing 123',
+                                        '⚠️ Test Title',
+                                        <div>
+                                            <form>
+                                                <TextBox placeholder='Category name...' value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} />
+                                            </form>
+                                        </div>
+                                    )
+                                )
                             }} type={ButtonType.SECONDARY} label='Add a category' />
                             <Button onClick={() => {}} type={ButtonType.DANGER_SECONDARY} label='Remove a category' />
                         </div>

@@ -1,7 +1,8 @@
 export interface GenericModalObject {
     id: string,
     title?: string,
-    description: string
+    description: string,
+    children?: JSX.Element
 }
 
 export enum ModalActionType {
@@ -21,13 +22,14 @@ export interface GenericModalRemoveAction extends GenericModalAction {
     id: string
 }
 
-export const GenerateGenericModalAddAction = (id: string, description: string, title?: string): GenericModalAddAction => {
+export const GenerateGenericModalAddAction = (id: string, description: string, title?: string, children?: JSX.Element): GenericModalAddAction => {
     return {
         type: ModalActionType.MODAL_ADD,
         payload: {
             id: id,
             description: description,
-            title: title
+            title: title,
+            children: children
         }
     }
 }

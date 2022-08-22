@@ -2,7 +2,7 @@ import React from "react";
 import {GenerateGenericModalRemoveAction, GenericModalObject, GenericModalRemoveAction} from "./ModalTypes";
 import Image from "next/image";
 
-interface Props extends React.PropsWithChildren, GenericModalObject {
+interface Props extends GenericModalObject {
     dispatchModalRemoval: React.Dispatch<GenericModalRemoveAction>
 }
 
