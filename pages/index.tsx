@@ -10,6 +10,8 @@ import Button from "../components/Button";
 import {ButtonType} from "../types/ButtonType";
 import {NotificationContext} from "../components/notifications/NotificationProvider";
 import {UserPermissions} from "../types/UserPermissions";
+import {useDispatch, useSelector} from "react-redux";
+import {toggleSidebarState} from "../utils/redux/SidebarSlice";
 
 type Props = {
     userData : UserData
@@ -23,8 +25,9 @@ const Home: NextPage = (props: Props) => {
     });
 
     const [ passwordShown, setPasswordShown ] = useState(false);
-    const [ sidebarOpened, setSideBarOpened ] = useState(true);
-    const toggleSidebar = () => { setSideBarOpened(x => !x) };
+    // @ts-ignore
+    const sidebarOpened = useSelector(state => state.sidebar.value)
+    const reduxDispatch = useDispatch();
 
     const notificationDispatch = useContext(NotificationContext);
   return (
@@ -37,7 +40,7 @@ const Home: NextPage = (props: Props) => {
                     icon='https://i.imgur.com/V2taHx1.png'
                     color='bg-green-600'
                     sidebarOpened={sidebarOpened}
-                    toggleSidebar={() => toggleSidebar()}
+                    toggleSidebar={() => reduxDispatch(toggleSidebarState())}
                 >
                     <SidebarItem icon='https://i.imgur.com/wZ8e1Lc.png' label='Inventory' link='inventory' sidebarOpened={sidebarOpened} />
                     <SidebarItem icon='https://i.imgur.com/nWxboHU.png' label='Employees' link='employees' sidebarOpened={sidebarOpened} />

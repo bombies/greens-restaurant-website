@@ -1,7 +1,7 @@
 import {GetServerSideProps, GetServerSidePropsContext, NextPage} from "next";
 import SidebarItem from "../../components/sidebar/SidebarItem";
 import Sidebar from "../../components/sidebar/Sidebar";
-import {useContext, useState} from "react";
+import {useContext} from "react";
 import {UserData} from "../../types/UserData";
 import {useRouter} from "next/router";
 import {UserPermissions} from "../../types/UserPermissions";
@@ -12,6 +12,8 @@ import {InventoryCategory} from "../../types/InventoryCategory";
 import {ModalContext} from "../../components/modals/ModalProvider";
 import {GenerateGenericModalAddAction} from "../../components/modals/ModalTypes";
 import {v4} from "uuid";
+import {useDispatch, useSelector} from "react-redux";
+import {toggleSidebarState} from "../../utils/redux/SidebarSlice";
 
 type Props = {
     userData : UserData,
@@ -21,8 +23,9 @@ type Props = {
 // @ts-ignore
 const Index: NextPage = (props: Props) => {
     const router = useRouter();
-    const [ sidebarOpened, setSideBarOpened ] = useState(true);
-    const toggleSidebar = () => { setSideBarOpened(x => !x) };
+    // @ts-ignore
+    const sidebarOpened = useSelector(state => state.sidebar.value)
+    const reduxDispatch = useDispatch();
     const dispatchNotification = useContext(NotificationContext);
     const dispatchModal = useContext(ModalContext);
 
@@ -42,7 +45,7 @@ const Index: NextPage = (props: Props) => {
                 icon='https://i.imgur.com/V2taHx1.png'
                 color='bg-green-600'
                 sidebarOpened={sidebarOpened}
-                toggleSidebar={() => toggleSidebar()}
+                toggleSidebar={() => reduxDispatch(toggleSidebarState())}
             >
                 <SidebarItem icon='https://i.imgur.com/wZ8e1Lc.png' label='Inventory' link='inventory' sidebarOpened={sidebarOpened} />
                 <SidebarItem icon='https://i.imgur.com/nWxboHU.png' label='Employees' link='employees' sidebarOpened={sidebarOpened} />
