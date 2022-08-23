@@ -8,7 +8,8 @@ module.exports = {
     animation: {
       'slide-left': 'slide-left-keyframe .4s forwards',
       'slide-right': 'slide-right-keyframe .4s forwards',
-      'spin': 'spin .75s linear infinite'
+      'spin': 'spin .75s linear infinite',
+      'ping': 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite'
     },
     extend: {
       keyframes: {
@@ -19,7 +20,7 @@ module.exports = {
         'slide-right-keyframe': {
           '0%': { 'margin-left': '0%' },
           '100%': { 'margin-left': '120%' }
-        }
+        },
       }
     },
   },

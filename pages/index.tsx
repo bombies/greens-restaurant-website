@@ -36,7 +36,7 @@ const Home: NextPage = (props: Props) => {
 
               {
                   props.userData ?
-                      <div className='flex dark:bg-neutral-800'>
+                      <div className='flex dark:bg-neutral-800 transition-fast'>
                           <Sidebar
                               icon='https://i.imgur.com/HLTQ78m.png'
                               color='bg-green-600 dark:bg-green-700'

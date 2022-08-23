@@ -18,8 +18,8 @@ import {Field, Form} from "react-final-form";
 import CategoryCard from "../../components/inventory/CategoryCard";
 import {GenerateNotificationAddAction} from "../../components/notifications/NotificationTypes";
 import {NotificationType} from "../../types/NotificationType";
-import Toggle from "../../components/Toggle";
 import Layout from "../../components/Layout";
+import toggle from "../../components/Toggle";
 
 type Props = {
     userData : UserData,
@@ -40,13 +40,33 @@ const Index: NextPage = (props: Props) => {
     const [ categories, setCategories ] = useState(props.categories);
     const addCategory = (category: InventoryCategory) => {
         setCategories(prev => [...prev, category]);
+        if (removeMode)
+            toggleRemoveMode()
     }
 
     const removeCategory = (uid: string) => {
-        setCategories(prev => prev.filter(x => x.id !== uid))
+        setCategories(prev => {
+
+            const newArr = prev.filter(x => x.id !== uid);
+            if (newArr.length === 0 && removeMode)
+                setRemoveMode(false);
+
+            return newArr;
+        })
     }
 
-    const categoriesJSX = categories.map(category => <CategoryCard key={category.id} name={category.name} uid={category.id} />)
+    const generateCategories = () => categories.map(category => <CategoryCard
+        key={category.id}
+        name={category.name}
+        uid={category.id}
+        removeMode={removeMode}
+        onRemove={() => removeCategory(category.id)}
+    />);
+
+    const [ removeMode, setRemoveMode ] = useState(false);
+    const toggleRemoveMode = () => {
+        setRemoveMode(prev => !prev);
+    }
 
     if (!props.userData) {
         router.push('/');
@@ -60,7 +80,7 @@ const Index: NextPage = (props: Props) => {
 
     return (
         <Layout title='Inventory'>
-            <main className='flex dark:bg-neutral-800'>
+            <main className='flex dark:bg-neutral-800 transition-fast'>
                 <Sidebar
                     icon='https://i.imgur.com/HLTQ78m.png'
                     color='bg-green-600 dark:bg-green-700'
@@ -99,6 +119,13 @@ const Index: NextPage = (props: Props) => {
                                                             index: 0,
                                                             stock: []
                                                         })
+                                                        if (dispatchNotification) {
+                                                            dispatchNotification(GenerateNotificationAddAction(
+                                                                v4(),
+                                                                NotificationType.SUCCESS,
+                                                                `You have created a category with the name: ${e.newCategoryName}`
+                                                            ))
+                                                        }
                                                     }}
                                                     render={({ handleSubmit, form, submitting, pristine, values }) => (
                                                         <form onSubmit={handleSubmit}>
@@ -122,13 +149,26 @@ const Index: NextPage = (props: Props) => {
                                         )
                                     )
                                 }} type={ButtonType.SECONDARY} label='Add a category' />
-                                <Button onClick={() => {}} type={ButtonType.DANGER_SECONDARY} label='Remove a category' />
+                                <Button onClick={() => {
+                                    if (categories.length === 0) {
+                                        if (dispatchNotification) {
+                                            dispatchNotification(GenerateNotificationAddAction(
+                                                v4(),
+                                                NotificationType.ERROR,
+                                                'There are no categories to remove!'
+                                            ))
+                                        }
+                                        return;
+                                    }
+
+                                    toggleRemoveMode();
+                                }} type={ButtonType.DANGER_SECONDARY} label={removeMode ? 'Exit Remove Mode' : 'Remove a category'} />
                             </div>
                             <div className='w-full border-[1px] border-green-400 border-opacity-20 rounded-xl shadow-md p-6'>
                                 {
                                     categories.length !== 0 ?
-                                        <div className='grid grid-cols-4 gap-y-5'>
-                                            {categoriesJSX}
+                                        <div className='grid grid-cols-4 gap-y-5 gap-x-5'>
+                                            {generateCategories()}
                                         </div>
                                         :
                                         <div>

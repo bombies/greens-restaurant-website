@@ -18,8 +18,8 @@ const Notification = (props: NotificationProps) => {
             typeObject = {
                 title: 'Note',
                 icon: 'https://i.imgur.com/OKylpdO.png',
-                color: 'bg-neutral-300',
-                barColor: 'bg-neutral-600'
+                color: 'bg-neutral-300 dark:bg-neutral-300',
+                barColor: 'bg-neutral-600 dark:bg-neutral-500'
             }
             break;
         }
@@ -27,8 +27,8 @@ const Notification = (props: NotificationProps) => {
             typeObject = {
                 title: 'Success',
                 icon: 'https://i.imgur.com/5YS430G.png',
-                color: 'bg-green-500',
-                barColor: 'bg-green-700'
+                color: 'bg-green-500 dark:bg-green-400',
+                barColor: 'bg-green-700 dark:bg-green-600'
             }
             break;
         }
@@ -36,8 +36,8 @@ const Notification = (props: NotificationProps) => {
             typeObject = {
                 title: 'Error',
                 icon: 'https://i.imgur.com/gAMSFoG.png',
-                color: 'bg-red-500',
-                barColor: 'bg-red-700'
+                color: 'bg-red-500 dark:bg-red-400',
+                barColor: 'bg-red-700 dark:bg-red-600'
             }
             break;
         }
@@ -45,8 +45,8 @@ const Notification = (props: NotificationProps) => {
             typeObject = {
                 title: 'Warning',
                 icon: 'https://i.imgur.com/gGwEe5j.png',
-                color: 'bg-amber-500',
-                barColor: 'bg-amber-400'
+                color: 'bg-amber-500 dark:bg-amber-300',
+                barColor: 'bg-amber-400 dark:bg-amber-500'
             }
             break;
         }
@@ -98,7 +98,7 @@ const Notification = (props: NotificationProps) => {
 
     return (
         <div
-            className={`bg-opacity-30 p-4 mb-5 w-full bg-backdrop-blur-xl ${typeObject.color} rounded-md shadow-md animate-slide-left ${exit ? 'animate-slide-right' : ''}`}
+            className={`z-50 p-4 mb-5 w-full bg-opacity-20 backdrop-blur-xl ${typeObject.color} rounded-md shadow-md animate-slide-left ${exit ? 'animate-slide-right' : ''}`}
             onMouseEnter={handlePauseProgressTimer}
             onMouseLeave={handleStartProgressTimer}
         >
