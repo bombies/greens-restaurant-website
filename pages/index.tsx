@@ -37,7 +37,7 @@ const Home: NextPage = (props: Props) => {
         props.userData ? 
             <div className='flex'>
                 <Sidebar
-                    icon='https://i.imgur.com/V2taHx1.png'
+                    icon='https://i.imgur.com/HLTQ78m.png'
                     color='bg-green-600'
                     sidebarOpened={sidebarOpened}
                     toggleSidebar={() => reduxDispatch(toggleSidebarState())}

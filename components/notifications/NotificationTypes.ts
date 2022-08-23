@@ -17,11 +17,23 @@ export interface NotificationAction {
 }
 
 export interface NotificationAddAction extends NotificationAction {
-    type: NotificationActionType,
     payload: NotificationObject
 }
 
 export interface NotificationRemoveAction extends NotificationAction {
     id: string
 }
+
+export const GenerateNotificationAddAction = (id: string, type: NotificationType, description: string, title?: string): NotificationAddAction => {
+    return {
+        type: NotificationActionType.NOTIFICATION_ADD,
+        payload: {
+            id: id,
+            type: type,
+            description: description,
+            title: title
+        }
+    }
+}
+
 

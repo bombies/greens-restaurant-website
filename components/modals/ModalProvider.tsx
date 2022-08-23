@@ -1,9 +1,15 @@
 import React, {createContext, useReducer} from "react";
-import {GenericModalAction, GenericModalAddAction, GenericModalObject, ModalActionType} from "./ModalTypes";
+import {
+    GenericModalAction,
+    GenericModalAddAction,
+    GenericModalObject,
+    GenericModalRemoveAction,
+    ModalActionType
+} from "./ModalTypes";
 import {add} from "unload";
 import GenericModal from "./GenericModal";
 
-export const ModalContext = createContext<React.Dispatch<GenericModalAddAction> | null>(null);
+export const ModalContext = createContext<React.Dispatch<GenericModalAddAction | GenericModalRemoveAction> | null>(null);
 
 interface Props extends React.PropsWithChildren {};
 

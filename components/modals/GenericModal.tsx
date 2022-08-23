@@ -23,10 +23,10 @@ const GenericModal = (props: Props) => {
                 { props.title &&
                     <div>
                         <h1 className='font-bold text-4xl tracking-wider text-center mb-4'>{props.title}</h1>
-                        <hr />
+                        <hr className='mb-4' />
                     </div>
                 }
-                <p className='text-xl text-center'>{props.description}</p>
+                <p className='text-xl text-center mb-6'>{props.description}</p>
                 {props.children}
             </div>
         </div>

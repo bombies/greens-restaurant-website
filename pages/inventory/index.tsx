@@ -10,11 +10,14 @@ import {ButtonType} from "../../types/ButtonType";
 import {NotificationContext} from "../../components/notifications/NotificationProvider";
 import {InventoryCategory} from "../../types/InventoryCategory";
 import {ModalContext} from "../../components/modals/ModalProvider";
-import {GenerateGenericModalAddAction} from "../../components/modals/ModalTypes";
+import {GenerateGenericModalAddAction, GenerateGenericModalRemoveAction} from "../../components/modals/ModalTypes";
 import {v4} from "uuid";
 import {useDispatch, useSelector} from "react-redux";
 import {toggleSidebarState} from "../../utils/redux/SidebarSlice";
-import TextBox from "../../components/TextBox";
+import {Field, Form} from "react-final-form";
+import CategoryCard from "../../components/inventory/CategoryCard";
+import {GenerateNotificationAddAction} from "../../components/notifications/NotificationTypes";
+import {NotificationType} from "../../types/NotificationType";
 
 type Props = {
     userData : UserData,
@@ -25,12 +28,23 @@ type Props = {
 const Index: NextPage = (props: Props) => {
     const router = useRouter();
     // @ts-ignore
-    const sidebarOpened = useSelector(state => state.sidebar.value)
+    const sidebarOpened = useSelector(state => state.sidebar.value);
+    // @ts-ignore
+    const newCategoryName = useSelector(state => state.categoryNameModalInput.value);
     const reduxDispatch = useDispatch();
     const dispatchNotification = useContext(NotificationContext);
     const dispatchModal = useContext(ModalContext);
 
-    const [ newCategoryName, setNewCategoryName ] = useState('');
+    const [ categories, setCategories ] = useState(props.categories);
+    const addCategory = (category: InventoryCategory) => {
+        setCategories(prev => [...prev, category]);
+    }
+
+    const removeCategory = (uid: string) => {
+        setCategories(prev => prev.filter(x => x.id !== uid))
+    }
+
+    const categoriesJSX = categories.map(category => <CategoryCard key={category.id} name={category.name} uid={category.id} />)
 
     if (!props.userData) {
         router.push('/');
@@ -45,7 +59,7 @@ const Index: NextPage = (props: Props) => {
     return (
         <main className='flex'>
             <Sidebar
-                icon='https://i.imgur.com/V2taHx1.png'
+                icon='https://i.imgur.com/HLTQ78m.png'
                 color='bg-green-600'
                 sidebarOpened={sidebarOpened}
                 toggleSidebar={() => reduxDispatch(toggleSidebarState())}
@@ -64,30 +78,58 @@ const Index: NextPage = (props: Props) => {
                             <Button onClick={() => {
                                 if (!dispatchModal)
                                     return;
+                                const modalID = v4();
                                 dispatchModal(
                                     GenerateGenericModalAddAction(
-                                        v4(),
-                                        'Testing 123',
-                                        '⚠️ Test Title',
+                                        modalID,
+                                        'What would you like this new category to be called?',
+                                        '➕ Add A Category',
                                         <div>
-                                            <form>
-                                                <TextBox placeholder='Category name...' value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} />
-                                            </form>
+                                            <Form
+                                                onSubmit={(e) => {
+                                                    dispatchModal(
+                                                        GenerateGenericModalRemoveAction(modalID)
+                                                    );
+                                                    addCategory({
+                                                        id: v4(),
+                                                        name: e.newCategoryName,
+                                                        index: 0,
+                                                        stock: []
+                                                    })
+                                                }}
+                                                render={({ handleSubmit, form, submitting, pristine, values }) => (
+                                                    <form onSubmit={handleSubmit}>
+                                                        <div className='flex flex-col justify-center items-center gap-4'>
+                                                            <Field
+                                                                name='newCategoryName'
+                                                                component='input'
+                                                                type='text'
+                                                                placeholder='Category name...'
+                                                            />
+                                                            <Button
+                                                                type={ButtonType.PRIMARY}
+                                                                submitButton={true}
+                                                                isDisabled={submitting || pristine}
+                                                            />
+                                                        </div>
+                                                    </form>
+                                                )}
+                                            />
                                         </div>
                                     )
                                 )
                             }} type={ButtonType.SECONDARY} label='Add a category' />
                             <Button onClick={() => {}} type={ButtonType.DANGER_SECONDARY} label='Remove a category' />
                         </div>
-                        <div className='w-full border-[1px] border-green-400 border-opacity-20 rounded-xl shadow-md'>
+                        <div className='w-full border-[1px] border-green-400 border-opacity-20 rounded-xl shadow-md p-6'>
                             {
-                                props.categories.length !== 0 ?
-                                    <div className='grid grid-cols-4'>
-
+                                categories.length !== 0 ?
+                                    <div className='grid grid-cols-4 gap-y-5'>
+                                        {categoriesJSX}
                                     </div>
                                     :
                                     <div>
-                                        <p className='text-center text-4xl text-neutral-300 m-12'>There&apos;s nothing here yet...</p>
+                                        <p className='text-center text-4xl text-neutral-300 m-12 pointer-events-none'>There&apos;s nothing here yet...</p>
                                     </div>
                             }
                         </div>

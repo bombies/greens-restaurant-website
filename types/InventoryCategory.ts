@@ -1,4 +1,5 @@
 export type InventoryCategory = {
+    id: string,
     name: string,
     index: number,
     stock: StockItem[]

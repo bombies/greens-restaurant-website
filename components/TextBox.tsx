@@ -2,8 +2,8 @@ import {ChangeEvent, ChangeEventHandler} from "react";
 
 type Props = {
     placeholder?: string,
-    value: string,
-    onChange: ChangeEventHandler<HTMLInputElement>
+    value?: string,
+    onChange?: ChangeEventHandler<HTMLInputElement>
     width?:  number,
     height?: number
 }

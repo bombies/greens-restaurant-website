@@ -13,12 +13,12 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
       <Provider store={store}>
           <QueryClientProvider client={queryClient}>
-              <NotificationProvider>
-                  <ModalProvider>
+              <ModalProvider>
+                  <NotificationProvider>
                       <NextNProgress color='#0c8400'/>
                       <Component {...pageProps} />
-                  </ModalProvider>
-              </NotificationProvider>
+                  </NotificationProvider>
+              </ModalProvider>
           </QueryClientProvider>
       </Provider>
   )
