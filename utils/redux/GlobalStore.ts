@@ -1,11 +1,13 @@
 import {configureStore} from "@reduxjs/toolkit";
 import sidebarReducer from "./SidebarSlice";
+import darkModeReducer from "./DarkModeSlice";
 import categoryNameModalReducer from "./CategoryNameModalSlice";
 
 export const store = configureStore({
     reducer: {
         sidebar: sidebarReducer,
-        categoryNameModalInput: categoryNameModalReducer
+        categoryNameModalInput: categoryNameModalReducer,
+        darkMode: darkModeReducer
     }
 });
 

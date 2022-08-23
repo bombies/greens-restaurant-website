@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { MouseEventHandler, useState } from "react";
+import Toggle from "../Toggle";
+import {useDispatch, useSelector} from "react-redux";
+import {toggleDarkMode} from "../../utils/redux/DarkModeSlice";
 
 interface Props extends React.PropsWithChildren {
     icon?: string,
@@ -12,6 +15,9 @@ interface Props extends React.PropsWithChildren {
 }
 
 const Sidebar = (props: Props) => {
+    // @ts-ignore
+    const darkMode = useSelector(state => state.darkMode.value);
+    const reduxDispatcher = useDispatch();
 
     return (
         <div className={`relative transition-fast p-2 h-screen ${props.sidebarOpened ? 'w-64' : 'w-32'} ${props.color} shadow-[0_0_10px_5px_rgba(0,0,0,0.1)]`}>
@@ -34,6 +40,14 @@ const Sidebar = (props: Props) => {
             </div>
             <div className='flex flex-col'>
                 {props.children}
+                <div className='flex justify-center mt-6'>
+                    <Toggle
+                        state={darkMode}
+                        onClick={() => reduxDispatcher(toggleDarkMode())}
+                        onIcon='https://i.imgur.com/vlb61Uh.png'
+                        offIcon='https://i.imgur.com/WlaCFSH.png'
+                    />
+                </div>
             </div>
         </div>
     )
