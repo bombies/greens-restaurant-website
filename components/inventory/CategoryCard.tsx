@@ -29,13 +29,13 @@ const CategoryCard = (props: Props) => {
                                 <Image src='https://i.imgur.com/qNlanxv.png' alt='' layout='fill' />
                             </div>
                         </div>
-                        <div className='w-72 h-12 flex items-center justify-center bg-green-400 dark:bg-green-500 rounded-xl shadow-md border-opacity-10 border-2 border-green-400 hover:border-opacity-100'>
+                        <div className='w-72 h-12 flex items-center justify-center bg-green-400 dark:bg-green-600 rounded-xl shadow-md border-opacity-10 hover:border-opacity-100'>
                             <p className='text-xl dark:text-white tracking-wider text-center overflow-hidden overflow-ellipsis pointer-events-none'>{props.name}</p>
                         </div>
                     </div>
                     :
                     <Link href={`/inventory/${props.uid}`}>
-                        <div className='w-72 h-12 flex items-center justify-center bg-green-400 dark:bg-green-500 rounded-xl shadow-md border-opacity-10 border-2 border-green-400 hover:border-opacity-100'>
+                        <div className='w-72 h-12 flex items-center justify-center bg-green-400 dark:bg-green-600 rounded-xl shadow-md border-opacity-10 hover:border-opacity-100'>
                             <p className='text-xl dark:text-white tracking-wider text-center overflow-hidden overflow-ellipsis pointer-events-none'>{props.name}</p>
                         </div>
                     </Link>
