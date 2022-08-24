@@ -1,9 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { MouseEventHandler, useState } from "react";
+import React, {MouseEventHandler, useContext, useState} from "react";
 import Toggle from "../Toggle";
 import {useDispatch, useSelector} from "react-redux";
 import {toggleDarkMode} from "../../utils/redux/DarkModeSlice";
+import {useMutation} from "react-query";
+import axios from "axios";
+import {GenerateNotificationAddAction} from "../notifications/NotificationTypes";
+import {v4} from "uuid";
+import {NotificationType} from "../../types/NotificationType";
+import {NotificationContext} from "../notifications/NotificationProvider";
+import {setUserData} from "../../utils/redux/UserDataSlice";
+import SidebarItem from "./SidebarItem";
 
 interface Props extends React.PropsWithChildren {
     icon?: string,
@@ -17,7 +25,34 @@ interface Props extends React.PropsWithChildren {
 const Sidebar = (props: Props) => {
     // @ts-ignore
     const darkMode = useSelector(state => state.darkMode.value);
+    // @ts-ignore
+    const userData = useSelector(state => state.userData.value);
     const reduxDispatcher = useDispatch();
+    const notificationDispatch = useContext(NotificationContext);
+
+    const logout = useMutation(() => {
+        return axios.post('/api/logout')
+            .then(() => {
+                // @ts-ignore
+                reduxDispatcher(setUserData({}));
+                if (notificationDispatch) {
+                    notificationDispatch(GenerateNotificationAddAction(
+                        v4(),
+                        NotificationType.SUCCESS,
+                        'Successfully logged out!'
+                    ))
+                }
+            })
+            .catch(err => {
+                if (notificationDispatch) {
+                    notificationDispatch(GenerateNotificationAddAction(
+                        v4(),
+                        NotificationType.ERROR,
+                        err.response.data.message || JSON.stringify(err.response.data.error)
+                    ))
+                }
+            });
+    })
 
     return (
         <div className={`relative transition-fast p-2 h-screen ${props.sidebarOpened ? 'w-64' : 'w-32'} ${props.color} shadow-[0_0_10px_5px_rgba(0,0,0,0.1)]`}>
@@ -40,6 +75,7 @@ const Sidebar = (props: Props) => {
             </div>
             <div className='flex flex-col'>
                 {props.children}
+                <SidebarItem icon='https://i.imgur.com/Z0Iiqv2.png' label='Logout' onClick={() => logout.mutate()} sidebarOpened={props.sidebarOpened} />
                 <div className='flex justify-center mt-6'>
                     <Toggle
                         state={darkMode}

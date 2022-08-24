@@ -98,7 +98,7 @@ const Notification = (props: NotificationProps) => {
 
     return (
         <div
-            className={`z-50 p-4 mb-5 w-full bg-opacity-20 backdrop-blur-xl ${typeObject.color} rounded-md shadow-md animate-slide-left ${exit ? 'animate-slide-right' : ''}`}
+            className={`z-50 p-4 mb-5 w-full bg-opacity-50 backdrop-blur-xl ${typeObject.color} rounded-md shadow-md animate-slide-left ${exit ? 'animate-slide-right' : ''}`}
             onMouseEnter={handlePauseProgressTimer}
             onMouseLeave={handleStartProgressTimer}
         >
