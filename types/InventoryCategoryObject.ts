@@ -1,4 +1,4 @@
-export type InventoryCategory = {
+export type InventoryCategoryObject = {
     id: string,
     name: string,
     index: number,

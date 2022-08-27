@@ -41,14 +41,25 @@ const Button = (props: Props) => {
         <div>
             {
                 props.submitButton ?
-                    <input type='submit' className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
-                    w-44 h-16 rounded-xl text-lg p-4 ${buttonType} flex justify-center transition-faster shadow-md`} onClick={props.isDisabled ? () => {} : undefined} disabled={props.isDisabled} />
-                    :
-                    <div
-                        onClick={props.isDisabled === true ? () => {} : props.onClick}
-                        className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
-            w-48 h-16 rounded-xl text-lg p-2 ${buttonType} flex justify-center transition-faster shadow-md`}
-                    >
+                    props.isWorking ?
+                        <div className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
+                w-48 h-16 rounded-xl text-lg p-2 ${buttonType} flex justify-center transition-faster shadow-md`}>
+                            <button className='pointer-events-none'>
+                                <div className='animate-spin relative w-5 h-5'>
+                                    <Image src='https://i.imgur.com/oQkKuvH.png' alt='' layout='fill' />
+                                </div>
+                            </button>
+                        </div>
+
+                        :
+                        <input type='submit' className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
+                        w-44 h-16 rounded-xl text-lg p-4 ${buttonType} flex justify-center transition-faster shadow-md`} onClick={props.isDisabled ? () => {} : undefined} disabled={props.isDisabled} />
+                        :
+                        <div
+                            onClick={props.isDisabled === true ? () => {} : props.onClick}
+                            className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
+                w-48 h-16 rounded-xl text-lg p-2 ${buttonType} flex justify-center transition-faster shadow-md`}
+                        >
                         <button className='pointer-events-none'>
                             {
                                 props.isWorking !== true ?

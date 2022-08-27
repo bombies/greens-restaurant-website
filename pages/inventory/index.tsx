@@ -8,7 +8,7 @@ import {UserPermissions} from "../../types/UserPermissions";
 import Button from "../../components/Button";
 import {ButtonType} from "../../types/ButtonType";
 import {NotificationContext} from "../../components/notifications/NotificationProvider";
-import {InventoryCategory} from "../../types/InventoryCategory";
+import {InventoryCategoryObject} from "../../types/InventoryCategoryObject";
 import {ModalContext} from "../../components/modals/ModalProvider";
 import {GenerateGenericModalAddAction, GenerateGenericModalRemoveAction} from "../../components/modals/ModalTypes";
 import {v4} from "uuid";
@@ -22,8 +22,7 @@ import Layout from "../../components/Layout";
 import toggle from "../../components/Toggle";
 
 type Props = {
-    userData : UserData,
-    categories: InventoryCategory[]
+    categories: InventoryCategoryObject[]
 }
 
 // @ts-ignore
@@ -32,13 +31,13 @@ const Index: NextPage = (props: Props) => {
     // @ts-ignore
     const sidebarOpened = useSelector(state => state.sidebar.value);
     // @ts-ignore
-    const newCategoryName = useSelector(state => state.categoryNameModalInput.value);
+    const userData = useSelector(state => state.userData.value);
     const reduxDispatch = useDispatch();
     const dispatchNotification = useContext(NotificationContext);
     const dispatchModal = useContext(ModalContext);
 
     const [ categories, setCategories ] = useState(props.categories);
-    const addCategory = (category: InventoryCategory) => {
+    const addCategory = (category: InventoryCategoryObject) => {
         setCategories(prev => [...prev, category]);
         if (removeMode)
             toggleRemoveMode()
@@ -68,12 +67,17 @@ const Index: NextPage = (props: Props) => {
         setRemoveMode(prev => !prev);
     }
 
-    if (!props.userData) {
+    if (!userData) {
         router.push('/');
         return <div></div>;
     }
 
-    if (Object.keys(props.userData).length == 0) {
+    if (!userData) {
+        router.push('/');
+        return <div></div>;
+    }
+
+    if (Object.keys(userData).length == 0) {
         router.push('/');
         return <div></div>;
     }
@@ -187,14 +191,6 @@ const Index: NextPage = (props: Props) => {
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
     return {
         props: {
-            userData: {
-                username: 'agreen',
-                first_name: 'Ajani',
-                last_name: 'Green',
-                avatar: null,
-                creation_date: new Date().getTime(),
-                permissions: UserPermissions.ADMINISTRATOR,
-            },
             categories: []
         }
     }
