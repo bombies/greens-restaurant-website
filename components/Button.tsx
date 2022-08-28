@@ -1,6 +1,7 @@
 import {MouseEventHandler} from "react";
 import Image from "next/image";
 import {ButtonType} from "../types/ButtonType";
+import Spinner from "./Spinner";
 
 type Props = {
     label?: string,
@@ -9,6 +10,8 @@ type Props = {
     isDisabled?: boolean,
     isWorking?: boolean,
     submitButton?: boolean,
+    width?: number,
+    height?: number,
     type: ButtonType
 }
 
@@ -42,50 +45,55 @@ const Button = (props: Props) => {
             {
                 props.submitButton ?
                     props.isWorking ?
-                        <div className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
-                w-48 h-16 rounded-xl text-lg p-2 ${buttonType} flex justify-center transition-faster shadow-md`}>
+                        <div
+                            className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
+                rounded-xl text-lg p-2 ${buttonType} flex justify-center transition-faster shadow-md`}
+                            style={{ width: `${props.width || 12}rem`, height: `${props.height || 4}rem` }}
+                        >
                             <button className='pointer-events-none'>
-                                <div className='animate-spin relative w-5 h-5'>
-                                    <Image src='https://i.imgur.com/oQkKuvH.png' alt='' layout='fill' />
-                                </div>
+                                <Spinner size={1.25} />
                             </button>
                         </div>
 
                         :
-                        <input type='submit' className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
-                        w-44 h-16 rounded-xl text-lg p-4 ${buttonType} flex justify-center transition-faster shadow-md`} onClick={props.isDisabled ? () => {} : undefined} disabled={props.isDisabled} />
+                        <input
+                            type='submit'
+                            className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
+                        rounded-xl text-lg p-4 ${buttonType} flex justify-center transition-faster shadow-md`}
+                            onClick={props.isDisabled ? () => {} : undefined} disabled={props.isDisabled}
+                            style={{ width: `${props.width || 11}rem`, height: `${props.height || 4}rem` }}
+                        />
                         :
                         <div
                             onClick={props.isDisabled === true ? () => {} : props.onClick}
                             className={`${props.isDisabled ? 'cursor-not-allowed brightness-75' : 'cursor-pointer hover:scale-105 '} 
-                w-48 h-16 rounded-xl text-lg p-2 ${buttonType} flex justify-center transition-faster shadow-md`}
+                rounded-xl text-lg p-2 ${buttonType} flex justify-center transition-faster shadow-md`}
+                            style={{ width: `${props.width || 12}rem`, height: `${props.height || 4}rem` }}
                         >
-                        <button className='pointer-events-none'>
-                            {
-                                props.isWorking !== true ?
-                                    (
-                                        <div className='flex gap-2'>
-                                            {
-                                                props.icon &&
-                                                <div className='relative h-5 w-5 self-center'>
-                                                    <Image src={props.icon} alt='' layout='fill' />
-                                                </div>
-                                            }
-                                            {
-                                                props.label &&
-                                                <p className='self-center pointer-events-none'>{props.label}</p>
-                                            }
-                                        </div>
-                                    )
-                                    :
-                                    (
-                                        <div className='animate-spin relative w-5 h-5'>
-                                            <Image src='https://i.imgur.com/oQkKuvH.png' alt='' layout='fill' />
-                                        </div>
-                                    )
-                            }
-                        </button>
-                    </div>
+                            <button className='pointer-events-none'>
+                                {
+                                    props.isWorking !== true ?
+                                        (
+                                            <div className='flex gap-2'>
+                                                {
+                                                    props.icon &&
+                                                    <div className='relative h-5 w-5 self-center'>
+                                                        <Image src={props.icon} alt='' layout='fill' />
+                                                    </div>
+                                                }
+                                                {
+                                                    props.label &&
+                                                    <p className='self-center pointer-events-none'>{props.label}</p>
+                                                }
+                                            </div>
+                                        )
+                                        :
+                                        (
+                                            <Spinner size={1.25} />
+                                        )
+                                }
+                            </button>
+                        </div>
             }
         </div>
 

@@ -19,6 +19,8 @@ import {NotificationType} from "../types/NotificationType";
 import {useMutation} from "react-query";
 import axios from "axios";
 import {setUserData} from "../utils/redux/UserDataSlice";
+import Spinner from "../components/Spinner";
+import {generateDefaultSidebar} from "../utils/GeneralUtils";
 
 type Props = {
     userData: UserData
@@ -71,16 +73,7 @@ const Home: NextPage = (props: Props) => {
               {
                   Object.keys(userData).length ?
                       <div className='flex dark:bg-neutral-800 transition-fast'>
-                          <Sidebar
-                              icon='https://i.imgur.com/HLTQ78m.png'
-                              color='bg-green-600 dark:bg-green-700'
-                              sidebarOpened={sidebarOpened}
-                              toggleSidebar={() => reduxDispatch(toggleSidebarState())}
-                          >
-                              <SidebarItem icon='https://i.imgur.com/wZ8e1Lc.png' label='Inventory' link='inventory' sidebarOpened={sidebarOpened} />
-                              <SidebarItem icon='https://i.imgur.com/nWxboHU.png' label='Employees' link='employees' sidebarOpened={sidebarOpened} />
-                              <SidebarItem icon='https://i.imgur.com/no6wh9w.png' label='Management' link='management' sidebarOpened={sidebarOpened} />
-                          </Sidebar>
+                          {generateDefaultSidebar(sidebarOpened, reduxDispatch)}
                           <div className='pl-8 pt-16'>
                               <div className='flex gap-4 mb-16'>
                                   <div className='relative rounded-full w-32 h-32 self-center border-4 border-green-500'>

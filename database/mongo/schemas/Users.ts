@@ -19,8 +19,7 @@ export const UserJoiSchema = Joi.object({
     last_name: Joi.string().required(),
     email: Joi.string().email(),
     avatar: Joi.string().allow(null),
-    creation_date: Joi.number().required(),
-    permissions: Joi.number().required()
+    creation_date: Joi.number().required()
 });
 
 const UserSchema = new Schema<IUser>({

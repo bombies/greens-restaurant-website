@@ -24,7 +24,7 @@ const SidebarItem = (props: Props) => {
                 }
                 {
                     props.sidebarOpened &&
-                    <p className={`transition-fast text-lg font-medium self-center text-${props.textColor ? `[${props.textColor}]` : 'white'}`}>{props.label}</p>
+                    <p className={`transition-fast text-lg font-medium self-center overflow-hidden overflow-ellipsis text-${props.textColor ? `[${props.textColor}]` : 'white'}`}>{props.label}</p>
                 }
             </div>
         )
@@ -34,7 +34,7 @@ const SidebarItem = (props: Props) => {
         <div className='hover:bg-neutral-800/25 rounded-sm transition-fast hover:cursor-pointer px-6 py-2'>
             {
                 props.link ?
-                    <Link href={props.link} title={props.label}>
+                    <Link href={`/${props.link}`} title={props.label}>
                         {generateElem()}
                     </Link>
                     :

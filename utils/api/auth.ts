@@ -1,5 +1,6 @@
 import {NextApiHandler, NextApiRequest, NextApiResponse} from "next";
 import {verify} from "jsonwebtoken";
+import {UserPermissions} from "../../types/UserPermissions";
 
 export const authenticated = (fn: NextApiHandler, permissionRequired?: number) => async (req: NextApiRequest, res: NextApiResponse) => {
     // @ts-ignore
@@ -9,9 +10,14 @@ export const authenticated = (fn: NextApiHandler, permissionRequired?: number) =
                 // @ts-ignore
                 if ((decoded.permissions & permissionRequired) === permissionRequired)
                     return await fn(req, res);
-                else return res.status(401).json({
-                    error: 'You do not have enough permissions to use this endpoint'
-                });
+                else {
+                    // @ts-ignore
+                    if ((decoded.permissions & UserPermissions.ADMINISTRATOR) === UserPermissions.ADMINISTRATOR)
+                        return await fn(req, res);
+                    return res.status(401).json({
+                        error: 'You do not have enough permissions to use this endpoint'
+                    });
+                }
             }
 
             return await fn(req, res);

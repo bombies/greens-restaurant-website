@@ -13,14 +13,15 @@ const LoginSchema = Joi.object({
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { method, body } = req;
-    await createDBConnection();
 
     switch (method) {
         case "POST": {
             try {
                 const { error } = LoginSchema.validate(body)
                 if (error)
-                    throw new Error(error.details[0].message);
+                    return res.status(400).json({ error: error.details[0].message});
+
+                await createDBConnection();
 
                 const user = await User.findOne({ username: body.username })
                 if (!user)
@@ -42,13 +43,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                             permissions: user.permissions
                         };
                         // @ts-ignore
-                        const jwt = sign(claims, process.env.LOCAL_API_KEY, { expiresIn: '1h' });
+                        const jwt = sign(claims, process.env.LOCAL_API_KEY, { expiresIn: '1w' });
 
                         res.setHeader('Set-Cookie', cookie.serialize('authorization', jwt, {
                             httpOnly: true,
                             secure: false,
                             sameSite: 'strict',
-                            maxAge: 60 * 60,
+                            maxAge: 60 * 60 * 24 * 7,
                             path: '/'
                         }));
 
@@ -67,7 +68,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 });
             } catch (e) {
                 // @ts-ignore
-                return res.status(400).json({ error: e.message || e })
+                return res.status(500).json({ error: e.message || e });
             }
             break;
         }

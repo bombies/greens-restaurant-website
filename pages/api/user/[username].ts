@@ -6,19 +6,24 @@ import {UserPermissions} from "../../../types/UserPermissions";
 const handler = authenticated(async (req, res) => {
     const { method, query } = req;
     const { username } = query;
-    await createDBConnection();
+    try {
+        switch (method) {
+            case "GET": {
+                await createDBConnection();
 
-    switch (method) {
-        case "GET": {
-            const person = await User.findOne({ username: username });
-            if (!person)
-                return res.status(400).json({ error: `There is no one with the username: ${username}`})
-            person.password = undefined;
-            return res.status(200).json({ data: person });
+                const person = await User.findOne({ username: username });
+                if (!person)
+                    return res.status(400).json({ error: `There is no one with the username: ${username}`})
+                person.password = undefined;
+                return res.status(200).json({ data: person });
+            }
+            default: {
+                return res.status(405).json({ error: `You cannot ${method} this route!`});
+            }
         }
-        default: {
-            return res.status(405).json({ error: `You cannot ${method} this route!`});
-        }
+    } catch (e) {
+        // @ts-ignore
+        return res.status(500).json({ error: e.message || e });
     }
 }, UserPermissions.ADMINISTRATOR);
 
