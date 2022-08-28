@@ -30,6 +30,14 @@ type Props = {
     id: string
 }
 
+enum SortMode {
+    NAME_ASC,
+    NAME_DESC,
+    QUANTITY_ASC,
+    QUANTITY_DESC,
+    NONE
+}
+
 // @ts-ignore
 const InventoryCategoryPage: NextPage = (props: Props) => {
     const router = useRouter();
@@ -40,6 +48,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
     const dispatchModal = useContext(ModalContext);
     const dispatchNotification = useContext(NotificationContext);
     const reduxDispatch = useDispatch();
+    const [ sortMode, setSortMode ] = useState(SortMode.NONE);
 
     const placeHolder: InventoryCategoryObject = {
         id: '',
@@ -115,6 +124,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
         })
             .then(data => {
                 setCategoryInfo(data.data);
+                updateSort();
                 sendNotification(
                     dispatchNotification,
                     NotificationType.SUCCESS,
@@ -143,6 +153,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
         })
             .then(data => {
                 setCategoryInfo(data.data);
+                updateSort();
                 sendNotification(
                     dispatchNotification,
                     NotificationType.SUCCESS,
@@ -184,6 +195,42 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
             return;
         }
     }, [categoryInfo]);
+
+    useEffect(() => {
+        if (!categoryInfo)
+            return;
+
+        if (Object.keys(categoryInfo).length === 0)
+            return;
+
+        updateSort();
+
+    }, [sortMode]);
+
+    const updateSort = () => {
+        switch (sortMode) {
+            case SortMode.NAME_ASC: {
+                setCategoryInfo(prev => ({...prev, stock: prev.stock.sort((a, b) => a.name.localeCompare(b.name))}));
+                return;
+            }
+            case SortMode.NAME_DESC: {
+                setCategoryInfo(prev => ({...prev, stock: prev.stock.sort((a, b) => b.name.localeCompare(a.name))}));
+                return;
+            }
+            case SortMode.QUANTITY_ASC: {
+                setCategoryInfo(prev => ({...prev, stock: prev.stock.sort((a, b) => a.quantity - b.quantity)}));
+                return;
+            }
+            case SortMode.QUANTITY_DESC: {
+                setCategoryInfo(prev => ({...prev, stock: prev.stock.sort((a, b) => b.quantity - a.quantity)}));
+                return;
+            }
+            case SortMode.NONE: {
+                getAndSetCategoryInfo.mutate();
+                return;
+            }
+        }
+    }
 
     const generateTableRows = () => {
         return categoryInfo.stock.map(item => (
@@ -279,7 +326,14 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                                                         'The count must be a positive integer!'
                                                     );
 
-                                                decreaseStock.mutate({ stockId: item.uid, count: Number(values.count) })
+                                                if (count > item.quantity)
+                                                    return sendNotification(
+                                                        dispatchNotification,
+                                                        NotificationType.ERROR,
+                                                        'You cannot remove more stocks than available!'
+                                                    )
+
+                                                decreaseStock.mutate({ stockId: item.uid, count: count })
                                                 removeModal(dispatchModal, modalID);
                                             }}
                                             render={({ handleSubmit, pristine }) => (
@@ -378,8 +432,32 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                                     <Table>
                                         <thead>
                                         <TableRow isHeading={true}>
-                                            <TableHeader className='border-opacity-100 text-center p-6 justify-center bg-green-300 dark:bg-green-500' title='Item' />
-                                            <TableHeader className='border-opacity-100 text-center p-6 justify-center bg-green-300 dark:bg-green-500' title='Quantity' />
+                                            <TableHeader
+                                                className='border-opacity-100 text-center p-6 justify-center bg-green-300 dark:bg-green-500'
+                                                title='Item'
+                                                onClick={() => {
+                                                    if (sortMode === SortMode.NAME_DESC)
+                                                        setSortMode(SortMode.NONE)
+                                                    else if (sortMode === SortMode.NAME_ASC)
+                                                        setSortMode(SortMode.NAME_DESC)
+                                                    else
+                                                        setSortMode(SortMode.NAME_ASC)
+                                                }}
+                                                sortMode={sortMode === SortMode.NAME_ASC ? '1' : sortMode === SortMode.NAME_DESC ? '2' : '0'}
+                                            />
+                                            <TableHeader
+                                                className='border-opacity-100 text-center p-6 justify-center bg-green-300 dark:bg-green-500'
+                                                title='Quantity'
+                                                onClick={() => {
+                                                    if (sortMode === SortMode.QUANTITY_DESC)
+                                                        setSortMode(SortMode.NONE)
+                                                    else if (sortMode === SortMode.QUANTITY_ASC)
+                                                        setSortMode(SortMode.QUANTITY_DESC)
+                                                    else
+                                                        setSortMode(SortMode.QUANTITY_ASC)
+                                                }}
+                                                sortMode={sortMode === SortMode.QUANTITY_ASC ? '1' : sortMode === SortMode.QUANTITY_DESC ? '2' : '0'}
+                                            />
                                             <TableHeader className='border-opacity-100 text-center p-6 justify-center bg-green-300 dark:bg-green-500' title='Action' />
                                         </TableRow>
                                         </thead>

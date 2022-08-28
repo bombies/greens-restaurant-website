@@ -6,7 +6,7 @@ interface Props extends React.PropsWithChildren {
 
 const TableDataCell = (props: Props) => {
     return (
-        <td className={`border-[1px] border-solid border-opacity-100 p-3 dark:text-white ${props.className || ''}`}>
+        <td className={`border-[1px] border-solid border-opacity-100 dark:border-neutral-700 p-3 dark:text-white ${props.className || ''}`}>
             {
                 props.children
             }
