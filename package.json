@@ -19,6 +19,7 @@
     "final-form": "^4.20.7",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
+    "loader-utils": "^3.2.0",
     "mongoose": "^6.5.2",
     "next": "12.2.5",
     "nextjs-progressbar": "^0.0.14",

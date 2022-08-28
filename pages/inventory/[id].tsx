@@ -242,6 +242,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                         <Button
                             type={ButtonType.PRIMARY}
                             label='Add Stock'
+                            icon='https://i.imgur.com/tUc41Dg.png'
                             width={11} height={3}
                             onClick={() => {
                                 const modalID = v4();
@@ -297,6 +298,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                         />
                         <Button
                             type={ButtonType.DANGER}
+                            icon='https://i.imgur.com/W7O8G76.png'
                             label='Remove Stock'
                             width={11} height={3}
                             onClick={() => {
@@ -360,8 +362,8 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                         />
                         <Button
                             type={ButtonType.DANGER_SECONDARY}
-                            label='Delete Item'
-                            width={11} height={3}
+                            icon='https://i.imgur.com/wvi6Bge.png'
+                            width={4} height={3}
                             onClick={() => removeItem.mutate(item.uid)}
                         />
                     </div>
@@ -381,6 +383,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                         <div className='w-3/4 border-[1px] border-green-400 border-opacity-20 rounded-xl shadow-md p-6 mb-12 flex'>
                             <Button
                                 type={ButtonType.SECONDARY}
+                                icon='https://i.imgur.com/51nLXl9.png'
                                 label='Add an item'
                                 onClick={() => {
                                     const modalID = v4();
