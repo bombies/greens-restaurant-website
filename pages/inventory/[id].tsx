@@ -30,6 +30,7 @@ import Table from "../../components/table/Table";
 import TableRow from "../../components/table/TableRow";
 import TableHeader from "../../components/table/TableHeader";
 import TableDataCell from "../../components/table/TableDataCell";
+import DashboardSection from "../../components/dashboard/DashboardSection";
 
 type Props = {
     id: string;
@@ -455,7 +456,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
         >
             {categoryInfo && (
                 <div>
-                    <div className="w-3/4 border-[1px] border-green-400 border-opacity-20 rounded-xl shadow-md p-6 mb-12 flex">
+                    <DashboardSection>
                         <Button
                             type={ButtonType.SECONDARY}
                             icon="https://i.imgur.com/51nLXl9.png"
@@ -528,8 +529,8 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                                     );
                             }}
                         />
-                    </div>
-                    <div className="w-3/4 border-[1px] border-green-400 border-opacity-20 rounded-xl shadow-md p-6">
+                    </DashboardSection>
+                    <DashboardSection>
                         {categoryInfo.stock.length > 0 ? (
                             <Table>
                                 <thead>
@@ -608,7 +609,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                                 There&apos;s nothing here yet...
                             </p>
                         )}
-                    </div>
+                    </DashboardSection>
                 </div>
             )}
         </Layout>

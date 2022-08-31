@@ -5,8 +5,6 @@ import type {
 } from "next";
 import { useContext, useEffect, useState } from "react";
 import { UserData } from "../types/UserData";
-import Sidebar from "../components/sidebar/Sidebar";
-import SidebarItem from "../components/sidebar/SidebarItem";
 import Image from "next/image";
 import Layout from "../components/Layout";
 import CheckBox from "../components/Checkbox";
@@ -14,7 +12,6 @@ import Button from "../components/Button";
 import { ButtonType } from "../types/ButtonType";
 import { NotificationContext } from "../components/notifications/NotificationProvider";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleSidebarState } from "../utils/redux/SidebarSlice";
 import { verify } from "jsonwebtoken";
 import { Field, Form } from "react-final-form";
 import { GenerateNotificationAddAction } from "../components/notifications/NotificationTypes";
@@ -23,8 +20,8 @@ import { NotificationType } from "../types/NotificationType";
 import { useMutation } from "react-query";
 import axios from "axios";
 import { setUserData } from "../utils/redux/UserDataSlice";
-import Spinner from "../components/Spinner";
-import { generateDefaultSidebar } from "../utils/GeneralUtils";
+import { handleAxiosError } from "../utils/GeneralUtils";
+import LowStockWidget from "../components/widgets/LowStockWidget";
 
 type Props = {
     userData: UserData;
@@ -36,10 +33,6 @@ const Home: NextPage = (props: Props) => {
     // @ts-ignore
     const userData = useSelector((state) => state.userData.value);
     const reduxDispatch = useDispatch();
-
-    useEffect(() => {
-        reduxDispatch(setUserData(props.userData));
-    }, []);
 
     const notificationDispatch = useContext(NotificationContext);
 
@@ -76,12 +69,25 @@ const Home: NextPage = (props: Props) => {
         }
     );
 
+    const [lowStockData, setLowStockData] = useState(undefined);
+    const getLowStock = useMutation(() => {
+        return axios
+            .get("/api/inventory/lowstock")
+            .then((data) => setLowStockData(data.data))
+            .catch((e) => handleAxiosError(notificationDispatch, e));
+    });
+
+    useEffect(() => {
+        reduxDispatch(setUserData(props.userData));
+        getLowStock.mutate();
+    }, []);
+
     return (
         <Layout showSidebar={Object.keys(userData).length !== 0}>
             <main
                 className={`${
                     Object.keys(userData).length ? "" : "bg-blurred"
-                } h-screen`}
+                } h-full`}
             >
                 {Object.keys(userData).length ? (
                     <div>
@@ -104,10 +110,11 @@ const Home: NextPage = (props: Props) => {
                                 </span>
                             </h1>
                         </div>
-                        <div>
-                            <h2 className="text-4xl font-bold text-neutral-700 dark:text-green-400">
+                        <div className="h-3/4 overflow-hidden">
+                            <h2 className="text-4xl font-bold text-neutral-700 dark:text-green-400 mb-12">
                                 Overview
                             </h2>
+                            <LowStockWidget stockInfo={lowStockData} />
                         </div>
                     </div>
                 ) : (

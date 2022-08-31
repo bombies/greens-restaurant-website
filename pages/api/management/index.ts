@@ -20,7 +20,9 @@ const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) 
 
                 if (!config)
                     config = await Config.create(generateDefaultConfig());
-                return res.status(200).json(config);
+                // @ts-ignore
+                const { _id: undefined, __v: _, ...result } = config._doc;
+                return res.status(200).json(result);
             }
             case "PATCH": {
                 const { error } = PatchBody.validate(body)
@@ -36,7 +38,9 @@ const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) 
                 if (body.stockWarningMinimum)
                     config.stockWarningMinimum = body.stockWarningMinimum;
                 const newDoc = await config.save();
-                return res.status(200).json(newDoc);
+                // @ts-ignore
+                const { _id: undefined, __v: _, ...result } = newDoc._doc;
+                return res.status(200).json(result);
             }
             default: {
                 return res.status(405).json({ error: `You cannot ${method} this route!`});
@@ -49,7 +53,7 @@ const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) 
 
 }, UserPermissions.ADMINISTRATOR);
 
-const generateDefaultConfig = (): IConfig => {
+export const generateDefaultConfig = (): IConfig => {
     return {
         stockWarningMinimum: 10
     }

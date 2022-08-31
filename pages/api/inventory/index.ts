@@ -1,10 +1,9 @@
-import {NextApiRequest, NextApiResponse} from "next";
 import createDBConnection from "../../../database/mongo/db";
 import {StockCategory, StockCategoryJoiSchema} from "../../../database/mongo/schemas/StockCategories";
 import {authenticated} from "../../../utils/api/auth";
 import {UserPermissions} from "../../../types/UserPermissions";
 
-const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = authenticated(async (req, res) => {
     const { method, body } = req;
 
     try {

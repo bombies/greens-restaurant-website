@@ -1,6 +1,4 @@
 import { NextPage } from "next";
-import SidebarItem from "../../components/sidebar/SidebarItem";
-import Sidebar from "../../components/sidebar/Sidebar";
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Button from "../../components/Button";
@@ -22,9 +20,8 @@ import Layout from "../../components/Layout";
 import { useMutation } from "react-query";
 import axios from "axios";
 import Image from "next/image";
-import {
-    handleAxiosError,
-} from "../../utils/GeneralUtils";
+import { handleAxiosError } from "../../utils/GeneralUtils";
+import DashboardSection from "../../components/dashboard/DashboardSection";
 
 // @ts-ignore
 const Index: NextPage = () => {
@@ -139,8 +136,8 @@ const Index: NextPage = () => {
                     <h3 className="text-4xl text-neutral-700 dark:text-green-400 font-bold self-center pointer-events-none mb-4">
                         Categories
                     </h3>
-                    <div className="w-3/4 h-full">
-                        <div className="w-full mb-6 border-[1px] border-green-400 border-opacity-20 h-32 rounded-xl shadow-md flex gap-4 items-center px-4">
+                    <DashboardSection>
+                        <div className="flex gap-4">
                             <Button
                                 onClick={() => {
                                     if (!dispatchModal) return;
@@ -235,30 +232,30 @@ const Index: NextPage = () => {
                                 }
                             />
                         </div>
-                        <div className="w-full border-[1px] border-green-400 border-opacity-20 rounded-xl shadow-md p-6">
-                            {getAndSetCategories.isLoading ? (
-                                <div className="m-12">
-                                    <div className="mx-auto animate-spin relative w-24 h-24 brightness-50 opacity-20">
-                                        <Image
-                                            src="https://i.imgur.com/oQkKuvH.png"
-                                            alt=""
-                                            layout="fill"
-                                        />
-                                    </div>
+                    </DashboardSection>
+                    <DashboardSection>
+                        {getAndSetCategories.isLoading ? (
+                            <div className="m-12">
+                                <div className="mx-auto animate-spin relative w-24 h-24 brightness-50 opacity-20">
+                                    <Image
+                                        src="https://i.imgur.com/oQkKuvH.png"
+                                        alt=""
+                                        layout="fill"
+                                    />
                                 </div>
-                            ) : categories.length !== 0 ? (
-                                <div className="grid grid-cols-4 gap-y-5 gap-x-5">
-                                    {generateCategories()}
-                                </div>
-                            ) : (
-                                <div>
-                                    <p className="text-center text-4xl text-neutral-300 dark:text-neutral-700 m-12 pointer-events-none">
-                                        There&apos;s nothing here yet...
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                            </div>
+                        ) : categories.length !== 0 ? (
+                            <div className="grid grid-cols-4 gap-y-5 gap-x-5">
+                                {generateCategories()}
+                            </div>
+                        ) : (
+                            <div>
+                                <p className="text-center text-4xl text-neutral-300 dark:text-neutral-700 m-12 pointer-events-none">
+                                    There&apos;s nothing here yet...
+                                </p>
+                            </div>
+                        )}
+                    </DashboardSection>
                 </div>
             </div>
         </Layout>
