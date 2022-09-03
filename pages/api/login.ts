@@ -5,6 +5,7 @@ import Joi from "joi";
 import {sign} from "jsonwebtoken";
 import cookie from "cookie";
 import {User} from "../../database/mongo/schemas/Users";
+import { handleInvalidHTTPMethod } from "../../utils/GeneralUtils";
 
 const LoginSchema = Joi.object({
     username: Joi.string().required(),
@@ -73,7 +74,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             break;
         }
         default: {
-            return res.status(405).json({ error: `You cannot ${method} this route!`});
+            return handleInvalidHTTPMethod(res, method);
         }
     }
 }

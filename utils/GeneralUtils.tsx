@@ -11,6 +11,7 @@ import {
     GenerateGenericModalRemoveAction,
     GenericModalAddAction, GenericModalRemoveAction
 } from "../components/modals/ModalTypes";
+import { NextApiResponse } from "next";
 
 export const handleAxiosError = (dispatchNotification: Dispatch<NotificationAddAction> | null, err: any) => {
     const errMsg = err.response.data.error;
@@ -127,4 +128,8 @@ export const arrayCompare = (arr1: any[], arr2: any[]) => {
         }
     }
     return true;
+}
+
+export const handleInvalidHTTPMethod = (res: NextApiResponse, method?: string) => {
+    return res.status(405).json({ error: `You cannot ${method} this route!` });
 }

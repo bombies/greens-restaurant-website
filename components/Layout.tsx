@@ -35,7 +35,7 @@ const Layout = (props: Props) => {
                         props.showSidebar
                     )
                 ) : handleAuth ? (
-                    <div></div>
+                    <div className="h-full"></div>
                 ) : (
                     generateLayout(
                         props.children,
@@ -58,10 +58,10 @@ const generateLayout = (
     showSidebar?: boolean
 ) => {
     return (
-        <div className="flex dark:bg-neutral-800 transition-fast">
+        <div className="flex dark:bg-neutral-800 transition-fast sticky w-full">
             {(showSidebar === true || showSidebar === undefined) && generateDefaultSidebar(sidebarOpened, reduxDispatch)}
-            <div className={`${(showSidebar === true || showSidebar === undefined) ? "pl-8 pt-16 " : ""}w-full`}>
-                <div>
+            <div className={`${(showSidebar === true || showSidebar === undefined) ? "pl-8 pt-16 " : ""}w-full h-full`}>
+                <div className="h-full">
                     {pageTitle && (
                         <h1 className="text-7xl font-bold self-center pointer-events-none mb-12 dark:text-white">
                             {pageTitle}

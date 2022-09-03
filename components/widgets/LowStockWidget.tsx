@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { StockItem } from "../../types/InventoryCategoryObject";
 import GenericWidget from "./GenericWidget";
 
@@ -7,22 +8,32 @@ type Props = {
 
 const LowStockWidget = (props: Props) => {
     const generateClickabes = () => {
-        return props.stockInfo?.map(obj => {
-            const items = obj.stock.map(e => <div><p>{`${e.name} (${e.quantity} in stock)`}</p></div>);
+        return props.stockInfo?.map((obj) => {
+            const items = obj.stock.map((e) => (
+                <div>
+                    <p>{`${e.name} (${e.quantity} in stock)`}</p>
+                </div>
+            ));
 
             return (
-                <div className="mr-4">
-                    <div className="bg-green-400 dark:bg-green-500 py-1 px-3 rounded-t-md ">
-                        <p className="text-white text-lg tracking-wider">{obj.name}</p>
-                    </div>
-                    <div className="bg-green-100 dark:bg-green-200 py-1 px-3">
-                        {items}
-                    </div>
-                    <hr className='my-2 transition-medium dark:opacity-10' />
+                <div className="cursor-pointer">
+                    <Link href={`/inventory/${obj.id}`}>
+                        <div className="mr-4">
+                            <div className="bg-green-400 dark:bg-green-500 py-1 px-3 rounded-t-md">
+                                <p className="text-white text-lg tracking-wider">
+                                    {obj.name}
+                                </p>
+                            </div>
+                            <div className="bg-green-100 dark:bg-green-200 py-1 px-3">
+                                {items}
+                            </div>
+                            <hr className="my-2 transition-medium dark:opacity-10" />
+                        </div>
+                    </Link>
                 </div>
-            )
-        })
-    }
+            );
+        });
+    };
 
     return (
         <GenericWidget title="Low Stock">

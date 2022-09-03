@@ -1,6 +1,7 @@
 import {authenticated} from "../../utils/api/auth";
 import cookie from "cookie";
 import {NextApiRequest, NextApiResponse} from "next";
+import { handleInvalidHTTPMethod } from "../../utils/GeneralUtils";
 
 const handler = authenticated((req: NextApiRequest, res: NextApiResponse) => {
     const { method } = req;
@@ -17,7 +18,7 @@ const handler = authenticated((req: NextApiRequest, res: NextApiResponse) => {
             return res.status(200).json({ message: 'Logged out'});
         }
         default: {
-            return res.status(405).json({ error: `You cannot ${method} this route!`});
+            return handleInvalidHTTPMethod(res, method);
         }
     }
 });

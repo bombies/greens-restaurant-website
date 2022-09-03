@@ -2,6 +2,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 import createDBConnection from "../../database/mongo/db";
 import {hash} from "bcrypt";
 import {User, UserJoiSchema} from "../../database/mongo/schemas/Users";
+import { handleInvalidHTTPMethod } from "../../utils/GeneralUtils";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { method, body } = req;
@@ -26,7 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             break;
         }
         default: {
-            return res.status(405).json({ error: `You cannot ${method} this route!`});
+            return handleInvalidHTTPMethod(res, method);
         }
     }
 }

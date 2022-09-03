@@ -3,9 +3,9 @@ import sidebarReducer from "./SidebarSlice";
 import darkModeReducer from "./DarkModeSlice";
 import userDataSliceReducer from "./UserDataSlice";
 // @ts-ignore
-import storage from "redux-persist/lib/storage";
 import {persistReducer, persistStore} from "redux-persist";
 import thunk from "redux-thunk";
+import storage from "./NoopStorage";
 
 const persistConfig = {
     key: 'root',

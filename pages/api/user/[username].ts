@@ -2,6 +2,7 @@ import {authenticated} from "../../../utils/api/auth";
 import createDBConnection from "../../../database/mongo/db";
 import {User} from "../../../database/mongo/schemas/Users";
 import {UserPermissions} from "../../../types/UserPermissions";
+import { handleInvalidHTTPMethod } from "../../../utils/GeneralUtils";
 
 const handler = authenticated(async (req, res) => {
     const { method, query } = req;
@@ -18,7 +19,7 @@ const handler = authenticated(async (req, res) => {
                 return res.status(200).json({ data: person });
             }
             default: {
-                return res.status(405).json({ error: `You cannot ${method} this route!`});
+                return handleInvalidHTTPMethod(res, method);
             }
         }
     } catch (e) {

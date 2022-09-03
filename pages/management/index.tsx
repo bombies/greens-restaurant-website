@@ -13,7 +13,7 @@ import { NotificationType } from "../../types/NotificationType";
 import TextBox from "../../components/TextBox";
 import DashboardRow from "../../components/dashboard/DashboardRow";
 import DashboardSection from "../../components/dashboard/DashboardSection";
-import Button from "../../components/Button";
+import Button from "../../components/button/Button";
 import { ButtonType } from "../../types/ButtonType";
 
 const Management: NextPage = () => {

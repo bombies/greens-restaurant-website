@@ -4,6 +4,7 @@ import createDBConnection from "../../../database/mongo/db";
 import {StockCategory} from "../../../database/mongo/schemas/StockCategories";
 import {authenticated} from "../../../utils/api/auth";
 import {UserPermissions} from "../../../types/UserPermissions";
+import { handleInvalidHTTPMethod } from "../../../utils/GeneralUtils";
 
 const PatchSchema = Joi.object({
     name: Joi.string(),
@@ -58,7 +59,7 @@ const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) 
                 return res.status(200).json({ message: `You have deleted the "${fetchedDoc.name}" category!`});
             }
             default: {
-                return res.status(405).json({ error: `You cannot ${method} this route!`});
+                return handleInvalidHTTPMethod(res, method);
             }
         }
     } catch (e) {

@@ -1,14 +1,14 @@
-import { authenticated } from "../../../utils/api/auth";
-import { UserPermissions } from "../../../types/UserPermissions";
-import createDBConnection from "../../../database/mongo/db";
-import axios from "axios";
+import { authenticated } from "../../../../utils/api/auth";
+import { UserPermissions } from "../../../../types/UserPermissions";
+import createDBConnection from "../../../../database/mongo/db";
 import {
     IStockCategory,
     StockCategory,
-} from "../../../database/mongo/schemas/StockCategories";
-import { StockItem } from "../../../types/InventoryCategoryObject";
-import { Config } from "../../../database/mongo/schemas/Config";
-import { generateDefaultConfig } from "../management";
+} from "../../../../database/mongo/schemas/StockCategories";
+import { StockItem } from "../../../../types/InventoryCategoryObject";
+import { Config } from "../../../../database/mongo/schemas/Config";
+import { generateDefaultConfig } from "../../management";
+import { handleInvalidHTTPMethod } from "../../../../utils/GeneralUtils";
 
 const handler = authenticated(async (req, res) => {
     const { method } = req;
@@ -40,9 +40,7 @@ const handler = authenticated(async (req, res) => {
                 return res.status(200).json(result);
             }
             default: {
-                return res
-                    .status(405)
-                    .json({ error: `You cannot ${method} this route!` });
+                return handleInvalidHTTPMethod(res, method);
             }
         }
     } catch (e) {

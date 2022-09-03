@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Button from "../../components/Button";
+import Button from "../../components/button/Button";
 import { ButtonType } from "../../types/ButtonType";
 import { NotificationContext } from "../../components/notifications/NotificationProvider";
 import { InventoryCategoryObject } from "../../types/InventoryCategoryObject";
@@ -19,9 +19,9 @@ import { NotificationType } from "../../types/NotificationType";
 import Layout from "../../components/Layout";
 import { useMutation } from "react-query";
 import axios from "axios";
-import Image from "next/image";
 import { handleAxiosError } from "../../utils/GeneralUtils";
 import DashboardSection from "../../components/dashboard/DashboardSection";
+import Spinner from "../../components/Spinner";
 
 // @ts-ignore
 const Index: NextPage = () => {
@@ -235,15 +235,7 @@ const Index: NextPage = () => {
                     </DashboardSection>
                     <DashboardSection>
                         {getAndSetCategories.isLoading ? (
-                            <div className="m-12">
-                                <div className="mx-auto animate-spin relative w-24 h-24 brightness-50 opacity-20">
-                                    <Image
-                                        src="https://i.imgur.com/oQkKuvH.png"
-                                        alt=""
-                                        layout="fill"
-                                    />
-                                </div>
-                            </div>
+                            <Spinner size={3} />
                         ) : categories.length !== 0 ? (
                             <div className="grid grid-cols-4 gap-y-5 gap-x-5">
                                 {generateCategories()}

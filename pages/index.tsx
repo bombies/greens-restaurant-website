@@ -8,7 +8,7 @@ import { UserData } from "../types/UserData";
 import Image from "next/image";
 import Layout from "../components/Layout";
 import CheckBox from "../components/Checkbox";
-import Button from "../components/Button";
+import Button from "../components/button/Button";
 import { ButtonType } from "../types/ButtonType";
 import { NotificationContext } from "../components/notifications/NotificationProvider";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +20,7 @@ import { NotificationType } from "../types/NotificationType";
 import { useMutation } from "react-query";
 import axios from "axios";
 import { setUserData } from "../utils/redux/UserDataSlice";
-import { handleAxiosError } from "../utils/GeneralUtils";
+import { handleAxiosError, sendNotification } from "../utils/GeneralUtils";
 import LowStockWidget from "../components/widgets/LowStockWidget";
 
 type Props = {
@@ -42,6 +42,7 @@ const Home: NextPage = (props: Props) => {
                 .post("/api/login", loginObject)
                 .then((data) => {
                     reduxDispatch(setUserData(data.data.data));
+                    getLowStock.mutate();
 
                     if (notificationDispatch) {
                         notificationDispatch(
@@ -73,18 +74,26 @@ const Home: NextPage = (props: Props) => {
     const getLowStock = useMutation(() => {
         return axios
             .get("/api/inventory/lowstock")
-            .then((data) => setLowStockData(data.data))
+            .then((data) => {
+                setLowStockData(data.data);
+                if (data.data.length > 0)
+                    sendNotification(
+                        notificationDispatch,
+                        NotificationType.WARNING,
+                        "There are low stock!"
+                    );
+            })
             .catch((e) => handleAxiosError(notificationDispatch, e));
     });
 
     useEffect(() => {
         reduxDispatch(setUserData(props.userData));
-        getLowStock.mutate();
+        if (Object.keys(props.userData).length !== 0) getLowStock.mutate();
     }, []);
 
     return (
         <Layout showSidebar={Object.keys(userData).length !== 0}>
-            <main
+            <div
                 className={`${
                     Object.keys(userData).length ? "" : "bg-blurred"
                 } h-full`}
@@ -114,11 +123,16 @@ const Home: NextPage = (props: Props) => {
                             <h2 className="text-4xl font-bold text-neutral-700 dark:text-green-400 mb-12">
                                 Overview
                             </h2>
-                            <LowStockWidget stockInfo={lowStockData} />
+                            <div className="grid grid-cols-2 gap-y-8">
+                                <LowStockWidget stockInfo={lowStockData} />
+                                <LowStockWidget stockInfo={lowStockData} />
+                                <LowStockWidget stockInfo={lowStockData} />
+                                <LowStockWidget stockInfo={lowStockData} />
+                            </div>
                         </div>
                     </div>
                 ) : (
-                    <div>
+                    <div className="">
                         <div className="relative w-80 h-80 mx-auto">
                             <Image
                                 src="https://i.imgur.com/HLTQ78m.png"
@@ -216,7 +230,7 @@ const Home: NextPage = (props: Props) => {
                         </div>
                     </div>
                 )}
-            </main>
+            </div>
         </Layout>
     );
 };

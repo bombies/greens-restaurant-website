@@ -7,7 +7,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Layout from "../../components/Layout";
 import {
     handleAxiosError,
@@ -15,7 +15,7 @@ import {
     sendModal,
     sendNotification,
 } from "../../utils/GeneralUtils";
-import Button from "../../components/Button";
+import Button from "../../components/button/Button";
 import { ButtonType } from "../../types/ButtonType";
 import { ModalContext } from "../../components/modals/ModalProvider";
 import {
@@ -31,6 +31,10 @@ import TableRow from "../../components/table/TableRow";
 import TableHeader from "../../components/table/TableHeader";
 import TableDataCell from "../../components/table/TableDataCell";
 import DashboardSection from "../../components/dashboard/DashboardSection";
+import Image from "next/image";
+import { Tooltip } from "flowbite-react";
+import ButtonDropDownItem from "../../components/button/ButtonDropDownItem";
+import Link from "next/link";
 
 type Props = {
     id: string;
@@ -49,6 +53,8 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
     const router = useRouter();
     // @ts-ignore
     const userData = useSelector((state) => state.userData.value);
+    // @ts-ignore
+    const darkMode = useSelector((state) => state.darkMode.value);
     const dispatchModal = useContext(ModalContext);
     const dispatchNotification = useContext(NotificationContext);
     const [sortMode, setSortMode] = useState(SortMode.NONE);
@@ -61,6 +67,11 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
     };
     const [categoryInfo, setCategoryInfo] = useState(placeHolder);
 
+    const placeHolder2:
+        | { id: string; name: string; stock: StockItem[] }
+        | undefined = undefined;
+    const [lowStock, setLowStock] = useState(placeHolder2);
+
     const getAndSetCategoryInfo = useMutation(() => {
         return axios
             .get(`/api/inventory/${props.id}`)
@@ -70,6 +81,21 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                 return setCategoryInfo(null);
             });
     });
+
+    const getAndSetLowStock = useMutation(() => {
+        return axios
+            .get(`/api/inventory/lowstock/${props.id}`)
+            .then((data) =>
+                setLowStock(data.data.stock.length !== 0 ? data.data : null)
+            )
+            .catch((e) => handleAxiosError(dispatchNotification, e));
+    });
+
+    const itemIsLowStock = (item: StockItem): boolean => {
+        if (!lowStock) return false;
+        // @ts-ignore
+        return lowStock.stock.some((e: StockItem) => e.uid === item.uid);
+    };
 
     const addItem = useMutation((item: StockItem) => {
         return axios
@@ -83,6 +109,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                     NotificationType.SUCCESS,
                     `You have successfully added ${item.name} as a new item!`
                 );
+                getAndSetLowStock.mutate();
             })
             .catch((e) => handleAxiosError(dispatchNotification, e));
     });
@@ -111,6 +138,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                     NotificationType.SUCCESS,
                     `You have successfully removed ${item[0].name} as an item!`
                 );
+                getAndSetLowStock.mutate();
             });
     });
 
@@ -146,8 +174,11 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                     sendNotification(
                         dispatchNotification,
                         NotificationType.SUCCESS,
-                        `You have successfully added ${stockObj.count} stocks to ${item[0].name}`
+                        `You have successfully added ${stockObj.count} stock${
+                            stockObj.count > 1 ? "s" : ""
+                        } to ${item[0].name}`
                     );
+                    getAndSetLowStock.mutate();
                 })
                 .catch((e) => handleAxiosError(dispatchNotification, e));
         }
@@ -185,8 +216,11 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                     sendNotification(
                         dispatchNotification,
                         NotificationType.SUCCESS,
-                        `You have successfully removed ${stockObj.count} stocks from ${item[0].name}`
+                        `You have successfully removed ${stockObj.count} stock${
+                            stockObj.count > 1 ? "s" : ""
+                        } from ${item[0].name}`
                     );
+                    getAndSetLowStock.mutate();
                 })
                 .catch((e) => handleAxiosError(dispatchNotification, e));
         }
@@ -204,6 +238,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
         }
 
         getAndSetCategoryInfo.mutate();
+        getAndSetLowStock.mutate();
     }, []);
 
     useEffect(() => {
@@ -276,168 +311,236 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
 
     const generateTableRows = () => {
         return categoryInfo.stock.map((item) => (
-            <TableRow key={item.uid}>
-                <TableDataCell>{item.name}</TableDataCell>
+            <TableRow key={item.uid} id={item.uid}>
+                <TableDataCell>
+                    <div className="flex gap-4">
+                        {itemIsLowStock(item) && (
+                            <Tooltip
+                                content="Low stock"
+                                style={darkMode ? "dark" : "light"}
+                            >
+                                <div className="relative w-4 h-4 self-center">
+                                    <Image
+                                        src="https://i.imgur.com/gGwEe5j.png"
+                                        alt=""
+                                        layout="fill"
+                                    />
+                                </div>
+                            </Tooltip>
+                        )}{" "}
+                        {item.name}
+                    </div>
+                </TableDataCell>
                 <TableDataCell>{item.quantity}</TableDataCell>
                 <TableDataCell>
                     <div className="flex gap-4 justify-center">
                         <Button
                             type={ButtonType.PRIMARY}
-                            label="Add Stock"
-                            icon="https://i.imgur.com/tUc41Dg.png"
-                            width={11}
-                            height={3}
+                            label="+1"
                             onClick={() => {
-                                const modalID = v4();
-                                sendModal(
-                                    dispatchModal,
-                                    modalID,
-                                    "Add Stock",
-                                    `How many stocks would you like to add to ${item.name}?`,
-                                    <div>
-                                        <Form
-                                            onSubmit={(values) => {
-                                                let count = values.count;
-                                                if (isNaN(count))
-                                                    return sendNotification(
-                                                        dispatchNotification,
-                                                        NotificationType.ERROR,
-                                                        "The count must be an integer!"
-                                                    );
-
-                                                count = Number(values.count);
-                                                if (count <= 0)
-                                                    return sendNotification(
-                                                        dispatchNotification,
-                                                        NotificationType.ERROR,
-                                                        "The count must be a positive integer!"
-                                                    );
-
-                                                increaseStock.mutate({
-                                                    stockId: item.uid,
-                                                    count: Number(values.count),
-                                                });
-                                                removeModal(
-                                                    dispatchModal,
-                                                    modalID
-                                                );
-                                            }}
-                                            render={({
-                                                handleSubmit,
-                                                pristine,
-                                            }) => (
-                                                <form onSubmit={handleSubmit}>
-                                                    <div className="flex flex-col justify-center items-center gap-4">
-                                                        <Field
-                                                            name="count"
-                                                            component="input"
-                                                            type="text"
-                                                            placeholder="Stock count..."
-                                                        />
-                                                        <Button
-                                                            type={
-                                                                ButtonType.PRIMARY
-                                                            }
-                                                            submitButton={true}
-                                                            isDisabled={
-                                                                pristine
-                                                            }
-                                                        />
-                                                    </div>
-                                                </form>
-                                            )}
-                                        />
-                                    </div>
-                                );
+                                increaseStock.mutate({
+                                    stockId: item.uid,
+                                    count: 1,
+                                });
                             }}
+                            width={4}
+                            height={3}
                         />
                         <Button
                             type={ButtonType.DANGER}
-                            icon="https://i.imgur.com/W7O8G76.png"
-                            label="Remove Stock"
-                            width={11}
-                            height={3}
+                            label="-1"
                             onClick={() => {
-                                const modalID = v4();
-                                sendModal(
-                                    dispatchModal,
-                                    modalID,
-                                    "Remove Stock",
-                                    `How many stocks would you like to remove from ${item.name}?`,
-                                    <div>
-                                        <Form
-                                            onSubmit={(values) => {
-                                                let count = values.count;
-                                                if (isNaN(count))
-                                                    return sendNotification(
-                                                        dispatchNotification,
-                                                        NotificationType.ERROR,
-                                                        "The count must be an integer!"
-                                                    );
-
-                                                count = Number(values.count);
-                                                if (count <= 0)
-                                                    return sendNotification(
-                                                        dispatchNotification,
-                                                        NotificationType.ERROR,
-                                                        "The count must be a positive integer!"
-                                                    );
-
-                                                if (count > item.quantity)
-                                                    return sendNotification(
-                                                        dispatchNotification,
-                                                        NotificationType.ERROR,
-                                                        "You cannot remove more stocks than available!"
-                                                    );
-
-                                                decreaseStock.mutate({
-                                                    stockId: item.uid,
-                                                    count: count,
-                                                });
-                                                removeModal(
-                                                    dispatchModal,
-                                                    modalID
-                                                );
-                                            }}
-                                            render={({
-                                                handleSubmit,
-                                                pristine,
-                                            }) => (
-                                                <form onSubmit={handleSubmit}>
-                                                    <div className="flex flex-col justify-center items-center gap-4">
-                                                        <Field
-                                                            name="count"
-                                                            component="input"
-                                                            type="text"
-                                                            placeholder="Stock count..."
-                                                        />
-                                                        <Button
-                                                            type={
-                                                                ButtonType.PRIMARY
-                                                            }
-                                                            submitButton={true}
-                                                            isDisabled={
-                                                                pristine
-                                                            }
-                                                        />
-                                                    </div>
-                                                </form>
-                                            )}
-                                        />
-                                    </div>
-                                );
+                                decreaseStock.mutate({
+                                    stockId: item.uid,
+                                    count: 1,
+                                });
                             }}
-                        />
-                        <Button
-                            type={ButtonType.DANGER_SECONDARY}
-                            icon="https://i.imgur.com/wvi6Bge.png"
                             width={4}
                             height={3}
-                            onClick={() => removeItem.mutate(item.uid)}
                         />
+                        <Button
+                            type={ButtonType.SECONDARY}
+                            icon='https://i.imgur.com/YpjxUaa.png'
+                            height={3}
+                            width={4}
+                        >
+                            <ButtonDropDownItem
+                                label="Add Multiple Stocks"
+                                onClick={() => {
+                                    const modalID = v4();
+                                    sendModal(
+                                        dispatchModal,
+                                        modalID,
+                                        "Add Stock",
+                                        `How many stocks would you like to add to ${item.name}?`,
+                                        <div>
+                                            <Form
+                                                onSubmit={(values) => {
+                                                    let count = values.count;
+                                                    if (isNaN(count))
+                                                        return sendNotification(
+                                                            dispatchNotification,
+                                                            NotificationType.ERROR,
+                                                            "The count must be an integer!"
+                                                        );
+
+                                                    count = Number(
+                                                        values.count
+                                                    );
+                                                    if (count <= 0)
+                                                        return sendNotification(
+                                                            dispatchNotification,
+                                                            NotificationType.ERROR,
+                                                            "The count must be a positive integer!"
+                                                        );
+
+                                                    increaseStock.mutate({
+                                                        stockId: item.uid,
+                                                        count: Number(
+                                                            values.count
+                                                        ),
+                                                    });
+                                                    removeModal(
+                                                        dispatchModal,
+                                                        modalID
+                                                    );
+                                                }}
+                                                render={({
+                                                    handleSubmit,
+                                                    pristine,
+                                                }) => (
+                                                    <form
+                                                        onSubmit={handleSubmit}
+                                                    >
+                                                        <div className="flex flex-col justify-center items-center gap-4">
+                                                            <Field
+                                                                name="count"
+                                                                component="input"
+                                                                type="text"
+                                                                placeholder="Stock count..."
+                                                            />
+                                                            <Button
+                                                                type={
+                                                                    ButtonType.PRIMARY
+                                                                }
+                                                                submitButton={
+                                                                    true
+                                                                }
+                                                                isDisabled={
+                                                                    pristine
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </form>
+                                                )}
+                                            />
+                                        </div>
+                                    );
+                                }}
+                            />
+                            <ButtonDropDownItem
+                                label="Remove Multiple Stocks"
+                                onClick={() => {
+                                    const modalID = v4();
+                                    sendModal(
+                                        dispatchModal,
+                                        modalID,
+                                        "Remove Stock",
+                                        `How many stocks would you like to remove from ${item.name}?`,
+                                        <div>
+                                            <Form
+                                                onSubmit={(values) => {
+                                                    let count = values.count;
+                                                    if (isNaN(count))
+                                                        return sendNotification(
+                                                            dispatchNotification,
+                                                            NotificationType.ERROR,
+                                                            "The count must be an integer!"
+                                                        );
+
+                                                    count = Number(
+                                                        values.count
+                                                    );
+                                                    if (count <= 0)
+                                                        return sendNotification(
+                                                            dispatchNotification,
+                                                            NotificationType.ERROR,
+                                                            "The count must be a positive integer!"
+                                                        );
+
+                                                    if (count > item.quantity)
+                                                        return sendNotification(
+                                                            dispatchNotification,
+                                                            NotificationType.ERROR,
+                                                            "You cannot remove more stocks than available!"
+                                                        );
+
+                                                    decreaseStock.mutate({
+                                                        stockId: item.uid,
+                                                        count: count,
+                                                    });
+                                                    removeModal(
+                                                        dispatchModal,
+                                                        modalID
+                                                    );
+                                                }}
+                                                render={({
+                                                    handleSubmit,
+                                                    pristine,
+                                                }) => (
+                                                    <form
+                                                        onSubmit={handleSubmit}
+                                                    >
+                                                        <div className="flex flex-col justify-center items-center gap-4">
+                                                            <Field
+                                                                name="count"
+                                                                component="input"
+                                                                type="text"
+                                                                placeholder="Stock count..."
+                                                            />
+                                                            <Button
+                                                                type={
+                                                                    ButtonType.PRIMARY
+                                                                }
+                                                                submitButton={
+                                                                    true
+                                                                }
+                                                                isDisabled={
+                                                                    pristine
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </form>
+                                                )}
+                                            />
+                                        </div>
+                                    );
+                                }}
+                            />
+                            <ButtonDropDownItem
+                                label="Delete Stock"
+                                icon="https://i.imgur.com/wvi6Bge.png"
+                                onClick={() => removeItem.mutate(item.uid)}
+                            />
+                        </Button>
                     </div>
                 </TableDataCell>
             </TableRow>
+        ));
+    };
+
+    const generateLowStockElements = () => {
+        if (!lowStock) return;
+        // @ts-ignore
+        return lowStock.stock.map((item: StockItem) => (
+            <Link key={item.uid} href={`#${item.uid}`}>
+                <div className="cursor-pointer transition-faster flex justify-between bg-green-300/50 dark:bg-green-600/50 backdrop-blur-xl p-2 rounded-xl mb-3 w-full text-white text-[1.15rem]">
+                    <p className="self-center">{item.name}</p>
+                    <div className="self-center bg-red-600/80 rounded-full px-2 h-fit">
+                        <p>{item.quantity}</p>
+                    </div>
+                </div>
+            </Link>
         ));
     };
 
@@ -530,6 +633,13 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                             }}
                         />
                     </DashboardSection>
+                    {lowStock && (
+                        <DashboardSection title="Low Stock">
+                            <div className="grid grid-cols-2 gap-x-4 transition-faster border-[1px] border-white/30 bg-green-400 dark:bg-green-500 shadow-md w-1/2 p-6 rounded-md">
+                                {generateLowStockElements()}
+                            </div>
+                        </DashboardSection>
+                    )}
                     <DashboardSection>
                         {categoryInfo.stock.length > 0 ? (
                             <Table>

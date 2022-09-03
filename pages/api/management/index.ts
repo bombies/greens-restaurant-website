@@ -4,6 +4,7 @@ import {UserPermissions} from "../../../types/UserPermissions";
 import createDBConnection from "../../../database/mongo/db";
 import {Config, IConfig} from "../../../database/mongo/schemas/Config";
 import Joi from "joi";
+import { handleInvalidHTTPMethod } from "../../../utils/GeneralUtils";
 
 const PatchBody = Joi.object({
     stockWarningMinimum: Joi.number()
@@ -43,7 +44,7 @@ const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) 
                 return res.status(200).json(result);
             }
             default: {
-                return res.status(405).json({ error: `You cannot ${method} this route!`});
+                return handleInvalidHTTPMethod(res, method);
             }
         }
     } catch (e) {

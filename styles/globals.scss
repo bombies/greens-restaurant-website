@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,50 +11,68 @@ $transition-faster: 100ms;
 $transition-fastest: 75ms;
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Montserrat', sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Montserrat", sans-serif;
+}
+
+html, body, main, #__next {
+    height: 100%;
 }
 
 .bg-blurred {
-  background-image: url(https://i.imgur.com/GYsutX5.jpg);
+    background-image: url(https://i.imgur.com/GYsutX5.jpg);
 }
 
 .transition-slow {
-  transition: all ease-in-out $transition-slow;
+    transition: all ease-in-out $transition-slow;
 }
 
 .transition-slowest {
-  transition: all ease-in-out $transition-slowest;
+    transition: all ease-in-out $transition-slowest;
 }
 
 .transition-medium {
-  transition: all ease-in-out $transition-medium;
+    transition: all ease-in-out $transition-medium;
 }
 
 .transition-fast {
-  transition: all ease-in-out $transition-fast;
+    transition: all ease-in-out $transition-fast;
 }
 
 .transition-faster {
-  transition: all ease-in-out $transition-faster;
+    transition: all ease-in-out $transition-faster;
 }
 
 .transition-fastest {
-  transition: all ease-in-out $transition-fastest;
+    transition: all ease-in-out $transition-fastest;
+}
+
+input[type="text"],
+input[type="password"] {
+    border-radius: 7px;
+    border: rgba(173, 255, 47, 0.29) 1.5px solid;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.25);
+    padding-left: 0.5rem;
+    height: 3rem;
+    width: 15rem;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
 }
 
 ::-webkit-scrollbar {
-  width: 0.5rem;
+    width: 0.5rem;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(82, 82, 82);
-  border-radius: 10px;
+    background: rgb(82, 82, 82);
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #292929;
+    background: #292929;
 }
-

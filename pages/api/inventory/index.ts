@@ -2,6 +2,7 @@ import createDBConnection from "../../../database/mongo/db";
 import {StockCategory, StockCategoryJoiSchema} from "../../../database/mongo/schemas/StockCategories";
 import {authenticated} from "../../../utils/api/auth";
 import {UserPermissions} from "../../../types/UserPermissions";
+import { handleInvalidHTTPMethod } from "../../../utils/GeneralUtils";
 
 const handler = authenticated(async (req, res) => {
     const { method, body } = req;
@@ -34,7 +35,7 @@ const handler = authenticated(async (req, res) => {
                 return res.status(200).json(createdDoc);
             }
             default: {
-                return res.status(405).json({ error: `You cannot ${method} this route!`});
+                return handleInvalidHTTPMethod(res, method);
             }
         }
     } catch (e) {
