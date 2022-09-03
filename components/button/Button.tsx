@@ -61,6 +61,7 @@ const Button = (props: Props) => {
     };
     
     const dropDownRef = useRef(null);
+    const buttonRef = useRef(null);
     
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -77,7 +78,7 @@ const Button = (props: Props) => {
     }, [dropDownRef])
 
     return (
-        <div>
+        <div ref={buttonRef}>
             {props.submitButton ? (
                 props.isWorking ? (
                     <div
@@ -160,7 +161,7 @@ const Button = (props: Props) => {
                 </div>
             )}
             <div
-                className={`transition-faster ${darkMode ? "bg-neutral-800" : "bg-neutral-200"} ${
+                className={`transition-faster ${darkMode ? "bg-neutral-800" : "bg-neutral-50"} ${
                     showDropDown ? "opacity-100 visible" : "opacity-0 invisible"
                 } border-[1px] border-green-400/20 shadow-md mt-1.5 rounded-lg py-4 absolute z-10 w-fit`}
                 ref={dropDownRef}

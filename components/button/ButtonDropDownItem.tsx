@@ -10,7 +10,7 @@ type Props = {
 const ButtonDropDownItem = (props: Props) => {
     return (
         <div
-            className="transition-fast hover:bg-neutral-300/70 hover:dark:bg-neutral-900/70 p-2 flex justify-center gap-4 cursor-pointer"
+            className="transition-fast hover:bg-neutral-200/70 hover:dark:bg-neutral-900/70 p-2 flex justify-center gap-4 cursor-pointer"
             onClick={() => {
                 if (!props.onClick)
                     return;

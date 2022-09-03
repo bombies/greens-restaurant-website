@@ -104,6 +104,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
             })
             .then((data) => {
                 setCategoryInfo(data.data);
+                updateSort();
                 sendNotification(
                     dispatchNotification,
                     NotificationType.SUCCESS,
@@ -350,6 +351,12 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                             type={ButtonType.DANGER}
                             label="-1"
                             onClick={() => {
+                                if (item.quantity === 0)
+                                    return sendNotification(
+                                        dispatchNotification,
+                                        NotificationType.ERROR,
+                                        `You cannot decrement any more stock for ${item.name}`
+                                    );
                                 decreaseStock.mutate({
                                     stockId: item.uid,
                                     count: 1,
@@ -360,7 +367,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                         />
                         <Button
                             type={ButtonType.SECONDARY}
-                            icon='https://i.imgur.com/YpjxUaa.png'
+                            icon="https://i.imgur.com/YpjxUaa.png"
                             height={3}
                             width={4}
                         >
