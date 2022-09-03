@@ -2,7 +2,7 @@ import createDBConnection from "../../../database/mongo/db";
 import {StockCategory, StockCategoryJoiSchema} from "../../../database/mongo/schemas/StockCategories";
 import {authenticated} from "../../../utils/api/auth";
 import {UserPermissions} from "../../../types/UserPermissions";
-import { handleInvalidHTTPMethod } from "../../../utils/GeneralUtils";
+import { handleInvalidHTTPMethod, handleJoiValidation } from "../../../utils/GeneralUtils";
 
 const handler = authenticated(async (req, res) => {
     const { method, body } = req;
@@ -14,9 +14,8 @@ const handler = authenticated(async (req, res) => {
                 return res.status(200).json(allCategories);
             }
             case "POST": {
-                const { error } = StockCategoryJoiSchema.validate(body);
-                if (error)
-                    return res.status(400).json({ error: error.details[0].message});
+                if (!handleJoiValidation(res, StockCategoryJoiSchema, body))
+                    return;
 
                 await createDBConnection();
 

@@ -541,7 +541,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
         // @ts-ignore
         return lowStock.stock.map((item: StockItem) => (
             <Link key={item.uid} href={`#${item.uid}`}>
-                <div className="cursor-pointer transition-faster flex justify-between bg-green-300/50 dark:bg-green-600/50 backdrop-blur-xl p-2 rounded-xl mb-3 w-full text-white text-[1.15rem]">
+                <div className="cursor-pointer transition-faster flex justify-between bg-green-300/50 dark:bg-green-600/50 backdrop-blur-xl py-2 px-4 rounded-xl mb-3 w-full text-white text-[1.15rem]">
                     <p className="self-center">{item.name}</p>
                     <div className="self-center bg-red-600/80 rounded-full px-2 h-fit">
                         <p>{item.quantity}</p>
@@ -642,7 +642,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                     </DashboardSection>
                     {lowStock && (
                         <DashboardSection title="Low Stock">
-                            <div className="grid grid-cols-2 gap-x-4 transition-faster border-[1px] border-white/30 bg-green-400 dark:bg-green-500 shadow-md w-1/2 p-6 rounded-md">
+                            <div className="grid grid-cols-3 gap-x-4 transition-faster border-[1px] border-white/30 bg-green-400 dark:bg-green-500 shadow-md w-5/6 p-6 rounded-md">
                                 {generateLowStockElements()}
                             </div>
                         </DashboardSection>

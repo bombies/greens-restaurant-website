@@ -12,6 +12,7 @@ import {
     GenericModalAddAction, GenericModalRemoveAction
 } from "../components/modals/ModalTypes";
 import { NextApiResponse } from "next";
+import Joi from "joi";
 
 export const handleAxiosError = (dispatchNotification: Dispatch<NotificationAddAction> | null, err: any) => {
     const errMsg = err.response.data.error;
@@ -132,4 +133,13 @@ export const arrayCompare = (arr1: any[], arr2: any[]) => {
 
 export const handleInvalidHTTPMethod = (res: NextApiResponse, method?: string) => {
     return res.status(405).json({ error: `You cannot ${method} this route!` });
+}
+
+export const handleJoiValidation = (res: NextApiResponse, joiObj: Joi.ObjectSchema, body: Object): boolean => {
+    const { error } = joiObj.validate(body)
+    if (error) {
+        res.status(400).json({ error: error.details[0].message });
+        return false;
+    }
+    return true;
 }

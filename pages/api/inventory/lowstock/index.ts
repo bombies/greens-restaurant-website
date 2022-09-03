@@ -6,9 +6,8 @@ import {
     StockCategory,
 } from "../../../../database/mongo/schemas/StockCategories";
 import { StockItem } from "../../../../types/InventoryCategoryObject";
-import { Config } from "../../../../database/mongo/schemas/Config";
-import { generateDefaultConfig } from "../../management";
 import { handleInvalidHTTPMethod } from "../../../../utils/GeneralUtils";
+import { getConfig } from "../../management";
 
 const handler = authenticated(async (req, res) => {
     const { method } = req;
@@ -17,9 +16,7 @@ const handler = authenticated(async (req, res) => {
         switch (method) {
             case "GET": {
                 await createDBConnection();
-                let config = (await Config.find())[0];
-                if (!config)
-                    config = await Config.create(generateDefaultConfig());
+                let config = await getConfig();
                 const allCategories = await StockCategory.find();
 
                 let result: { id: string, name: string; stock: StockItem[] }[] | [] = [];
@@ -27,7 +24,7 @@ const handler = authenticated(async (req, res) => {
                     let obj = { id: category.id, name: category.name, stock: [] };
 
                     category.stock.forEach((item: StockItem) => {
-                        if (item.quantity < config.stockWarningMinimum)
+                        if (item.quantity < config.inventory.stockWarningMinimum)
                             // @ts-ignore
                             obj.stock.push(item);
                     });

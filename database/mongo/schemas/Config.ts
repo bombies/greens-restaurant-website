@@ -1,12 +1,22 @@
 import mongoose from "mongoose";
 
 export interface IConfig {
-    stockWarningMinimum: number
+    inventory: {
+        stockWarningMinimum: number;
+    };
+    employees: {
+        jobPositions: string[];
+    };
 }
 
 const ConfigSchema = new mongoose.Schema<IConfig>({
-    stockWarningMinimum: { type: Number, required: true }
+    employees: {
+        type: Object,
+        required: true,
+    },
+    inventory: { type: Object, required: true },
 });
 
 export default ConfigSchema;
-export const Config = mongoose.models.config || mongoose.model('config', ConfigSchema, 'config');
+export const Config =
+    mongoose.models.config || mongoose.model("config", ConfigSchema, "config");

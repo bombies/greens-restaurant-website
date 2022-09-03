@@ -8,7 +8,7 @@ import { StockItem } from "../../../../types/InventoryCategoryObject";
 import { UserPermissions } from "../../../../types/UserPermissions";
 import { authenticated } from "../../../../utils/api/auth";
 import { handleInvalidHTTPMethod } from "../../../../utils/GeneralUtils";
-import { generateDefaultConfig } from "../../management";
+import { getConfig } from "../../management";
 
 const handler = authenticated(async (req, res) => {
     const { method, query } = req;
@@ -17,8 +17,7 @@ const handler = authenticated(async (req, res) => {
     switch (method) {
         case "GET": {
             await createDBConnection();
-            let config = (await Config.find())[0];
-            if (!config) config = await Config.create(generateDefaultConfig());
+            let config = await getConfig();
             const category = await StockCategory.findOne({ id: id });
 
             if (!category)
@@ -33,7 +32,7 @@ const handler = authenticated(async (req, res) => {
             };
             
             category.stock.forEach((item: StockItem) => {
-                if (item.quantity < config.stockWarningMinimum)
+                if (item.quantity < config.inventory.stockWarningMinimum)
                     result.stock.push(item);
             });
 

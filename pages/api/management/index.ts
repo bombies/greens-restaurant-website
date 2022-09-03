@@ -1,63 +1,85 @@
-import {NextApiRequest, NextApiResponse} from "next";
-import {authenticated} from "../../../utils/api/auth";
-import {UserPermissions} from "../../../types/UserPermissions";
+import { NextApiRequest, NextApiResponse } from "next";
+import { authenticated } from "../../../utils/api/auth";
+import { UserPermissions } from "../../../types/UserPermissions";
 import createDBConnection from "../../../database/mongo/db";
-import {Config, IConfig} from "../../../database/mongo/schemas/Config";
+import { Config } from "../../../database/mongo/schemas/Config";
 import Joi from "joi";
-import { handleInvalidHTTPMethod } from "../../../utils/GeneralUtils";
+import {
+    handleInvalidHTTPMethod,
+    handleJoiValidation,
+} from "../../../utils/GeneralUtils";
+import { generateDefaultConfig } from "../../../utils/api/ApiUtils";
 
 const PatchBody = Joi.object({
-    stockWarningMinimum: Joi.number()
-})
+    inventory: Joi.object({
+        stockWarningMinimum: Joi.number(),
+    }),
+    employees: Joi.object({
+        jobPositions: Joi.array().items(Joi.string()),
+    }),
+});
 
-const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method, body } = req;
+const handler = authenticated(
+    async (req: NextApiRequest, res: NextApiResponse) => {
+        const { method, body } = req;
 
-    try {
-        switch (method) {
-            case "GET": {
-                await createDBConnection();
-                let config = (await Config.find())[0];
+        try {
+            switch (method) {
+                case "GET": {
+                    await createDBConnection();
+                    const config = await getConfig()
+                    // @ts-ignore
+                    const { _id: undefined, __v: _, ...result } = config._doc;
+                    return res.status(200).json(result);
+                }
+                case "PATCH": {
+                    if (!handleJoiValidation(res, PatchBody, body)) return;
 
-                if (!config)
-                    config = await Config.create(generateDefaultConfig());
-                // @ts-ignore
-                const { _id: undefined, __v: _, ...result } = config._doc;
-                return res.status(200).json(result);
+                    await createDBConnection();
+                    const config = await getConfig();
+
+                    if (body.inventory) {
+                        // @ts-ignore
+                        config.inventory.stockWarningMinimum = body.inventory.stockWarningMinimum ?? config.inventory.stockWarningMinimum;
+                        config.markModified('inventory');
+                    }
+
+                    if (body.employees) {
+                        // @ts-ignore
+                        config.employees.jobPositions = body.employees.jobPositions ?? config.employees.jobPositions;
+                        config.markModified('employees');
+                    }
+
+
+                    // @ts-ignore
+                    const newDoc = await config.save();
+                    console.log(config, newDoc);
+                    // @ts-ignore
+                    const { _id: undefined, __v: _, ...result } = newDoc._doc;
+                    return res.status(200).json(result);
+                }
+                default: {
+                    return handleInvalidHTTPMethod(res, method);
+                }
             }
-            case "PATCH": {
-                const { error } = PatchBody.validate(body)
-                if (error)
-                    return res.status(400).json({ error: error.details[0].message});
-
-                await createDBConnection();
-                let config = (await Config.find())[0];
-
-                if (!config)
-                    config = await Config.create(generateDefaultConfig());
-
-                if (body.stockWarningMinimum)
-                    config.stockWarningMinimum = body.stockWarningMinimum;
-                const newDoc = await config.save();
-                // @ts-ignore
-                const { _id: undefined, __v: _, ...result } = newDoc._doc;
-                return res.status(200).json(result);
-            }
-            default: {
-                return handleInvalidHTTPMethod(res, method);
-            }
+        } catch (e) {
+            // @ts-ignore
+            return res.status(500).json({ error: e.message || e });
         }
-    } catch (e) {
-        // @ts-ignore
-        return res.status(500).json({ error: e.message || e });
-    }
+    },
+    UserPermissions.ADMINISTRATOR
+);
 
-}, UserPermissions.ADMINISTRATOR);
+export const getConfig = async () => {
+    let config = (await Config.find())[0];
+    config ??= await Config.create(generateDefaultConfig());
 
-export const generateDefaultConfig = (): IConfig => {
-    return {
-        stockWarningMinimum: 10
-    }
+    config.inventory ??= { stockWarningMinimum: 10 };
+    config.inventory.stockWarningMinimum ??= 10;
+
+    config.employees ??= { jobPositions: [] };
+    config.employees.jobPositions ??= [];
+    return await config.save();
 }
 
 export default handler;

@@ -4,9 +4,9 @@ import createDBConnection from "../../../database/mongo/db";
 import {StockCategory} from "../../../database/mongo/schemas/StockCategories";
 import {authenticated} from "../../../utils/api/auth";
 import {UserPermissions} from "../../../types/UserPermissions";
-import { handleInvalidHTTPMethod } from "../../../utils/GeneralUtils";
+import { handleInvalidHTTPMethod, handleJoiValidation } from "../../../utils/GeneralUtils";
 
-const PatchSchema = Joi.object({
+const PatchBody = Joi.object({
     name: Joi.string(),
     index: Joi.number(),
     stock: Joi.array().items(Joi.object({
@@ -31,9 +31,8 @@ const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) 
                 return res.status(200).json(fetchedDoc);
             }
             case "PATCH": {
-                const { error } = PatchSchema.validate(body);
-                if ( error )
-                    return res.status(400).json({ error: error.details[0].message});
+                if (!handleJoiValidation(res, PatchBody, body))
+                    return;
 
                 await createDBConnection();
                 const fetchedDoc = await StockCategory.findOne({ id: id });

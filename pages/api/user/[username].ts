@@ -26,6 +26,6 @@ const handler = authenticated(async (req, res) => {
         // @ts-ignore
         return res.status(500).json({ error: e.message || e });
     }
-}, UserPermissions.ADMINISTRATOR);
+}, UserPermissions.MANAGE_EMPLOYEES);
 
 export default handler;

@@ -15,6 +15,7 @@ import DashboardRow from "../../components/dashboard/DashboardRow";
 import DashboardSection from "../../components/dashboard/DashboardSection";
 import Button from "../../components/button/Button";
 import { ButtonType } from "../../types/ButtonType";
+import { generateDefaultConfig } from "../../utils/api/ApiUtils";
 
 const Management: NextPage = () => {
     const router = useRouter();
@@ -24,9 +25,7 @@ const Management: NextPage = () => {
     const dispatchNotification = useContext(NotificationContext);
     const reduxDispatch = useDispatch();
 
-    const placeHolder: IConfig = {
-        stockWarningMinimum: 0,
-    };
+    const placeHolder: IConfig = generateDefaultConfig();
 
     const [config, setConfig] = useState(placeHolder);
     const [originalConfig, setOriginalConfig] = useState({});
@@ -39,7 +38,8 @@ const Management: NextPage = () => {
                 setConfig(data.data);
                 setOriginalConfig(data.data);
             })
-            .catch(() => {
+            .catch((e) => {
+                console.error(e);
                 // @ts-ignore
                 return setConfig(null);
             });
@@ -49,6 +49,7 @@ const Management: NextPage = () => {
         return axios
             .patch("/api/management", config)
             .then(data => {
+                console.log(data.data);
                 setOriginalConfig(data.data);
                 setChangesMade(false);
                 sendNotification(
@@ -81,11 +82,29 @@ const Management: NextPage = () => {
     const setMinStock = (x: number) => {
         if (isNaN(x)) return;
         setConfig((prev) => {
-            const newObj = { ...prev, stockWarningMinimum: Number(x) };
+            const newObj = { ...prev, inventory: {...prev.inventory, stockWarningMinimum: Number(x) }  };
             checkForChanges(newObj);
             return newObj;
         });
     };
+
+    const addJobPosition = (job: string) => {
+        if (!job) return;
+        setConfig(prev => {
+            const newObj = { ...prev, employees: {...prev.employees, jobPositions: [...prev.employees.jobPositions, job] }  };
+            checkForChanges(newObj);
+            return newObj;
+        });
+    };
+
+    const removeJobPosition = (job: string) => {
+        if (!job) return;
+        setConfig(prev => {
+            const newObj = { ...prev, employees: {...prev.employees, jobPositions: prev.employees.jobPositions.filter(e => e !== job) } };
+            checkForChanges(newObj);
+            return newObj;
+        });
+    }
 
     useEffect(() => {
         if (!userData) {
@@ -164,7 +183,7 @@ const Management: NextPage = () => {
                         <TextBox
                             placeholder="Enter a value..."
                             numbersOnly={true}
-                            value={config.stockWarningMinimum}
+                            value={config.inventory.stockWarningMinimum}
                             onChange={(e) => {
                                 // @ts-ignore
                                 setMinStock(e.target.value);
