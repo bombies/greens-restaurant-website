@@ -39,7 +39,7 @@
     "@types/bcrypt": "^5.0.0",
     "@types/cookie": "^0.5.1",
     "@types/jsonwebtoken": "^8.5.9",
-    "@types/node": "18.7.14",
+    "@types/node": "18.7.21",
     "@types/react": "18.0.17",
     "@types/react-dom": "18.0.6",
     "@types/redux-persist": "^4.3.1",
