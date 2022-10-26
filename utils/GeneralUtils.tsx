@@ -62,6 +62,7 @@ export const generateDefaultSidebar = (sidebarOpened: boolean, reduxDispatch: Di
         >
             <SidebarItem icon='https://i.imgur.com/wZ8e1Lc.png' label='Inventory' link='inventory' sidebarOpened={sidebarOpened} />
             <SidebarItem icon='https://i.imgur.com/nWxboHU.png' label='Employees' link='employees' sidebarOpened={sidebarOpened} />
+            <SidebarItem icon='https://i.imgur.com/Uc4bWGn.png' label='Invoices' link='invoices' sidebarOpened={sidebarOpened} />
             <SidebarItem icon='https://i.imgur.com/no6wh9w.png' label='Management' link='management' sidebarOpened={sidebarOpened} />
         </Sidebar>
     )

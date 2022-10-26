@@ -235,7 +235,9 @@ const Index: NextPage = () => {
                     </DashboardSection>
                     <DashboardSection>
                         {getAndSetCategories.isLoading ? (
-                            <Spinner size={3} />
+                            <div className='flex justify-center'>
+                                <Spinner size={3} />
+                            </div>
                         ) : categories.length !== 0 ? (
                             <div className="grid grid-cols-4 gap-y-5 gap-x-5">
                                 {generateCategories()}
