@@ -23,7 +23,7 @@
     "jsonwebtoken": "^8.5.1",
     "loader-utils": "^3.2.0",
     "mongoose": "^6.7.0",
-    "next": "12.2.5",
+    "next": "13.0.0",
     "nextjs-progressbar": "^0.0.14",
     "react": "18.2.0",
     "react-dom": "18.2.0",
