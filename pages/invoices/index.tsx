@@ -18,7 +18,7 @@ const generateInvoiceClickable = (info: InvoiceObject) => {
             <div className="p-4 bg-green-500 rounded-2xl transition-fast cursor-pointer hover:scale-105">
                 <h1 className='text-xl font-medium text-white overflow-hidden overflow-ellipsis'>{info.title}</h1>
                 <p className='text-lg text-neutral-200 overflow-hidden overflow-ellipsis'>{info.addressed_to}</p>
-                <p className={'text-sm text-green-700'}>{`Created: ${new Date(info.date_of_creation).toLocaleDateString('en-US')}`}</p>
+                <p className={'text-sm text-green-700'}>{`Created: ${new Date(info.date_of_creation).toLocaleDateString('en-UK')}`}</p>
             </div>
         </Link>
     );
