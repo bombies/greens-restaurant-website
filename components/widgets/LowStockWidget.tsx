@@ -10,13 +10,13 @@ const LowStockWidget = (props: Props) => {
     const generateClickabes = () => {
         return props.stockInfo?.map((obj) => {
             const items = obj.stock.map((e) => (
-                <div>
+                <div key={e.uid}>
                     <p>{`${e.name} (${e.quantity} in stock)`}</p>
                 </div>
             ));
 
             return (
-                <div className="cursor-pointer">
+                <div key={obj.id} className="cursor-pointer">
                     <Link href={`/inventory/${obj.id}`}>
                         <div className="mr-4">
                             <div className="bg-green-400 dark:bg-green-500 py-1 px-3 rounded-t-md">
