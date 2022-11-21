@@ -42,7 +42,7 @@
     "@types/jsonwebtoken": "^8.5.9",
     "@types/node": "18.11.4",
     "@types/react": "18.0.22",
-    "@types/react-dom": "18.0.6",
+    "@types/react-dom": "18.0.9",
     "@types/redux-persist": "^4.3.1",
     "@typescript-eslint/parser": "^5.36.1",
     "autoprefixer": "^10.4.8",
