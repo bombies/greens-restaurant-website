@@ -99,6 +99,22 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
 
     const addItem = useMutation((item: StockItem) => {
         return axios
+            .put(`/api/inventory/${props.id}`, item)
+            .then((data) => {
+                setCategoryInfo(data.data);
+                updateSort();
+                sendNotification(
+                    dispatchNotification,
+                    NotificationType.SUCCESS,
+                    `You have successfully added ${item.name} as a new item!`
+                );
+                getAndSetLowStock.mutate();
+            })
+            .catch((e) => handleAxiosError(dispatchNotification, e));
+    });
+
+    const updateItem = useMutation((item: StockItem) => {
+        return axios
             .patch(`/api/inventory/${props.id}`, {
                 stock: [...categoryInfo.stock, item],
             })
@@ -316,18 +332,20 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                 <TableDataCell>
                     <div className="flex gap-4">
                         {itemIsLowStock(item) && (
-                            <Tooltip
-                                content="Low stock"
-                                style={darkMode ? "dark" : "light"}
-                            >
-                                <div className="relative w-4 h-4 self-center">
-                                    <Image
-                                        src="https://i.imgur.com/gGwEe5j.png"
-                                        alt=""
-                                        layout="fill"
-                                    />
-                                </div>
-                            </Tooltip>
+                            <div className='self-center'>
+                                <Tooltip
+                                    content="Low stock"
+                                    style={darkMode ? "dark" : "light"}
+                                >
+                                    <div className="relative w-4 h-4 self-center">
+                                        <Image
+                                            src="https://i.imgur.com/gGwEe5j.png"
+                                            alt=""
+                                            layout="fill"
+                                        />
+                                    </div>
+                                </Tooltip>
+                            </div>
                         )}{" "}
                         {item.name}
                     </div>

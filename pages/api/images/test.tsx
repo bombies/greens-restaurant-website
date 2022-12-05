@@ -1,7 +1,6 @@
 import { ImageResponse } from "@vercel/og";
 import { NextApiRequest } from "next";
 import { getParamFromSearch } from "../../../utils/api/ApiUtils";
-import { fetchFontData, Font } from "../../../utils/Fonts";
 
 export const config = {
     runtime: "experimental-edge",

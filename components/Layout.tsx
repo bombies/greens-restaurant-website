@@ -3,6 +3,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { generateDefaultSidebar } from "../utils/GeneralUtils";
 import { AnyAction, Dispatch } from "redux";
+import { montserrat } from "../utils/Fonts";
 
 interface Props extends React.PropsWithChildren {
     title?: string;
@@ -25,7 +26,7 @@ const Layout = (props: Props) => {
                     props.title ? ` - ${props.title}` : ""
                 }`}</title>
             </Head>
-            <main>
+            <main className={`${montserrat.variable} font-sans`}>
                 {props.authenticated ? (
                     generateLayout(
                         props.children,
@@ -35,7 +36,7 @@ const Layout = (props: Props) => {
                         props.showSidebar
                     )
                 ) : handleAuth ? (
-                    <div className="h-full"></div>
+                    <div className=""></div>
                 ) : (
                     generateLayout(
                         props.children,
@@ -60,7 +61,7 @@ const generateLayout = (
     return (
         <div className="flex dark:bg-neutral-800 transition-fast min-h-screen">
             {(showSidebar === true || showSidebar === undefined) && generateDefaultSidebar(sidebarOpened, reduxDispatch)}
-            <div className={`${(showSidebar === true || showSidebar === undefined) ? "pl-8 pt-16 " : ""}w-full h-full`}>
+            <div className={`${(showSidebar === true || showSidebar === undefined) ? "pl-8 pt-16 " : ""} min-h-screen w-full`}>
                 <div className="h-full">
                     {pageTitle && (
                         <h1 className="text-7xl font-bold self-center pointer-events-none mb-12 dark:text-white">

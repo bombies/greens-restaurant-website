@@ -96,7 +96,7 @@ const Home: NextPage = (props: Props) => {
             <div
                 className={`${
                     Object.keys(userData).length ? "" : "bg-blurred"
-                } h-full`}
+                } h-full pb-6`}
             >
                 {Object.keys(userData).length ? (
                     <div>
@@ -125,9 +125,9 @@ const Home: NextPage = (props: Props) => {
                             </h2>
                             <div className="grid grid-cols-2 gap-y-8">
                                 <LowStockWidget stockInfo={lowStockData} />
-                                <LowStockWidget stockInfo={lowStockData} />
-                                <LowStockWidget stockInfo={lowStockData} />
-                                <LowStockWidget stockInfo={lowStockData} />
+                                {/*<LowStockWidget stockInfo={lowStockData} />*/}
+                                {/*<LowStockWidget stockInfo={lowStockData} />*/}
+                                {/*<LowStockWidget stockInfo={lowStockData} />*/}
                             </div>
                         </div>
                     </div>

@@ -15,6 +15,13 @@ const PatchBody = Joi.object({
         quantity: Joi.number().required(),
         lastUpdated: Joi.number().required()
     }))
+});
+
+const PutBody = Joi.object({
+    uid: Joi.string().required(),
+    name: Joi.string().required(),
+    quantity: Joi.number().required(),
+    lastUpdated: Joi.number().required()
 })
 
 const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) => {
@@ -29,6 +36,24 @@ const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) 
                 if (!fetchedDoc)
                     return res.status(404).json({ error: `There was no category with the ID ${id}` });
                 return res.status(200).json(fetchedDoc);
+            }
+            case "PUT": {
+                if (!handleJoiValidation(res, PutBody, body))
+                    return;
+
+                await createDBConnection();
+                const fetchedDoc = await StockCategory.findOne({ id: id });
+                if (!fetchedDoc)
+                    return res.status(404).json({ error: `There was no category with the ID ${id}` });
+
+                const existingItem = fetchedDoc.stock.filter(x => x.name.toLowerCase() === body.name.toLowerCase());
+                if (existingItem)
+                    return res.status(401).json({ error: `There is already an item with the name "${body.name}"`});
+
+                fetchedDoc.stock = [...fetchedDoc.stock, body];
+                fetchedDoc.lastUpdated = new Date().getTime();
+                const newDoc = await fetchedDoc.save();
+                return res.status(200).json(newDoc);
             }
             case "PATCH": {
                 if (!handleJoiValidation(res, PatchBody, body))

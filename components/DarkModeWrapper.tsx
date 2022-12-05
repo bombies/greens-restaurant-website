@@ -8,7 +8,7 @@ const DarkModeWrapper = (props: Props) => {
     const darkMode = useSelector(state => state.darkMode.value);
 
     return (
-        <div className={`h-full ${darkMode ? 'dark' : ''}`}>
+        <div className={`${darkMode ? 'dark' : ''}`}>
             {props.children}
         </div>
     )
