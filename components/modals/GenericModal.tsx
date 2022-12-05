@@ -13,7 +13,7 @@ const GenericModal = (props: Props) => {
 
     return (
         <div className='fixed z-50 bg-neutral-800 bg-opacity-50 w-full h-full flex items-center'>
-            <div className='absolute w-[50rem] min-h-fit bg-white dark:bg-neutral-900 rounded-xl py-12 px-6 left-0 right-0 mx-auto'>
+            <div className='absolute w-3/4 min-h-fit bg-white dark:bg-neutral-900 rounded-xl py-12 px-6 left-0 right-0 mx-auto'>
                 <div
                     className={'absolute right-4 top-4 w-5 h-5 cursor-pointer opacity-25 hover:opacity-100 transition-faster'}
                     onClick={() => {
@@ -22,7 +22,7 @@ const GenericModal = (props: Props) => {
                         props.dispatchModalRemoval(GenerateGenericModalRemoveAction(props.id));
                     }}
                 >
-                    <Image src={darkMode ? 'https://i.imgur.com/qNlanxv.png' : 'https://i.imgur.com/tl7Zktf.png'} alt='' layout='fill' />
+                    <Image src={darkMode ? 'https://i.imgur.com/qNlanxv.png' : 'https://i.imgur.com/tl7Zktf.png'} alt='' fill={true} />
                 </div>
                 { props.title &&
                     <div>

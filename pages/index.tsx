@@ -100,19 +100,19 @@ const Home: NextPage = (props: Props) => {
             >
                 {Object.keys(userData).length ? (
                     <div>
-                        <div className="flex gap-4 mb-16">
-                            <div className="relative rounded-full w-32 h-32 self-center border-4 border-green-500">
+                        <div className="flex phone:flex-col mb-16 justify-between">
+                            <div className="relative rounded-full w-32 h-32 phone:w-20 phone:h-20 border-4 border-green-500">
                                 <Image
                                     src={
                                         userData.avatar ||
                                         "https://i.imgur.com/V2EC9kV.jpg"
                                     }
                                     alt=""
-                                    layout="fill"
+                                    fill={true}
                                     className="rounded-full"
                                 />
                             </div>
-                            <h1 className="text-7xl font-bold self-center pointer-events-none dark:text-white">
+                            <h1 className="text-7xl tablet:text-5xl phone:text-4xl font-bold self-center pointer-events-none dark:text-white">
                                 Welcome back,{" "}
                                 <span className="text-green-400 dark:text-green-500">
                                     {userData.first_name}
@@ -123,11 +123,11 @@ const Home: NextPage = (props: Props) => {
                             <h2 className="text-4xl font-bold text-neutral-700 dark:text-green-400 mb-12">
                                 Overview
                             </h2>
-                            <div className="grid grid-cols-2 gap-y-8">
+                            <div className="grid grid-cols-2 tablet:grid-cols-1 gap-y-8">
                                 <LowStockWidget stockInfo={lowStockData} />
-                                {/*<LowStockWidget stockInfo={lowStockData} />*/}
-                                {/*<LowStockWidget stockInfo={lowStockData} />*/}
-                                {/*<LowStockWidget stockInfo={lowStockData} />*/}
+                                <LowStockWidget stockInfo={lowStockData} />
+                                <LowStockWidget stockInfo={lowStockData} />
+                                <LowStockWidget stockInfo={lowStockData} />
                             </div>
                         </div>
                     </div>
@@ -137,7 +137,7 @@ const Home: NextPage = (props: Props) => {
                             <Image
                                 src="https://i.imgur.com/HLTQ78m.png"
                                 alt=""
-                                layout="fill"
+                                fill={true}
                             />
                         </div>
                         <div className="mx-auto border-green-500 border-solid border-[1px] w-[30rem] p-12 rounded-2xl">

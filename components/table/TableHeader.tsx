@@ -19,7 +19,7 @@ const TableHeader = (props: Props) => {
                 {
                     props.sortMode && props.sortMode !== '0' &&
                     <div className='relative w-6 h-6 self-center brightness-0 dark:brightness-100'>
-                        <Image src={props.sortMode === '1' ? 'https://i.imgur.com/PdtXRah.png' : 'https://i.imgur.com/FeGpxiw.png'} alt='' layout='fill' />
+                        <Image src={props.sortMode === '1' ? 'https://i.imgur.com/PdtXRah.png' : 'https://i.imgur.com/FeGpxiw.png'} alt='' fill={true} />
                     </div>
                 }
             </div>

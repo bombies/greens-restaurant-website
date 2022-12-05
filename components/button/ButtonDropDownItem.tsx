@@ -19,7 +19,7 @@ const ButtonDropDownItem = (props: Props) => {
         >
             {props.icon && (
                 <div className="relative w-4 h-4 self-center">
-                    <Image src={props.icon} alt="" layout="fill" />
+                    <Image src={props.icon} alt="" fill={true} />
                 </div>
             )}
             <p className='text-center text-sm'>{props.label}</p>

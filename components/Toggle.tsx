@@ -19,7 +19,7 @@ const Toggle = (props: Props) => {
                 {
                     props.offIcon && props.onIcon &&
                     <div className='relative w-3 h-3 mx-auto mt-1'>
-                        <Image src={`${props.state ? props.onIcon : props.offIcon}`} alt='' layout='fill' />
+                        <Image src={`${props.state ? props.onIcon : props.offIcon}`} alt='' fill={true} />
                     </div>
                 }
             </div>

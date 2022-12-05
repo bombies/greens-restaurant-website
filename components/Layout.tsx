@@ -59,9 +59,9 @@ const generateLayout = (
     showSidebar?: boolean
 ) => {
     return (
-        <div className="flex dark:bg-neutral-800 transition-fast min-h-screen">
+        <div className="flex tablet:block dark:bg-neutral-800 transition-fast min-h-screen">
             {(showSidebar === true || showSidebar === undefined) && generateDefaultSidebar(sidebarOpened, reduxDispatch)}
-            <div className={`${(showSidebar === true || showSidebar === undefined) ? "pl-8 pt-16 " : ""} min-h-screen w-full`}>
+            <div className={`${(showSidebar === true || showSidebar === undefined) ? "px-8 pt-16 phone:pl-3 phone:pr-0 phone:pt-12 " : ""} min-h-screen w-full`}>
                 <div className="h-full">
                     {pageTitle && (
                         <h1 className="text-7xl font-bold self-center pointer-events-none mb-12 dark:text-white">

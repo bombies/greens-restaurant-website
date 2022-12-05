@@ -19,7 +19,7 @@ const SidebarItem = (props: Props) => {
                 {
                     props.icon &&
                     <div className={`relative ${!props.sidebarOpened ? 'w-8 h-8' : 'w-10 h-10'} self-center transition-fast`}>
-                        <Image src={props.icon} alt='' layout='fill' />
+                        <Image src={props.icon} alt='' fill={true} />
                     </div>
                 }
                 {

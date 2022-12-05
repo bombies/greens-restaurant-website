@@ -137,7 +137,7 @@ const Index: NextPage = () => {
                         Categories
                     </h3>
                     <DashboardSection>
-                        <div className="flex gap-4">
+                        <div className="flex phone:flex-col gap-4">
                             <Button
                                 onClick={() => {
                                     if (!dispatchModal) return;
@@ -239,7 +239,7 @@ const Index: NextPage = () => {
                                 <Spinner size={3} />
                             </div>
                         ) : categories.length !== 0 ? (
-                            <div className="grid grid-cols-4 gap-y-5 gap-x-5">
+                            <div className="grid grid-cols-4 laptop:grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-y-5 gap-x-5 place-content-center">
                                 {generateCategories()}
                             </div>
                         ) : (

@@ -6,6 +6,14 @@ module.exports = {
     'node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}'
   ],
   theme: {
+    screens: {
+      laptop: {'max': '1280px'},
+      tablet: {'max': '1025px'},
+      phone: {'max': '615px'},
+      'laptop-min': {'min': '1280px'},
+      'tablet-min': {'min': '1025px'},
+      'phone-min': {'min': '615px'},
+    },
     animation: {
       'slide-left': 'slide-left-keyframe .4s forwards',
       'slide-right': 'slide-right-keyframe .4s forwards',

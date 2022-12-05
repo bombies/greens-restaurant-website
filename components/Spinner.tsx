@@ -14,7 +14,7 @@ const Spinner = (props: Props) => {
             opacity: `${props.opacity || 100}%`,
             filter: `brightness(${props.brightness || 100}%)`
         }}>
-            <Image src='https://i.imgur.com/oQkKuvH.png' alt='' layout='fill' />
+            <Image src='https://i.imgur.com/oQkKuvH.png' alt='' fill={true} />
         </div>
     )
 }

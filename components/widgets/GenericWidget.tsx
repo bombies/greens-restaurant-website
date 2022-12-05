@@ -6,7 +6,7 @@ interface Props extends React.PropsWithChildren {
 const GenericWidget = (props: Props) => {
     return (
         <div
-            className={`transition-faster w-[30rem] h-72 shadow-lg border-green-400/20 border-[1px] rounded-xl p-6 ${
+            className={`transition-faster w-5/6 h-72 shadow-lg border-green-400/20 border-[1px] rounded-xl p-6 ${
                 props.className || ""
             }`}
         >

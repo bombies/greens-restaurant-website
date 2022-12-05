@@ -341,7 +341,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                                         <Image
                                             src="https://i.imgur.com/gGwEe5j.png"
                                             alt=""
-                                            layout="fill"
+                                            fill={true}
                                         />
                                     </div>
                                 </Tooltip>
@@ -660,7 +660,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                     </DashboardSection>
                     {lowStock && (
                         <DashboardSection title="Low Stock">
-                            <div className="grid grid-cols-3 gap-x-4 transition-faster border-[1px] border-white/30 bg-green-400 dark:bg-green-500 shadow-md w-5/6 p-6 rounded-md">
+                            <div className="grid grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-x-4 transition-faster border-[1px] border-white/30 bg-green-400 dark:bg-green-500 shadow-md w-5/6 p-6 rounded-md">
                                 {generateLowStockElements()}
                             </div>
                         </DashboardSection>

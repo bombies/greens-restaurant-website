@@ -144,7 +144,7 @@ const Button = (props: Props) => {
                                         <Image
                                             src={props.icon}
                                             alt=""
-                                            layout="fill"
+                                            fill={true}
                                         />
                                     </div>
                                 )}
