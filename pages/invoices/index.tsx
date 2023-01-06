@@ -41,16 +41,18 @@ const Invoices: NextPage = () => {
                 <div className="flex gap-4">
                     <Button
                         type={ButtonType.PRIMARY}
-                        label="Create an invoice"
+                        label="New Invoice"
+                        width={8}
                     />
                     <Button
                         type={ButtonType.DANGER}
-                        label='Delete an invoice'
+                        label='Delete Invoice'
+                        width={8}
                     />
                 </div>
             </DashboardSection>
             <DashboardSection title='Your Invoices'>
-                <div className='grid grid-cols-3 gap-4'>
+                <div className='grid grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-4'>
                     {generateInvoiceClickable({
                         id: v4(),
                         title: 'Digicel\'s Invoice',

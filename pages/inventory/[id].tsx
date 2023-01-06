@@ -354,6 +354,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                 <TableDataCell>
                     <div className="flex gap-4 justify-center">
                         <Button
+                            className='phone:hidden'
                             type={ButtonType.PRIMARY}
                             label="+1"
                             onClick={() => {
@@ -366,6 +367,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                             height={3}
                         />
                         <Button
+                            className='phone:hidden'
                             type={ButtonType.DANGER}
                             label="-1"
                             onClick={() => {
@@ -671,7 +673,7 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
                                 <thead>
                                     <TableRow isHeading={true}>
                                         <TableHeader
-                                            className="border-opacity-100 text-center p-6 justify-center bg-green-300 dark:bg-green-500"
+                                            className="border-opacity-100 text-center p-2 justify-center bg-green-300 dark:bg-green-500"
                                             title="Item"
                                             onClick={() => {
                                                 if (

@@ -23,6 +23,7 @@ interface Props extends React.PropsWithChildren {
     width?: number;
     height?: number;
     type: ButtonType;
+    className?: string;
 }
 
 const Button = (props: Props) => {
@@ -78,7 +79,7 @@ const Button = (props: Props) => {
     }, [dropDownRef])
 
     return (
-        <div ref={buttonRef}>
+        <div className={`${props.className || ''} relative`} ref={buttonRef}>
             {props.submitButton ? (
                 props.isWorking ? (
                     <div
@@ -163,7 +164,7 @@ const Button = (props: Props) => {
             <div
                 className={`transition-faster ${darkMode ? "bg-neutral-800" : "bg-neutral-50"} ${
                     showDropDown ? "opacity-100 visible" : "opacity-0 invisible"
-                } border-[1px] border-green-400/20 shadow-md mt-1.5 rounded-lg py-4 absolute z-10 w-fit`}
+                } border-[1px] border-green-400/20 shadow-md mt-1.5 rounded-lg py-4 absolute right-[-10px] z-10 w-32`}
                 ref={dropDownRef}
             >
                 {props.children}

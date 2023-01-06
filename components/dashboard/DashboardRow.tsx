@@ -1,13 +1,13 @@
 type Props = {
+    className?: string;
     title: string;
     description?: string;
     component: JSX.Element;
-    gap?: number;
 };
 
 const DashboardRow = (props: Props) => {
     return (
-        <div className="flex mb-6" style={{ gap: `${props.gap || 13}rem` }}>
+        <div className={`flex mb-6 ${props.className || ''}`}>
             <div>
                 <p className="dark:text-white font-medium text-xl pointer-events-none">
                     {props.title}

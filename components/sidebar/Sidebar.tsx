@@ -107,7 +107,7 @@ const Sidebar = (props: Props) => {
         <div className={`tablet:pt-6 tablet:z-50 ${miniBarOpened ? 'absolute z-50' : ''}`}>
             <div
                 className={`tablet-min:hidden tablet:visible 
-            ${props.color} ${props.sidebarOpened ? 'w-72 h-[30rem]' : 'w-12 h-12' }  rounded-xl 
+            ${props.color} ${props.sidebarOpened ? 'w-72 h-[36rem]' : 'w-12 h-12' }  rounded-xl 
             shadow-[0_0_10px_5px_rgba(0,0,0,0.1)] ml-6 p-2
             hover:cursor-pointer hover:scale-105 transition-fast
             `}
@@ -119,6 +119,19 @@ const Sidebar = (props: Props) => {
                 {
                     props.sidebarOpened ?
                         <div>
+                            <div
+                                className='relative w-6 h-6 m-3 hover:scale-105 transition-fast'
+                                onClick={(e) => {
+                                    props.toggleSidebar(e);
+                                    toggleMiniBar();
+                                }}
+                            >
+                                <Image
+                                    src={'https://i.imgur.com/qNlanxv.png'}
+                                    alt={'Close minibar'}
+                                    fill={true}
+                                />
+                            </div>
                             {props.icon && (
                                 <Link href="/">
                                     <div

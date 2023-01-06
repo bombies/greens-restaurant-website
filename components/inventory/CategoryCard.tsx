@@ -5,7 +5,7 @@ import Image from "next/image";
 type Props = {
     name: string,
     uid: string,
-    removeMode: boolean
+    removeMode: boolean,
     onRemove: MouseEventHandler<HTMLDivElement>;
 }
 

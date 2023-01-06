@@ -150,12 +150,12 @@ const Management: NextPage = () => {
             <div
                 className={`fixed ${
                     changesMade ? "bottom-5" : "bottom-[-200px]"
-                } bg-neutral-100 dark:bg-neutral-900 p-8 rounded-2xl shadow-md transition-fast w-3/4 flex justify-between`}
+                } bg-neutral-100 dark:bg-neutral-900 p-8 phone:p-2 rounded-2xl shadow-md transition-fast w-5/6 flex justify-between`}
             >
                 <p className="dark:text-white self-center text-xl">
                     Careful - You have unsaved changes!
                 </p>
-                <div className="flex gap-4">
+                <div className="flex phone:flex-col gap-4">
                     <Button
                         type={ButtonType.PRIMARY}
                         icon="https://i.imgur.com/ooM2GsJ.png"
@@ -177,18 +177,21 @@ const Management: NextPage = () => {
             </div>
             <DashboardSection title="Inventory Settings">
                 <DashboardRow
+                    className='gap-32 tablet:gap-16 phone:gap-3'
                     title="Minimum Stock Warning"
                     description="Set the minimum value a stock can have before a low stock warning is given."
                     component={
-                        <TextBox
-                            placeholder="Enter a value..."
-                            numbersOnly={true}
-                            value={config.inventory.stockWarningMinimum}
-                            onChange={(e) => {
-                                // @ts-ignore
-                                setMinStock(e.target.value);
-                            }}
-                        />
+                        <div className='self-center phone:w-24'>
+                            <TextBox
+                                placeholder="Enter a value..."
+                                numbersOnly={true}
+                                value={config.inventory.stockWarningMinimum}
+                                onChange={(e) => {
+                                    // @ts-ignore
+                                    setMinStock(e.target.value);
+                                }}
+                            />
+                        </div>
                     }
                 />
             </DashboardSection>

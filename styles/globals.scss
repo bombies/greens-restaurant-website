@@ -20,8 +20,8 @@ html {
     scroll-behavior: smooth;
 }
 
-html, body, main, #__next {
-    min-height: 100vh;
+html, body, main, #__next, #__darkMode_wrapper {
+    height: fit-content;
 }
 
 .bg-blurred {

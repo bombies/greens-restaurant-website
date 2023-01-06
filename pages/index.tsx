@@ -100,7 +100,7 @@ const Home: NextPage = (props: Props) => {
             >
                 {Object.keys(userData).length ? (
                     <div>
-                        <div className="flex phone:flex-col mb-16 justify-between">
+                        <div className="flex phone:flex-col tablet:mt-4 mb-16 gap-x-4">
                             <div className="relative rounded-full w-32 h-32 phone:w-20 phone:h-20 border-4 border-green-500">
                                 <Image
                                     src={
