@@ -34,6 +34,17 @@ const Employees: NextPage = () => {
     const dispatchNotification = useContext(NotificationContext);
     const reduxDispatch = useDispatch();
 
+    const [employees, setEmployees] = useState<IUser[]>([]);
+    const addEmployee = (employee: IUser) => {
+        setEmployees((prev) => [...prev, employee]);
+    };
+
+    const removeEmployee = (username: string) => {
+        setEmployees((prev) =>
+            prev.filter((employee) => employee.username !== username)
+        );
+    };
+
     const [removeMode, setRemoveMode] = useState(false);
     const toggleRemoveMode = () => {
         setRemoveMode((prev) => !prev);
@@ -42,8 +53,25 @@ const Employees: NextPage = () => {
     const fetchEmployees = useQuery({
         queryKey: ["employees"],
         queryFn: () => {
-            return axios.get("/api/user/");
+            return axios.get("/api/user/").then((data) => {
+                setEmployees(data.data);
+                return data;
+            });
         },
+    });
+
+    const removeUser = useMutation((username: string) => {
+        return axios
+            .delete(`/api/user/${username}`)
+            .then(() => removeEmployee(username))
+            .catch((e) => {
+                console.error(e)
+                sendNotification(
+                    dispatchNotification,
+                    NotificationType.ERROR,
+                    `There was an error trying to remove ${username}`
+                );
+            });
     });
 
     const sendInvitation = useMutation((invitationUser: InvitationUser) => {
@@ -81,6 +109,7 @@ const Employees: NextPage = () => {
                     first_name: userInfo.first_name,
                     last_name: userInfo.last_name,
                 });
+                addEmployee(userInfo)
             })
             .catch((e) => {
                 console.error(e);
@@ -116,7 +145,7 @@ const Employees: NextPage = () => {
 
     const generateEmployeeCards = () => {
         // @ts-ignore
-        return fetchEmployees.data?.data.map((employee) => (
+        return employees.map((employee) => (
             <EmployeeCard
                 key={employee.username}
                 username={employee.username}
@@ -126,7 +155,7 @@ const Employees: NextPage = () => {
                 permissions={employee.permissions}
                 removeMode={removeMode}
                 onRemove={() => {
-                    // TODO
+                    removeUser.mutate(employee.username)
                 }}
             />
         ));
@@ -138,7 +167,7 @@ const Employees: NextPage = () => {
             title="Employees"
             pageTitle="Employees"
         >
-            <DashboardSection className='flex gap-4'>
+            <DashboardSection className="flex gap-4">
                 <Button
                     type={ButtonType.SECONDARY}
                     label="Create An Employee"
@@ -268,7 +297,9 @@ const Employees: NextPage = () => {
                 ></Button>
                 <Button
                     type={ButtonType.DANGER_SECONDARY}
-                    label={ removeMode ? 'Toggle Remove Move' : 'Remove An Employee'}
+                    label={
+                        removeMode ? "Toggle Remove Move" : "Remove An Employee"
+                    }
                     onClick={() => toggleRemoveMode()}
                 />
             </DashboardSection>

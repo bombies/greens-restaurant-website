@@ -3,7 +3,7 @@ import createDBConnection from "../../../database/mongo/db";
 import { User, UserJoiPatchSchema, UserJoiSchema } from "../../../database/mongo/schemas/Users";
 import {hash} from "bcrypt";
 import {UserPermission} from "../../../types/UserPermission";
-import { handleInvalidHTTPMethod } from "../../../utils/GeneralUtils";
+import { handleInvalidHTTPMethod, handleJoiValidation } from "../../../utils/GeneralUtils";
 
 const handler = authenticated(async (req, res) => {
     const { method, query, body } = req;
@@ -48,6 +48,14 @@ const handler = authenticated(async (req, res) => {
                     person.avatar = body.avatar
                 const newPerson = await person.save();
                 return res.status(200).json(newPerson)
+            }
+            case "DELETE": {
+                await createDBConnection();
+                const user = await User.findOne({ username: username });
+                if (!user)
+                    return res.status(400).json({ error: `There was no user with the username: ${body.username}`});
+                await User.deleteOne({ username: username });
+                return res.status(200).json({ message: `Successfully deleted ${body.username}`});
             }
             default: {
                 return handleInvalidHTTPMethod(res, method);
