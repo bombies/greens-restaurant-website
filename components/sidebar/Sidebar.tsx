@@ -12,6 +12,7 @@ import { NotificationType } from "../../types/NotificationType";
 import { NotificationContext } from "../notifications/NotificationProvider";
 import { setUserData } from "../../utils/redux/UserDataSlice";
 import SidebarItem from "./SidebarItem";
+import { UserData } from "../../types/UserData";
 
 interface Props extends React.PropsWithChildren {
     icon?: string;
@@ -26,7 +27,7 @@ const Sidebar = (props: Props) => {
     // @ts-ignore
     const darkMode = useSelector((state) => state.darkMode.value);
     // @ts-ignore
-    const userData = useSelector((state) => state.userData.value);
+    const userData: UserData = useSelector((state) => state.userData.value);
     const reduxDispatcher = useDispatch();
     const notificationDispatch = useContext(NotificationContext);
 

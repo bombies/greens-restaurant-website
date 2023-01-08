@@ -5,7 +5,7 @@ import {
     IStockCategory,
 } from "../../../../database/mongo/schemas/StockCategories";
 import { StockItem } from "../../../../types/InventoryCategoryObject";
-import { UserPermissions } from "../../../../types/UserPermissions";
+import { UserPermission } from "../../../../types/UserPermission";
 import { authenticated } from "../../../../utils/api/auth";
 import { handleInvalidHTTPMethod } from "../../../../utils/GeneralUtils";
 import { getConfig } from "../../management";
@@ -42,6 +42,6 @@ const handler = authenticated(async (req, res) => {
             return handleInvalidHTTPMethod(res, method);
         }
     }
-}, UserPermissions.MANAGE_INVENTORY);
+}, UserPermission.MANAGE_INVENTORY);
 
 export default handler;

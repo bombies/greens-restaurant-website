@@ -2,7 +2,7 @@ import {authenticated} from "../../../utils/api/auth";
 import createDBConnection from "../../../database/mongo/db";
 import { User, UserJoiPatchSchema, UserJoiSchema } from "../../../database/mongo/schemas/Users";
 import {hash} from "bcrypt";
-import {UserPermissions} from "../../../types/UserPermissions";
+import {UserPermission} from "../../../types/UserPermission";
 import { handleInvalidHTTPMethod } from "../../../utils/GeneralUtils";
 
 const handler = authenticated(async (req, res) => {
@@ -57,6 +57,6 @@ const handler = authenticated(async (req, res) => {
         // @ts-ignore
         return res.status(500).json({ error: e.message || e });
     }
-}, UserPermissions.MANAGE_EMPLOYEES);
+}, UserPermission.MANAGE_EMPLOYEES);
 
 export default handler;

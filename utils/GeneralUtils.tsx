@@ -13,6 +13,9 @@ import {
 } from "../components/modals/ModalTypes";
 import { NextApiResponse } from "next";
 import Joi from "joi";
+import { UserData } from "../types/UserData";
+import { UserPermission } from "../types/UserPermission";
+import { userHasPermission } from "./api/auth";
 
 export const handleAxiosError = (dispatchNotification: Dispatch<NotificationAddAction> | null, err: any) => {
     const errMsg = err.response.data.error;
@@ -52,7 +55,7 @@ export const removeModal = (dispatchModal: Dispatch<GenericModalRemoveAction> | 
         dispatchModal(GenerateGenericModalRemoveAction(modalID));
 }
 
-export const generateDefaultSidebar = (sidebarOpened: boolean, reduxDispatch: Dispatch<AnyAction>) => {
+export const generateDefaultSidebar = (sidebarOpened: boolean, reduxDispatch: Dispatch<AnyAction>, userData: UserData) => {
     return (
         <Sidebar
             icon='https://i.imgur.com/HLTQ78m.png'
@@ -60,10 +63,10 @@ export const generateDefaultSidebar = (sidebarOpened: boolean, reduxDispatch: Di
             sidebarOpened={sidebarOpened}
             toggleSidebar={() => reduxDispatch(toggleSidebarState())}
         >
-            <SidebarItem icon='https://i.imgur.com/wZ8e1Lc.png' label='Inventory' link='inventory' sidebarOpened={sidebarOpened} />
-            <SidebarItem icon='https://i.imgur.com/nWxboHU.png' label='Employees' link='employees' sidebarOpened={sidebarOpened} />
-            <SidebarItem icon='https://i.imgur.com/Uc4bWGn.png' label='Invoices' link='invoices' sidebarOpened={sidebarOpened} />
-            <SidebarItem icon='https://i.imgur.com/no6wh9w.png' label='Management' link='management' sidebarOpened={sidebarOpened} />
+            {userHasPermission(userData.permissions, UserPermission.MANAGE_INVENTORY) &&  <SidebarItem icon='https://i.imgur.com/wZ8e1Lc.png' label='Inventory' link='inventory' sidebarOpened={sidebarOpened} />}
+            {userHasPermission(userData.permissions, UserPermission.MANAGE_EMPLOYEES) &&  <SidebarItem icon='https://i.imgur.com/nWxboHU.png' label='Employees' link='employees' sidebarOpened={sidebarOpened} />}
+            {userHasPermission(userData.permissions, UserPermission.MANAGE_INVOICES) &&  <SidebarItem icon='https://i.imgur.com/Uc4bWGn.png' label='Invoices' link='invoices' sidebarOpened={sidebarOpened} />}
+            {userHasPermission(userData.permissions, UserPermission.ADMINISTRATOR) &&  <SidebarItem icon='https://i.imgur.com/no6wh9w.png' label='Management' link='management' sidebarOpened={sidebarOpened} />}
         </Sidebar>
     )
 }

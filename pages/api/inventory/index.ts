@@ -1,7 +1,7 @@
 import createDBConnection from "../../../database/mongo/db";
 import {StockCategory, StockCategoryJoiSchema} from "../../../database/mongo/schemas/StockCategories";
 import {authenticated} from "../../../utils/api/auth";
-import {UserPermissions} from "../../../types/UserPermissions";
+import {UserPermission} from "../../../types/UserPermission";
 import { handleInvalidHTTPMethod, handleJoiValidation } from "../../../utils/GeneralUtils";
 
 const handler = authenticated(async (req, res) => {
@@ -41,6 +41,6 @@ const handler = authenticated(async (req, res) => {
         // @ts-ignore
         return res.status(500).json({ error: e.message || e });
     }
-}, UserPermissions.MANAGE_INVENTORY);
+}, UserPermission.MANAGE_INVENTORY);
 
 export default handler;

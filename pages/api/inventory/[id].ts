@@ -3,7 +3,7 @@ import Joi from "joi";
 import createDBConnection from "../../../database/mongo/db";
 import {StockCategory} from "../../../database/mongo/schemas/StockCategories";
 import {authenticated} from "../../../utils/api/auth";
-import {UserPermissions} from "../../../types/UserPermissions";
+import {UserPermission} from "../../../types/UserPermission";
 import { handleInvalidHTTPMethod, handleJoiValidation } from "../../../utils/GeneralUtils";
 import { StockItem } from "../../../types/InventoryCategoryObject";
 
@@ -102,7 +102,7 @@ const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) 
         // @ts-ignore
         return res.status(500).json({ error: e.message || e });
     }
-}, UserPermissions.MANAGE_INVENTORY);
+}, UserPermission.MANAGE_INVENTORY);
 
 
 export default handler;

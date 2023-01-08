@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Url } from "url";
 import {MouseEventHandler} from "react";
+import { UserPermission } from "../../types/UserPermission";
 
 type Props = {
     icon?: string,

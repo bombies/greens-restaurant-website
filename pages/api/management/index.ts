@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { authenticated } from "../../../utils/api/auth";
-import { UserPermissions } from "../../../types/UserPermissions";
+import { UserPermission } from "../../../types/UserPermission";
 import createDBConnection from "../../../database/mongo/db";
 import { Config } from "../../../database/mongo/schemas/Config";
 import Joi from "joi";
@@ -67,7 +67,7 @@ const handler = authenticated(
             return res.status(500).json({ error: e.message || e });
         }
     },
-    UserPermissions.ADMINISTRATOR
+    UserPermission.ADMINISTRATOR
 );
 
 export const getConfig = async () => {

@@ -1,19 +1,16 @@
 import {NextApiHandler, NextApiRequest, NextApiResponse} from "next";
 import {verify} from "jsonwebtoken";
-import {UserPermissions} from "../../types/UserPermissions";
+import {UserPermission} from "../../types/UserPermission";
 
-export const authenticated = (fn: NextApiHandler, permissionRequired?: number) => async (req: NextApiRequest, res: NextApiResponse) => {
+export const authenticated = (fn: NextApiHandler, permissionRequired?: UserPermission) => async (req: NextApiRequest, res: NextApiResponse) => {
     // @ts-ignore
     verify(req.cookies.authorization, process.env.LOCAL_API_KEY, async (err, decoded) => {
         if (!err && decoded) {
             if (permissionRequired) {
                 // @ts-ignore
-                if ((decoded.permissions & permissionRequired) === permissionRequired)
+                if (userHasPermission(decoded.permissions, permissionRequired))
                     return await fn(req, res);
                 else {
-                    // @ts-ignore
-                    if ((decoded.permissions & UserPermissions.ADMINISTRATOR) === UserPermissions.ADMINISTRATOR)
-                        return await fn(req, res);
                     return res.status(401).json({
                         error: 'You do not have enough permissions to use this endpoint'
                     });
@@ -25,4 +22,8 @@ export const authenticated = (fn: NextApiHandler, permissionRequired?: number) =
 
         res.status(401).json({ error: 'You are not authenticated', data: {} });
     });
+}
+
+export const userHasPermission = (userPermissions: number, permission: UserPermission) => {
+    return ((userPermissions & permission) === permission) || ((userPermissions & UserPermission.ADMINISTRATOR) === UserPermission.ADMINISTRATOR);
 }

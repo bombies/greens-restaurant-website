@@ -1,5 +1,5 @@
 import { authenticated } from "../../../utils/api/auth";
-import { UserPermissions } from "../../../types/UserPermissions";
+import { UserPermission } from "../../../types/UserPermission";
 import { handleInvalidHTTPMethod, handleJoiValidation } from "../../../utils/GeneralUtils";
 import Joi from "joi";
 import createDBConnection from "../../../database/mongo/db";
@@ -28,6 +28,6 @@ const handler = authenticated(async (req, res) => {
             return handleInvalidHTTPMethod(res, method);
         }
     }
-}, UserPermissions.MANAGE_EMPLOYEES);
+}, UserPermission.MANAGE_EMPLOYEES);
 
 export default handler;
