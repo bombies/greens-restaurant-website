@@ -35,6 +35,8 @@ import Image from "next/image";
 import { Tooltip } from "flowbite-react";
 import ButtonDropDownItem from "../../components/button/ButtonDropDownItem";
 import Link from "next/link";
+import { userHasPermission } from "../../utils/api/auth";
+import { UserPermission } from "../../types/UserPermission";
 
 type Props = {
     id: string;
@@ -250,6 +252,11 @@ const InventoryCategoryPage: NextPage = (props: Props) => {
         }
 
         if (Object.keys(userData).length == 0) {
+            router.push("/");
+            return;
+        }
+
+        if (!userHasPermission(userData.permissions, UserPermission.MANAGE_INVENTORY)) {
             router.push("/");
             return;
         }

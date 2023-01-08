@@ -22,6 +22,8 @@ import axios from "axios";
 import { handleAxiosError } from "../../utils/GeneralUtils";
 import DashboardSection from "../../components/dashboard/DashboardSection";
 import Spinner from "../../components/Spinner";
+import { userHasPermission } from "../../utils/api/auth";
+import { UserPermission } from "../../types/UserPermission";
 
 // @ts-ignore
 const Index: NextPage = () => {
@@ -89,6 +91,11 @@ const Index: NextPage = () => {
         }
 
         if (Object.keys(userData).length == 0) {
+            router.push("/");
+            return;
+        }
+
+        if (!userHasPermission(userData.permissions, UserPermission.MANAGE_INVENTORY)) {
             router.push("/");
             return;
         }

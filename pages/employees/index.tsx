@@ -2,7 +2,7 @@ import { NextPage } from "next";
 import Layout from "../../components/Layout";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { ModalContext } from "../../components/modals/ModalProvider";
 import { NotificationContext } from "../../components/notifications/NotificationProvider";
 import DashboardSection from "../../components/dashboard/DashboardSection";
@@ -11,6 +11,8 @@ import { ButtonType } from "../../types/ButtonType";
 import { removeModal, sendModal } from "../../utils/GeneralUtils";
 import { v4 } from "uuid";
 import { Field, Form } from "react-final-form";
+import { userHasPermission } from "../../utils/api/auth";
+import { UserPermission } from "../../types/UserPermission";
 
 const Employees: NextPage = () => {
     const router = useRouter();
@@ -19,6 +21,23 @@ const Employees: NextPage = () => {
     const dispatchModal = useContext(ModalContext);
     const dispatchNotification = useContext(NotificationContext);
     const reduxDispatch = useDispatch();
+
+    useEffect(() => {
+        if (!userData) {
+            router.push("/");
+            return;
+        }
+
+        if (Object.keys(userData).length == 0) {
+            router.push("/");
+            return;
+        }
+
+        if (!userHasPermission(userData.permissions, UserPermission.MANAGE_EMPLOYEES)) {
+            router.push("/");
+            return;
+        }
+    }, []);
 
     return (
         <Layout

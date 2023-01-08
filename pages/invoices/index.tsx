@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { NotificationContext } from "../../components/notifications/NotificationProvider";
 import { ModalContext } from "../../components/modals/ModalProvider";
 import Layout from "../../components/Layout";
@@ -11,6 +11,8 @@ import { ButtonType } from "../../types/ButtonType";
 import InvoiceObject from "../../types/InvoiceObject";
 import { v4 } from "uuid";
 import Link from "next/link";
+import { userHasPermission } from "../../utils/api/auth";
+import { UserPermission } from "../../types/UserPermission";
 
 const generateInvoiceClickable = (info: InvoiceObject) => {
     return (
@@ -30,6 +32,23 @@ const Invoices: NextPage = () => {
     const userData = useSelector((state) => state.userData.value);
     const dispatchNotification = useContext(NotificationContext);
     const dispatchModal = useContext(ModalContext);
+
+    useEffect(() => {
+        if (!userData) {
+            router.push("/");
+            return;
+        }
+
+        if (Object.keys(userData).length == 0) {
+            router.push("/");
+            return;
+        }
+
+        if (!userHasPermission(userData.permissions, UserPermission.MANAGE_INVOICES)) {
+            router.push("/");
+            return;
+        }
+    }, [])
 
     return (
         <Layout

@@ -8,7 +8,11 @@ import { NotificationContext } from "../../components/notifications/Notification
 import { IConfig } from "../../database/mongo/schemas/Config";
 import { useMutation } from "react-query";
 import axios from "axios";
-import { handleAxiosError, objectCompare, sendNotification } from "../../utils/GeneralUtils";
+import {
+    handleAxiosError,
+    objectCompare,
+    sendNotification,
+} from "../../utils/GeneralUtils";
 import { NotificationType } from "../../types/NotificationType";
 import TextBox from "../../components/TextBox";
 import DashboardRow from "../../components/dashboard/DashboardRow";
@@ -16,11 +20,14 @@ import DashboardSection from "../../components/dashboard/DashboardSection";
 import Button from "../../components/button/Button";
 import { ButtonType } from "../../types/ButtonType";
 import { generateDefaultConfig } from "../../utils/api/ApiUtils";
+import { userHasPermission } from "../../utils/api/auth";
+import { UserData } from "../../types/UserData";
+import { UserPermission } from "../../types/UserPermission";
 
 const Management: NextPage = () => {
     const router = useRouter();
     // @ts-ignore
-    const userData = useSelector((state) => state.userData.value);
+    const userData: UserData = useSelector((state) => state.userData.value);
     const dispatchModal = useContext(ModalContext);
     const dispatchNotification = useContext(NotificationContext);
     const reduxDispatch = useDispatch();
@@ -113,6 +120,11 @@ const Management: NextPage = () => {
         }
 
         if (Object.keys(userData).length == 0) {
+            router.push("/");
+            return;
+        }
+        
+        if (!userHasPermission(userData.permissions, UserPermission.ADMINISTRATOR)) {
             router.push("/");
             return;
         }
