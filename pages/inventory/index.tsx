@@ -17,7 +17,7 @@ import CategoryCard from "../../components/inventory/CategoryCard";
 import { GenerateNotificationAddAction } from "../../components/notifications/NotificationTypes";
 import { NotificationType } from "../../types/NotificationType";
 import Layout from "../../components/Layout";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { handleAxiosError } from "../../utils/GeneralUtils";
 import DashboardSection from "../../components/dashboard/DashboardSection";

@@ -17,11 +17,13 @@ import { Field, Form } from "react-final-form";
 import { GenerateNotificationAddAction } from "../components/notifications/NotificationTypes";
 import { v4 } from "uuid";
 import { NotificationType } from "../types/NotificationType";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { setUserData } from "../utils/redux/UserDataSlice";
 import { handleAxiosError, sendNotification } from "../utils/GeneralUtils";
 import LowStockWidget from "../components/widgets/LowStockWidget";
+import { UserPermission } from "../types/UserPermission";
+import { userHasPermission } from "../utils/api/auth";
 
 type Props = {
     userData: UserData;
@@ -42,7 +44,8 @@ const Home: NextPage = (props: Props) => {
                 .post("/api/login", loginObject)
                 .then((data) => {
                     reduxDispatch(setUserData(data.data.data));
-                    getLowStock.mutate();
+                    if (userHasPermission(userData.permissions, UserPermission.MANAGE_INVENTORY))
+                        getLowStock.mutate();
 
                     if (notificationDispatch) {
                         notificationDispatch(
@@ -88,7 +91,10 @@ const Home: NextPage = (props: Props) => {
 
     useEffect(() => {
         reduxDispatch(setUserData(props.userData));
-        if (Object.keys(props.userData).length !== 0) getLowStock.mutate();
+        if (Object.keys(props.userData).length !== 0) {
+            if (userHasPermission(userData.permissions, UserPermission.MANAGE_INVENTORY))
+                getLowStock.mutate();
+        }
     }, []);
 
     return (
@@ -124,10 +130,7 @@ const Home: NextPage = (props: Props) => {
                                 Overview
                             </h2>
                             <div className="grid grid-cols-2 tablet:grid-cols-1 gap-y-8">
-                                <LowStockWidget stockInfo={lowStockData} />
-                                <LowStockWidget stockInfo={lowStockData} />
-                                <LowStockWidget stockInfo={lowStockData} />
-                                <LowStockWidget stockInfo={lowStockData} />
+                                {userHasPermission(userData.permissions, UserPermission.MANAGE_INVENTORY) && <LowStockWidget stockInfo={lowStockData} />}
                             </div>
                         </div>
                     </div>

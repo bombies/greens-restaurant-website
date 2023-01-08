@@ -2,12 +2,13 @@ import "../styles/globals.scss";
 import type { AppProps } from "next/app";
 import NextNProgress from "nextjs-progressbar";
 import NotificationProvider from "../components/notifications/NotificationProvider";
-import { QueryClient, QueryClientProvider } from "react-query";
 import ModalProvider from "../components/modals/ModalProvider";
 import { Provider } from "react-redux";
 import { persistor, store } from "../utils/redux/GlobalStore";
 import DarkModeWrapper from "../components/DarkModeWrapper";
 import { PersistGate } from "redux-persist/integration/react";
+import { QueryClient } from "@tanstack/query-core";
+import { QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 

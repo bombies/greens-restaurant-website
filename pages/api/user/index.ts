@@ -13,12 +13,17 @@ const handler = authenticated(async (req, res) => {
     const { method, body } = req;
 
     switch (method) {
+        case "GET": {
+            await createDBConnection();
+            const users = await User.find();
+            return res.status(200).json(users);
+        }
         case "DELETE": {
             if (!handleJoiValidation(res, DeleteBody, body))
                 return;
 
             await createDBConnection();
-            const user = User.findOne({ username: body.username });
+            const user = await User.findOne({ username: body.username });
             if (!user)
                 return res.status(400).json({ error: `There was no user with the username: ${body.username}`});
             await User.deleteOne({ username: body.username });

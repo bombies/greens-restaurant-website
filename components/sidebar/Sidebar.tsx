@@ -4,7 +4,7 @@ import React, { MouseEventHandler, useContext, useEffect, useState } from "react
 import Toggle from "../Toggle";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "../../utils/redux/DarkModeSlice";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { GenerateNotificationAddAction } from "../notifications/NotificationTypes";
 import { v4 } from "uuid";

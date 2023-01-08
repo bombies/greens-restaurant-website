@@ -5,7 +5,7 @@ import {
     StockItem,
 } from "../../types/InventoryCategoryObject";
 import { useContext, useEffect, useState } from "react";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import Layout from "../../components/Layout";

@@ -6,7 +6,7 @@ export interface IUser {
     password?: string,
     first_name: string,
     last_name: string,
-    email?: string,
+    email: string,
     avatar?: string | null,
     creation_date: number,
     permissions: number
@@ -17,9 +17,10 @@ export const UserJoiSchema = Joi.object({
     password: Joi.string().required(),
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),
-    email: Joi.string().email(),
+    email: Joi.string().email().required(),
     avatar: Joi.string().allow(null),
-    creation_date: Joi.number().required()
+    creation_date: Joi.number().required(),
+    permissions: Joi.number().required()
 });
 
 export const UserJoiPatchSchema = Joi.object({

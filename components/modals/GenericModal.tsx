@@ -13,7 +13,7 @@ const GenericModal = (props: Props) => {
 
     return (
         <div className='fixed z-50 bg-neutral-800 bg-opacity-50 w-full h-full flex items-center'>
-            <div className='absolute w-3/4 min-h-fit bg-white dark:bg-neutral-900 rounded-xl py-12 px-6 left-0 right-0 mx-auto'>
+            <div className='absolute w-3/5 tablet:w-3/4 phone:w-5/6 min-h-fit bg-opacity-50 backdrop-blur-xl bg-green-400 dark:bg-green-500 rounded-xl py-12 px-6 left-0 right-0 mx-auto'>
                 <div
                     className={'absolute right-4 top-4 w-5 h-5 cursor-pointer opacity-25 hover:opacity-100 transition-faster'}
                     onClick={() => {
@@ -22,15 +22,15 @@ const GenericModal = (props: Props) => {
                         props.dispatchModalRemoval(GenerateGenericModalRemoveAction(props.id));
                     }}
                 >
-                    <Image src={darkMode ? 'https://i.imgur.com/qNlanxv.png' : 'https://i.imgur.com/tl7Zktf.png'} alt='' fill={true} />
+                    <Image src={'https://i.imgur.com/qNlanxv.png'} alt='' fill={true} />
                 </div>
                 { props.title &&
                     <div>
-                        <h1 className='font-bold text-4xl tracking-wider text-center mb-4 dark:text-white'>{props.title}</h1>
+                        <h1 className='font-bold text-5xl drop-shadow-md tracking-widest text-center mb-4 text-white'>{props.title}</h1>
                         <hr className='mb-4' />
                     </div>
                 }
-                <p className='text-xl text-center mb-6 dark:text-white'>{props.description}</p>
+                <p className='text-2xl text-center mb-6 drop-shadow-md text-white'>{props.description}</p>
                 {props.children}
             </div>
         </div>
