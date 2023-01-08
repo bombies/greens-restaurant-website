@@ -5,6 +5,7 @@ import {StockCategory} from "../../../database/mongo/schemas/StockCategories";
 import {authenticated} from "../../../utils/api/auth";
 import {UserPermissions} from "../../../types/UserPermissions";
 import { handleInvalidHTTPMethod, handleJoiValidation } from "../../../utils/GeneralUtils";
+import { StockItem } from "../../../types/InventoryCategoryObject";
 
 const PatchBody = Joi.object({
     name: Joi.string(),
@@ -50,10 +51,11 @@ const handler = authenticated(async (req: NextApiRequest, res: NextApiResponse) 
                         });
 
                 const existingItem = fetchedDoc.stock.filter(
-                    (x: any) =>
+                    (x: StockItem) =>
                         x.name.toLowerCase() === body.name.toLowerCase()
                 );
-                if (existingItem)
+
+                if (existingItem.length)
                     return res
                         .status(401)
                         .json({
