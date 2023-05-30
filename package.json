@@ -24,7 +24,7 @@
     "flowbite": "^1.6.5",
     "flowbite-react": "^0.4.1",
     "generate-password-ts": "^1.6.3",
-    "joi": "^17.6.0",
+    "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
     "loader-utils": "^3.2.1",
     "mongoose": "^6.8.2",
