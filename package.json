@@ -28,7 +28,7 @@
     "jsonwebtoken": "^9.0.0",
     "loader-utils": "^3.2.1",
     "mongoose": "^7.2.2",
-    "next": "13.0.6",
+    "next": "13.4.4",
     "nextjs-progressbar": "^0.0.16",
     "nodemailer": "^6.9.3",
     "react": "18.2.0",
