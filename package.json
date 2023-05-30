@@ -34,7 +34,7 @@
     "@redux-devtools/core": "^3.13.1",
     "@types/bcrypt": "^5.0.0",
     "@types/node": "20.2.5",
-    "@types/react": "18.0.26",
+    "@types/react": "18.2.7",
     "@types/react-dom": "18.0.11",
     "@typescript-eslint/parser": "^5.45.0",
     "autoprefixer": "^10.4.14",
