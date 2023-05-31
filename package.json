@@ -11,7 +11,7 @@
   "dependencies": {
     "@next/font": "^13.4.4",
     "@reduxjs/toolkit": "^1.9.5",
-    "@tanstack/react-query": "^4.26.0",
+    "@tanstack/react-query": "^4.29.12",
     "@types/joi": "^17.2.3",
     "@types/mongoose": "^5.11.97",
     "@types/nodemailer": "^6.4.8",
