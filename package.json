@@ -43,7 +43,7 @@
     "@redux-devtools/core": "^3.13.1",
     "@types/bcrypt": "^5.0.0",
     "@types/cookie": "^0.5.1",
-    "@types/jsonwebtoken": "^8.5.9",
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "20.2.5",
     "@types/react": "18.2.7",
     "@types/react-dom": "18.2.4",
