@@ -16,7 +16,7 @@
     "@types/mongoose": "^5.11.97",
     "@types/nodemailer": "^6.4.8",
     "@types/uuid": "^8.3.4",
-    "@vercel/og": "^0.0.20",
+    "@vercel/og": "^0.5.6",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "cookie": "^0.5.0",
