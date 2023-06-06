@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+$transition-slowest: 1000ms;
+$transition-slow: 700ms;
+$transition-medium: 500ms;
+$transition-fast: 300ms;
+$transition-faster: 100ms;
+$transition-fastest: 75ms;
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.bg-blurred {
+    background-image: url(https://i.imgur.com/GYsutX5.jpg);
+}
+
+.transition-slow {
+    transition: all ease-in-out $transition-slow;
+}
+
+.transition-slowest {
+    transition: all ease-in-out $transition-slowest;
+}
+
+.transition-medium {
+    transition: all ease-in-out $transition-medium;
+}
+
+.transition-fast {
+    transition: all ease-in-out $transition-fast;
+}
+
+.transition-faster {
+    transition: all ease-in-out $transition-faster;
+}
+
+.transition-fastest {
+    transition: all ease-in-out $transition-fastest;
+}
+
+::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(82, 82, 82);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #292929;
+}
