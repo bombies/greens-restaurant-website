@@ -6,6 +6,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import close from "/public/icons/close-circled.svg";
 import check from '/public/icons/check-green-circled.svg';
+import signInIcon from '/public/icons/sign-in.svg';
 import { sendToast } from "../../utils/Hooks";
 import GenericImage from "../_components/GenericImage";
 import GenericInput from "../_components/inputs/GenericInput";
@@ -103,6 +104,7 @@ export default function HomePage() {
                         type='submit'
                         disabled={isAuthenticating}
                         loading={isAuthenticating}
+                        icon={signInIcon}
                         fullWidth
                     >
                         Login

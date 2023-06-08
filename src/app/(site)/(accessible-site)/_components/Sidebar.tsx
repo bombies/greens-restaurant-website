@@ -8,6 +8,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import InventoryIcon from "../../../_components/icons/InventoryIcon";
 import waving from '/public/icons/waving-hand.svg';
+import signOutIcon from '/public/icons/sign-out.svg';
 import GenericImage from "../../../_components/GenericImage";
 import GenericButton from "../../../_components/inputs/GenericButton";
 import UsersIcon from "../../../_components/icons/UsersIcon";
@@ -32,7 +33,10 @@ export default function Sidebar() {
                     <InvoicesSidebarItem />
                     <ManagementSidebarItem />
                 </div>
-                <GenericButton shadow onClick={() => signOut().then(() => {
+                <GenericButton
+                    shadow
+                    icon={signOutIcon}
+                    onClick={() => signOut().then(() => {
                     sendToast({
                         description: 'See you later!',
                         icon: waving

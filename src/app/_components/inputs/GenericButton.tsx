@@ -4,7 +4,7 @@ import ComponentColor from "../ComponentColor";
 import { StaticImageData } from "next/image";
 import clsx from "clsx";
 import GenericImage from "../GenericImage";
-import Spinner from "../../../components/Spinner";
+import { Spinner } from "@nextui-org/spinner";
 
 interface Props extends React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
     size?: ComponentSize;
@@ -90,13 +90,13 @@ export default function GenericButton(props: Props) {
             <div className="flex justify-center gap-4">
                 {
                     props.loading ?
-                        <Spinner size={1.25} />
+                        <Spinner size='sm' color='white' />
                         :
                         <div className={clsx(
                             "flex justify-center gap-4 self-center my-auto text-white",
                             props.iconPlacement === "right" ? "flex-row-reverse" : "")
                         }>
-                            {props.icon && <GenericImage className='self-center' src={props.icon} width={1.25} />}
+                            {props.icon && <GenericImage className='self-center' src={props.icon} width={1.35} />}
                             {props.children}
                         </div>
                 }
