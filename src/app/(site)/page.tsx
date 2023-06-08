@@ -15,7 +15,7 @@ import { Spacer } from "@nextui-org/react";
 export default function HomePage() {
     const userInfo = useSession();
     const router = useRouter();
-    const form = useForm({
+    const form = useForm<FieldValues>({
         defaultValues: {
             "email": "",
             "password": ""
