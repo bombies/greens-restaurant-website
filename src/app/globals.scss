@@ -1,3 +1,5 @@
+@import 'node_modules/nprogress/nprogress.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,6 +10,16 @@ $transition-medium: 500ms;
 $transition-fast: 300ms;
 $transition-faster: 100ms;
 $transition-fastest: 75ms;
+
+@layer components {
+    .default-container {
+        background-color: rgb(23 23 23 / 0.5);
+        border-width: theme('borderWidth.2');
+        border-color: rgb(255 255 255 / 0.05);
+        border-radius: theme('borderRadius.3xl');
+        box-shadow: theme('boxShadow.inner');
+    }
+}
 
 * {
     box-sizing: border-box;

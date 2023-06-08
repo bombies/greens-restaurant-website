@@ -27,8 +27,8 @@ export default function Providers(props: Props) {
         >
             <SSRProvider>
                 <ReduxProvider>
-                    <NextUIProvider>
-                        <DarkModeProvider>
+                    <DarkModeProvider>
+                        <NextUIProvider>
                             <SessionProvider session={props.session}>
 
                                 <Toaster
@@ -37,8 +37,8 @@ export default function Providers(props: Props) {
                                 />
                                 {props.children}
                             </SessionProvider>
-                        </DarkModeProvider>
-                    </NextUIProvider>
+                        </NextUIProvider>
+                    </DarkModeProvider>
                 </ReduxProvider>
             </SSRProvider>
         </SWRConfig>

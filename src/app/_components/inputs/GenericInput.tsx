@@ -7,21 +7,35 @@ import lock from "/public/icons/lock.svg";
 import unlocked from "/public/icons/unlocked.svg";
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
-import { FieldValues, UseFormRegister } from "react-hook-form";
+import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
 
 type Props = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "size"> & {
+    containerClass?: string,
     id: string;
-    label: string;
+    label?: string;
     width?: number;
     iconLeft?: string | StaticImageData;
     iconRight?: string | StaticImageData;
     required?: boolean;
-    register: UseFormRegister<FieldValues>;
+    register?: UseFormRegister<FieldValues>;
+    errors?: FieldErrors,
     size?: ComponentSize;
+    doAutoComplete?: boolean
 }
 
 export default function GenericInput({
-                                         id, label, size, width, iconLeft, iconRight, required, register, ...props
+                                         containerClass,
+                                         id,
+                                         label,
+                                         size,
+                                         width,
+                                         iconLeft,
+                                         iconRight,
+                                         required,
+                                         register,
+                                         errors,
+                                         doAutoComplete,
+                                         ...props
                                      }: Props) {
     const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -55,20 +69,28 @@ export default function GenericInput({
 
     return (
         <label>
-                <span className="block">
-                    <p className="mb-2">{label}</p>
-                </span>
-            <div className="relative placeholder:none">
+            {
+                label && (
+                    <span className="block">
+                        <p className="mb-2">{label}</p>
+                    </span>
+                )
+            }
+
+            <div className={clsx("relative placeholder:none", containerClass && containerClass)}>
                 {
                     iconLeft &&
                     <span className="z-10 absolute inset-y-0 left-0 flex items-center pl-3">
                             <GenericImage src={iconLeft} width={1.25} />
                         </span>
                 }
-                <input
-                    {...register(id, { required })}
-                    {...props}
-                    className={clsx(`
+                {
+                    register ?
+                        (
+                            <input
+                                {...register(id, { required })}
+                                {...props}
+                                className={clsx(`
                     outline-none
                     rounded-xl
                     ring-2
@@ -81,18 +103,53 @@ export default function GenericInput({
                     bg-neutral-900
                     disabled:opacity-50
                     disabled:cursor-not-allowed`,
-                        parsedSize,
-                        iconLeft ? "pl-10" : "pl-4",
-                        iconRight || props.type === "password" ? "pr-10" : "pr-4"
-                    )}
-                    style={{
-                        width: width ? `${width}rem` : "100%"
-                    }}
-                    id={id}
-                    autoComplete={id}
-                    placeholder={props.placeholder}
-                    type={props.type === "password" ? (passwordVisible ? "text" : "password") : props.type}
-                />
+                                    errors && (errors[id] && "focus:ring-danger"),
+                                    parsedSize,
+                                    iconLeft ? "pl-10" : "pl-4",
+                                    iconRight || props.type === "password" ? "pr-10" : "pr-4"
+                                )}
+                                style={{
+                                    width: width ? `${width}rem` : "100%"
+                                }}
+                                id={id}
+                                autoComplete={doAutoComplete ? id : undefined}
+                                placeholder={props.placeholder}
+                                type={props.type === "password" ? (passwordVisible ? "text" : "password") : props.type}
+                            />
+                        )
+                        :
+                        (
+                            <input
+                                {...props}
+                                className={clsx(`
+                    outline-none
+                    rounded-xl
+                    ring-2
+                    ring-neutral-800
+                    placeholder-neutral-500
+                    focus:ring-primary
+                    focus:-translate-y-[0.15rem]
+                    focus:placeholder:opacity-0
+                    transition-fast
+                    bg-neutral-900
+                    disabled:opacity-50
+                    disabled:cursor-not-allowed`,
+                                    errors && (errors[id] && "focus:ring-danger"),
+                                    parsedSize,
+                                    iconLeft ? "pl-10" : "pl-4",
+                                    iconRight || props.type === "password" ? "pr-10" : "pr-4"
+                                )}
+                                style={{
+                                    width: width ? `${width}rem` : "100%"
+                                }}
+                                id={id}
+                                autoComplete={doAutoComplete ? id : undefined}
+                                placeholder={props.placeholder}
+                                type={props.type === "password" ? (passwordVisible ? "text" : "password") : props.type}
+                            />
+                        )
+                }
+
                 {
                     props.type === "password" ?
                         <span className="z-10 absolute inset-y-0 right-0 flex items-center pr-3"

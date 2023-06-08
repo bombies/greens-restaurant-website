@@ -22,9 +22,11 @@ export default function Sidebar() {
 
     const sidebar = (
         <div
-            className={`h-fit max-h-[90vh] w-96 py-12 px-6 border-2 border-white/5 bg-neutral-900/50 backdrop-blur-md rounded-3xl transition-fast shadow-inner`}>
+            className={`h-fit max-h-[90vh] default-container w-96 py-12 px-6 backdrop-blur-md transition-fast`}>
             <div className="flex justify-center">
-                <GenericImage src="https://i.imgur.com/HLTQ78m.png" width={10} />
+                <Link href='/home'>
+                    <GenericImage  src="https://i.imgur.com/HLTQ78m.png" width={10} />
+                </Link>
             </div>
             <div>
                 <div className="w-full max-h-[50vh] overflow-y-auto flex flex-col mb-6">

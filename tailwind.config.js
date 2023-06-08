@@ -22,7 +22,7 @@ module.exports = {
         },
         extend: {
             colors: {
-                dark: "#0E0E0EFF",
+                dark: "#101010",
                 primary: "#00D615",
                 secondary: "#007d0d",
                 danger: "#ff2c2c",
@@ -80,10 +80,12 @@ module.exports = {
             }
         }
     },
+    darkMode: "class",
     plugins: [nextui({
         themes: {
             light: {
                 primary: "#00D615",
+                brand: "#00D615",
                 secondary: "#007d0d",
                 danger: "#ff2c2c",
                 warning: "#ffa700",
@@ -91,6 +93,7 @@ module.exports = {
             },
             dark: {
                 primary: "#00D615",
+                brand: "#00D615",
                 secondary: "#007d0d",
                 danger: "#ff2c2c",
                 warning: "#ffa700",
@@ -99,5 +102,4 @@ module.exports = {
         },
         defaultTheme: 'dark'
     })],
-    darkMode: "class"
 };

@@ -8,9 +8,9 @@ export default function AccessibleSiteLayout(props: React.PropsWithChildren) {
             backgroundRepeat: 'no-repeat',
             backgroundAttachment: 'fixed'
         }}>
-            <div className='flex tablet:block'>
+            <div className='flex w-full tablet:block'>
                 <Sidebar />
-                <div className='p-12 tablet:py-20'>
+                <div className='p-12 flex-grow tablet:py-20'>
                     {props.children}
                 </div>
             </div>
