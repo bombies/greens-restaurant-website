@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useSelector } from "react-redux";
+import { useDarkMode } from "../app/_components/DarkModeProvider";
 
 type Props = {
     opacity?: number,
@@ -7,8 +8,7 @@ type Props = {
 }
 
 const Spinner = (props: Props) => {
-    // @ts-ignore
-    const darkMode = useSelector(state => state.darkMode.value);
+    const [darkMode] = useDarkMode();
 
     return (
         <div className='animate-spin relative' style={{

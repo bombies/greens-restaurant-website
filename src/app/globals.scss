@@ -15,8 +15,47 @@ $transition-fastest: 75ms;
     padding: 0;
 }
 
+h1 {
+    font-size: 4rem;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
 html {
     scroll-behavior: smooth;
+    color: white;
+}
+
+.sidebar-enter {
+    position: absolute;
+    transform: translateX(-200%);
+}
+
+.sidebar-enter-active {
+    transform: translateX(0%);
+    transition: all 500ms ease;
+}
+
+.sidebar-enter-done {
+    transform: translateX(0%);
+    transition: all 500ms ease;
+}
+
+.sidebar-exit {
+    position: absolute;
+}
+
+.sidebar-exit-active {
+    transform: translateX(-200%);
+    transition: all 500ms ease;
+}
+
+.sidebar-exit-done {
+
 }
 
 .bg-blurred {

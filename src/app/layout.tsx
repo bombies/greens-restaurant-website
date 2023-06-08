@@ -19,7 +19,9 @@ interface Props extends React.PropsWithChildren {
 
 export default function HomeLayout(props: Props) {
     return (
-        <html className={inter.className}>
+        <html className={inter.className} style={{
+            backgroundImage: 'url("/images/mesh-bg-2.png")'
+        }}>
             <Providers session={props.session}>
                 <ProgressBar />
                 {props.children}

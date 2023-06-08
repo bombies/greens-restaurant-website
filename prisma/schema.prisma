@@ -18,7 +18,7 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   image       String?
-  permissions Int      @default(0)
+  permissions Int
 
   createdInventoryIds String[]    @db.ObjectId
   createdInventories  Inventory[] @relation()
