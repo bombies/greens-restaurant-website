@@ -93,7 +93,7 @@ export default function GenericButton(props: Props) {
                         <Spinner size={1.25} />
                         :
                         <div className={clsx(
-                            "flex justify-center gap-4 self-center my-auto",
+                            "flex justify-center gap-4 self-center my-auto text-white",
                             props.iconPlacement === "right" ? "flex-row-reverse" : "")
                         }>
                             {props.icon && <GenericImage className='self-center' src={props.icon} width={1.25} />}

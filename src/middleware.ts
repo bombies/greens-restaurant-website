@@ -9,5 +9,8 @@ export default withAuth({
 export const config = {
     matcher: [
         "/home/:path*",
+        "/employees/:path*",
+        "/inventory/:path*",
+        "/management/:path*",
     ]
 };

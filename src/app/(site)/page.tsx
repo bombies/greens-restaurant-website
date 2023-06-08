@@ -1,7 +1,6 @@
 "use client";
 
 import { signIn, useSession } from "next-auth/react";
-import { Button, Input, Loading, Spacer } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -11,6 +10,7 @@ import { sendToast } from "../../utils/Hooks";
 import GenericImage from "../_components/GenericImage";
 import GenericInput from "../_components/inputs/GenericInput";
 import GenericButton from "../_components/inputs/GenericButton";
+import { Spacer } from "@nextui-org/react";
 
 export default function HomePage() {
     const userInfo = useSession();

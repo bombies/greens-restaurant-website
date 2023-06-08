@@ -28,7 +28,7 @@ export default function Sidebar() {
             <div>
                 <div className="w-full max-h-[50vh] overflow-y-auto flex flex-col mb-6">
                     <InventorySidebarItem />
-                    <UsersSidebarItem />
+                    <EmployeesSidebarItem />
                     <InvoicesSidebarItem />
                     <ManagementSidebarItem />
                 </div>
@@ -122,15 +122,15 @@ function InventorySidebarItem() {
     />);
 }
 
-function UsersSidebarItem() {
+function EmployeesSidebarItem() {
     const [iconColor, setIconColor] = useState("#ffffff");
     const setActiveColor = () => setIconColor("#00D615");
     const setDefaultColor = () => setIconColor("#ffffff");
 
     const icon = <UsersIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
     return (<SidebarItem
-        label={"Users"}
-        href={"users"}
+        label={"Employees"}
+        href={"employees"}
         icon={icon}
         onHoverEnter={setActiveColor}
         onHoverLeave={setDefaultColor}

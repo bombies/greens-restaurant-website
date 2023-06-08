@@ -1,5 +1,4 @@
 import {NextApiHandler, NextApiRequest, NextApiResponse} from "next";
-import {verify} from "jsonwebtoken";
 import {UserPermission} from "../../types/UserPermission";
 
 export const authenticated = (fn: NextApiHandler, permissionRequired?: UserPermission) => async (req: NextApiRequest, res: NextApiResponse) => {
