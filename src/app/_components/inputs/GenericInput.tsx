@@ -3,49 +3,52 @@
 import { DetailedHTMLProps, InputHTMLAttributes, useState } from "react";
 import clsx from "clsx";
 import ComponentSize from "../ComponentSize";
-import lock from '/public/icons/lock.svg';
-import unlocked from '/public/icons/unlocked.svg';
+import lock from "/public/icons/lock.svg";
+import unlocked from "/public/icons/unlocked.svg";
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
 import { FieldValues, UseFormRegister } from "react-hook-form";
 
-interface Props extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
+type Props = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "size"> & {
+    id: string;
     label: string;
-    size?: ComponentSize;
     width?: number;
     iconLeft?: string | StaticImageData;
     iconRight?: string | StaticImageData;
     required?: boolean;
     register: UseFormRegister<FieldValues>;
+    size?: ComponentSize;
 }
 
-export default function GenericInput(props: Props) {
+export default function GenericInput({
+                                         id, label, size, width, iconLeft, iconRight, required, register, ...props
+                                     }: Props) {
     const [passwordVisible, setPasswordVisible] = useState(false);
 
-    let size: string;
-    switch (props.size) {
+    let parsedSize: string;
+    switch (size) {
         case "xs": {
-            size = "py-2";
+            parsedSize = "py-2";
             break;
         }
         case "sm": {
-            size = "py-3";
+            parsedSize = "py-3";
             break;
         }
         case "md": {
-            size = "py-4";
+            parsedSize = "py-4";
             break;
         }
         case "lg": {
-            size = "py-5";
+            parsedSize = "py-5";
             break;
         }
         case "xl": {
-            size = "py-6";
+            parsedSize = "py-6";
             break;
         }
         default: {
-            size = "py-4";
+            parsedSize = "py-4";
             break;
         }
     }
@@ -53,17 +56,17 @@ export default function GenericInput(props: Props) {
     return (
         <label>
                 <span className="block">
-                    <p className='mb-2'>{props.label}</p>
+                    <p className="mb-2">{label}</p>
                 </span>
             <div className="relative placeholder:none">
                 {
-                    props.iconLeft &&
+                    iconLeft &&
                     <span className="z-10 absolute inset-y-0 left-0 flex items-center pl-3">
-                            <GenericImage src={props.iconLeft} width={1.25} />
+                            <GenericImage src={iconLeft} width={1.25} />
                         </span>
                 }
                 <input
-                    {...props.register(props.id, { required: props.required })}
+                    {...register(id, { required })}
                     {...props}
                     className={clsx(`
                     outline-none
@@ -78,26 +81,28 @@ export default function GenericInput(props: Props) {
                     bg-neutral-900
                     disabled:opacity-50
                     disabled:cursor-not-allowed`,
-                        size,
-                        props.iconLeft ? 'pl-10' : 'pl-4',
-                        props.iconRight || props.type === 'password' ? 'pr-10' : 'pr-4'
+                        parsedSize,
+                        iconLeft ? "pl-10" : "pl-4",
+                        iconRight || props.type === "password" ? "pr-10" : "pr-4"
                     )}
                     style={{
-                        width: props.width ? `${props.width}rem` : "100%"
+                        width: width ? `${width}rem` : "100%"
                     }}
-                    id={props.id}
-                    autoComplete={props.id}
+                    id={id}
+                    autoComplete={id}
                     placeholder={props.placeholder}
                     type={props.type === "password" ? (passwordVisible ? "text" : "password") : props.type}
                 />
                 {
                     props.type === "password" ?
-                        <span className="z-10 absolute inset-y-0 right-0 flex items-center pr-3" onClick={() => setPasswordVisible(prev => !prev)}>
-                                <GenericImage src={passwordVisible ? lock : unlocked} width={1.25} onClick={() => setPasswordVisible(prev => !prev)} />
+                        <span className="z-10 absolute inset-y-0 right-0 flex items-center pr-3"
+                              onClick={() => setPasswordVisible(prev => !prev)}>
+                                <GenericImage src={passwordVisible ? lock : unlocked} width={1.25}
+                                              onClick={() => setPasswordVisible(prev => !prev)} />
                             </span> :
-                        props.iconRight &&
+                        iconRight &&
                         <span className="z-10 absolute inset-y-0 right-0 flex items-center pr-3">
-                            <GenericImage src={props.iconRight} width={1.25} />
+                            <GenericImage src={iconRight} width={1.25} />
                         </span>
                 }
             </div>
