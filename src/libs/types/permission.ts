@@ -12,8 +12,12 @@ export enum Permission {
 }
 
 export const hasPermission = (userPermissions: number, permission: Permission) => {
-    return ((userPermissions & permission) === permission) || ((userPermissions & Permission.ADMINISTRATOR) === Permission.ADMINISTRATOR);
+    return (permissionCheck(userPermissions, permission)) || ((userPermissions & Permission.ADMINISTRATOR) === Permission.ADMINISTRATOR);
 };
+
+export const permissionCheck = (userPermissions: number, permission: Permission) => {
+    return (userPermissions & permission) === permission
+}
 
 type PermissionObject = {
     label: string,

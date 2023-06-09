@@ -17,6 +17,7 @@ export type SelectMenuContent = {
 }
 
 interface Props {
+    id: string,
     content?: SelectMenuContent[],
     placeholder?: string,
     size?: ComponentSize,
@@ -64,8 +65,10 @@ const parseCategories = (content?: SelectMenuContent[]): { category?: string, it
 };
 
 const generateCategoryElement = (
+    key: string,
     content: { category?: string, items: SelectMenuContent[] },
-    handleSelect: (val: SelectMenuContent) => void, selectedItems?: SelectMenuContent[],
+    handleSelect: (val: SelectMenuContent) => void,
+    selectedItems?: SelectMenuContent[],
     displayCategories?: boolean,
     onItemSelect?: (item: SelectMenuContent) => void
 ) => {
@@ -73,10 +76,10 @@ const generateCategoryElement = (
         return selectedItems ? selectedItems.filter(i => i.value === item.value).length > 0 : false;
     };
 
-    const itemElements = content.items.map(item => {
+    const itemElements = content.items.map((item, i) => {
         return (
             <div
-                key={`${content.category}#${item.label}#${item.value}`}
+                key={`${content.category || i}#${item.label}#${item.value}`}
                 className="flex gap-4 cursor-pointer"
                 onClick={() => {
                     handleSelect(item);
@@ -93,7 +96,7 @@ const generateCategoryElement = (
     });
 
     return (
-        <div>
+        <div key={key}>
             {displayCategories !== false &&
                 <h4 className="dark:text-neutral-600 text-neutral-700 text-center uppercase font-semibold text-sm my-3 select-none whitespace-nowrap overflow-hidden text-ellipsis">{content.category || "No Category"}</h4>}
             {itemElements}
@@ -107,14 +110,9 @@ export default function SelectMenu(props: Props) {
     const [searchValue, setSearchValue] = useState("");
     const [visibleItems, setVisibleItems] = useState(parseCategories(props.content));
 
-
-    useEffect(() => {
-        setSelected(props.content?.filter(item => item.selected === true));
-    }, [props.content]);
-
     useEffect(() => {
         setVisibleItems(searchValue === "" ? parseCategories(props.content) : parseCategories(props.content?.filter(item => item.label.toLowerCase().includes(searchValue.trim()))));
-    }, [searchValue, props.content, setVisibleItems]);
+    }, [props.content, searchValue, setVisibleItems]);
 
     const toggleExpanded = () => {
         if (props.disabled)
@@ -154,7 +152,16 @@ export default function SelectMenu(props: Props) {
             }
         });
     };
-    const categories = visibleItems.map(category => generateCategoryElement(category, handleSelect, selected, props.displayCategories));
+
+    const categories = visibleItems.map((category, i) =>
+        generateCategoryElement(
+            category.category ? `select_category:${category.category}` : `select_category:${i}`,
+            category,
+            handleSelect,
+            selected,
+            props.displayCategories
+        )
+    );
 
     const wrapperRef = useRef<any>(null);
     const optionsViewRef = useRef<any>(null);
@@ -201,6 +208,7 @@ export default function SelectMenu(props: Props) {
                 ref={optionsViewRef}
             >
                 <GenericInput
+                    id={`select_menu_search:${props.id}`}
                     containerClass="mb-2"
                     placeholder="Search..."
                     value={searchValue}

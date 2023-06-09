@@ -7,8 +7,8 @@ import { Divider } from "@nextui-org/divider";
 import GenericButton from "../../../../_components/inputs/GenericButton";
 import inviteIcon from "/public/icons/invite.svg";
 import SelectMenu, { SelectMenuContent } from "../../../../_components/inputs/SelectMenu";
-import { useEffect, useMemo, useState } from "react";
-import { Permissions } from "../../../../../libs/types/permission";
+import { useEffect, useState } from "react";
+import { permissionCheck, Permissions } from "../../../../../libs/types/permission";
 import { InviteDto } from "../../../../api/users/invite/route";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
@@ -42,25 +42,23 @@ export default function InviteEmployeeForm() {
                 description: "Invitation sent!",
                 icon: checkIcon
             }, {
-                position: 'top-center'
+                position: "top-center"
             }))
             .catch((err) => {
-                console.error(err)
+                console.error(err);
                 sendToast({
                     description: "Could not send invitation!"
                 }, {
-                    position: 'top-center'
-                })
+                    position: "top-center"
+                });
             });
     }, [inviteInfo, triggerInvitation]);
 
-    const selectionMenuContent = useMemo<SelectMenuContent[]>(() => {
-        return Permissions.map<SelectMenuContent>(permission => ({
-            label: permission.label,
-            value: permission.value.toString()
-        }));
-
-    }, []);
+    const selectionMenuContent = Permissions.map<SelectMenuContent>(permission => ({
+        label: permission.label,
+        value: permission.value.toString(),
+        selected: false
+    }));
 
     const submitHandler: SubmitHandler<FieldValues> = (data) => {
         const inviteData: InviteDto = {
@@ -70,7 +68,6 @@ export default function InviteEmployeeForm() {
             username: data.newUsername,
             permissions
         };
-
         setInviteInfo(inviteData);
     };
 
@@ -116,17 +113,22 @@ export default function InviteEmployeeForm() {
             <Spacer y={6} />
             <p className="mb-[.5rem]">Permissions</p>
             <SelectMenu
+                id="permissions_select"
+                content={selectionMenuContent}
                 fullWidth
                 multiSelect
                 disabled={invitationIsSending}
                 displayCategories={false}
                 handleItemSelect={item => {
-                    setPermissions(prev => prev + Number(item.value));
+                    setPermissions(prev =>
+                        prev + (!permissionCheck(prev, Number(item.value)) ? Number(item.value) : 0)
+                    );
                 }}
                 handleItemDeselect={item => {
-                    setPermissions(prev => prev - Number(item.value));
+                    setPermissions(prev =>
+                        prev - (permissionCheck(prev, Number(item.value)) ? Number(item.value) : 0)
+                    );
                 }}
-                content={selectionMenuContent}
 
             />
             <Spacer y={6} />
