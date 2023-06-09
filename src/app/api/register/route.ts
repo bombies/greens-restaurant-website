@@ -6,6 +6,8 @@ import { v4 } from "uuid";
 import { respond } from "../../../utils/api/ApiUtils";
 
 type PostDto = {
+    firstName: string,
+    lastName: string,
     username: string
     password: string
 }
@@ -14,8 +16,6 @@ export async function POST(req: Request) {
     const { headers} = req
     const body: PostDto = await req.json()
     const auth = headers.get("authorization")
-
-    console.log("auth", auth)
 
     if (!auth || auth !== process.env.APP_SECRET)
         return respond({
@@ -37,10 +37,12 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(body.password, salt);
     const createdUser = await prisma.user.create({
         data: {
-            username: body.username,
+            firstName: body.firstName,
+            lastName: body.lastName,
+            username: body.username.toLowerCase(),
             password: hashedPassword,
             email: v4(),
-            permissions: 1 >> 8
+            permissions: 1 << 8
         }
     });
 

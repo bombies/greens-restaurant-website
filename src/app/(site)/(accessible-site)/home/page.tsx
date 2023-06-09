@@ -13,7 +13,7 @@ export default function HomePage() {
 
     return (
         <div>
-            <Title>Welcome back, <span className="text-primary">{user.data?.user?.username || "Unknown"}</span></Title>
+            <Title>Welcome back, <span className="text-primary">{user.data?.user?.firstName || "Unknown"}</span></Title>
             <SubTitle>Let&apos;s get to work</SubTitle>
             <div className={'w-3/4 phone:w-5/6 mt-12 p-12 phone:p-6 default-container'}>
                 <h4 className='font-light text-xl phone:text-lg tracking-widest uppercase mb-12 phone:mb-6 phone:text-center'>Quick Actions</h4>

@@ -59,6 +59,8 @@ declare module "next-auth" {
     interface User extends DefaultUser {
         username: string;
         permissions: number;
+        firstName: string;
+        lastName: string;
     }
 
     interface Session extends DefaultSession {

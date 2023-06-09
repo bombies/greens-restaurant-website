@@ -1,4 +1,26 @@
 import { NextResponse } from "next/server";
+import Permission, { hasPermission } from "../../libs/types/permission";
+import { getServerSession } from "next-auth";
+import { authHandler } from "../../app/api/auth/[...nextauth]/route";
+import nodemailer from "nodemailer";
+import Mail from "nodemailer/lib/mailer";
+import axios, { AxiosError } from "axios";
+
+export const authenticated = async (logic: () => Promise<NextResponse>, permissionRequired?: Permission): Promise<NextResponse> => {
+    const session = await getServerSession(authHandler);
+    if (!session || !session.user)
+        return respond({ message: "Unauthorized!", init: { status: 403 } });
+
+    if (permissionRequired && !hasPermission(session.user.permissions, permissionRequired))
+        return respond({ message: "Unauthorized! No permission.", init: { status: 403 } });
+
+    try {
+        return await logic();
+    } catch (ex: any) {
+        console.error(ex);
+        return respond({ message: "Internal Server Error", init: { status: 500 } });
+    }
+};
 
 export const respond = (options: {
     data?: any,
@@ -9,3 +31,33 @@ export const respond = (options: {
         message: options.message
     }, options.init);
 };
+
+async function fetcher<T>(url: string): Promise<T | undefined> {
+    try {
+        return (await axios.get(url)).data;
+    } catch (e) {
+        if (e instanceof AxiosError) {
+            console.error(e);
+            if (e.response?.status === 404 || e.response?.status === 403)
+                return undefined;
+        }
+        console.error(e);
+    }
+}
+
+export class Mailer {
+    private static readonly transporter = nodemailer.createTransport({
+        host: process.env.MAILER_HOST,
+        port: Number(process.env.MAILER_PORT),
+        secure: false,
+        requireTLS: true,
+        auth: {
+            user: process.env.MAILER_USER,
+            pass: process.env.MAILER_PASSWORD
+        },
+    });
+
+    public static async sendMail(options: Mail.Options) {
+        return await Mailer.transporter.sendMail(options);
+    }
+}
