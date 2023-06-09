@@ -7,7 +7,7 @@ import { Divider } from "@nextui-org/divider";
 import GenericButton from "../../../../_components/inputs/GenericButton";
 import inviteIcon from "/public/icons/invite.svg";
 import SelectMenu, { SelectMenuContent } from "../../../../_components/inputs/SelectMenu";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { permissionCheck, Permissions } from "../../../../../libs/types/permission";
 import { InviteDto } from "../../../../api/users/invite/route";
 import axios from "axios";
@@ -21,7 +21,11 @@ const SendInvitationMail = (dto?: InviteDto) => {
     return useSWRMutation("/api/users/invite", mutator);
 };
 
-export default function InviteEmployeeForm() {
+type Props = {
+    setModalVisible: Dispatch<SetStateAction<boolean>>
+}
+
+export default function InviteEmployeeForm({ setModalVisible }: Props) {
     const {
         register,
         handleSubmit,
@@ -38,12 +42,16 @@ export default function InviteEmployeeForm() {
             return;
 
         triggerInvitation()
-            .then(() => sendToast({
-                description: "Invitation sent!",
-                icon: checkIcon
-            }, {
-                position: "top-center"
-            }))
+            .then(() => {
+                sendToast({
+                    description: "Invitation sent!",
+                    icon: checkIcon
+                }, {
+                    position: "top-center"
+                });
+                
+                setModalVisible(false);
+            })
             .catch((err) => {
                 console.error(err);
                 sendToast({
@@ -52,7 +60,7 @@ export default function InviteEmployeeForm() {
                     position: "top-center"
                 });
             });
-    }, [inviteInfo, triggerInvitation]);
+    }, [inviteInfo, setModalVisible, triggerInvitation]);
 
     const selectionMenuContent = Permissions.map<SelectMenuContent>(permission => ({
         label: permission.label,

@@ -1,0 +1,85 @@
+"use client";
+
+import { JSX, useEffect, useState } from "react";
+import GenericInput from "../../../../_components/inputs/GenericInput";
+import searchIcon from "/public/icons/search.svg";
+import { Spacer } from "@nextui-org/react";
+import useSWR from "swr";
+import { User } from "@prisma/client";
+import axios, { AxiosError } from "axios";
+import EmployeeCard from "./EmployeeCard";
+
+export async function fetcher<T>(url: string): Promise<T | undefined> {
+    try {
+        return (await axios.get(url)).data;
+    } catch (e) {
+        if (e instanceof AxiosError) {
+            console.error(e);
+            if (e.response?.status === 404 || e.response?.status === 403)
+                return undefined;
+        }
+        console.error(e);
+    }
+}
+
+const useEmployeeInfo = () => {
+    return useSWR("/api/users", fetcher<User[]>);
+};
+
+export default function EmployeeGrid() {
+    const [search, setSearch] = useState("");
+    const { data: employeeInfo, error: employeeError, isLoading: employeesLoading } = useEmployeeInfo();
+    const [visibleEmployees, setVisibleEmployees] = useState<User[]>([]);
+
+    useEffect(() => {
+        if (!employeesLoading && employeeInfo) {
+            setVisibleEmployees(employeeInfo);
+        }
+    }, [employeeInfo, employeesLoading]);
+    
+    useEffect(() => {
+        if (employeeInfo == null)
+            return;
+
+        if (search.length === 0) {
+            setVisibleEmployees(employeeInfo)
+            return;
+        }
+
+        const results = employeeInfo.filter(employee => {
+            const employeeName = `${employee.firstName.toLowerCase()} ${employee.lastName.toLowerCase()}`
+            return employeeName.includes(search.toLowerCase().trim()) || employee.username.includes(search.toLowerCase().trim())
+        })
+
+        setVisibleEmployees(results);
+    }, [employeeInfo, search])
+
+    const employeeCards = visibleEmployees.map(employee =>
+        <EmployeeCard key={`employee:${employee.username}`} user={employee} />
+    );
+
+    return (
+        <div>
+            <Spacer y={6} />
+            <div className='w-[24rem] tablet:w-full'>
+                <GenericInput
+                    id="employee_search"
+                    size="md"
+                    iconLeft={searchIcon}
+                    placeholder="Search for an employee..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                />
+            </div>
+            <Spacer y={12} />
+            {
+                employeesLoading ? <div>Loading</div>
+                    :
+                    <div className="grid grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-6">
+                        {employeeCards.length == 0 ? <p className='default-container p-6'>No employees found...</p> : employeeCards}
+                    </div>
+            }
+
+        </div>
+    );
+}
