@@ -47,31 +47,31 @@ export default function GenericButton(props: Props) {
     let color: string;
     switch (props.color) {
         case "primary": {
-            color = props.bordered ? "border-2 bg-none border-primary text-primary" : "bg-primary";
+            color = props.bordered ? "border-2 bg-none border-primary !text-primary" : "bg-primary";
             if (props.shadow)
                 color += " shadow-primary/50";
             break;
         }
         case "secondary": {
-            color = props.bordered ? "border-2 bg-none border-secondary text-secondary" : "bg-secondary";
+            color = props.bordered ? "border-2 bg-none border-secondary !text-secondary" : "bg-secondary";
             if (props.shadow)
                 color += " shadow-secondary/50";
             break;
         }
         case "warning": {
-            color = props.bordered ? "border-2 bg-none border-warning text-warning" : "bg-warning";
+            color = props.bordered ? "border-2 bg-none border-warning !text-warning" : "bg-warning";
             if (props.shadow)
                 color += " shadow-warning/50";
             break;
         }
         case "danger": {
-            color = props.bordered ? "border-2 bg-none border-danger text-danger" : "bg-danger";
+            color = props.bordered ? "border-2 bg-none border-danger !text-danger" : "bg-danger";
             if (props.shadow)
                 color += " shadow-danger/50";
             break;
         }
         default: {
-            color = props.bordered ? "border-2 bg-none border-primary text-primary" : "bg-primary";
+            color = props.bordered ? "border-2 bg-none border-primary !text-primary" : "bg-primary";
             if (props.shadow)
                 color += " shadow-primary/50";
             break;
@@ -95,7 +95,7 @@ export default function GenericButton(props: Props) {
                         <Spinner size="sm" color="white" />
                         :
                         <div className={clsx(
-                            "flex justify-center gap-4 self-center my-auto text-white",
+                            "flex justify-center gap-2 self-center my-auto text-white",
                             props.iconPlacement === "right" ? "flex-row-reverse" : "")
                         }>
                             {props.icon && <GenericImage className="self-center" src={props.icon} width={1.35} />}

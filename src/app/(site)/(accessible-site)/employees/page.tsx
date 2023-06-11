@@ -9,12 +9,19 @@ import { useEffect, useState } from "react";
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/modal";
 import InviteEmployeeForm from "./_components/InviteEmployeeForm";
 import EmployeeGrid from "./_components/EmployeeGrid";
-import { User } from "@prisma/client";
+import { hasPermission, Permission } from "../../../../libs/types/permission";
+import { useRouter } from "next/navigation";
 
 export default function EmployeesPage() {
     const user = useSession();
+    const router = useRouter();
     const [inviteModalVisible, setInviteModalVisible] = useState(false);
-
+    
+    useEffect(() => {
+        if (!hasPermission(user.data!.user!.permissions, Permission.ADMINISTRATOR))
+            return router.push('/home')
+    }, [router, user])
+    
     return (
         <div>
             <Title>Manage Employees</Title>

@@ -22,7 +22,7 @@ export default function Sidebar() {
 
     const sidebar = (
         <div
-            className={`h-fit max-h-[90vh] default-container w-96 py-12 px-6 backdrop-blur-md transition-fast`}>
+            className={`h-fit max-h-[90vh] default-container w-96 phone:w-80 py-12 px-6 backdrop-blur-md transition-fast`}>
             <div className="flex justify-center">
                 <Link href='/home'>
                     <GenericImage  src="https://i.imgur.com/HLTQ78m.png" width={10} />

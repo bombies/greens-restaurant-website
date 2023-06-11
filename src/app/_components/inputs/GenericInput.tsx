@@ -72,7 +72,7 @@ export default function GenericInput({
             {
                 label && (
                     <span className="block">
-                        <p className="mb-2">{label}</p>
+                        <p className="mb-2 capitalize">{label}</p>
                     </span>
                 )
             }
