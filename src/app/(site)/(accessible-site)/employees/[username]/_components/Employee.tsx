@@ -32,12 +32,12 @@ const useEmployeeData = (username: string) => {
     return useSWRImmutable(`/api/users/${username}`, fetcher<User>);
 };
 
-export const UpdateUser = (username?: string, newData?: Partial<User>) => {
+export const UpdateUser = (username?: string, newData?: Partial<User>, nonAdmin?: boolean) => {
     const mutator = (url: string) => axios.patch(url, newData ? {
         ...newData,
         password: undefined
     } : undefined);
-    return useSWRMutation(`/api/users/${username}`, mutator);
+    return useSWRMutation(nonAdmin ? `/api/users/me` : `/api/users/${username}`, mutator);
 };
 
 export default function Employee({ username }: Props) {

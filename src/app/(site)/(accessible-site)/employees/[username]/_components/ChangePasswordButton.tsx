@@ -15,21 +15,22 @@ import { User } from "@prisma/client";
 import useSWRMutation from "swr/mutation";
 import { useSWRConfig } from "swr";
 
-const ChangePassword = (username: string, password: string) => {
+const ChangePassword = (username: string, password: string, nonAdmin?: boolean) => {
     const dto: Partial<User> = {
         password: password
     };
     const mutator = async (url: string) => await axios.patch(url, dto);
-    return useSWRMutation(`/api/users/${username}`, mutator);
+    return useSWRMutation(nonAdmin ? `/api/users/me` : `/api/users/${username}`, mutator);
 };
 
 type Props = {
     username: string,
     allowed: boolean,
-    checkPrevious?: boolean
+    checkPrevious?: boolean,
+    nonAdmin?: boolean,
 }
 
-export default function ChangePasswordButton({ username, allowed, checkPrevious }: Props) {
+export default function ChangePasswordButton({ username, allowed, checkPrevious, nonAdmin }: Props) {
     const { mutate } = useSWRConfig();
     const [modalOpen, setModalOpen] = useState(false);
     const { register, handleSubmit } = useForm<FieldValues>();
@@ -38,8 +39,8 @@ export default function ChangePasswordButton({ username, allowed, checkPrevious 
 
     const {
         trigger: triggerPasswordChange,
-        isMutating: passwordIsChanging,
-    } = ChangePassword(username, password);
+        isMutating: passwordIsChanging
+    } = ChangePassword(username, password, nonAdmin);
 
     useEffect(() => {
         if (!password)
@@ -70,7 +71,7 @@ export default function ChangePasswordButton({ username, allowed, checkPrevious 
         const { password, confirmedPassword, oldPassword } = data;
 
         if (oldPassword) {
-            setOldPasswordChecking(true)
+            setOldPasswordChecking(true);
 
             const checkPassword = async (dto: { password: string }): Promise<{ result: boolean }> => {
                 return (await axios.post(`/api/users/${username}/password`, dto)).data;

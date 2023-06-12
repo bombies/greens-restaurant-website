@@ -188,7 +188,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
 
             if (existingUser)
                 return respond({
-                    message: `There is already a user with the email: ${body.username}`,
+                    message: `There is already a user with the email: ${body.email}`,
                     init: { status: 401 }
                 });
 

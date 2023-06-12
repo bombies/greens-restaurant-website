@@ -17,20 +17,21 @@ import EditableEmployeeField, { DataContainer } from "../employees/[username]/_c
 import { EMAIL_REGEX, NAME_REGEX, USERNAME_REGEX } from "../../../../utils/regex";
 import { Divider } from "@nextui-org/divider";
 import ChangePasswordButton from "../employees/[username]/_components/ChangePasswordButton";
+import ContainerSkeleton from "../../../_components/ContainerSkeleton";
 
-const useSelfData = (username?: string) => {
-    return useSWRImmutable(`/api/users/${username}`, fetcher<User>);
+const useSelfData = () => {
+    return useSWRImmutable(`/api/users/me`, fetcher<User>);
 };
 
 export default function AccountPage() {
     const session = useSession();
-    const { data: user, isLoading: userIsLoading } = useSelfData(session.data?.user?.username);
+    const { data: user, isLoading: userIsLoading } = useSelfData();
     const [currentData, setCurrentData] = useState<Partial<User>>();
     const [changesMade, setChangesMade] = useState(false);
     const {
         trigger: triggerUserUpdate,
         isMutating: userIsUpdating
-    } = UpdateUser(session.data?.user?.username, currentData);
+    } = UpdateUser(session.data?.user?.username, currentData, true);
 
     useEffect(() => {
         if (!userIsLoading && user)
@@ -95,12 +96,22 @@ export default function AccountPage() {
                 {
                     userIsLoading ?
                         <>
-                            <Skeleton className="rounded-full w-24 h-24" />
-                            <Spacer x={6} />
-                            <div className="self-center">
-                                <Skeleton className="rounded-xl w-36 h-4" />
-                                <Spacer y={1} />
-                                <Skeleton className="rounded-xl w-28 h-2" />
+                            <div className="default-container p-12 tablet:px-6 phone:px-2 w-3/4 tablet:w-full">
+                                <div className="flex gap-4 phone:gap-2">
+                                    <Skeleton className="rounded-full w-24 h-24" />
+                                    <Spacer x={6} />
+                                    <div className="self-center">
+                                        <Skeleton className="rounded-xl w-36 h-4" />
+                                        <Spacer y={1} />
+                                        <Skeleton className="rounded-xl w-28 h-2" />
+                                    </div>
+                                </div>
+                                <Spacer y={12} />
+                                <div className="space-y-6">
+                                    <ContainerSkeleton width="full" />
+                                    <ContainerSkeleton width="full" />
+                                    <ContainerSkeleton width="full" />
+                                </div>
                             </div>
                         </>
                         :
@@ -109,15 +120,16 @@ export default function AccountPage() {
                                 <CldUploadButton
                                     options={{
                                         maxFiles: 1,
-                                        maxFileSize: 1000000,
+                                        maxFileSize: 3000000,
                                         resourceType: "image"
                                     }}
                                     onUpload={handleImageUpload}
                                     uploadPreset="kyyplgrx"
                                 >
                                     <Avatar
-                                        src={currentData?.image || undefined} size="xl"
-                                        className="transition-fast hover:brightness-150 cursor-pointer w-24 phone:w-16 h-24 phone:h-16"
+                                        src={currentData?.image || undefined}
+                                        isBordered={true}
+                                        className="transition-fast hover:brightness-150 cursor-pointer w-36 phone:w-16 h-36 phone:h-16"
                                     />
                                 </CldUploadButton>
                                 <Spacer x={6} />
@@ -205,12 +217,13 @@ export default function AccountPage() {
                                     />
                                     <DataContainer
                                         label="Password"
-                                        editAllowed={true}
+                                        editAllowed={false}
                                     >
                                         <ChangePasswordButton
                                             username={currentData?.username || ""}
                                             allowed={true}
                                             checkPrevious={true}
+                                            nonAdmin
                                         />
                                     </DataContainer>
                                 </DataGroupContainer>
