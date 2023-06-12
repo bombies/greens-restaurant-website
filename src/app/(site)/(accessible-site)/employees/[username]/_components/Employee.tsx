@@ -52,6 +52,11 @@ export default function Employee({ username }: Props) {
         trigger: triggerUserUpdate,
         isMutating: userIsUpdating
     } = UpdateUser(username, currentData);
+    
+    useEffect(() => {
+        if (username === "root" && session.data?.user?.username !== "root")
+            router.push("/employees")
+    }, [router, session.data?.user?.username, username])
 
     useEffect(() => {
         if (!isLoading && !user) {
