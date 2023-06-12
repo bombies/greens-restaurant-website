@@ -3,6 +3,8 @@
 import { CSSTransition } from "react-transition-group";
 import { useRef } from "react";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
+import saveIcon from "/public/icons/save.svg";
+import trashIcon from "/public/icons/trash.svg";
 
 type Props = {
     changesMade: boolean,
@@ -34,6 +36,7 @@ export default function ChangesMadeBar({ changesMade, onAccept, onReject, isChan
                             onClick={() => onAccept()}
                             disabled={!changesMade || isChanging}
                             loading={isChanging}
+                            icon={saveIcon}
                         >
                             Save
                         </GenericButton>
@@ -42,6 +45,7 @@ export default function ChangesMadeBar({ changesMade, onAccept, onReject, isChan
                             shadow
                             onClick={() => onReject()}
                             disabled={!changesMade || isChanging}
+                            icon={trashIcon}
                         >
                             Discard
                         </GenericButton>
