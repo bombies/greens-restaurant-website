@@ -2,10 +2,10 @@
 
 import { Toast } from "react-hot-toast";
 import { StaticImageData } from "next/image";
-import { NormalColors } from "@nextui-org/react";
 import GenericImage from "./GenericImage";
 import clsx from "clsx";
 import { JSX } from "react";
+import { NormalColors } from "@nextui-org/shared-utils";
 
 type Props = {
     toastObj: Toast

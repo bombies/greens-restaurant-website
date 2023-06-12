@@ -19,3 +19,5 @@ export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\S]{8,}$/
 
 // Support unicode characters
 export const NAME_REGEX = /^[\p{L}'-]{1,50}$/u
+
+export const INVENTORY_NAME_REGEX = /^[a-zA-Z][a-z-A-Z0-9\s]{, 29}/

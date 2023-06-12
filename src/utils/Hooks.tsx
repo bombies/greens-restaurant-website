@@ -5,6 +5,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { toast, ToastOptions } from "react-hot-toast";
 import ToastComponent, { ToastDataProps } from "../app/_components/ToastComponent";
 import { MutableRefObject, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import { AxiosError } from "axios";
 
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<AppState> = useSelector;
@@ -28,7 +29,12 @@ export function useVisible(ref: MutableRefObject<any>): boolean {
     return isVisible;
 }
 
-export function sendToast(props: ToastDataProps, options?: ToastOptions) {
+export function sendToast(props: ToastDataProps & { error?: AxiosError }, options?: ToastOptions) {
+    if (props.error) {
+        // @ts-ignore
+        props.description = props.error.response?.data?.message || (props.description || "An error occurred!");
+    }
+
     toast.custom(t => (<ToastComponent toastObj={t} data={props} />), options);
 }
 

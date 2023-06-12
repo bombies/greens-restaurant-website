@@ -55,9 +55,9 @@ export default function Employee({ username }: Props) {
     } = UpdateUser(username, currentData);
 
     useEffect(() => {
-        if (username === "root" && session.data?.user?.username !== "root")
+        if (session.status !== "loading" && session.data?.user?.username !== "root" && username === "root")
             router.push("/employees");
-    }, [router, session.data?.user?.username, username]);
+    }, [router, session.data?.user?.username, session.status, username]);
 
     useEffect(() => {
         if (!isLoading && !user) {

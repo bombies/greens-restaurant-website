@@ -1,16 +1,36 @@
 import { NextResponse } from "next/server";
-import Permission, { hasPermission } from "../../libs/types/permission";
+import Permission, { hasAnyPermission, hasPermissions } from "../../libs/types/permission";
 import { getServerSession, Session } from "next-auth";
 import { authHandler } from "../../app/api/auth/[...nextauth]/route";
 import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 
 export const authenticated = async (logic: (session: Session) => Promise<NextResponse>, permissionRequired?: Permission): Promise<NextResponse> => {
+    return authenticatedAny(logic, permissionRequired ? [permissionRequired] : undefined);
+};
+
+export const authenticatedAny = async (logic: (session: Session) => Promise<NextResponse>, permissionsRequired?: Permission[]): Promise<NextResponse> => {
     const session = await getServerSession(authHandler);
     if (!session || !session.user)
         return respond({ message: "Unauthorized!", init: { status: 403 } });
 
-    if (permissionRequired && !hasPermission(session.user.permissions, permissionRequired))
+    if (permissionsRequired && !hasAnyPermission(session.user.permissions, permissionsRequired))
+        return respond({ message: "Unauthorized! No permission.", init: { status: 403 } });
+
+    try {
+        return await logic(session);
+    } catch (ex: any) {
+        console.error(ex);
+        return respond({ message: "Internal Server Error", init: { status: 500 } });
+    }
+};
+
+export const authenticatedAll = async (logic: (session: Session) => Promise<NextResponse>, permissionsRequired?: Permission[]): Promise<NextResponse> => {
+    const session = await getServerSession(authHandler);
+    if (!session || !session.user)
+        return respond({ message: "Unauthorized!", init: { status: 403 } });
+
+    if (permissionsRequired && !hasPermissions(session.user.permissions, permissionsRequired))
         return respond({ message: "Unauthorized! No permission.", init: { status: 403 } });
 
     try {
@@ -40,7 +60,7 @@ export class Mailer {
         auth: {
             user: process.env.MAILER_USER,
             pass: process.env.MAILER_PASSWORD
-        },
+        }
     });
 
     public static async sendMail(options: Mail.Options) {

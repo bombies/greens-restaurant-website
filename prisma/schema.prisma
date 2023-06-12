@@ -28,6 +28,7 @@ model User {
 
 model Inventory {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
   userId    String?  @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -82,7 +82,7 @@ export default function GenericButton(props: Props) {
         <button
             {...props}
             className={clsx(
-                "z-0 rounded-xl self-center cursor-pointer transition-fast hover:-translate-y-[.25rem] disabled:opacity-50 disabled:cursor-not-allowed",
+                "z-0 rounded-xl self-center cursor-pointer transition-fast hover:-translate-y-[.25rem] disabled:opacity-50 disabled:cursor-not-allowed px-3",
                 size,
                 color,
                 props.shadow ? "shadow-lg" : "",
