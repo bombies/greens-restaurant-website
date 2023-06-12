@@ -24,9 +24,18 @@ interface Props {
         message?: string
     }
     successMessage?: string
+    editAllowed: boolean
 }
 
-export default function EditableEmployeeField({ label, field, capitalizeField, onValueChange, validate, successMessage }: Props) {
+export default function EditableEmployeeField({
+                                                  label,
+                                                  field,
+                                                  capitalizeField,
+                                                  onValueChange,
+                                                  validate,
+                                                  successMessage,
+                                                  editAllowed
+                                              }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const {
         register,
@@ -59,11 +68,17 @@ export default function EditableEmployeeField({ label, field, capitalizeField, o
 
     return (
         <div>
-            <DataContainer label={label} field={field} capitalizeField={capitalizeField} onEdit={() => setModalOpen(true)} />
+            <DataContainer
+                label={label}
+                field={field}
+                capitalizeField={capitalizeField}
+                onEdit={() => setModalOpen(true)}
+                editAllowed={editAllowed}
+            />
             <Modal
                 size="2xl"
                 className="bg-neutral-800"
-                isOpen={modalOpen}
+                isOpen={modalOpen && editAllowed}
                 onClose={() => setModalOpen(false)}
                 showCloseButton={true}
                 backdrop="opaque"
@@ -103,26 +118,46 @@ type DataContainerProps = {
     field?: string,
     onEdit?: MouseEventHandler<HTMLDivElement>
     capitalizeField?: boolean
+    editAllowed: boolean
 }
 
-export function DataContainer({ label, field, onEdit, capitalizeField }: DataContainerProps) {
+export function DataContainer({ label, field, onEdit, capitalizeField, editAllowed }: DataContainerProps) {
     const [editButtonShown, setEditButtonShown] = useState(false);
 
     return (
         <div
             className="default-container p-6 bg-secondary/10"
-            onMouseEnter={() => setEditButtonShown(true)}
-            onMouseLeave={() => setEditButtonShown(false)}
+            onMouseEnter={() => {
+                if (!editAllowed)
+                    return;
+                setEditButtonShown(true);
+            }}
+            onMouseLeave={() => {
+                if (!editAllowed)
+                    return;
+                setEditButtonShown(false);
+            }}
         >
             <div className="flex gap-4">
                 <p className="text-primary text-xl phone:text-lg capitalize">{label}</p>
-                <Tooltip color="secondary" content="Edit">
+                <Tooltip
+                    isDisabled={!editAllowed}
+                    color="secondary"
+                    content="Edit"
+                >
                     <div
                         className={clsx(
-                            "transition-fast flex flex-col justify-center cursor-pointer",
-                            editButtonShown ? "opacity-100" : "opacity-0"
+                            "transition-fast flex flex-col justify-center",
+                            editButtonShown ? "opacity-100" : "opacity-0",
+                            editAllowed ? "cursor-pointer" : "cursor-default"
                         )}
-                        onClick={onEdit}
+                        onClick={(event) => {
+                            if (!editAllowed)
+                                return;
+
+                            if (onEdit)
+                                onEdit(event);
+                        }}
                     >
                         <GenericImage src={editIcon} width={1} />
                     </div>

@@ -18,6 +18,9 @@ export default function EmployeesPage() {
     const [inviteModalVisible, setInviteModalVisible] = useState(false);
     
     useEffect(() => {
+        if (!user.data?.user)
+            return;
+
         if (!hasPermission(user.data!.user!.permissions, Permission.ADMINISTRATOR))
             return router.push('/home')
     }, [router, user])

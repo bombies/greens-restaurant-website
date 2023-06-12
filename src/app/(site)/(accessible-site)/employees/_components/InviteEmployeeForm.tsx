@@ -14,6 +14,7 @@ import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../utils/Hooks";
 import checkIcon from "/public/icons/check-green-circled.svg";
+import { useRouter } from "next/navigation";
 
 
 const SendInvitationMail = (dto?: InviteDto) => {
@@ -26,6 +27,7 @@ type Props = {
 }
 
 export default function InviteEmployeeForm({ setModalVisible }: Props) {
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -49,7 +51,8 @@ export default function InviteEmployeeForm({ setModalVisible }: Props) {
                 }, {
                     position: "top-center"
                 });
-                
+
+                router.refresh()
                 setModalVisible(false);
             })
             .catch((err) => {

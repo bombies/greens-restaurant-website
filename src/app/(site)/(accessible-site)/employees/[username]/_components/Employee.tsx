@@ -2,10 +2,6 @@
 
 import { User } from "@prisma/client";
 import SubTitle from "../../../../../_components/text/SubTitle";
-import GenericButton from "../../../../../_components/inputs/GenericButton";
-import trashIcon from "/public/icons/trash.svg";
-import passwordIcon from "/public/icons/password.svg";
-import useSWR from "swr";
 import { fetcher } from "../../_components/EmployeeGrid";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,28 +15,60 @@ import ChangesMadeBar from "./ChangesMadeBar";
 import { sendToast } from "../../../../../../utils/Hooks";
 import EditableEmployeeField from "./EditableEmployeeField";
 import { EMAIL_REGEX, NAME_REGEX, USERNAME_REGEX } from "../../../../../../utils/regex";
+import ChangePasswordButton from "./ChangePasswordButton";
+import DeleteEmployeeButton from "./DeleteEmployeeButton";
+import { useSession } from "next-auth/react";
+import axios from "axios";
+import useSWRMutation from "swr/mutation";
+import useSWRImmutable from "swr/immutable";
+import ContainerSkeleton from "../../../../../_components/ContainerSkeleton";
 
 type Props = {
     username: string
 }
 
 const useEmployeeData = (username: string) => {
-    return useSWR(`/api/users/${username}`, fetcher<User>);
+    return useSWRImmutable(`/api/users/${username}`, fetcher<User>);
+};
+
+const UpdateUser = (username: string, newData?: Partial<User>) => {
+    const mutator = (url: string) => axios.patch(url, newData ? {
+        ...newData,
+        password: undefined
+    } : undefined);
+    return useSWRMutation(`/api/users/${username}`, mutator);
 };
 
 export default function Employee({ username }: Props) {
-    const { data: user, isLoading, error } = useEmployeeData(username);
+    const session = useSession();
+    const { data: user, isLoading, error: employeeDataError } = useEmployeeData(username);
     const router = useRouter();
     const [currentData, setCurrentData] = useState<Partial<User>>();
     const [changesMade, setChangesMade] = useState(false);
     const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+    const [editAllowed, setEditAllowed] = useState(false);
+
+    const {
+        trigger: triggerUserUpdate,
+        isMutating: userIsUpdating
+    } = UpdateUser(username, currentData);
 
     useEffect(() => {
-        if (!isLoading && !user)
+        if (!isLoading && !user) {
+            if (employeeDataError)
+                console.error("employee data error", employeeDataError);
             router.push("/employees");
-        else if (!isLoading && user)
+        } else if (!isLoading && user) {
             setCurrentData(user);
-    }, [isLoading, router, user]);
+            setEditAllowed(
+                permissionCheck(user.permissions, Permission.ADMINISTRATOR) ?
+                    session.data?.user?.username === user.username
+                    || session.data?.user?.username === "root"
+                    :
+                    true
+            );
+        }
+    }, [employeeDataError, isLoading, router, session.data?.user?.username, user]);
 
     useEffect(() => {
         if (!user)
@@ -60,15 +88,57 @@ export default function Employee({ username }: Props) {
         setSelectedPermissions(permissions);
     }, [user]);
 
+    const doUpdate = () => {
+        triggerUserUpdate()
+            .then((value) => {
+                const newUser: User | undefined = value?.data;
+
+                // The gods have blessed us with an impossible error
+                if (!newUser) {
+                    sendToast({
+                        description: "Something went wrong! An undefined user was returned."
+                    }, {
+                        position: "top-center"
+                    });
+                    return;
+                }
+
+                // If the DTO contained a new username, the url slug will have to be updated.
+                if (newUser.username !== user?.username) {
+                    router.replace(`/employees/${newUser.username}`);
+                    router.refresh();
+                }
+
+                sendToast({
+                    description: "Successfully updated user!"
+                });
+            })
+            .catch((e) => {
+                console.log(e);
+                sendToast({
+                    description: "Could not update user!"
+                }, {
+                    position: "top-center"
+                });
+            });
+    };
+
     return (
         <div>
             <ChangesMadeBar
+                isChanging={userIsUpdating}
                 changesMade={changesMade}
-                onAccept={() => {
-                    sendToast({ description: "Changes accepted" });
-                }}
+                onAccept={doUpdate}
                 onReject={() => {
-                    sendToast({ description: "Changes rejected" });
+                    setCurrentData(user);
+
+                    const permissions = Object.values(Permission)
+                        .filter(v => !isNaN(Number(v)))
+                        .filter(perm => permissionCheck(user!.permissions, Number(perm)))
+                        .map(value => value.toString());
+
+                    setSelectedPermissions(permissions);
+                    sendToast({ description: "Discarded all changes." });
                 }} />
             <div className="default-container p-12">
                 <GoBackButton />
@@ -76,20 +146,20 @@ export default function Employee({ username }: Props) {
                 <SubTitle>Account Actions</SubTitle>
                 <Spacer y={6} />
                 <div className="flex phone:flex-col gap-4">
-                    <GenericButton shadow icon={passwordIcon}>
-                        Change Password
-                    </GenericButton>
-                    <GenericButton shadow color="danger" icon={trashIcon}>
-                        Delete Employee
-                    </GenericButton>
+                    <ChangePasswordButton username={username} allowed={editAllowed} />
+                    <DeleteEmployeeButton username={username} allowed={editAllowed} />
                 </div>
             </div>
             <Spacer y={12} />
             <div className="default-container p-12 phone:p-6">
                 {
-                    isLoading ? <div>Loading...</div>
+                    isLoading ?
+                        <div>
+                            <ContainerSkeleton width="3/4" contentRepeat={3} />
+                            <ContainerSkeleton width="3/4" contentRepeat={1} />
+                        </div>
                         :
-                        (error ? <div>Error :(</div>
+                        (employeeDataError ? <div>Error :(</div>
                                 :
                                 <div>
                                     <div className="default-container p-6 phone:p-3 w-3/4 tablet:w-full">
@@ -97,6 +167,7 @@ export default function Employee({ username }: Props) {
                                         <DataGroupContainer>
                                             <EditableEmployeeField
                                                 label="username"
+                                                editAllowed={editAllowed}
                                                 field={currentData?.username}
                                                 validate={{
                                                     test(value) {
@@ -118,6 +189,7 @@ export default function Employee({ username }: Props) {
                                         <DataGroupContainer>
                                             <EditableEmployeeField
                                                 label="first name"
+                                                editAllowed={editAllowed}
                                                 field={currentData?.firstName}
                                                 capitalizeField
                                                 validate={{
@@ -133,6 +205,7 @@ export default function Employee({ username }: Props) {
                                             />
                                             <EditableEmployeeField
                                                 label="last name"
+                                                editAllowed={editAllowed}
                                                 field={currentData?.lastName}
                                                 capitalizeField
                                                 validate={{
@@ -153,6 +226,7 @@ export default function Employee({ username }: Props) {
                                         <DataGroupContainer>
                                             <EditableEmployeeField
                                                 label="email address"
+                                                editAllowed={editAllowed}
                                                 field={currentData?.email}
                                                 validate={{
                                                     test(value) {
@@ -175,6 +249,7 @@ export default function Employee({ username }: Props) {
                                                 color="secondary"
                                                 label="Select Permissions"
                                                 value={selectedPermissions}
+                                                isDisabled={!editAllowed}
                                                 onChange={values => {
                                                     setSelectedPermissions(values);
 
@@ -189,7 +264,14 @@ export default function Employee({ username }: Props) {
                                                 }}
                                             >
                                                 <Checkbox
-                                                    value={Permission.ADMINISTRATOR.toString()}>Administrator</Checkbox>
+                                                    value={Permission.ADMINISTRATOR.toString()}
+                                                    isDisabled={
+                                                        session.data?.user?.username === username
+                                                        || session.data?.user?.username !== "root"
+                                                    }
+                                                >
+                                                    Administrator
+                                                </Checkbox>
                                                 <Checkbox value={Permission.CREATE_INVENTORY.toString()}>Create
                                                     Inventory</Checkbox>
                                                 <Checkbox value={Permission.VIEW_INVENTORY.toString()}>View
@@ -202,6 +284,7 @@ export default function Employee({ username }: Props) {
                                                     Invoices</Checkbox>
                                             </CheckboxGroup>
                                         </div>
+                                        <Spacer y={6} />
                                     </div>
                                 </div>
                         )

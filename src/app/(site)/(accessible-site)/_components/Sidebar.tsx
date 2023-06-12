@@ -15,6 +15,7 @@ import UsersIcon from "../../../_components/icons/UsersIcon";
 import GearsIcon from "../../../_components/icons/GearsIcon";
 import { sendToast } from "../../../../utils/Hooks";
 import InvoiceIcon from "../../../_components/icons/InvoiceIcon";
+import AccountIcon from "../../../_components/icons/AccountIcon";
 
 export default function Sidebar() {
     const user = useSession();
@@ -22,7 +23,7 @@ export default function Sidebar() {
 
     const sidebar = (
         <div
-            className={`h-fit max-h-[90vh] default-container w-96 phone:w-80 py-12 px-6 backdrop-blur-md transition-fast`}>
+            className={`h-fit default-container w-96 phone:w-80 py-12 px-6 backdrop-blur-md transition-fast`}>
             <div className="flex justify-center">
                 <Link href='/home'>
                     <GenericImage  src="https://i.imgur.com/HLTQ78m.png" width={10} />
@@ -33,6 +34,7 @@ export default function Sidebar() {
                     <InventorySidebarItem />
                     <EmployeesSidebarItem />
                     <InvoicesSidebarItem />
+                    <AccountSidebarItem />
                     <ManagementSidebarItem />
                 </div>
                 <GenericButton
@@ -54,8 +56,9 @@ export default function Sidebar() {
         <div className={clsx(`
             h-full
             p-6
-            relative
+            sticky
             tablet:absolute
+            top-0
             transition-fast
             z-40`,
             opened ? "w-96" : "w-24"
@@ -172,4 +175,20 @@ function InvoicesSidebarItem() {
         onHoverLeave={setDefaultColor}
     />);
 }
+
+function AccountSidebarItem() {
+    const [iconColor, setIconColor] = useState("#ffffff");
+    const setActiveColor = () => setIconColor("#00D615");
+    const setDefaultColor = () => setIconColor("#ffffff");
+
+    const icon = <AccountIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
+    return (<SidebarItem
+        label={"My Account"}
+        href={"account"}
+        icon={icon}
+        onHoverEnter={setActiveColor}
+        onHoverLeave={setDefaultColor}
+    />);
+}
+
 

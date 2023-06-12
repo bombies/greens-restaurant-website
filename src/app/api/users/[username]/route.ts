@@ -1,8 +1,7 @@
 import { authenticated, Mailer, respond } from "../../../../utils/api/ApiUtils";
-import Permission from "../../../../libs/types/permission";
+import Permission, { permissionCheck } from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { User } from "@prisma/client";
 import { EMAIL_REGEX, NAME_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "../../../../utils/regex";
 import bcrypt from "bcrypt";
 
@@ -29,7 +28,7 @@ export async function GET(req: Request, { params }: RouteContext) {
 }
 
 export async function DELETE(req: Request, { params }: RouteContext) {
-    return await authenticated(async () => {
+    return await authenticated(async (session) => {
         const user = await prisma.user.findUnique({
             where: { username: params.username }
         });
@@ -38,6 +37,17 @@ export async function DELETE(req: Request, { params }: RouteContext) {
             return respond({
                 message: `There was no user with the username: ${params.username}`,
                 init: { status: 404 }
+            });
+
+        if (user.username === session.user?.username)
+            return respond({
+                message: "You cannot delete yourself!",
+                init: { status: 401 }
+            });
+        else if (user.username === "root")
+            return respond({
+                message: "You cannot delete the root user!",
+                init: { status: 401 }
             });
 
         const deletedUser = await prisma.user.delete({
@@ -60,7 +70,7 @@ type UpdateUserDto = Partial<{
 }>
 
 export async function PATCH(req: Request, { params }: RouteContext) {
-    return await authenticated(async () => {
+    return await authenticated(async (session) => {
         const user = await prisma.user.findUnique({
             where: { username: params.username }
         });
@@ -71,12 +81,24 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 init: { status: 404 }
             });
 
+        if (
+            permissionCheck(user.permissions, Permission.ADMINISTRATOR)
+            && session.user?.username !== user.username
+            && session.user?.username !== "root"
+        )
+            return respond({
+                message: "You cannot edit another administrator that isn't yourself!",
+                init: {
+                    status: 403
+                }
+            });
+
         const body: UpdateUserDto = await req.json();
         if (!body)
             return respond({ message: "You must provide some information to update!" });
 
         // Validation
-        if (body.username) {
+        if (body.username && body.username !== user.username) {
             if (!USERNAME_REGEX.test(body.username))
                 return respond({
                     message: "Invalid username! Usernames must include alphanumeric characters only.",
@@ -127,7 +149,31 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 });
         }
 
-        if (body.email) {
+        if (body.permissions) {
+            if (
+                permissionCheck(body.permissions, Permission.ADMINISTRATOR)
+                && session.user?.username !== "root"
+            )
+                return respond({
+                    message: "You can't give another user administrator privileges unless you are the root user!",
+                    init: {
+                        status: 403
+                    }
+                });
+            else if (
+                body.password
+                && !permissionCheck(body.permissions, Permission.ADMINISTRATOR)
+                && body.username === session.user?.username
+            )
+                return respond({
+                    message: "You cannot remove administrator privileges from yourself!",
+                    init: {
+                        status: 403
+                    }
+                });
+        }
+
+        if (body.email && body.email !== user.email) {
             if (!EMAIL_REGEX.test(body.email))
                 return respond({
                     message: "Invalid email!",
@@ -159,11 +205,14 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             });
         }
 
+        // Just a fail-safe in case the body contains an id field.
+        // @ts-ignore
+        const { id, ...updatableBody } = body;
         const updatedUser = await prisma.user.update({
             where: {
                 username: user.username
             },
-            data: body
+            data: updatableBody
         });
 
         return NextResponse.json(updatedUser);

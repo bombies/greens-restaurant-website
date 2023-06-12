@@ -26,7 +26,6 @@ export default function GenericImage(props: Props) {
         <div
             ref={ref}
             className={`relative ${props.fade !== undefined ? `fade-in-section ${isVisible ? 'is-visible' : ''}` : ''} ${props.className || ''} ${props.onClick ? 'cursor-pointer' : ''}`}
-            onClick={props.onClick}
             style={{
                 width: props.width && `${props.width}rem`,
                 height: props.width && `${props.height ?? props.width}rem`,
