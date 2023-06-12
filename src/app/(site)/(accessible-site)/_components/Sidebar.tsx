@@ -49,7 +49,7 @@ export default function Sidebar() {
                     {
                         hasAnyPermission(session.data?.user?.permissions, [
                             Permission.VIEW_INVOICES,
-                            Permission.CREATE_INVENTORY,
+                            Permission.CREATE_INVOICE,
                         ])
                         &&
                         <InvoicesSidebarItem />
