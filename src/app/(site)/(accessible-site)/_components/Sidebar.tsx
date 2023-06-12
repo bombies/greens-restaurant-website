@@ -7,8 +7,8 @@ import { CSSTransition } from "react-transition-group";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import InventoryIcon from "../../../_components/icons/InventoryIcon";
-import waving from '/public/icons/waving-hand.svg';
-import signOutIcon from '/public/icons/sign-out.svg';
+import waving from "/public/icons/waving-hand.svg";
+import signOutIcon from "/public/icons/sign-out.svg";
 import GenericImage from "../../../_components/GenericImage";
 import GenericButton from "../../../_components/inputs/GenericButton";
 import UsersIcon from "../../../_components/icons/UsersIcon";
@@ -16,38 +16,62 @@ import GearsIcon from "../../../_components/icons/GearsIcon";
 import { sendToast } from "../../../../utils/Hooks";
 import InvoiceIcon from "../../../_components/icons/InvoiceIcon";
 import AccountIcon from "../../../_components/icons/AccountIcon";
+import { hasAnyPermission, hasPermission, Permission } from "../../../../libs/types/permission";
 
 export default function Sidebar() {
-    const user = useSession();
+    const session = useSession();
     const [opened, setOpened] = useState(false);
 
     const sidebar = (
         <div
             className={`h-fit default-container w-96 phone:w-80 py-12 px-6 backdrop-blur-md transition-fast`}>
             <div className="flex justify-center">
-                <Link href='/home'>
-                    <GenericImage  src="https://i.imgur.com/HLTQ78m.png" width={10} />
+                <Link href="/home">
+                    <GenericImage src="https://i.imgur.com/HLTQ78m.png" width={10} />
                 </Link>
             </div>
             <div>
                 <div className="w-full max-h-[50vh] overflow-y-auto flex flex-col mb-6">
-                    <InventorySidebarItem />
-                    <EmployeesSidebarItem />
-                    <InvoicesSidebarItem />
+                    {
+                        hasAnyPermission(session.data?.user?.permissions, [
+                            Permission.CREATE_INVENTORY,
+                            Permission.VIEW_INVENTORY,
+                            Permission.MUTATE_STOCK
+                        ])
+                        &&
+                        <InventorySidebarItem />
+                    }
+                    {
+                        hasPermission(session.data?.user?.permissions, Permission.ADMINISTRATOR)
+                        &&
+                        <EmployeesSidebarItem />
+                    }
+                    {
+                        hasAnyPermission(session.data?.user?.permissions, [
+                            Permission.VIEW_INVOICES,
+                            Permission.CREATE_INVENTORY,
+                        ])
+                        &&
+                        <InvoicesSidebarItem />
+                    }
                     <AccountSidebarItem />
-                    <ManagementSidebarItem />
+                    {
+                        hasPermission(session.data?.user?.permissions, Permission.ADMINISTRATOR)
+                        &&
+                        <ManagementSidebarItem />
+                    }
                 </div>
                 <GenericButton
                     shadow
                     icon={signOutIcon}
                     onClick={() => signOut().then(() => {
-                    sendToast({
-                        description: 'See you later!',
-                        icon: waving
-                    }, {
-                        position: 'top-center'
-                    })
-                })}>Sign Out</GenericButton>
+                        sendToast({
+                            description: "See you later!",
+                            icon: waving
+                        }, {
+                            position: "top-center"
+                        });
+                    })}>Sign Out</GenericButton>
             </div>
         </div>
     );
