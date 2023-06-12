@@ -119,9 +119,9 @@ type DataContainerProps = {
     onEdit?: MouseEventHandler<HTMLDivElement>
     capitalizeField?: boolean
     editAllowed: boolean
-}
+} & React.PropsWithChildren
 
-export function DataContainer({ label, field, onEdit, capitalizeField, editAllowed }: DataContainerProps) {
+export function DataContainer({ label, field, onEdit, capitalizeField, editAllowed, children }: DataContainerProps) {
     const [editButtonShown, setEditButtonShown] = useState(false);
 
     return (
@@ -163,11 +163,13 @@ export function DataContainer({ label, field, onEdit, capitalizeField, editAllow
                     </div>
                 </Tooltip>
             </div>
-            <p className={clsx(
-                "max-w-sm overflow-clip",
-                capitalizeField && "capitalize"
-            )}>{field}</p>
-
+            <Spacer y={2} />
+            {
+                children || <p className={clsx(
+                    "max-w-sm overflow-clip",
+                    capitalizeField && "capitalize"
+                )}>{field}</p>
+            }
         </div>
     );
 }

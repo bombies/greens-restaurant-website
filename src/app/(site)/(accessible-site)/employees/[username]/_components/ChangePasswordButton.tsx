@@ -13,6 +13,7 @@ import { PASSWORD_REGEX } from "../../../../../../utils/regex";
 import axios from "axios";
 import { User } from "@prisma/client";
 import useSWRMutation from "swr/mutation";
+import { useSWRConfig } from "swr";
 
 const ChangePassword = (username: string, password: string) => {
     const dto: Partial<User> = {
@@ -24,17 +25,20 @@ const ChangePassword = (username: string, password: string) => {
 
 type Props = {
     username: string,
-    allowed: boolean
+    allowed: boolean,
+    checkPrevious?: boolean
 }
 
-export default function ChangePasswordButton({ username, allowed }: Props) {
+export default function ChangePasswordButton({ username, allowed, checkPrevious }: Props) {
+    const { mutate } = useSWRConfig();
     const [modalOpen, setModalOpen] = useState(false);
     const { register, handleSubmit } = useForm<FieldValues>();
     const [password, setPassword] = useState("");
+    const [oldPasswordChecking, setOldPasswordChecking] = useState(false);
+
     const {
         trigger: triggerPasswordChange,
         isMutating: passwordIsChanging,
-        error: passwordChangeError
     } = ChangePassword(username, password);
 
     useEffect(() => {
@@ -59,11 +63,45 @@ export default function ChangePasswordButton({ username, allowed }: Props) {
             });
     }, [password, triggerPasswordChange]);
 
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    const onSubmit: SubmitHandler<FieldValues> = async (data) => {
         if (!allowed)
             return;
 
-        const { password, confirmedPassword } = data;
+        const { password, confirmedPassword, oldPassword } = data;
+
+        if (oldPassword) {
+            setOldPasswordChecking(true)
+
+            const checkPassword = async (dto: { password: string }): Promise<{ result: boolean }> => {
+                return (await axios.post(`/api/users/${username}/password`, dto)).data;
+            };
+
+            const samePassword = await mutate(`/api/users/${username}/password`, checkPassword({
+                password: oldPassword
+            }));
+
+            if (samePassword === undefined) {
+                sendToast({
+                    description: "There was an error comparing your old password!"
+                }, {
+                    position: "top-center"
+                });
+                setOldPasswordChecking(false);
+                return;
+            }
+
+            if (!samePassword.result) {
+                sendToast({
+                    description: "The old password provided doesn't natch your current password!"
+                }, {
+                    position: "top-center"
+                });
+                setOldPasswordChecking(false);
+                return;
+            }
+
+            setOldPasswordChecking(false);
+        }
 
         if (password !== confirmedPassword) {
             sendToast({
@@ -110,9 +148,23 @@ export default function ChangePasswordButton({ username, allowed }: Props) {
                     <ModalBody>
                         <div className="p-6">
                             <form onSubmit={handleSubmit(onSubmit)}>
+                                {
+                                    checkPrevious &&
+                                    <>
+                                        <GenericInput
+                                            register={register}
+                                            disabled={passwordIsChanging || oldPasswordChecking}
+                                            type="password"
+                                            id="oldPassword"
+                                            label="Old Password"
+                                            required
+                                        />
+                                        <Spacer y={6} />
+                                    </>
+                                }
                                 <GenericInput
                                     register={register}
-                                    disabled={passwordIsChanging}
+                                    disabled={passwordIsChanging || oldPasswordChecking}
                                     type="password"
                                     id="password"
                                     label="New Password"
@@ -121,7 +173,7 @@ export default function ChangePasswordButton({ username, allowed }: Props) {
                                 <Spacer y={6} />
                                 <GenericInput
                                     register={register}
-                                    disabled={passwordIsChanging}
+                                    disabled={passwordIsChanging || oldPasswordChecking}
                                     type="password"
                                     id="confirmedPassword"
                                     label="Confirm New Password"
@@ -130,8 +182,8 @@ export default function ChangePasswordButton({ username, allowed }: Props) {
                                 <Spacer y={6} />
                                 <GenericButton
                                     type="submit"
-                                    disabled={passwordIsChanging}
-                                    loading={passwordIsChanging}
+                                    disabled={passwordIsChanging || oldPasswordChecking}
+                                    loading={passwordIsChanging || oldPasswordChecking}
                                     shadow
                                 >
                                     Change Password

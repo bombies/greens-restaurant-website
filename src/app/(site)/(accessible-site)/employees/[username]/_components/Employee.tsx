@@ -22,6 +22,7 @@ import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import useSWRImmutable from "swr/immutable";
 import ContainerSkeleton from "../../../../../_components/ContainerSkeleton";
+import clsx from "clsx";
 
 type Props = {
     username: string
@@ -31,7 +32,7 @@ const useEmployeeData = (username: string) => {
     return useSWRImmutable(`/api/users/${username}`, fetcher<User>);
 };
 
-const UpdateUser = (username: string, newData?: Partial<User>) => {
+export const UpdateUser = (username?: string, newData?: Partial<User>) => {
     const mutator = (url: string) => axios.patch(url, newData ? {
         ...newData,
         password: undefined
@@ -52,11 +53,11 @@ export default function Employee({ username }: Props) {
         trigger: triggerUserUpdate,
         isMutating: userIsUpdating
     } = UpdateUser(username, currentData);
-    
+
     useEffect(() => {
         if (username === "root" && session.data?.user?.username !== "root")
-            router.push("/employees")
-    }, [router, session.data?.user?.username, username])
+            router.push("/employees");
+    }, [router, session.data?.user?.username, username]);
 
     useEffect(() => {
         if (!isLoading && !user) {
@@ -320,9 +321,16 @@ function GoBackButton() {
     );
 }
 
-export function DataGroupContainer({ children }: React.PropsWithChildren) {
+type DataGroupContainerProps = {
+    direction?: "horizontal" | "vertical"
+} & React.PropsWithChildren
+
+export function DataGroupContainer({ direction, children }: DataGroupContainerProps) {
     return (
-        <div className="flex phone:flex-col gap-12 p-3">
+        <div className={clsx(
+            "flex phone:flex-col gap-12 p-3",
+            direction === "vertical" ? "flex-col" : ""
+        )}>
             {children}
         </div>
     );
