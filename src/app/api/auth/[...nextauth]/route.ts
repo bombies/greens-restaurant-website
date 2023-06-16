@@ -4,6 +4,7 @@ import { compare } from "bcrypt";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import prisma from "../../../../libs/prisma";
+import { DefaultJWT } from "next-auth/jwt";
 
 export const authHandler: AuthOptions = {
     adapter: PrismaAdapter(prisma),
@@ -40,13 +41,16 @@ export const authHandler: AuthOptions = {
     callbacks: {
         async jwt({ token, user, account }) {
             if (user)
-                token = { ...token, ...user }
+                token = { ...token, ...user };
+            token.accessToken = account?.access_token;
             return token;
         },
         session({ token, session }) {
             if (token && session.user)
                 session.user = { ...session.user, ...token };
-            return session
+
+            session.accessToken = token.accessToken as string;
+            return session;
         }
     },
     debug: process.env.NODE_ENV === "development",
@@ -65,6 +69,7 @@ declare module "next-auth" {
 
     interface Session extends DefaultSession {
         user?: User;
+        accessToken?: string,
     }
 }
 

@@ -120,8 +120,8 @@ export default function Employee({ username }: Props) {
                 });
             })
             .catch((e) => {
-                console.log(e);
                 sendToast({
+                    error: e,
                     description: "Could not update user!"
                 }, {
                     position: "top-center"

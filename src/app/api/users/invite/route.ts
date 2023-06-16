@@ -14,7 +14,7 @@ export type InviteDto = {
 }
 
 export async function POST(req: Request) {
-    return await authenticated(async () => {
+    return await authenticated(req, async () => {
         const { firstName, lastName, username, email, permissions }: InviteDto = await req.json();
 
         if (!username || !email || !permissions)

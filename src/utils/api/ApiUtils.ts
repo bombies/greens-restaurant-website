@@ -4,12 +4,22 @@ import { getServerSession, Session } from "next-auth";
 import { authHandler } from "../../app/api/auth/[...nextauth]/route";
 import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
+import { AuthenticatedServerAxiosClient } from "./AuthenticatedServerAxiosClient";
+import { getToken } from "next-auth/jwt";
 
-export const authenticated = async (logic: (session: Session) => Promise<NextResponse>, permissionRequired?: Permission): Promise<NextResponse> => {
-    return authenticatedAny(logic, permissionRequired ? [permissionRequired] : undefined);
+export const authenticated = async (
+    request: Request,
+    logic: (session: Session, axios: AuthenticatedServerAxiosClient) => Promise<NextResponse>,
+    permissionRequired?: Permission
+): Promise<NextResponse> => {
+    return authenticatedAny(request, logic, permissionRequired ? [permissionRequired] : undefined);
 };
 
-export const authenticatedAny = async (logic: (session: Session) => Promise<NextResponse>, permissionsRequired?: Permission[]): Promise<NextResponse> => {
+export const authenticatedAny = async (
+    request: Request,
+    logic: (session: Session, axios: AuthenticatedServerAxiosClient) => Promise<NextResponse>,
+    permissionsRequired?: Permission[]
+): Promise<NextResponse> => {
     const session = await getServerSession(authHandler);
     if (!session || !session.user)
         return respond({ message: "Unauthorized!", init: { status: 403 } });
@@ -18,14 +28,21 @@ export const authenticatedAny = async (logic: (session: Session) => Promise<Next
         return respond({ message: "Unauthorized! No permission.", init: { status: 403 } });
 
     try {
-        return await logic(session);
+        // @ts-ignore
+        const token = await getToken({ req: request, raw: true });
+        const client = new AuthenticatedServerAxiosClient(token);
+        return await logic(session, client);
     } catch (ex: any) {
         console.error(ex);
         return respond({ message: "Internal Server Error", init: { status: 500 } });
     }
 };
 
-export const authenticatedAll = async (logic: (session: Session) => Promise<NextResponse>, permissionsRequired?: Permission[]): Promise<NextResponse> => {
+export const authenticatedAll = async (
+    request: Request,
+    logic: (session: Session, axios: AuthenticatedServerAxiosClient) => Promise<NextResponse>,
+    permissionsRequired?: Permission[]
+): Promise<NextResponse> => {
     const session = await getServerSession(authHandler);
     if (!session || !session.user)
         return respond({ message: "Unauthorized!", init: { status: 403 } });
@@ -34,7 +51,10 @@ export const authenticatedAll = async (logic: (session: Session) => Promise<Next
         return respond({ message: "Unauthorized! No permission.", init: { status: 403 } });
 
     try {
-        return await logic(session);
+        // @ts-ignore
+        const token = await getToken({ req: request, raw: true });
+        const client = new AuthenticatedServerAxiosClient(token);
+        return await logic(session, client);
     } catch (ex: any) {
         console.error(ex);
         return respond({ message: "Internal Server Error", init: { status: 500 } });

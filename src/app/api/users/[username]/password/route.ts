@@ -9,7 +9,7 @@ type PostDto = {
 }
 
 export async function POST(req: Request) {
-    return authenticated(async (session) => {
+    return authenticated(req, async (session) => {
         const user = await prisma.user.findUnique({
             where: {
                 username: session.user?.username

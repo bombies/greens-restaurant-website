@@ -42,7 +42,8 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
             }
             classNames={{
                 inputWrapper: clsx(
-                    "transition-fast ring-2 ring-neutral-800 hover:ring-primary hover:-translate-y-[0.15rem]"
+                    "transition-fast ring-2 ring-neutral-800 hover:ring-primary hover:-translate-y-[0.15rem]",
+                    (errors && errors[id]) && "ring-danger"
                 )
             }}
         />

@@ -3,9 +3,10 @@ import Permission from "../../../libs/types/permission";
 import prisma from "../../../libs/prisma";
 import { NextResponse } from "next/server";
 import { INVENTORY_NAME_REGEX } from "../../../utils/regex";
+import { v4 } from "uuid";
 
-export function GET() {
-    return authenticatedAny(async () => {
+export function GET(req: Request) {
+    return authenticatedAny(req, async () => {
         const inventories = await prisma.inventory.findMany();
         return NextResponse.json(inventories);
     }, [
@@ -21,7 +22,7 @@ export type CreateInventoryDto = {
 }
 
 export function POST(req: Request) {
-    return authenticated(async () => {
+    return authenticated(req, async () => {
         const { name, createdBy }: CreateInventoryDto = await req.json();
         if (!name || !createdBy)
             return respond({
@@ -63,8 +64,8 @@ export function POST(req: Request) {
         const inventory = await prisma.inventory.create({
             data: {
                 name: validName,
-                createdByUserId: createdBy,
-                stockItemIds: []
+                uid: v4(),
+                createdByUserId: createdBy
             }
         });
 

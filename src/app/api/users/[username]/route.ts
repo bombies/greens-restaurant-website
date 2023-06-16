@@ -12,7 +12,7 @@ type RouteContext = {
 }
 
 export async function GET(req: Request, { params }: RouteContext) {
-    return await authenticated(async () => {
+    return await authenticated(req, async () => {
         const user = await prisma.user.findUnique({
             where: { username: params.username }
         });
@@ -28,7 +28,7 @@ export async function GET(req: Request, { params }: RouteContext) {
 }
 
 export async function DELETE(req: Request, { params }: RouteContext) {
-    return await authenticated(async (session) => {
+    return await authenticated(req, async (session) => {
         const user = await prisma.user.findUnique({
             where: { username: params.username }
         });
@@ -70,7 +70,7 @@ type UpdateUserDto = Partial<{
 }>
 
 export async function PATCH(req: Request, { params }: RouteContext) {
-    return await authenticated(async (session) => {
+    return await authenticated(req, async (session) => {
         const user = await prisma.user.findUnique({
             where: { username: params.username }
         });

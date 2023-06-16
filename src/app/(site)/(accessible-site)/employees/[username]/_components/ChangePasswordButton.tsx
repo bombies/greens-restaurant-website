@@ -55,7 +55,7 @@ export default function ChangePasswordButton({ username, allowed, checkPrevious,
                 setModalOpen(false);
             })
             .catch((e) => {
-                console.log(e);
+                console.error(e);
                 sendToast({
                     description: "There was an error updating this user's password!"
                 }, {

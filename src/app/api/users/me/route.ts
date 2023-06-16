@@ -4,8 +4,8 @@ import prisma from "../../../../libs/prisma";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "../../../../utils/regex";
 import bcrypt from "bcrypt";
 
-export async function GET() {
-    return await authenticated(async (session) => {
+export async function GET(req: Request) {
+    return await authenticated(req, async (session) => {
         const user = await prisma.user.findUnique({
             where: { username: session.user?.username }
         });
@@ -27,7 +27,7 @@ type UpdateUserDto = Partial<{
 }>
 
 export async function PATCH(req: Request) {
-    return await authenticated(async (session) => {
+    return await authenticated(req, async (session) => {
         const user = await prisma.user.findUnique({
             where: { username: session.user?.username }
         });

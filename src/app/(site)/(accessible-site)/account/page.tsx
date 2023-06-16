@@ -71,8 +71,8 @@ export default function AccountPage() {
                 });
             })
             .catch((e) => {
-                console.log(e);
                 sendToast({
+                    error: e,
                     description: "Could not update your account!"
                 }, {
                     position: "top-center"

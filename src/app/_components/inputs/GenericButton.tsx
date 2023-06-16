@@ -15,6 +15,7 @@ type Props =
     icon?: string | StaticImageData;
     iconPlacement?: "left" | "right";
     fullWidth?: boolean;
+    width?: number;
     bordered?: boolean;
     loading?: boolean
 }
@@ -88,6 +89,9 @@ export default function GenericButton(props: Props) {
                 props.shadow ? "shadow-lg" : "",
                 props.fullWidth ? "!w-full" : ""
             )}
+            style={{
+                width: `${props.width}rem`
+            }}
         >
             <div className="flex justify-center gap-4">
                 {
