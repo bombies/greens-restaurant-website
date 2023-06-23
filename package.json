@@ -50,7 +50,7 @@
     "@types/redux-persist": "^4.3.1",
     "@typescript-eslint/parser": "^5.59.8",
     "autoprefixer": "^10.4.14",
-    "eslint": "8.41.0",
+    "eslint": "8.43.0",
     "eslint-config-next": "13.4.7",
     "postcss": "^8.4.21",
     "prettier": "^2.8.8",
