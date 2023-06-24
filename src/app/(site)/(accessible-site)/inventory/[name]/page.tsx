@@ -1,4 +1,3 @@
-import Title from "../../../../_components/text/Title";
 import Inventory from "./_components/Inventory";
 
 type Context = {

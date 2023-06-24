@@ -209,7 +209,6 @@ export default function SelectMenu(props: Props) {
             >
                 <GenericInput
                     id={`select_menu_search:${props.id}`}
-                    containerClass="mb-2"
                     placeholder="Search..."
                     value={searchValue}
                     onChange={e => {

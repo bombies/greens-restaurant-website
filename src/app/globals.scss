@@ -12,127 +12,137 @@ $transition-faster: 100ms;
 $transition-fastest: 75ms;
 
 @layer components {
-    .default-container {
-        background-color: rgb(23 23 23 / 0.5);
-        border-width: theme('borderWidth.2');
-        border-color: rgb(255 255 255 / 0.05);
-        border-radius: theme('borderRadius.3xl');
-        box-shadow: theme('boxShadow.inner');
-    }
+  .default-container {
+    background-color: rgb(23 23 23 / 0.5);
+    border-width: theme('borderWidth.2');
+    border-color: rgb(255 255 255 / 0.05);
+    border-radius: theme('borderRadius.3xl');
+    box-shadow: theme('boxShadow.inner');
+  }
 }
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 h1 {
-    font-size: 4rem;
-    font-weight: bold;
+  font-size: 4rem;
+  font-weight: bold;
 }
 
 h3 {
-    font-size: 2.5rem;
-    font-weight: bold;
+  font-size: 2.5rem;
+  font-weight: bold;
 }
 
 html {
-    scroll-behavior: smooth;
-    color: white;
+  scroll-behavior: smooth;
+  color: white;
 }
 
 .sidebar-enter {
-    position: absolute;
-    transform: translateX(-200%);
+  position: absolute;
+  transform: translateX(-200%);
 }
 
 .sidebar-enter-active {
-    transform: translateX(0%);
-    transition: all 500ms ease;
-}
-
-.sidebar-enter-done {
-    transform: translateX(0%);
-    transition: all 500ms ease;
+  transform: translateX(0%);
+  transition: all 500ms ease;
 }
 
 .sidebar-exit {
-    position: absolute;
+  position: absolute;
 }
 
 .sidebar-exit-active {
-    transform: translateX(-200%);
-    transition: all 500ms ease;
-}
-
-.sidebar-exit-done {
-
+  transform: translateX(-200%);
+  transition: all 500ms ease;
 }
 
 .changes-made-enter {
-    transform: translateY(200%);
+  transform: translateY(200%);
 }
 
 .changes-made-enter-active {
-    transform: translateY(0%);
-    transition: all 500ms ease;
+  transform: translateY(0%);
+  transition: all 500ms ease;
 }
 
 .changes-made-enter-done {
-    transform: translateY(0%);
-    transition: all 500ms ease;
+  transform: translateY(0%);
+  transition: all 500ms ease;
 }
 
 .changes-made-exit {
 }
 
 .changes-made-exit-active {
-    transform: translateY(200%);
-    transition: all 500ms ease;
+  transform: translateY(200%);
+  transition: all 500ms ease;
 }
 
 .changes-made-exit-done {
 
 }
 
+//
+
+.stock-quantity-value-enter {
+  opacity: 0;
+}
+
+.stock-quantity-value-enter-active {
+  opacity: 100%;
+  transition: all 200ms ease;
+}
+
+.stock-quantity-value-exit {
+}
+
+.stock-quantity-value-exit-active {
+  opacity: 0;
+  transition: all 200ms ease;
+}
+
 .bg-blurred {
-    background-image: url(https://i.imgur.com/GYsutX5.jpg);
+  background-image: url(https://i.imgur.com/GYsutX5.jpg);
 }
 
 .transition-slow {
-    transition: all ease-in-out $transition-slow;
+  transition: all ease-in-out $transition-slow;
 }
 
 .transition-slowest {
-    transition: all ease-in-out $transition-slowest;
+  transition: all ease-in-out $transition-slowest;
 }
 
 .transition-medium {
-    transition: all ease-in-out $transition-medium;
+  transition: all ease-in-out $transition-medium;
 }
 
 .transition-fast {
-    transition: all ease-in-out $transition-fast;
+  transition: all ease-in-out $transition-fast;
 }
 
 .transition-faster {
-    transition: all ease-in-out $transition-faster;
+  transition: all ease-in-out $transition-faster;
 }
 
 .transition-fastest {
-    transition: all ease-in-out $transition-fastest;
+  transition: all ease-in-out $transition-fastest;
 }
 
 ::-webkit-scrollbar {
-    width: 0.5rem;
+  width: 0.5rem;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgb(82, 82, 82);
-    border-radius: 10px;
+  background: rgb(82, 82, 82);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #292929;
+  background: #292929;
 }

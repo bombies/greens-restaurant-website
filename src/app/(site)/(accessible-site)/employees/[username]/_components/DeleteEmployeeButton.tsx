@@ -11,6 +11,7 @@ import { sendToast } from "../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
 import { Spacer } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
+import ConfirmationModal from "../../../../../_components/ConfirmationModal";
 
 const DeleteUser = (username: string) => {
     const mutator = async (url: string) => await axios.delete(url);
@@ -43,87 +44,52 @@ export default function DeleteEmployeeButton({ username, allowed }: Props) {
             >
                 Delete Employee
             </GenericButton>
-            <Modal
-                size="2xl"
-                className="bg-neutral-800"
-                isOpen={modalOpen && allowed}
-                onClose={() => setModalOpen(false)}
-                showCloseButton={true}
-                backdrop="opaque"
-            >
-                <ModalContent>
-                    <ModalHeader>
-                        <SubTitle thick>Delete User</SubTitle>
-                    </ModalHeader>
-                    <ModalBody>
-                        <div className="p-6">
-                            <div className="default-container p-6">
-                                <p className="font-semibold">Are you sure you want to delete this user?</p>
-                                <Spacer y={6} />
-                                <div className="flex gap-4">
-                                    <GenericButton
-                                        shadow
-                                        disabled={userIsDeleting}
-                                        onClick={() => {
-                                            if (!allowed)
-                                                return;
+            <ConfirmationModal
+                isOpen={modalOpen}
+                setOpen={setModalOpen}
+                title="Delete User"
+                message="Are you sure you want to delete this user?"
+                onAccept={() => {
+                    if (!allowed)
+                        return;
 
-                                            if (session.data?.user?.username === username) {
-                                                sendToast({
-                                                    description: "You cannot delete yourself!"
-                                                }, {
-                                                    position: "top-center"
-                                                });
-                                                return;
-                                            } else if (username === "root") {
-                                                sendToast({
-                                                    description: "You cannot delete the root user!"
-                                                }, {
-                                                    position: "top-center"
-                                                });
-                                                return;
-                                            }
+                    if (session.data?.user?.username === username) {
+                        sendToast({
+                            description: "You cannot delete yourself!"
+                        }, {
+                            position: "top-center"
+                        });
+                        return;
+                    } else if (username === "root") {
+                        sendToast({
+                            description: "You cannot delete the root user!"
+                        }, {
+                            position: "top-center"
+                        });
+                        return;
+                    }
 
-                                            triggerUserDelete()
-                                                .then(() => {
-                                                    sendToast({
-                                                        description: `Successfully deleted ${username}!`
-                                                    }, {
-                                                        position: "top-center"
-                                                    });
+                    triggerUserDelete()
+                        .then(() => {
+                            sendToast({
+                                description: `Successfully deleted ${username}!`
+                            }, {
+                                position: "top-center"
+                            });
 
-                                                    router.push("/employees");
-                                                })
-                                                .catch((e) => {
-                                                    console.error(e);
-                                                    sendToast({
-                                                        description: "There was an error deleting this user!"
-                                                    }, {
-                                                        position: "top-center"
-                                                    });
-                                                });
-                                        }
-                                        }
-                                    >
-                                        I&apos;m sure
-                                    </GenericButton>
-                                    <GenericButton
-                                        disabled={userIsDeleting}
-                                        color="danger"
-                                        bordered
-                                        onClick={() => {
-                                            setModalOpen(false);
-                                        }}
-                                    >
-                                        Never mind
-                                    </GenericButton>
-                                </div>
-                            </div>
-
-                        </div>
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+                            router.push("/employees");
+                        })
+                        .catch((e) => {
+                            console.error(e);
+                            sendToast({
+                                description: "There was an error deleting this user!"
+                            }, {
+                                position: "top-center"
+                            });
+                        });
+                }}
+                accepting={userIsDeleting}
+            />
         </>
     );
 }

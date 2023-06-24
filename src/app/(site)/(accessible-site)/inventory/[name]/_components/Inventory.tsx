@@ -7,10 +7,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
-import StockTable from "./StockTable";
+import StockTable from "./table/StockTable";
 import { Spacer } from "@nextui-org/spacer";
 import Title from "../../../../../_components/text/Title";
 import SpecificInventoryControlBar from "./SpecificInventoryControlBar";
+import SubTitle from "../../../../../_components/text/SubTitle";
 
 type Props = {
     name: string
@@ -25,6 +26,7 @@ const useInventoryInfo = (name: string) => {
 
 const useCurrentSnapshot = (name: string) => {
     return useSWR(`/api/inventory/${name}/currentsnapshot`, fetcher<InventorySnapshot & {
+        inventory: Inventory & { stock: Stock[] },
         stockSnapshots: StockSnapshot[]
     }>);
 };
@@ -51,7 +53,17 @@ export default function Inventory({ name }: Props) {
         if ((!inventoryDataLoading && !inventoryData) || (!currentSnapshotDataLoading && !currentSnapshotData))
             router.replace("/inventory");
         else if (!currentSnapshotDataLoading && currentSnapshotData)
-            setCurrentStockSnapshot(currentSnapshotData.stockSnapshots);
+            setCurrentStockSnapshot(currentSnapshotData.inventory.stock.map(stock => {
+                return ({
+                    id: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.id || "",
+                    name: stock.name,
+                    quantity: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.quantity || 0,
+                    uid: stock.uid,
+                    inventorySnapshotId: currentSnapshotData.id,
+                    createdAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.createdAt || new Date(),
+                    updatedAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.updatedAt || new Date()
+                });
+            }));
     }, [currentSnapshotData, currentSnapshotDataLoading, inventoryData, inventoryDataLoading, router]);
 
     return (
@@ -63,8 +75,13 @@ export default function Inventory({ name }: Props) {
             <Spacer y={6} />
             <div className="default-container p-12 phone:px-4">
                 {
-                    !currentSnapshotDataLoading &&
-                    <StockTable stock={currentStockSnapshot} />
+                    currentSnapshotDataLoading ? <div>Loading...</div> :
+                        currentStockSnapshot.length > 0 ?
+                            <StockTable stock={currentStockSnapshot} />
+                            :
+                            <div className="default-container p-12">
+                                <SubTitle>There are no items...</SubTitle>
+                            </div>
                 }
             </div>
 
