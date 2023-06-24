@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
-    "@nextui-org/react": "^0.0.0-dev-v2-20230616024445",
+    "@nextui-org/react": "^0.0.0-dev-v2-20230624033637",
     "@prisma/client": "4.16.1",
     "@reduxjs/toolkit": "^1.9.5",
     "@types/nodemailer": "^6.4.8",
