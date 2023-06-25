@@ -46,7 +46,8 @@ const nextConfig = {
   swcMinify: true,
   images: {
     domains: [
-        'i.imgur.com'
+        'i.imgur.com',
+        'res.cloudinary.com'
     ]
   }
 }
