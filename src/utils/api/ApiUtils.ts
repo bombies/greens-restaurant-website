@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 import { AuthenticatedServerAxiosClient } from "./AuthenticatedServerAxiosClient";
 import { getToken } from "next-auth/jwt";
+import prisma from "../../libs/prisma";
 
 export const authenticated = async (
     request: Request,
@@ -24,7 +25,8 @@ export const authenticatedAny = async (
     if (!session || !session.user)
         return respond({ message: "Unauthorized!", init: { status: 403 } });
 
-    if (permissionsRequired && !hasAnyPermission(session.user.permissions, permissionsRequired))
+    const userPermissions = await fetchPermissionsFromUserSession(session);
+    if (permissionsRequired && !hasAnyPermission(userPermissions, permissionsRequired))
         return respond({ message: "Unauthorized! No permission.", init: { status: 403 } });
 
     try {
@@ -47,7 +49,8 @@ export const authenticatedAll = async (
     if (!session || !session.user)
         return respond({ message: "Unauthorized!", init: { status: 403 } });
 
-    if (permissionsRequired && !hasPermissions(session.user.permissions, permissionsRequired))
+    const userPermissions = await fetchPermissionsFromUserSession(session);
+    if (permissionsRequired && !hasPermissions(userPermissions, permissionsRequired))
         return respond({ message: "Unauthorized! No permission.", init: { status: 403 } });
 
     try {
@@ -59,6 +62,15 @@ export const authenticatedAll = async (
         console.error(ex);
         return respond({ message: "Internal Server Error", init: { status: 500 } });
     }
+};
+
+const fetchPermissionsFromUserSession = async (session: Session): Promise<number> => {
+    const user = await prisma.user.findUnique({
+        where: {
+            username: session.user?.username
+        }
+    });
+    return user?.permissions || 0;
 };
 
 export const respond = (options: {
