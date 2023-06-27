@@ -15,7 +15,7 @@ type UpdateStockQuantityDto = Partial<{
     quantity: number,
 }>
 
-export default async function POST(req: Request, { params }: RouteContext) {
+export async function POST(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
         const inventory = await prisma.inventory.findUnique({
             where: {
@@ -34,7 +34,7 @@ export default async function POST(req: Request, { params }: RouteContext) {
                 }
             });
 
-        const item = inventory.stock.find(item => item.id === params.id);
+        const item = inventory.stock.find(item => item.uid === params.id);
         if (!item)
             return respond({
                 message: `There was no stock item found in ${params.name} with id: ${params.id}`,
@@ -46,9 +46,16 @@ export default async function POST(req: Request, { params }: RouteContext) {
 
         const { quantity }: UpdateStockQuantityDto = await req.json();
 
-        if (!quantity)
+        if (quantity === undefined)
             return respond({
                 message: "You provided nothing to update!",
+                init: {
+                    status: 401
+                }
+            });
+        else if (quantity < 0)
+            return respond({
+                message: "The quantity cannot be a negative number!",
                 init: {
                     status: 401
                 }
@@ -73,14 +80,13 @@ export default async function POST(req: Request, { params }: RouteContext) {
 
         if (existingSnapshot) {
             // If the snapshot exists, just update it.
-            const existingStockSnapshot = existingSnapshot.stockSnapshots.filter(snapshot => snapshot.uid === item.uid);
-
+            const existingStockSnapshot = existingSnapshot.stockSnapshots.filter(snapshot => snapshot.uid === item.uid)[0];
             if (existingStockSnapshot) {
                 // If the snapshot already has a snapshot of the current stock item, update it
                 return NextResponse.json(
                     await prisma.stockSnapshot.update({
                         where: {
-                            id: existingSnapshot.id
+                            id: existingStockSnapshot.id
                         },
                         data: {
                             quantity: quantity
@@ -109,16 +115,41 @@ export default async function POST(req: Request, { params }: RouteContext) {
                 }
             });
 
-            const stockSnapshot = await prisma.stockSnapshot.create({
-                data: {
-                    name: item.name,
+            // Check if there is already a snapshot of the current stock item before today.
+            const existingStockSnapshot = await prisma.stockSnapshot.findFirst({
+                where: {
                     uid: item.uid,
-                    quantity: quantity,
-                    inventorySnapshotId: inventorySnapshot.id
+                    createdAt: {
+                        lt: todaysDate
+                    }
                 }
             });
 
-            return NextResponse.json(stockSnapshot);
+            // If an existing snapshot exists, re-create it so that a snapshot for today's date is created.
+            if (existingStockSnapshot) {
+                return NextResponse.json(
+                    await prisma.stockSnapshot.create({
+                        data: {
+                            name: item.name,
+                            uid: item.uid,
+                            quantity: existingStockSnapshot.quantity,
+                            inventorySnapshotId: inventorySnapshot.id
+                        }
+                    })
+                );
+            } else {
+                // If not, create a new snapshot with the current quantity.
+                return NextResponse.json(
+                    await prisma.stockSnapshot.create({
+                        data: {
+                            name: item.name,
+                            uid: item.uid,
+                            quantity: quantity,
+                            inventorySnapshotId: inventorySnapshot.id
+                        }
+                    })
+                );
+            }
         }
     }, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK]);
 }

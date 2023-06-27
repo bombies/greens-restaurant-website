@@ -9,13 +9,15 @@ import { Spacer } from "@nextui-org/react";
 import { Dispatch, SetStateAction } from "react";
 
 type Props = {
+    disabled?: boolean,
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>
     onClose: () => void
     item?: StockSnapshot
+    onSubmit: SubmitHandler<FieldValues>
 }
 
-export default function RemoveStockModal({ isOpen, setOpen, onClose, item }: Props) {
+export default function RemoveStockModal({ isOpen, setOpen, onClose, item, onSubmit, disabled }: Props) {
     const {
         register,
         handleSubmit,
@@ -23,10 +25,6 @@ export default function RemoveStockModal({ isOpen, setOpen, onClose, item }: Pro
             errors
         }
     } = useForm<FieldValues>();
-
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        setOpen(false);
-    };
 
     return (
         <GenericModal
@@ -44,6 +42,7 @@ export default function RemoveStockModal({ isOpen, setOpen, onClose, item }: Pro
         >
             <form onSubmit={handleSubmit(onSubmit)}>
                 <GenericInput
+                    isDisabled={disabled}
                     register={register}
                     errors={errors}
                     id="quantity"
@@ -54,7 +53,7 @@ export default function RemoveStockModal({ isOpen, setOpen, onClose, item }: Pro
                     max={item?.quantity}
                 />
                 <Spacer y={6} />
-                <GenericButton type="submit">Remove Stock</GenericButton>
+                <GenericButton disabled={disabled} loading={disabled} type="submit">Remove Stock</GenericButton>
             </form>
 
         </GenericModal>

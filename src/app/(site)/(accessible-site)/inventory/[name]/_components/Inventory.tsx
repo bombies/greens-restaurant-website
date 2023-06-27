@@ -77,7 +77,7 @@ export default function Inventory({ name }: Props) {
                 {
                     currentSnapshotDataLoading ? <div>Loading...</div> :
                         currentStockSnapshot.length > 0 ?
-                            <StockTable stock={currentStockSnapshot} />
+                            <StockTable inventoryName={name} stock={currentStockSnapshot} />
                             :
                             <div className="default-container p-12">
                                 <SubTitle>There are no items...</SubTitle>

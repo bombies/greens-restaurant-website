@@ -1,5 +1,7 @@
+"use client";
+
 import { StockSnapshot } from "@prisma/client";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import GenericInput from "../../../../../../_components/inputs/GenericInput";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import clsx from "clsx";
@@ -7,9 +9,11 @@ import { CSSTransition } from "react-transition-group";
 
 type Props = {
     stock: StockSnapshot,
+    disabled?: boolean,
+    submitHandler: (data: { quantity: number }, setEditMode: Dispatch<SetStateAction<boolean>>) => void,
 }
 
-export default function StockQuantityField({ stock }: Props) {
+export default function StockQuantityField({ stock, submitHandler, disabled }: Props) {
     const [editMode, setEditMode] = useState(false);
     const { register, handleSubmit } = useForm<FieldValues>();
     const formRef = useRef<any>(null);
@@ -27,7 +31,7 @@ export default function StockQuantityField({ stock }: Props) {
     }, [editMode, formRef]);
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        setEditMode(false);
+        submitHandler(data as { quantity: number }, setEditMode);
     };
 
     return (
@@ -42,7 +46,8 @@ export default function StockQuantityField({ stock }: Props) {
                     "cursor-pointer border-2 border-neutral-800/0 hover:default-container transition-fast w-fit py-3 px-5 rounded-2xl"
                 )}
                    onClick={() => {
-                       console.log("clicked");
+                       if (disabled)
+                           return;
                        setEditMode(true);
                    }}>
                     {stock.quantity}
@@ -62,6 +67,7 @@ export default function StockQuantityField({ stock }: Props) {
                     onSubmit={handleSubmit(onSubmit)}
                 >
                     <GenericInput
+                        isDisabled={disabled}
                         register={register}
                         label="New Quantity"
                         placeholder="Enter a new quantity"

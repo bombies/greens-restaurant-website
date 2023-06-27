@@ -107,31 +107,81 @@ export const fetchCurrentSnapshot = async (name: string): Promise<Either<Invento
     });
 
     if (!snapshot) {
-        return new Either<InventorySnapshot & {
-            inventory: Inventory & { stock: Stock[] };
-            stockSnapshots: StockSnapshot[]
-        }, NextResponse>(
-            await prisma.inventorySnapshot.create({
-                data: {
-                    uid: inventory.uid,
-                    inventoryId: inventory.id
-                },
-                include: {
-                    stockSnapshots: true,
-                    inventory: {
-                        include: {
-                            stock: true
-                        }
+        const newSnapshot = await prisma.inventorySnapshot.create({
+            data: {
+                uid: inventory.uid,
+                inventoryId: inventory.id
+            },
+            include: {
+                stockSnapshots: true,
+                inventory: {
+                    include: {
+                        stock: true
                     }
                 }
-            })
-        );
-    } else {
-        return new Either<InventorySnapshot & {
-            inventory: Inventory & { stock: Stock[] };
-            stockSnapshots: StockSnapshot[]
-        }, NextResponse>(snapshot);
+            }
+        });
+        return await generateWholesomeCurrentSnapshot(inventory, newSnapshot);
+    } else return await generateWholesomeCurrentSnapshot(inventory, snapshot);
+};
+
+const generateWholesomeCurrentSnapshot = async (inventory: Inventory, snapshot: InventorySnapshot & {
+    inventory: Inventory & { stock: Stock[] };
+    stockSnapshots: StockSnapshot[]
+}): Promise<Either<InventorySnapshot & {
+    inventory: Inventory & { stock: Stock[] },
+    stockSnapshots: StockSnapshot[]
+}, NextResponse>> => {
+    if (!snapshot.stockSnapshots.length) {
+        // Fetch all the stock items and create a snapshot for each one based on the snapshot for the most recent date before today.
+        // This will be done in-memory and not committed to the database to ensure speed.
+        const todaysDate = new Date();
+        todaysDate.setHours(0, 0, 0, 0);
+        const previousSnapshot = await prisma.inventorySnapshot.findFirst({
+            where: {
+                uid: inventory.uid,
+                createdAt: {
+                    lt: todaysDate
+                }
+            },
+            include: {
+                stockSnapshots: true
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        if (previousSnapshot) {
+            const newStockSnapshots = previousSnapshot.stockSnapshots.map(stockSnapshot => {
+                const { id, createdAt, updatedAt, inventorySnapshotId, ...validSnapshot } = stockSnapshot;
+                return ({
+                    ...validSnapshot,
+                    createdAt: todaysDate,
+                    updatedAt: todaysDate,
+                    inventorySnapshotId: snapshot.id
+                });
+            });
+
+            await prisma.stockSnapshot.createMany({
+                data: newStockSnapshots
+            });
+
+            return new Either<InventorySnapshot & {
+                inventory: Inventory & { stock: Stock[] };
+                stockSnapshots: StockSnapshot[]
+            }, NextResponse>({
+                ...snapshot,
+                stockSnapshots: newStockSnapshots.map(snapshot => ({ ...snapshot, id: "" }))
+            });
+        }
+
     }
+
+    return new Either<InventorySnapshot & {
+        inventory: Inventory & { stock: Stock[] };
+        stockSnapshots: StockSnapshot[]
+    }, NextResponse>(snapshot);
 };
 
 export const createStockSnapshot = async (

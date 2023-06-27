@@ -9,13 +9,15 @@ import { Spacer } from "@nextui-org/react";
 import { Dispatch, SetStateAction } from "react";
 
 type Props = {
+    disabled?: boolean,
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>
     onClose: () => void
-    item?: StockSnapshot
+    item?: StockSnapshot,
+    onSubmit: SubmitHandler<FieldValues>
 }
 
-export default function AddStockModal({ isOpen, setOpen, onClose, item }: Props) {
+export default function AddStockModal({ isOpen, setOpen, onClose, item, onSubmit, disabled }: Props) {
     const {
         register,
         handleSubmit,
@@ -23,10 +25,6 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item }: Props)
             errors
         }
     } = useForm<FieldValues>();
-
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        setOpen(false);
-    };
 
     return (
         <GenericModal
@@ -44,6 +42,7 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item }: Props)
         >
             <form onSubmit={handleSubmit(onSubmit)}>
                 <GenericInput
+                    isDisabled={disabled}
                     register={register}
                     errors={errors}
                     id="quantity"
@@ -54,7 +53,7 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item }: Props)
                     min={1}
                 />
                 <Spacer y={6} />
-                <GenericButton type="submit">Add Stock</GenericButton>
+                <GenericButton disabled={disabled} loading={disabled} type="submit">Add Stock</GenericButton>
             </form>
 
         </GenericModal>

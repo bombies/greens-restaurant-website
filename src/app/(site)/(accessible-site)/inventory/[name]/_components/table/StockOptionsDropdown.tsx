@@ -1,15 +1,17 @@
 "use client";
 
-import { DropdownItem, DropdownMenu } from "@nextui-org/react";
+import { DropdownItem, DropdownMenu, Spacer } from "@nextui-org/react";
 import { Key } from "react";
+import { Divider } from "@nextui-org/divider";
 
 type Props = {
     onAdd: () => void,
     onRemove: () => void,
     onDelete: () => void,
+    disabled?: boolean,
 }
 
-export default function StockOptionsDropdown({ onAdd, onRemove, onDelete }: Props) {
+export default function StockOptionsDropdown({ onAdd, onRemove, onDelete, disabled }: Props) {
 
     const handleAction = (key: Key) => {
         switch (key) {
@@ -33,6 +35,7 @@ export default function StockOptionsDropdown({ onAdd, onRemove, onDelete }: Prop
             <DropdownMenu
                 aria-labelledby="Stock Options Dropdown"
                 onAction={handleAction}
+                disabledKeys={disabled ? ["add", "remove", "delete"] : undefined}
             >
                 <DropdownItem key="add" description="Add a custom amount of stock to this item">Add
                     Multiple</DropdownItem>
@@ -40,10 +43,11 @@ export default function StockOptionsDropdown({ onAdd, onRemove, onDelete }: Prop
                     Multiple</DropdownItem>
                 <DropdownItem
                     key="delete"
-                    showDivider
                     className="text-danger hover:text-white"
                     color="danger"
                 >
+                    <Divider />
+                    <Spacer y={3} />
                     Remove Item
                 </DropdownItem>
             </DropdownMenu>

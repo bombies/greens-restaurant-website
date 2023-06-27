@@ -14,6 +14,6 @@ export async function GET(req: Request, { params }: RouteContext) {
         const fetchedSnapshot = await fetchCurrentSnapshot(params.name);
         if (fetchedSnapshot.error)
             return fetchedSnapshot.error;
-        return NextResponse.json(fetchedSnapshot.success!);
+        return NextResponse.json(fetchedSnapshot.success);
     }, [Permission.VIEW_INVENTORY, Permission.MUTATE_STOCK, Permission.CREATE_INVENTORY]);
 }
