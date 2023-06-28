@@ -10,6 +10,7 @@ import { DarkModeProvider } from "./DarkModeProvider";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 import { NextUIProvider } from "@nextui-org/react";
+import UserDataProvider from "./UserDataProvider";
 
 interface Props extends React.PropsWithChildren {
     session: any;
@@ -30,7 +31,6 @@ export default function Providers(props: Props) {
                     <DarkModeProvider>
                         <NextUIProvider>
                             <SessionProvider session={props.session}>
-
                                 <Toaster
                                     position="top-right"
                                     reverseOrder={false}

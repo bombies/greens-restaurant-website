@@ -26,6 +26,7 @@ import { sendToast } from "../../../../../../../utils/Hooks";
 type Props = {
     inventoryName: string,
     stock?: StockSnapshot[],
+    mutationAllowed?: boolean
 }
 
 type Column = {
@@ -85,7 +86,7 @@ const reducer = (state: StockSnapshot[], action: { type: StockAction, payload: P
     return newState;
 };
 
-export default function StockTable({ inventoryName, stock }: Props) {
+export default function StockTable({ inventoryName, stock, mutationAllowed }: Props) {
     const [stockState, dispatchStockState] = useReducer(reducer, stock ?? []);
     const [addStockModalOpen, setAddStockModalOpen] = useState(false);
     const [removeStockModalOpen, setRemoveStockModalOpen] = useState(false);
@@ -101,7 +102,7 @@ export default function StockTable({ inventoryName, stock }: Props) {
             return item.name;
         if (key === "stock_quantity")
             return <StockQuantityField
-                disabled={isUpdating}
+                disabled={isUpdating || !mutationAllowed}
                 submitHandler={(data, setEditMode) => {
                     triggerStockUpdate({
                         item: item,
@@ -135,7 +136,7 @@ export default function StockTable({ inventoryName, stock }: Props) {
                 <div className="flex gap-3">
                     <div className="flex gap-8 p-3 default-container !rounded-xl w-fit">
                         <IconButton
-                            isDisabled={isUpdating}
+                            isDisabled={isUpdating || !mutationAllowed}
                             icon={addIcon}
                             toolTip="Increment"
                             onPress={() => {
@@ -163,7 +164,7 @@ export default function StockTable({ inventoryName, stock }: Props) {
                             }}
                         />
                         <IconButton
-                            isDisabled={isUpdating}
+                            isDisabled={isUpdating || !mutationAllowed}
                             icon={minusIcon}
                             toolTip="Decrement"
                             onPress={() => {
@@ -193,12 +194,11 @@ export default function StockTable({ inventoryName, stock }: Props) {
                     </div>
                     <div className="flex  p-3 default-container !rounded-xl w-fit">
                         <IconButton
-                            isDisabled={isUpdating}
+                            isDisabled={isUpdating || !mutationAllowed}
                             icon={moreIcon}
                             toolTip="More Options"
                             withDropdown={
                                 <StockOptionsDropdown
-
                                     onAdd={() => {
                                         setSelectedItem(item);
                                         setAddStockModalOpen(true);
@@ -218,7 +218,7 @@ export default function StockTable({ inventoryName, stock }: Props) {
                 </div>
             );
         return undefined;
-    }, []);
+    }, [isUpdating, mutationAllowed, triggerStockUpdate]);
 
     return (
         <>
@@ -227,6 +227,9 @@ export default function StockTable({ inventoryName, stock }: Props) {
             {/*</div>*/}
             <AddStockModal
                 onSubmit={(data) => {
+                    if (!mutationAllowed)
+                        return;
+
                     triggerStockUpdate({
                         item: selectedItem!,
                         quantity: selectedItem!.quantity + Number(data.quantity)
@@ -261,6 +264,9 @@ export default function StockTable({ inventoryName, stock }: Props) {
             <RemoveStockModal
                 disabled={isUpdating}
                 onSubmit={(data) => {
+                    if (!mutationAllowed)
+                        return;
+
                     triggerStockUpdate({
                         item: selectedItem!,
                         quantity: selectedItem!.quantity - Number(data.quantity)
@@ -304,6 +310,9 @@ export default function StockTable({ inventoryName, stock }: Props) {
                     }?`
                 }
                 onAccept={() => {
+                    if (!mutationAllowed)
+                        return;
+
                     setDeleteStockModalOpen(false);
                 }}
             />

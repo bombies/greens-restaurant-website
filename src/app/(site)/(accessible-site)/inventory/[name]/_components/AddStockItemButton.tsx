@@ -12,6 +12,7 @@ import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
 import { StockSnapshot } from "@prisma/client";
+import { add } from "@internationalized/date/src/manipulation";
 
 const AddItem = (inventoryName: string, name?: string) => {
     const mutator = (url: string) => axios.post(url, { name });
@@ -21,10 +22,10 @@ const AddItem = (inventoryName: string, name?: string) => {
 type Props = {
     inventoryName: string,
     setCurrentData: Dispatch<SetStateAction<StockSnapshot[]>>
+    disabled?: boolean
 }
 
-export default function AddStockItemButton({ inventoryName, setCurrentData }: Props) {
-    const router = useRouter();
+export default function AddStockItemButton({ inventoryName, setCurrentData, disabled }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const [stockName, setStockName] = useState<string>();
     const { trigger: triggerStockAdd, isMutating: addingStock } = AddItem(inventoryName, stockName);
@@ -37,7 +38,7 @@ export default function AddStockItemButton({ inventoryName, setCurrentData }: Pr
     } = useForm<FieldValues>();
 
     useEffect(() => {
-        if (!stockName)
+        if (!stockName || disabled || addingStock)
             return;
 
         triggerStockAdd()
@@ -76,6 +77,7 @@ export default function AddStockItemButton({ inventoryName, setCurrentData }: Pr
     return (
         <>
             <GenericButton
+                disabled={disabled}
                 shadow
                 icon={addIcon}
                 onClick={() => setModalOpen(true)}
@@ -89,9 +91,9 @@ export default function AddStockItemButton({ inventoryName, setCurrentData }: Pr
             >
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <GenericInput
+                        isDisabled={disabled || addingStock}
                         id="name"
                         label="Item Name"
-                        disabled={addingStock}
                         register={register}
                         errors={errors}
                         isRequired={true}
@@ -102,7 +104,7 @@ export default function AddStockItemButton({ inventoryName, setCurrentData }: Pr
                         shadow
                         type="submit"
                         loading={addingStock}
-                        disabled={addingStock}
+                        disabled={addingStock || disabled}
                     >Add Item</GenericButton>
                 </form>
             </GenericModal>

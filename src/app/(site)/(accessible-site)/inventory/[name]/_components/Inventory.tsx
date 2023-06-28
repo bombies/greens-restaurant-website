@@ -5,13 +5,13 @@ import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import StockTable from "./table/StockTable";
 import { Spacer } from "@nextui-org/spacer";
 import Title from "../../../../../_components/text/Title";
 import SpecificInventoryControlBar from "./SpecificInventoryControlBar";
 import SubTitle from "../../../../../_components/text/SubTitle";
+import { useUserData } from "../../../../../../utils/Hooks";
 
 type Props = {
     name: string
@@ -32,22 +32,22 @@ const useCurrentSnapshot = (name: string) => {
 };
 
 export default function Inventory({ name }: Props) {
-    const session = useSession();
+    const { isLoading: userDataIsLoading, data: userData } = useUserData();
     const { data: inventoryData, isLoading: inventoryDataLoading } = useInventoryInfo(name);
     const { data: currentSnapshotData, isLoading: currentSnapshotDataLoading } = useCurrentSnapshot(name);
     const [currentStockSnapshot, setCurrentStockSnapshot] = useState<StockSnapshot[]>([]);
     const router = useRouter();
 
     useEffect(() => {
-        if (session.status !== "loading"
-            && !hasAnyPermission(session.data?.user?.permissions, [
+        if (!userDataIsLoading &&
+            (!userData || !hasAnyPermission(userData.permissions, [
                 Permission.VIEW_INVENTORY,
                 Permission.CREATE_INVENTORY,
-                Permission.VIEW_INVENTORY
-            ])
+                Permission.MUTATE_STOCK
+            ]))
         )
             router.replace("/home");
-    }, [router, session.data?.user?.permissions, session.status]);
+    }, [router, userData, userDataIsLoading]);
 
     useEffect(() => {
         if ((!inventoryDataLoading && !inventoryData) || (!currentSnapshotDataLoading && !currentSnapshotData))
@@ -71,20 +71,27 @@ export default function Inventory({ name }: Props) {
             <Title>Inventory - <span
                 className="text-primary capitalize">{inventoryData?.name.replaceAll("-", " ") || "Unknown"}</span></Title>
             <Spacer y={6} />
-            <SpecificInventoryControlBar inventoryName={name} setCurrentData={setCurrentStockSnapshot} />
+            <SpecificInventoryControlBar
+                inventoryName={name}
+                setCurrentData={setCurrentStockSnapshot}
+                controlsEnabled={hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
+            />
             <Spacer y={6} />
             <div className="default-container p-12 phone:px-4">
                 {
                     currentSnapshotDataLoading ? <div>Loading...</div> :
                         currentStockSnapshot.length > 0 ?
-                            <StockTable inventoryName={name} stock={currentStockSnapshot} />
+                            <StockTable
+                                inventoryName={name}
+                                stock={currentStockSnapshot}
+                                mutationAllowed={hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
+                            />
                             :
                             <div className="default-container p-12">
                                 <SubTitle>There are no items...</SubTitle>
                             </div>
                 }
             </div>
-
         </>
     );
 }

@@ -175,7 +175,6 @@ const generateWholesomeCurrentSnapshot = async (inventory: Inventory, snapshot: 
                 stockSnapshots: newStockSnapshots.map(snapshot => ({ ...snapshot, id: "" }))
             });
         }
-
     }
 
     return new Either<InventorySnapshot & {

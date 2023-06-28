@@ -7,18 +7,22 @@ import GenericInput from "../../../../_components/inputs/GenericInput";
 import GenericModal from "../../../../_components/GenericModal";
 import { Spacer } from "@nextui-org/react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { CreateInventoryDto } from "../../../../api/inventory/route";
 import { useSession } from "next-auth/react";
 import { sendToast } from "../../../../../utils/Hooks";
+
+type Props = {
+    disabled?: boolean
+}
 
 export const CreateInventory = (dto?: CreateInventoryDto) => {
     const mutator = (url: string) => axios.post(url, dto);
     return useSWRMutation(`/api/inventory`, mutator);
 };
 
-export default function CreateInventoryButton() {
+export default function CreateInventoryButton({disabled}: Props) {
     const session = useSession();
     const [modalOpen, setModalOpen] = useState(false);
     const [dto, setDto] = useState<CreateInventoryDto>();
@@ -32,7 +36,7 @@ export default function CreateInventoryButton() {
     const { trigger: triggerCreateInventory, isMutating: creatingInventory } = CreateInventory(dto);
 
     useEffect(() => {
-        if (!dto)
+        if (!dto || disabled || creatingInventory)
             return;
 
         triggerCreateInventory()
@@ -67,6 +71,7 @@ export default function CreateInventoryButton() {
             <GenericButton
                 shadow
                 icon={addIcon}
+                disabled={disabled}
                 size="md"
                 onClick={() => setModalOpen(true)}
             >
@@ -86,7 +91,7 @@ export default function CreateInventoryButton() {
                             isClearable
                             register={register}
                             errors={errors}
-                            disabled={creatingInventory}
+                            disabled={creatingInventory || disabled}
                             label="Inventory Name"
                             id="name"
                             required
@@ -95,7 +100,8 @@ export default function CreateInventoryButton() {
                         <GenericButton
                             type="submit"
                             icon={addIcon}
-                            disabled={creatingInventory}
+                            disabled={creatingInventory || disabled}
+                            loading={creatingInventory}
                             shadow
                         >
                             Create

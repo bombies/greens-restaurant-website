@@ -9,27 +9,35 @@ import { useRouter } from "next/navigation";
 import { Spacer } from "@nextui-org/react";
 import InventoryControlBar from "./_components/InventoryControlBar";
 import InventoryGrid from "./_components/InventoryGrid";
+import { useUserData } from "../../../../utils/Hooks";
 
 export default function InventoryPage() {
-    const session = useSession();
+    const { isLoading: userDataIsLoading, data: userData } = useUserData();
     const router = useRouter();
 
     useEffect(() => {
-
-        if (session.status !== "loading" && !hasAnyPermission(session.data?.user?.permissions, [
-            Permission.CREATE_INVENTORY,
-            Permission.VIEW_INVENTORY,
-            Permission.MUTATE_STOCK
-        ]))
+        if (!userDataIsLoading &&
+            (!userData || !hasAnyPermission(userData.permissions, [
+                Permission.VIEW_INVENTORY,
+                Permission.CREATE_INVENTORY,
+                Permission.MUTATE_STOCK
+            ]))
+        )
             router.replace("/home");
-    }, [router, session]);
+    }, [router, userData, userDataIsLoading]);
 
     return (
         <div>
             <Title>Inventory</Title>
             <SubTitle>Create, delete and edit inventories</SubTitle>
             <Spacer y={6} />
-            <InventoryControlBar />
+            <InventoryControlBar
+                controlsEnabled={
+                    hasAnyPermission(
+                        userData?.permissions,
+                        [Permission.CREATE_INVENTORY]
+                    )}
+            />
             <Spacer y={6} />
             <InventoryGrid />
         </div>

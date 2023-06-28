@@ -4,8 +4,12 @@ import { AppDispatch, AppState } from "./redux/GlobalStore";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { toast, ToastOptions } from "react-hot-toast";
 import ToastComponent, { ToastDataProps } from "../app/_components/ToastComponent";
-import { MutableRefObject, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
-import { AxiosError } from "axios";
+import React, { MutableRefObject, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import axios, { AxiosError } from "axios";
+import { useSession } from "next-auth/react";
+import { User } from "@prisma/client";
+import useSWR from "swr";
+import { fetcher } from "../app/(site)/(accessible-site)/employees/_components/EmployeeGrid";
 
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<AppState> = useSelector;
@@ -27,6 +31,21 @@ export function useVisible(ref: MutableRefObject<any>): boolean {
     }, [ref]);
 
     return isVisible;
+}
+
+type UserData = {
+    isLoading: boolean,
+    error: any,
+    data?: User
+}
+
+const FetchUserData = () => {
+    return useSWR("/api/users/me", fetcher<User>);
+};
+
+export function useUserData(): UserData {
+    const { data, isLoading, error } = FetchUserData();
+    return { data, isLoading, error };
 }
 
 export function sendToast(props: ToastDataProps & { error?: AxiosError }, options?: ToastOptions) {

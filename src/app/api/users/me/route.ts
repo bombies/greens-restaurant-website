@@ -15,8 +15,8 @@ export async function GET(req: Request) {
                 message: `There was no user with the username: ${session.user?.username}`,
                 init: { status: 404 }
             });
-
-        return NextResponse.json(user);
+        const { password, ...rest } = user;
+        return NextResponse.json(rest);
     });
 }
 
