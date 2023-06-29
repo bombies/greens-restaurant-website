@@ -1,7 +1,7 @@
 import { Skeleton, Spacer } from "@nextui-org/react";
 
 type Props = {
-    width: string,
+    width?: string,
     contentRepeat?: number,
     innerContentRepeat?: number,
 }
@@ -29,7 +29,7 @@ export default function ContainerSkeleton({ width, contentRepeat, innerContentRe
         <div
             className="default-container p-12"
             style={{
-                width: width
+                width: width || "100%"
             }}
         >
             {content}

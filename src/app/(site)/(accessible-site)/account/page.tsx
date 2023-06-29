@@ -17,7 +17,7 @@ import EditableEmployeeField, { DataContainer } from "../employees/[username]/_c
 import { EMAIL_REGEX, NAME_REGEX, USERNAME_REGEX } from "../../../../utils/regex";
 import { Divider } from "@nextui-org/divider";
 import ChangePasswordButton from "../employees/[username]/_components/ChangePasswordButton";
-import ContainerSkeleton from "../../../_components/ContainerSkeleton";
+import ContainerSkeleton from "../../../_components/skeletons/ContainerSkeleton";
 
 const useSelfData = () => {
     return useSWRImmutable(`/api/users/me`, fetcher<User>);

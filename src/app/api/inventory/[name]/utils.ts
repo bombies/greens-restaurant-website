@@ -11,14 +11,16 @@ export class Either<A, B> {
 }
 
 export const fetchInventory = async (name: string, options?: {
-    stock?: boolean
-}): Promise<Either<Inventory & { stock?: Stock[] }, NextResponse>> => {
+    stock?: boolean,
+    snapshots?: boolean,
+}): Promise<Either<Inventory & { stock?: Stock[], snapshots?: InventorySnapshot[] }, NextResponse>> => {
     const inventory = await prisma.inventory.findUnique({
         where: {
             name: name.toLowerCase()
         },
         include: {
-            stock: options?.stock || false
+            stock: options?.stock || false,
+            snapshots: options?.snapshots || false
         }
     });
 

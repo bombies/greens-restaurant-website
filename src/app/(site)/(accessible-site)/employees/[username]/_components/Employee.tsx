@@ -21,7 +21,7 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import useSWRImmutable from "swr/immutable";
-import ContainerSkeleton from "../../../../../_components/ContainerSkeleton";
+import ContainerSkeleton from "../../../../../_components/skeletons/ContainerSkeleton";
 import clsx from "clsx";
 
 type Props = {

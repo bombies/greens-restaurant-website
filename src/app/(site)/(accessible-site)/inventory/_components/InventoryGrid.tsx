@@ -7,6 +7,8 @@ import SubTitle from "../../../../_components/text/SubTitle";
 import { useEffect, useState } from "react";
 import InventoryCard from "./InventoryCard";
 import { Spacer } from "@nextui-org/react";
+import ContainerSkeleton from "../../../../_components/skeletons/ContainerSkeleton";
+import CardSkeleton from "../../../../_components/skeletons/CardSkeleton";
 
 const useInventoryData = () => {
     return useSWR("/api/inventory", fetcher<Inventory[]>);
@@ -32,7 +34,14 @@ export default function InventoryGrid() {
             <div className="grid grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-6">
                 {
                     isLoading ?
-                        <><p>Loading</p></>
+                        <>
+                            <CardSkeleton />
+                            <CardSkeleton />
+                            <CardSkeleton />
+                            <CardSkeleton />
+                            <CardSkeleton />
+                            <CardSkeleton />
+                        </>
                         :
                         <>
                             {inventoryCards}

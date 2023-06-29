@@ -6,12 +6,11 @@ import { fetcher } from "../../../employees/_components/EmployeeGrid";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
-import StockTable from "./table/StockTable";
-import { Spacer } from "@nextui-org/spacer";
-import Title from "../../../../../_components/text/Title";
-import SpecificInventoryControlBar from "./SpecificInventoryControlBar";
+import StockTable, { columns } from "./table/StockTable";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { useUserData } from "../../../../../../utils/Hooks";
+import TableSkeleton from "../../../../../_components/skeletons/TableSkeleton";
+import { useCurrentStock } from "./CurrentStockContext";
 
 type Props = {
     name: string
@@ -35,7 +34,7 @@ export default function Inventory({ name }: Props) {
     const { isLoading: userDataIsLoading, data: userData } = useUserData();
     const { data: inventoryData, isLoading: inventoryDataLoading } = useInventoryInfo(name);
     const { data: currentSnapshotData, isLoading: currentSnapshotDataLoading } = useCurrentSnapshot(name);
-    const [currentStockSnapshot, setCurrentStockSnapshot] = useState<StockSnapshot[]>([]);
+    const [currentStockSnapshot, setCurrentStockSnapshot] = useCurrentStock();
     const router = useRouter();
 
     useEffect(() => {
@@ -64,22 +63,15 @@ export default function Inventory({ name }: Props) {
                     updatedAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.updatedAt || new Date()
                 });
             }));
-    }, [currentSnapshotData, currentSnapshotDataLoading, inventoryData, inventoryDataLoading, router]);
+    }, [currentSnapshotData, currentSnapshotDataLoading, inventoryData, inventoryDataLoading, router, setCurrentStockSnapshot]);
 
     return (
         <>
-            <Title>Inventory - <span
-                className="text-primary capitalize">{inventoryData?.name.replaceAll("-", " ") || "Unknown"}</span></Title>
-            <Spacer y={6} />
-            <SpecificInventoryControlBar
-                inventoryName={name}
-                setCurrentData={setCurrentStockSnapshot}
-                controlsEnabled={hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
-            />
-            <Spacer y={6} />
             <div className="default-container p-12 phone:px-4">
                 {
-                    currentSnapshotDataLoading ? <div>Loading...</div> :
+                    currentSnapshotDataLoading ?
+                        <TableSkeleton columns={columns} contentRepeat={20} />
+                        :
                         currentStockSnapshot.length > 0 ?
                             <StockTable
                                 inventoryName={name}

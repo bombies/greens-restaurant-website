@@ -7,7 +7,7 @@ import {
     TableCell,
     TableColumn,
     TableHeader,
-    TableRow
+    TableRow,
 } from "@nextui-org/react";
 import addIcon from "/public/icons/add-2.svg";
 import minusIcon from "/public/icons/minus.svg";
@@ -15,7 +15,7 @@ import moreIcon from "/public/icons/more.svg";
 import IconButton from "../../../../../../_components/inputs/IconButton";
 import StockOptionsDropdown from "./StockOptionsDropdown";
 import AddStockModal from "./AddStockModal";
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useReducer, useState } from "react";
 import ConfirmationModal from "../../../../../../_components/ConfirmationModal";
 import RemoveStockModal from "./RemoveStockModal";
 import StockQuantityField from "./StockQuantityField";
@@ -35,7 +35,7 @@ type Column = {
 }
 
 
-const columns: Column[] = [
+export const columns: Column[] = [
     {
         key: "stock_name",
         value: "Name"
@@ -222,9 +222,6 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
 
     return (
         <>
-            {/*<div>*/}
-            {/*    {JSON.stringify(stock)}*/}
-            {/*</div>*/}
             <AddStockModal
                 onSubmit={(data) => {
                     if (!mutationAllowed)

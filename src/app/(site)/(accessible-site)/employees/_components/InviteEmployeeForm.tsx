@@ -24,9 +24,10 @@ const SendInvitationMail = (dto?: InviteDto) => {
 
 type Props = {
     setModalVisible: Dispatch<SetStateAction<boolean>>
+    userHasPermission: boolean,
 }
 
-export default function InviteEmployeeForm({ setModalVisible }: Props) {
+export default function InviteEmployeeForm({ setModalVisible, userHasPermission }: Props) {
     const router = useRouter();
     const {
         register,
@@ -40,7 +41,7 @@ export default function InviteEmployeeForm({ setModalVisible }: Props) {
     const { isMutating: invitationIsSending, trigger: triggerInvitation } = SendInvitationMail(inviteInfo);
 
     useEffect(() => {
-        if (!inviteInfo)
+        if (!inviteInfo || !userHasPermission)
             return;
 
         triggerInvitation()
@@ -63,7 +64,7 @@ export default function InviteEmployeeForm({ setModalVisible }: Props) {
                     position: "top-center"
                 });
             });
-    }, [inviteInfo, setModalVisible, triggerInvitation]);
+    }, [inviteInfo, router, setModalVisible, triggerInvitation, userHasPermission]);
 
     const selectionMenuContent = Permissions.map<SelectMenuContent>(permission => ({
         label: permission.label,
@@ -86,7 +87,7 @@ export default function InviteEmployeeForm({ setModalVisible }: Props) {
         <form onSubmit={handleSubmit(submitHandler)}>
             <div className="flex phone:flex-col gap-6">
                 <GenericInput
-                    disabled={invitationIsSending}
+                    disabled={invitationIsSending || !userHasPermission}
                     id="firstName"
                     label="First Name"
                     register={register}
@@ -94,7 +95,7 @@ export default function InviteEmployeeForm({ setModalVisible }: Props) {
                     errors={errors}
                 />
                 <GenericInput
-                    disabled={invitationIsSending}
+                    disabled={invitationIsSending || !userHasPermission}
                     id="lastName"
                     label="Last Name"
                     register={register}
@@ -104,7 +105,7 @@ export default function InviteEmployeeForm({ setModalVisible }: Props) {
             </div>
             <Spacer y={6} />
             <GenericInput
-                disabled={invitationIsSending}
+                disabled={invitationIsSending || !userHasPermission}
                 id="newEmail"
                 label="Email"
                 register={register}
@@ -114,7 +115,7 @@ export default function InviteEmployeeForm({ setModalVisible }: Props) {
             />
             <Spacer y={6} />
             <GenericInput
-                disabled={invitationIsSending}
+                disabled={invitationIsSending || !userHasPermission}
                 id="newUsername"
                 label="Username"
                 register={register}
@@ -128,7 +129,7 @@ export default function InviteEmployeeForm({ setModalVisible }: Props) {
                 content={selectionMenuContent}
                 fullWidth
                 multiSelect
-                disabled={invitationIsSending}
+                disabled={invitationIsSending || !userHasPermission}
                 displayCategories={false}
                 handleItemSelect={item => {
                     setPermissions(prev =>
@@ -148,7 +149,7 @@ export default function InviteEmployeeForm({ setModalVisible }: Props) {
             <GenericButton
                 shadow
                 loading={invitationIsSending}
-                disabled={invitationIsSending}
+                disabled={invitationIsSending || !userHasPermission}
                 icon={inviteIcon}
                 type="submit"
             >
