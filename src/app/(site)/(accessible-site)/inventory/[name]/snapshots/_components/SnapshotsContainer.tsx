@@ -7,6 +7,9 @@ import { useEffect } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { useUserData } from "../../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
+import SnapshotCard from "./SnapshotCard";
+import CardSkeleton from "../../../../../../_components/skeletons/CardSkeleton";
+import SubTitle from "../../../../../../_components/text/SubTitle";
 
 type Props = {
     inventoryName: string,
@@ -32,12 +35,28 @@ export default function SnapshotsContainer({ inventoryName }: Props) {
             router.replace("/home");
     }, [router, userData, userDataIsLoading]);
 
+    const cards = data?.snapshots
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .map(snapshot => (
+            <SnapshotCard
+                key={snapshot.id}
+                inventoryName={inventoryName}
+                snapshot={snapshot}
+            />
+        ));
+
     return (
-        <div>
+        <div className="default-container p-12 grid grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-4">
             {
-                isLoading ? <div>Loading...</div> : (
-                    JSON.stringify(data?.snapshots)
-                )
+                isLoading ? <>
+                        <CardSkeleton />
+                        <CardSkeleton />
+                        <CardSkeleton />
+                        <CardSkeleton />
+                        <CardSkeleton />
+                        <CardSkeleton />
+                    </> :
+                    cards || <SubTitle>There are no snapshots...</SubTitle>
             }
         </div>
     );

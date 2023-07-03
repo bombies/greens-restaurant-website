@@ -3,7 +3,7 @@
 import { Inventory, InventorySnapshot, Stock, StockSnapshot } from "@prisma/client";
 import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import StockTable, { columns } from "./table/StockTable";
@@ -59,6 +59,7 @@ export default function Inventory({ name }: Props) {
                     quantity: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.quantity || 0,
                     uid: stock.uid,
                     inventorySnapshotId: currentSnapshotData.id,
+                    inventoryId: currentSnapshotData.inventoryId,
                     createdAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.createdAt || new Date(),
                     updatedAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.updatedAt || new Date()
                 });

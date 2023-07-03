@@ -77,4 +77,6 @@ model StockSnapshot {
 
   inventorySnapshotId String            @db.ObjectId
   inventorySnapshot   InventorySnapshot @relation(fields: [inventorySnapshotId], references: [id], onDelete: Cascade)
+
+  inventoryId String @db.ObjectId
 }

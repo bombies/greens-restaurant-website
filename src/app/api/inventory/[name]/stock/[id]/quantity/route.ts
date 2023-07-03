@@ -101,7 +101,8 @@ export async function POST(req: Request, { params }: RouteContext) {
                             uid: item.uid,
                             quantity: quantity,
                             name: item.name,
-                            inventorySnapshotId: existingSnapshot.id
+                            inventorySnapshotId: existingSnapshot.id,
+                            inventoryId: inventory.id
                         }
                     })
                 );
@@ -133,7 +134,8 @@ export async function POST(req: Request, { params }: RouteContext) {
                             name: item.name,
                             uid: item.uid,
                             quantity: existingStockSnapshot.quantity,
-                            inventorySnapshotId: inventorySnapshot.id
+                            inventorySnapshotId: inventorySnapshot.id,
+                            inventoryId: inventory.id
                         }
                     })
                 );
@@ -145,7 +147,8 @@ export async function POST(req: Request, { params }: RouteContext) {
                             name: item.name,
                             uid: item.uid,
                             quantity: quantity,
-                            inventorySnapshotId: inventorySnapshot.id
+                            inventorySnapshotId: inventorySnapshot.id,
+                            inventoryId: inventory.id
                         }
                     })
                 );

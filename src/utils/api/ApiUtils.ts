@@ -83,6 +83,15 @@ export const respond = (options: {
     }, options.init);
 };
 
+export const respondWithInit = ({ data, message, ...init }: {
+    data?: any,
+    message?: string
+} & ResponseInit) => {
+    return NextResponse.json(data || {
+        message
+    }, init);
+};
+
 export class Mailer {
     private static readonly transporter = nodemailer.createTransport({
         host: process.env.MAILER_HOST,

@@ -235,7 +235,8 @@ export const createStockSnapshot = async (
             uid: originalStockItem.uid,
             name: validName,
             quantity: 0,
-            inventorySnapshotId: snapshot.id
+            inventorySnapshotId: snapshot.id,
+            inventoryId: snapshot.inventory.id
         }
     });
 

@@ -78,9 +78,8 @@ export default function AddStockItemButton({ inventoryName, setCurrentData, disa
         <>
             <GenericButton
                 disabled={disabled}
-                shadow
                 icon={addIcon}
-                onClick={() => setModalOpen(true)}
+                onPress={() => setModalOpen(true)}
             >
                 Add Item
             </GenericButton>
@@ -101,9 +100,8 @@ export default function AddStockItemButton({ inventoryName, setCurrentData, disa
                     <Spacer y={4} />
                     <GenericButton
                         icon={addIcon}
-                        shadow
                         type="submit"
-                        loading={addingStock}
+                        isLoading={addingStock}
                         disabled={addingStock || disabled}
                     >Add Item</GenericButton>
                 </form>

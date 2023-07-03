@@ -7,7 +7,7 @@ import {
     TableCell,
     TableColumn,
     TableHeader,
-    TableRow,
+    TableRow
 } from "@nextui-org/react";
 import addIcon from "/public/icons/add-2.svg";
 import minusIcon from "/public/icons/minus.svg";
@@ -22,6 +22,7 @@ import StockQuantityField from "./StockQuantityField";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../../../utils/Hooks";
+import SubTitle from "../../../../../../_components/text/SubTitle";
 
 type Props = {
     inventoryName: string,
@@ -313,22 +314,30 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                     setDeleteStockModalOpen(false);
                 }}
             />
-            <Table
-                isStriped={true}
-                className="!bg-secondary/20"
-                aria-label="Stock Table"
-            >
-                <TableHeader columns={columns}>
-                    {column => <TableColumn key={column.key}>{column.value}</TableColumn>}
-                </TableHeader>
-                <TableBody items={stockState}>
-                    {item => (
-                        <TableRow key={item.uid}>
-                            {columnKey => <TableCell className="capitalize">{getKeyValue(item, columnKey)}</TableCell>}
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+            {
+                stockState.length ?
+                    (
+                        <Table
+                            isStriped={true}
+                            className="!bg-secondary/20"
+                            aria-label="Stock Table"
+                        >
+                            <TableHeader columns={columns}>
+                                {column => <TableColumn key={column.key}>{column.value}</TableColumn>}
+                            </TableHeader>
+                            <TableBody items={stockState}>
+                                {item => (
+                                    <TableRow key={item.uid}>
+                                        {columnKey => <TableCell
+                                            className="capitalize">{getKeyValue(item, columnKey)}</TableCell>}
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    ) :
+                    <SubTitle>There are no items...</SubTitle>
+            }
+
         </>
     );
 }
