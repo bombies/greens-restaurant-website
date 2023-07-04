@@ -34,7 +34,6 @@ export default function HistoricTopStockGraph({ data, isLoading }: Props) {
         .slice(0, topMax);
 
     useEffect(() => {
-        console.log(selectedTopMax);
         switch (selectedTopMax) {
             case "top_3": {
                 setTopMax(TopMax.THREE);

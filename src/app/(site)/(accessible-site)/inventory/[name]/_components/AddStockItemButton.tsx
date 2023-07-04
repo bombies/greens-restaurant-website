@@ -2,7 +2,7 @@
 
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import addIcon from "/public/icons/add.svg";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericModal from "../../../../../_components/GenericModal";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
@@ -12,8 +12,16 @@ import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../../utils/Hooks";
 import { StockSnapshot } from "@prisma/client";
 
-const AddItem = (inventoryName: string, name?: string) => {
-    const mutator = (url: string) => axios.post(url, { name });
+type AddItemProps = {
+    arg: {
+        name: string,
+    }
+}
+
+const AddItem = (inventoryName: string) => {
+    const mutator = (url: string, { arg }: AddItemProps) => {
+        return axios.post(url, { name: arg.name });
+    };
     return useSWRMutation(`/api/inventory/${inventoryName}/stock`, mutator);
 };
 
@@ -25,8 +33,7 @@ type Props = {
 
 export default function AddStockItemButton({ inventoryName, setCurrentData, disabled }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
-    const [stockName, setStockName] = useState<string>();
-    const { trigger: triggerStockAdd, isMutating: addingStock } = AddItem(inventoryName, stockName);
+    const { trigger: triggerStockAdd, isMutating: addingStock } = AddItem(inventoryName);
     const {
         register,
         handleSubmit,
@@ -35,19 +42,15 @@ export default function AddStockItemButton({ inventoryName, setCurrentData, disa
         }
     } = useForm<FieldValues>();
 
-    useEffect(() => {
-        if (!stockName || disabled || addingStock)
-            return;
-
-        triggerStockAdd()
+    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+        const { name } = data;
+        triggerStockAdd({ name })
             .then(stock => {
                 sendToast({
                     description: "Successfully created that item"
                 }, {
                     position: "top-center"
                 });
-                setModalOpen(false);
-
                 setCurrentData(prev => [
                     ...prev,
                     {
@@ -55,21 +58,18 @@ export default function AddStockItemButton({ inventoryName, setCurrentData, disa
                         quantity: 0
                     }
                 ]);
+                setModalOpen(false);
             })
             .catch(e => {
+                console.error(e);
                 sendToast({
                     error: e,
                     description: "Could not create that item!" // Fallback
                 }, {
                     position: "top-center"
-                });
-                setStockName(undefined);
-            });
-    }, [addingStock, disabled, setCurrentData, stockName, triggerStockAdd]);
 
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        const { name } = data;
-        setStockName(name);
+                });
+            });
     };
 
     return (

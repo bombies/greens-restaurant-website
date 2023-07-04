@@ -68,6 +68,7 @@ export async function POST(req: Request, { params }: RouteContext) {
 
         const existingSnapshot = await prisma.inventorySnapshot.findFirst({
             where: {
+                inventoryId: inventory.id,
                 createdAt: {
                     lte: tommorowsDate,
                     gte: todaysDate
@@ -80,7 +81,7 @@ export async function POST(req: Request, { params }: RouteContext) {
 
         if (existingSnapshot) {
             // If the snapshot exists, just update it.
-            const existingStockSnapshot = existingSnapshot.stockSnapshots.filter(snapshot => snapshot.uid === item.uid)[0];
+            const existingStockSnapshot = existingSnapshot.stockSnapshots.find(snapshot => snapshot.uid === item.uid);
             if (existingStockSnapshot) {
                 // If the snapshot already has a snapshot of the current stock item, update it
                 return NextResponse.json(

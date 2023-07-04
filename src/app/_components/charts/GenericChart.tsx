@@ -92,8 +92,6 @@ export default function GenericChart({
         ...apexOptions
     };
 
-    console.log(data)
-
     return (
         <ReactApexChart
             options={options}

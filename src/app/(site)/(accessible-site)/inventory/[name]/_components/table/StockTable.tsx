@@ -26,7 +26,6 @@ import { sendToast } from "../../../../../../../utils/Hooks";
 import SubTitle from "../../../../../../_components/text/SubTitle";
 import GenericInput from "../../../../../../_components/inputs/GenericInput";
 import searchIcon from "/public/icons/search.svg";
-import GenericImage from "../../../../../../_components/GenericImage";
 
 type Props = {
     inventoryName: string,
