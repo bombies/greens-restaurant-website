@@ -2,13 +2,12 @@
 
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../_components/inputs/GenericInput";
-import { Spacer } from "@nextui-org/react";
+import { Checkbox, CheckboxGroup, Spacer } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import GenericButton from "../../../../_components/inputs/GenericButton";
 import inviteIcon from "/public/icons/invite.svg";
-import SelectMenu, { SelectMenuContent } from "../../../../_components/inputs/SelectMenu";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { permissionCheck, Permissions } from "../../../../../libs/types/permission";
+import { Permission, permissionCheck, Permissions } from "../../../../../libs/types/permission";
 import { InviteDto } from "../../../../api/users/invite/route";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
@@ -36,7 +35,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
             errors
         }
     } = useForm<FieldValues>();
-    const [permissions, setPermissions] = useState(0);
+    const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>();
     const [inviteInfo, setInviteInfo] = useState<InviteDto>();
     const { isMutating: invitationIsSending, trigger: triggerInvitation } = SendInvitationMail(inviteInfo);
 
@@ -53,7 +52,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
                     position: "top-center"
                 });
 
-                router.refresh()
+                router.refresh();
                 setModalVisible(false);
             })
             .catch((err) => {
@@ -66,11 +65,16 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
             });
     }, [inviteInfo, router, setModalVisible, triggerInvitation, userHasPermission]);
 
-    const selectionMenuContent = Permissions.map<SelectMenuContent>(permission => ({
-        label: permission.label,
-        value: permission.value.toString(),
-        selected: false
-    }));
+    const permissionCheckBoxes = Permissions
+        .filter(permission => permission.value !== Permission.ADMINISTRATOR || (permission.value === Permission.ADMINISTRATOR && userHasPermission))
+        .map(permission => (
+            <Checkbox
+                key={permission.value}
+                value={permission.value.toString()}
+            >
+                {permission.label}
+            </Checkbox>
+        ));
 
     const submitHandler: SubmitHandler<FieldValues> = (data) => {
         const inviteData: InviteDto = {
@@ -78,7 +82,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
             lastName: data.lastName,
             email: data.newEmail,
             username: data.newUsername,
-            permissions
+            permissions: selectedPermissions?.reduce((acc, next) => acc + next) || 0
         };
         setInviteInfo(inviteData);
     };
@@ -123,32 +127,20 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
                 errors={errors}
             />
             <Spacer y={6} />
-            <p className="mb-[.5rem]">Permissions</p>
-            <SelectMenu
-                id="permissions_select"
-                content={selectionMenuContent}
-                fullWidth
-                multiSelect
-                disabled={invitationIsSending || !userHasPermission}
-                displayCategories={false}
-                handleItemSelect={item => {
-                    setPermissions(prev =>
-                        prev + (!permissionCheck(prev, Number(item.value)) ? Number(item.value) : 0)
-                    );
+            <CheckboxGroup
+                label="Permissions"
+                value={selectedPermissions?.map(permission => permission.toString())}
+                onChange={value => {
+                    setSelectedPermissions(value.map(permissionString => Number(permissionString)));
                 }}
-                handleItemDeselect={item => {
-                    setPermissions(prev =>
-                        prev - (permissionCheck(prev, Number(item.value)) ? Number(item.value) : 0)
-                    );
-                }}
-
-            />
+            >
+                {permissionCheckBoxes}
+            </CheckboxGroup>
             <Spacer y={6} />
             <Divider />
             <Spacer y={6} />
             <GenericButton
-                shadow
-                loading={invitationIsSending}
+                isLoading={invitationIsSending}
                 disabled={invitationIsSending || !userHasPermission}
                 icon={inviteIcon}
                 type="submit"

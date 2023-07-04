@@ -160,7 +160,7 @@ export default function Employee({ username }: Props) {
             <div className="default-container p-12 phone:p-6">
                 {
                     isLoading ?
-                        <div>
+                        <div className="flex flex-col gap-y-6">
                             <ContainerSkeleton width="3/4" contentRepeat={3} />
                             <ContainerSkeleton width="3/4" contentRepeat={1} />
                         </div>

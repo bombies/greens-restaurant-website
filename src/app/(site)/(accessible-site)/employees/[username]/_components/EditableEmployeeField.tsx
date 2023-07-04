@@ -5,14 +5,13 @@ import { Spacer, Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
 import GenericImage from "../../../../../_components/GenericImage";
 import editIcon from "/public/icons/edit.svg";
-import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/modal";
-import SubTitle from "../../../../../_components/text/SubTitle";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import { sendToast } from "../../../../../../utils/Hooks";
 import closeIcon from "/public/icons/close.svg";
 import checkIcon from "/public/icons/check-green-circled.svg";
+import GenericModal from "../../../../../_components/GenericModal";
 
 interface Props {
     label: string,
@@ -75,40 +74,25 @@ export default function EditableEmployeeField({
                 onEdit={() => setModalOpen(true)}
                 editAllowed={editAllowed}
             />
-            <Modal
-                size="2xl"
-                className="bg-neutral-800"
+            <GenericModal
+                title={`Edit ${label}`}
                 isOpen={modalOpen && editAllowed}
                 onClose={() => setModalOpen(false)}
-                showCloseButton={true}
-                backdrop="opaque"
             >
-                <ModalContent>
-                    <ModalHeader>
-                        <SubTitle className="capitalize" thick>{`Edit ${label}`}</SubTitle>
-                    </ModalHeader>
-                    <ModalBody>
-                        <div className="p-6 w-3/4">
-                            <form onSubmit={handleSubmit(onSubmit)}>
-                                <GenericInput
-                                    register={register}
-                                    errors={errors}
-                                    id="value"
-                                    label={`New ${label}`}
-                                    required
-                                />
-                                <Spacer y={6} />
-                                <GenericButton
-                                    type="submit"
-                                    shadow
-                                >
-                                    Update
-                                </GenericButton>
-                            </form>
-                        </div>
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <GenericInput
+                        register={register}
+                        errors={errors}
+                        id="value"
+                        label={`New ${label}`}
+                        required
+                    />
+                    <Spacer y={6} />
+                    <GenericButton type="submit">
+                        Update
+                    </GenericButton>
+                </form>
+            </GenericModal>
         </div>
     );
 }

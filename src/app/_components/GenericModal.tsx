@@ -24,7 +24,7 @@ export default function GenericModal({ title, children, footerContent, ...modalP
         >
             <ModalContent>
                 <ModalHeader>
-                    <SubTitle thick>{title}</SubTitle>
+                    <SubTitle className="capitalize" thick>{title}</SubTitle>
                 </ModalHeader>
                 <ModalBody>
                     <div className=" p-6">

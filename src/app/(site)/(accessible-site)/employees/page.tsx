@@ -5,12 +5,12 @@ import SubTitle from "../../../_components/text/SubTitle";
 import GenericButton from "../../../_components/inputs/GenericButton";
 import inviteIcon from "/public/icons/invite.svg";
 import { useEffect, useState } from "react";
-import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/modal";
 import InviteEmployeeForm from "./_components/InviteEmployeeForm";
 import EmployeeGrid from "./_components/EmployeeGrid";
 import { hasPermission, Permission } from "../../../../libs/types/permission";
 import { useRouter } from "next/navigation";
 import { useUserData } from "../../../../utils/Hooks";
+import GenericModal from "../../../_components/GenericModal";
 
 export default function EmployeesPage() {
     const { data: user, isLoading: userIsLoading } = useUserData();
@@ -30,33 +30,22 @@ export default function EmployeesPage() {
             <div className={"my-12 default-container p-12 w-fit"}>
                 <GenericButton
                     disabled={!userHasPermission}
-                    shadow
                     icon={inviteIcon}
-                    onClick={() => setInviteModalVisible(true)}
+                    onPress={() => setInviteModalVisible(true)}
                 >
                     Invite Employee
                 </GenericButton>
-                <Modal
+                <GenericModal
                     size="3xl"
-                    className="bg-neutral-800"
                     isOpen={inviteModalVisible}
                     onClose={() => setInviteModalVisible(false)}
-                    backdrop="opaque"
+                    title="Invite an Employee"
                 >
-                    <ModalContent>
-                        <ModalHeader>
-                            <SubTitle thick>Invite an Employee</SubTitle>
-                        </ModalHeader>
-                        <ModalBody>
-                            <div className="p-6 w-3/4">
-                                <InviteEmployeeForm
-                                    setModalVisible={setInviteModalVisible}
-                                    userHasPermission={userHasPermission}
-                                />
-                            </div>
-                        </ModalBody>
-                    </ModalContent>
-                </Modal>
+                    <InviteEmployeeForm
+                        setModalVisible={setInviteModalVisible}
+                        userHasPermission={userHasPermission}
+                    />
+                </GenericModal>
             </div>
             <div className="p-12 default-container w-5/6">
                 <SubTitle>Employees</SubTitle>
