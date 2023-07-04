@@ -2,6 +2,7 @@
 
 import { Prisma, StockSnapshot } from "@prisma/client";
 import {
+    Spacer,
     Table,
     TableBody,
     TableCell,
@@ -15,7 +16,7 @@ import moreIcon from "/public/icons/more.svg";
 import IconButton from "../../../../../../_components/inputs/IconButton";
 import StockOptionsDropdown from "./StockOptionsDropdown";
 import AddStockModal from "./AddStockModal";
-import { useCallback, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import ConfirmationModal from "../../../../../../_components/ConfirmationModal";
 import RemoveStockModal from "./RemoveStockModal";
 import StockQuantityField from "./StockQuantityField";
@@ -23,6 +24,9 @@ import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../../../utils/Hooks";
 import SubTitle from "../../../../../../_components/text/SubTitle";
+import GenericInput from "../../../../../../_components/inputs/GenericInput";
+import searchIcon from "/public/icons/search.svg";
+import GenericImage from "../../../../../../_components/GenericImage";
 
 type Props = {
     inventoryName: string,
@@ -89,6 +93,9 @@ const reducer = (state: StockSnapshot[], action: { type: StockAction, payload: P
 
 export default function StockTable({ inventoryName, stock, mutationAllowed }: Props) {
     const [stockState, dispatchStockState] = useReducer(reducer, stock ?? []);
+    const [visibleStockState, setVisibleStockState] = useState<StockSnapshot[]>(stockState);
+    const [stockSearch, setStockSearch] = useState<string>();
+
     const [addStockModalOpen, setAddStockModalOpen] = useState(false);
     const [removeStockModalOpen, setRemoveStockModalOpen] = useState(false);
     const [deleteStockModalOpen, setDeleteStockModalOpen] = useState(false);
@@ -97,6 +104,21 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
         trigger: triggerStockUpdate,
         isMutating: isUpdating
     } = SetStockItem(inventoryName);
+
+    useEffect(() => {
+        if (!stockSearch) {
+            setVisibleStockState(stockState);
+            return;
+        }
+
+        setVisibleStockState(
+            stockState.filter(stock =>
+                stock.name
+                    .toLowerCase()
+                    .includes(stockSearch.toLowerCase().trim())
+            )
+        );
+    }, [stockSearch, stockState]);
 
     const getKeyValue = useCallback((item: StockSnapshot, key: Prisma.Key) => {
         if (key === "stock_name")
@@ -311,33 +333,46 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                     if (!mutationAllowed)
                         return;
 
+                    // TODO: Implement item deletion logic
+
                     setDeleteStockModalOpen(false);
                 }}
             />
             {
                 stockState.length ?
                     (
-                        <Table
-                            isStriped={true}
-                            className="!bg-secondary/20"
-                            aria-label="Stock Table"
-                        >
-                            <TableHeader columns={columns}>
-                                {column => <TableColumn key={column.key}>{column.value}</TableColumn>}
-                            </TableHeader>
-                            <TableBody items={stockState}>
-                                {item => (
-                                    <TableRow key={item.uid}>
-                                        {columnKey => <TableCell
-                                            className="capitalize">{getKeyValue(item, columnKey)}</TableCell>}
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                        <>
+                            <div className="w-1/4">
+                                <GenericInput
+                                    iconLeft={searchIcon}
+                                    id="stock_search"
+                                    label="Search for an item"
+                                    value={stockSearch}
+                                    onChange={(e) => setStockSearch(e.target.value)}
+                                />
+                            </div>
+                            <Spacer y={6} />
+                            <Table
+                                isStriped={true}
+                                className="!bg-secondary/20"
+                                aria-label="Stock Table"
+                            >
+                                <TableHeader columns={columns}>
+                                    {column => <TableColumn key={column.key}>{column.value}</TableColumn>}
+                                </TableHeader>
+                                <TableBody items={visibleStockState}>
+                                    {item => (
+                                        <TableRow key={item.uid}>
+                                            {columnKey => <TableCell
+                                                className="capitalize">{getKeyValue(item, columnKey)}</TableCell>}
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </>
                     ) :
                     <SubTitle>There are no items...</SubTitle>
             }
-
         </>
     );
 }
