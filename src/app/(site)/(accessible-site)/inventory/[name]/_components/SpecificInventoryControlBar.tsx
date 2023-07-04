@@ -6,6 +6,8 @@ import { useUserData } from "../../../../../../utils/Hooks";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import { useCurrentStock } from "./CurrentStockContext";
 import { usePathname, useRouter } from "next/navigation";
+import sparklesIcon from "/public/icons/sparkles-green.svg";
+import eyeIcon from "/public/icons/green-eye.svg";
 
 type Props = {
     inventoryName: string,
@@ -31,6 +33,7 @@ export default function SpecificInventoryControlBar({ inventoryName }: Props) {
             />
             <GenericButton
                 variant="flat"
+                icon={eyeIcon}
                 onPress={() => {
                     let url: string;
                     if (customSnapshotRegex.test(pathName)) {
@@ -50,6 +53,7 @@ export default function SpecificInventoryControlBar({ inventoryName }: Props) {
             }</GenericButton>
             <GenericButton
                 variant="flat"
+                icon={sparklesIcon}
                 onPress={() => {
                     let url: string;
                     if (insightPageRegex.test(pathName)) {

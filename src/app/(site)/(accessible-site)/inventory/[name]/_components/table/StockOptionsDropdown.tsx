@@ -1,8 +1,11 @@
 "use client";
 
-import { DropdownItem, DropdownMenu, Spacer } from "@nextui-org/react";
+import { DropdownItem, DropdownMenu, DropdownSection } from "@nextui-org/react";
 import { Key } from "react";
-import { Divider } from "@nextui-org/divider";
+import addIcon from "/public/icons/add.svg";
+import trashIcon from "/public/icons/red-trash.svg";
+import subtractIcon from "/public/icons/subtract.svg";
+import GenericImage from "../../../../../../_components/GenericImage";
 
 type Props = {
     onAdd: () => void,
@@ -37,19 +40,32 @@ export default function StockOptionsDropdown({ onAdd, onRemove, onDelete, disabl
                 onAction={handleAction}
                 disabledKeys={disabled ? ["add", "remove", "delete"] : undefined}
             >
-                <DropdownItem key="add" description="Add a custom amount of stock to this item">Add
-                    Multiple</DropdownItem>
-                <DropdownItem key="remove" description="Remove a custom amount of stock from this item">Remove
-                    Multiple</DropdownItem>
-                <DropdownItem
-                    key="delete"
-                    className="text-danger hover:text-white"
-                    color="danger"
-                >
-                    <Divider />
-                    <Spacer y={3} />
-                    Remove Item
-                </DropdownItem>
+                <DropdownSection title="Actions" showDivider>
+                    <DropdownItem
+                        key="add"
+                        description="Add a custom amount of stock to this item"
+                        startContent={<GenericImage src={addIcon} width={1.35} />}
+                    >
+                        Add Multiple
+                    </DropdownItem>
+                    <DropdownItem
+                        key="remove"
+                        description="Remove a custom amount of stock from this item"
+                        startContent={<GenericImage src={subtractIcon} width={1.35} />}
+                    >
+                        Remove Multiple
+                    </DropdownItem>
+                </DropdownSection>
+                <DropdownSection title="Danger Zone">
+                    <DropdownItem
+                        key="delete"
+                        className="text-danger hover:text-white"
+                        color="danger"
+                        startContent={<GenericImage src={trashIcon} width={1.15} />}
+                    >
+                        Remove Item
+                    </DropdownItem>
+                </DropdownSection>
             </DropdownMenu>
         </>
     );

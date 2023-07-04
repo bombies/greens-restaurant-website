@@ -17,7 +17,7 @@ export default function GenericModal({ title, children, footerContent, ...modalP
             size="2xl"
             className={clsx(
                 modalProps.className,
-                "!bg-neutral-800"
+                "!bg-neutral-950/90 backdrop-blur-md"
             )}
             showCloseButton={true}
             backdrop="blur"

@@ -7,6 +7,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import { Spacer } from "@nextui-org/react";
 import { Dispatch, SetStateAction } from "react";
+import addIcon from "/public/icons/add.svg";
 
 type Props = {
     disabled?: boolean,
@@ -53,7 +54,14 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item, onSubmit
                     min={1}
                 />
                 <Spacer y={6} />
-                <GenericButton disabled={disabled} loading={disabled} type="submit">Add Stock</GenericButton>
+                <GenericButton
+                    icon={addIcon}
+                    disabled={disabled}
+                    isLoading={disabled}
+                    type="submit"
+                >
+                    Add Stock
+                </GenericButton>
             </form>
 
         </GenericModal>

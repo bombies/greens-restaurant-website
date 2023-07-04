@@ -7,6 +7,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import { Spacer } from "@nextui-org/react";
 import { Dispatch, SetStateAction } from "react";
+import subtractIcon from "/public/icons/subtract.svg";
 
 type Props = {
     disabled?: boolean,
@@ -53,7 +54,14 @@ export default function RemoveStockModal({ isOpen, setOpen, onClose, item, onSub
                     max={item?.quantity}
                 />
                 <Spacer y={6} />
-                <GenericButton disabled={disabled} loading={disabled} type="submit">Remove Stock</GenericButton>
+                <GenericButton
+                    icon={subtractIcon}
+                    disabled={disabled}
+                    isLoading={disabled}
+                    type="submit"
+                >
+                    Remove Stock
+                </GenericButton>
             </form>
 
         </GenericModal>
