@@ -62,9 +62,8 @@ export default function Sidebar() {
                     }
                 </div>
                 <GenericButton
-                    shadow
                     icon={signOutIcon}
-                    onClick={() => signOut().then(() => {
+                    onPress={() => signOut().then(() => {
                         sendToast({
                             description: "See you later!",
                             icon: waving
@@ -148,7 +147,7 @@ function InventorySidebarItem() {
     const icon = <InventoryIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
     return (<SidebarItem
         label={"Inventory"}
-        href={"inventory"}
+        href={"/inventory"}
         icon={icon}
         onHoverEnter={setActiveColor}
         onHoverLeave={setDefaultColor}
@@ -163,7 +162,7 @@ function EmployeesSidebarItem() {
     const icon = <UsersIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
     return (<SidebarItem
         label={"Employees"}
-        href={"employees"}
+        href={"/employees"}
         icon={icon}
         onHoverEnter={setActiveColor}
         onHoverLeave={setDefaultColor}
@@ -178,7 +177,7 @@ function ManagementSidebarItem() {
     const icon = <GearsIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
     return (<SidebarItem
         label={"Management"}
-        href={"management"}
+        href={"/management"}
         icon={icon}
         onHoverEnter={setActiveColor}
         onHoverLeave={setDefaultColor}
@@ -193,7 +192,7 @@ function InvoicesSidebarItem() {
     const icon = <InvoiceIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
     return (<SidebarItem
         label={"Invoices"}
-        href={"invoices"}
+        href={"/invoices"}
         icon={icon}
         onHoverEnter={setActiveColor}
         onHoverLeave={setDefaultColor}
@@ -208,7 +207,7 @@ function AccountSidebarItem() {
     const icon = <AccountIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
     return (<SidebarItem
         label={"My Account"}
-        href={"account"}
+        href={"/account"}
         icon={icon}
         onHoverEnter={setActiveColor}
         onHoverLeave={setDefaultColor}

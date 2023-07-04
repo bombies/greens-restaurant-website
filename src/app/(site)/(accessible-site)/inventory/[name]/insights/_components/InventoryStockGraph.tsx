@@ -6,20 +6,22 @@ import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 import { StockTimeSeries } from "../../../../../../api/inventory/[name]/insights/stock/route";
 import { Spinner } from "@nextui-org/spinner";
 import { Spacer } from "@nextui-org/react";
+import "../../../../../../../utils/GeneralUtils";
+
 
 type Props = {
-    inventoryName: string,
+    data?: StockTimeSeries[],
+    isLoading: boolean,
 }
 
 const FetchInsights = (inventoryName: string) => {
     return useSWR(`/api/inventory/${inventoryName}/insights/stock`, fetcher<StockTimeSeries[]>);
 };
 
-export default function InventoryStockGraph({ inventoryName }: Props) {
-    const { data, isLoading, error } = FetchInsights(inventoryName);
+export default function InventoryStockGraph({ data, isLoading }: Props) {
 
     return (
-        <div className="bg-neutral-200 text-black backdrop-blur-md pt-6 px-2 pb-12 rounded-2xl h-96">
+        <div className="bg-neutral-950/70 backdrop-blur-md text-primary pt-6 px-6 pb-12 rounded-2xl h-[30rem]">
             <h3 className="font-black text-2xl">Stock Quantity</h3>
             <Spacer y={2} />
             {
@@ -34,13 +36,38 @@ export default function InventoryStockGraph({ inventoryName }: Props) {
                         dateTime
                         data={
                             data!.map(series => ({
-                                name: series.name,
+                                name: series.name.capitalize(),
                                 data: series.data.map(seriesData => ({
                                     x: new Date(seriesData.date).getTime(),
                                     y: seriesData.value
                                 }))
                             }))
                         }
+                        xaxis={{
+                            labels: {
+                                style: {
+                                    colors: "#ffffff"
+                                },
+                                datetimeUTC: true
+                            },
+                            type: "datetime"
+                        }}
+                        yaxis={{
+                            labels: {
+                                style: {
+                                    colors: "#ffffff"
+                                }
+                            }
+                        }}
+                        grid={{
+                            show: true,
+                            borderColor: "#000000"
+                        }}
+                        legend={{
+                            labels: {
+                                colors: "#ffffff"
+                            }
+                        }}
                     />
             }
 

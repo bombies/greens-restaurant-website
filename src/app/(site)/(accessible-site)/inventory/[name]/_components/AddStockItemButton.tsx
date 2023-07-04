@@ -10,9 +10,7 @@ import { Spacer } from "@nextui-org/react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../../utils/Hooks";
-import { useRouter } from "next/navigation";
 import { StockSnapshot } from "@prisma/client";
-import { add } from "@internationalized/date/src/manipulation";
 
 const AddItem = (inventoryName: string, name?: string) => {
     const mutator = (url: string) => axios.post(url, { name });
@@ -77,6 +75,7 @@ export default function AddStockItemButton({ inventoryName, setCurrentData, disa
     return (
         <>
             <GenericButton
+                fullWidth
                 disabled={disabled}
                 icon={addIcon}
                 onPress={() => setModalOpen(true)}

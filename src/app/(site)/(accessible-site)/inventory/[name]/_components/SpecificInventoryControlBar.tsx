@@ -25,13 +25,14 @@ export default function SpecificInventoryControlBar({ inventoryName }: Props) {
     const insightPageRegex = /\/inventory\/[a-zA-Z0-9-]+\/insights/;
 
     return (
-        <div className="default-container p-12 phone:px-4 flex phone:flex-col gap-4 phone:gap-2">
+        <div className="default-container p-12 phone:px-4 flex phone:flex-col gap-4 phone:gap-6">
             <AddStockItemButton
                 inventoryName={inventoryName}
                 setCurrentData={setCurrentData}
                 disabled={!hasAnyPermission(data?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
             />
             <GenericButton
+                fullWidth
                 variant="flat"
                 icon={eyeIcon}
                 onPress={() => {
@@ -52,6 +53,7 @@ export default function SpecificInventoryControlBar({ inventoryName }: Props) {
                             "View Current Stock"
             }</GenericButton>
             <GenericButton
+                fullWidth
                 variant="flat"
                 icon={sparklesIcon}
                 onPress={() => {

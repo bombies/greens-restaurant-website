@@ -1,13 +1,13 @@
 "use client";
 
-import Chart from "react-apexcharts";
+import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
 type Props = {
     data: {
         name: string,
         data: number[] | { x: number, y: number }[]
-    }[],
+    }[] | number[],
     categories?: string[]
     dateTime?: boolean,
     showCategories?: boolean,
@@ -62,9 +62,8 @@ export default function GenericChart({
                 }
             }
         },
-        dataLabels: { enabled: false },
-        legend: {
-            position: "bottom"
+        dataLabels: {
+            enabled: false,
         },
         fill: {
             type: "gradient",
@@ -74,13 +73,6 @@ export default function GenericChart({
                 opacityFrom: 0.4,
                 opacityTo: 0.1,
                 shadeIntensity: 0.2
-            }
-        },
-        states: {
-            hover: {
-                filter: {
-                    type: "none"
-                }
             }
         },
         colors: [
@@ -97,40 +89,19 @@ export default function GenericChart({
             "#f08c00",
             "#f08c00"
         ],
-        grid: {
-            borderColor: "rgba(255, 255, 255, 0.08)",
-            padding: {
-                left: -10,
-                right: 0,
-                top: -16,
-                bottom: -8
-            },
-            xaxis: { lines: { show: false } },
-            yaxis: { lines: { show: false } }
-        },
-        yaxis: { labels: { show: showY || false } },
-        xaxis: {
-            labels: { show: showCategories || false },
-            axisBorder: { show: false },
-            axisTicks: { show: false },
-            crosshairs: { show: false },
-            categories: categories
-        },
         ...apexOptions
     };
 
+    console.log(data)
+
     return (
-        <Chart
+        <ReactApexChart
             options={options}
             series={data}
-            xaxis={{
-                type: dateTime ? "datetime" : "category"
-            }}
             type={type || "area"}
             width={width || "100%"}
             height={height || "100%"}
             foreColor="#000000"
-            background="#000000"
         />
     );
 }

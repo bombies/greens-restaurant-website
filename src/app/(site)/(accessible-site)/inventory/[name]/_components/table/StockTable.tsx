@@ -342,11 +342,12 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                 stockState.length ?
                     (
                         <>
-                            <div className="w-1/4">
+                            <div className="w-1/4 tablet:w-1/2 phone:w-full">
                                 <GenericInput
                                     iconLeft={searchIcon}
                                     id="stock_search"
                                     label="Search for an item"
+                                    placeholder="Search..."
                                     value={stockSearch}
                                     onChange={(e) => setStockSearch(e.target.value)}
                                 />

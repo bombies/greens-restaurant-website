@@ -1,4 +1,4 @@
-import InventoryStockGraph from "./_components/InventoryStockGraph";
+import InventoryInsightsContainer from "./_components/InventoryInsightsContainer";
 
 type Context = {
     params: {
@@ -6,12 +6,8 @@ type Context = {
     }
 }
 
-export default function SpecificInventoryInsightsPage({params}: Context) {
+export default function SpecificInventoryInsightsPage({ params }: Context) {
     return (
-        <>
-            <div className="default-container p-12 grid grid-cols-1 gap-6">
-                <InventoryStockGraph inventoryName={params.name} />
-            </div>
-        </>
-    )
+        <InventoryInsightsContainer inventoryName={params.name} />
+    );
 }
