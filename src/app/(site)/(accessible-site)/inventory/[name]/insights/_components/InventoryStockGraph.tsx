@@ -25,7 +25,7 @@ export default function InventoryStockGraph({ inventoryName }: Props) {
             {
                 isLoading ?
                     <div className="flex justify-center items-center h-full w-full">
-                        <Spinner size="xl" />
+                        <Spinner size="lg" />
                     </div>
                     :
                     <GenericChart

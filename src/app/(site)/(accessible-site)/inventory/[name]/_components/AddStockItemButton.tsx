@@ -67,7 +67,7 @@ export default function AddStockItemButton({ inventoryName, setCurrentData, disa
                 });
                 setStockName(undefined);
             });
-    }, [stockName, triggerStockAdd]);
+    }, [addingStock, disabled, setCurrentData, stockName, triggerStockAdd]);
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         const { name } = data;
