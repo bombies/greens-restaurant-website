@@ -41,7 +41,7 @@ export const fetchStockItem = async (inventoryName: string, itemId: string): Pro
         return new Either<Stock, NextResponse>(undefined, fetchedInventory.error);
 
     const inventory = fetchedInventory.success!;
-    const item = inventory.stock?.find(item => item.id === itemId);
+    const item = inventory.stock?.find(item => item.id === itemId || item.uid === itemId);
     if (!item)
         return new Either<Stock, NextResponse>(
             undefined,
@@ -207,12 +207,12 @@ export const createStockSnapshot = async (
         return new Either<StockSnapshot, NextResponse>(undefined, validatedItemName.error);
 
     const validName = validatedItemName.success!;
-    const originalStockItem = snapshot.inventory.stock.filter(stock => stock.name === validName)[0];
+    const originalStockItem = snapshot.inventory.stock.find(stock => stock.name === validName);
     if (!originalStockItem)
         return new Either<StockSnapshot, NextResponse>(
             undefined,
             respond({
-                message: `Inventory with name "${inventoryName}" doesn't have any stock items called "${dto.name}"`,
+                message: `Inventory with name "${inventoryName}" doesn't have any stock items called "${validName}"`,
                 init: {
                     status: 401
                 }
@@ -278,6 +278,6 @@ export const generateValidName = (name: string, regex: RegExp, errorMsg: string)
         name.toLowerCase()
             .trim()
             .replaceAll(/\s{2,}/g, " ")
-            .replaceAll(" ", "-")
+            .replaceAll(/\s/g, "-")
     );
 };

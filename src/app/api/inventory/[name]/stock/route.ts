@@ -55,9 +55,10 @@ export async function POST(req: Request, { params }: RouteContext) {
         const validName = body.name
             .toLowerCase()
             .trim()
-            .replaceAll(/\s{2,}/g, " ");
+            .replaceAll(/\s{2,}/g, " ")
+            .replaceAll(/\s/g, "-");
 
-        if (inventory.stock?.filter(item => item.name === validName).length)
+        if (inventory.stock?.find(item => item.name === validName))
             return respond({
                 message: "There is already an item with that name in this inventory!",
                 init: {

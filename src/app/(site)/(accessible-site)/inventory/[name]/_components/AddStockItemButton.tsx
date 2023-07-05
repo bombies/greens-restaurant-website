@@ -10,7 +10,7 @@ import { Spacer } from "@nextui-org/react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../../utils/Hooks";
-import { StockSnapshot } from "@prisma/client";
+import { useCurrentStock } from "./CurrentStockContext";
 
 type AddItemProps = {
     arg: {
@@ -27,11 +27,11 @@ const AddItem = (inventoryName: string) => {
 
 type Props = {
     inventoryName: string,
-    setCurrentData: Dispatch<SetStateAction<StockSnapshot[]>>
     disabled?: boolean
 }
 
-export default function AddStockItemButton({ inventoryName, setCurrentData, disabled }: Props) {
+export default function AddStockItemButton({ inventoryName, disabled }: Props) {
+    const [, setCurrentData] = useCurrentStock();
     const [modalOpen, setModalOpen] = useState(false);
     const { trigger: triggerStockAdd, isMutating: addingStock } = AddItem(inventoryName);
     const {

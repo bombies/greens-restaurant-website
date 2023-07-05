@@ -32,7 +32,7 @@ const useCurrentSnapshot = (name: string) => {
 
 export default function Inventory({ name }: Props) {
     const { isLoading: userDataIsLoading, data: userData } = useUserData();
-    const { data: inventoryData, isLoading: inventoryDataLoading } = useInventoryInfo(name);
+    const { data: inventoryData, isLoading: inventoryDataLoading, error: inventoryDataError } = useInventoryInfo(name);
     const { data: currentSnapshotData, isLoading: currentSnapshotDataLoading } = useCurrentSnapshot(name);
     const [currentStockSnapshot, setCurrentStockSnapshot] = useCurrentStock();
     const router = useRouter();
@@ -45,12 +45,12 @@ export default function Inventory({ name }: Props) {
                 Permission.MUTATE_STOCK
             ]))
         )
-            router.replace("/home");
+            return router.push("/home");
     }, [router, userData, userDataIsLoading]);
 
     useEffect(() => {
-        if ((!inventoryDataLoading && !inventoryData) || (!currentSnapshotDataLoading && !currentSnapshotData))
-            router.replace("/inventory");
+        if ((!inventoryDataLoading && (!inventoryData || inventoryDataError)) || (!currentSnapshotDataLoading && !currentSnapshotData))
+            return router.replace("/inventory");
         else if (!currentSnapshotDataLoading && currentSnapshotData)
             setCurrentStockSnapshot(currentSnapshotData.inventory.stock.map(stock => {
                 return ({
@@ -64,27 +64,29 @@ export default function Inventory({ name }: Props) {
                     updatedAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.updatedAt || new Date()
                 });
             }));
-    }, [currentSnapshotData, currentSnapshotDataLoading, inventoryData, inventoryDataLoading, router, setCurrentStockSnapshot]);
+    }, [currentSnapshotData, currentSnapshotDataLoading, inventoryData, inventoryDataError, inventoryDataLoading, router, setCurrentStockSnapshot]);
 
     return (
-        <>
-            <div className="default-container p-12 phone:px-4">
-                {
-                    currentSnapshotDataLoading ?
-                        <TableSkeleton columns={columns} contentRepeat={20} />
+        <div className="default-container p-12 phone:px-4">
+            {
+                currentSnapshotDataLoading ?
+                    <TableSkeleton columns={columns} contentRepeat={20} />
+                    :
+                    !inventoryDataError ?
+                        (currentStockSnapshot.length > 0 ?
+                                <StockTable
+                                    inventoryName={name}
+                                    stock={currentStockSnapshot}
+                                    mutationAllowed={hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
+                                />
+                                :
+                                <div className="default-container p-12">
+                                    <SubTitle>There are no items...</SubTitle>
+                                </div>
+                        )
                         :
-                        currentStockSnapshot.length > 0 ?
-                            <StockTable
-                                inventoryName={name}
-                                stock={currentStockSnapshot}
-                                mutationAllowed={hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
-                            />
-                            :
-                            <div className="default-container p-12">
-                                <SubTitle>There are no items...</SubTitle>
-                            </div>
-                }
-            </div>
-        </>
+                        <div>There was an error</div>
+            }
+        </div>
     );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Prisma, StockSnapshot } from "@prisma/client";
+import { Prisma, Stock, StockSnapshot } from "@prisma/client";
 import {
     Spacer,
     Table,
@@ -26,6 +26,7 @@ import { sendToast } from "../../../../../../../utils/Hooks";
 import SubTitle from "../../../../../../_components/text/SubTitle";
 import GenericInput from "../../../../../../_components/inputs/GenericInput";
 import searchIcon from "/public/icons/search.svg";
+import "../../../../../../../utils/GeneralUtils";
 
 type Props = {
     inventoryName: string,
@@ -67,8 +68,20 @@ const SetStockItem = (inventoryName: string) => {
 };
 
 enum StockAction {
-    UPDATE
+    UPDATE,
+    DELETE
 }
+
+type DeleteStockItemProps = {
+    arg: {
+        item: StockSnapshot
+    }
+}
+
+const DeleteStockItem = (inventoryName: string) => {
+    const mutator = (url: string, { arg }: DeleteStockItemProps) => axios.delete(url.replaceAll("{item_id}", arg.item.uid));
+    return useSWRMutation(`/api/inventory/${inventoryName}/stock/{item_id}`, mutator);
+};
 
 const reducer = (state: StockSnapshot[], action: { type: StockAction, payload: Partial<StockSnapshot> }) => {
     let newState = [...state];
@@ -80,6 +93,11 @@ const reducer = (state: StockSnapshot[], action: { type: StockAction, payload: P
                 ...newState[index],
                 ...action.payload
             };
+            break;
+        }
+        case StockAction.DELETE: {
+            const index = state.findIndex(item => item.uid === action.payload.uid);
+            newState.splice(index);
             break;
         }
         default: {
@@ -103,6 +121,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
         trigger: triggerStockUpdate,
         isMutating: isUpdating
     } = SetStockItem(inventoryName);
+    const { trigger: deleteStockItem, isMutating: stockIsDeleting } = DeleteStockItem(inventoryName);
 
     useEffect(() => {
         if (!stockSearch) {
@@ -121,10 +140,10 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
 
     const getKeyValue = useCallback((item: StockSnapshot, key: Prisma.Key) => {
         if (key === "stock_name")
-            return item.name;
+            return item.name.replaceAll("-", " ");
         if (key === "stock_quantity")
             return <StockQuantityField
-                disabled={isUpdating || !mutationAllowed}
+                disabled={isUpdating || !mutationAllowed || stockIsDeleting}
                 submitHandler={(data, setEditMode) => {
                     triggerStockUpdate({
                         item: item,
@@ -158,7 +177,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                 <div className="flex gap-3">
                     <div className="flex gap-8 p-3 default-container !rounded-xl w-fit">
                         <IconButton
-                            isDisabled={isUpdating || !mutationAllowed}
+                            isDisabled={isUpdating || !mutationAllowed || stockIsDeleting}
                             icon={addIcon}
                             toolTip="Increment"
                             onPress={() => {
@@ -186,7 +205,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             }}
                         />
                         <IconButton
-                            isDisabled={isUpdating || !mutationAllowed}
+                            isDisabled={isUpdating || !mutationAllowed || stockIsDeleting}
                             icon={minusIcon}
                             toolTip="Decrement"
                             onPress={() => {
@@ -216,7 +235,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                     </div>
                     <div className="flex  p-3 default-container !rounded-xl w-fit">
                         <IconButton
-                            isDisabled={isUpdating || !mutationAllowed}
+                            isDisabled={isUpdating || !mutationAllowed || stockIsDeleting}
                             icon={moreIcon}
                             toolTip="More Options"
                             withDropdown={
@@ -240,7 +259,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                 </div>
             );
         return undefined;
-    }, [isUpdating, mutationAllowed, triggerStockUpdate]);
+    }, [isUpdating, mutationAllowed, stockIsDeleting, triggerStockUpdate]);
 
     return (
         <>
@@ -332,9 +351,33 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                     if (!mutationAllowed)
                         return;
 
-                    // TODO: Implement item deletion logic
+                    deleteStockItem({
+                        item: selectedItem!
+                    })
+                        .then((item) => {
+                            dispatchStockState({
+                                type: StockAction.DELETE,
+                                payload: { uid: selectedItem!.uid }
+                            });
 
-                    setDeleteStockModalOpen(false);
+                            const data = item.data as Stock;
+                            sendToast({
+                                description: `Successfully removed ${data.name.capitalize()}`
+                            }, {
+                                position: "top-center"
+                            });
+
+                            setDeleteStockModalOpen(false);
+                        })
+                        .catch(e => {
+                            console.error(e);
+                            sendToast({
+                                error: e,
+                                description: "Couldn't remove that item!"
+                            }, {
+                                position: "top-center"
+                            });
+                        });
                 }}
             />
             {

@@ -25,19 +25,19 @@ export default function ConfirmationModal({ isOpen, setOpen, title, message, onA
             <Spacer y={6} />
             <div className="flex gap-4">
                 <GenericButton
-                    shadow
                     disabled={accepting}
-                    onClick={() => {
+                    onPress={() => {
                         onAccept();
                     }}
+                    isLoading={accepting}
                 >
                     I&apos;m sure
                 </GenericButton>
                 <GenericButton
                     disabled={accepting}
                     color="danger"
-                    bordered
-                    onClick={() => {
+                    variant="flat"
+                    onPress={() => {
                         setOpen(false);
                     }}
                 >

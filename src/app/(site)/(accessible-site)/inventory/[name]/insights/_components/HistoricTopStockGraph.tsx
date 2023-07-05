@@ -27,7 +27,7 @@ export default function HistoricTopStockGraph({ data, isLoading }: Props) {
     const [selectedTopMax, setSelectedTopMax] = useState("Top 3");
 
     const totals = data?.map(item => ({
-        name: item.name.capitalize(),
+        name: item.name.replaceAll("-", " ").capitalize(),
         data: item.data.map(info => info.value).reduce((acc, next) => acc + next)
     }))
         .sort((a, b) => b.data - a.data)

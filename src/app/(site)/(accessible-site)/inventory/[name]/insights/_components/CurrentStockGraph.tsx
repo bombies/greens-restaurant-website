@@ -13,7 +13,7 @@ type Props = {
 
 export default function CurrentStockGraph({ data, isLoading }: Props) {
     const mostRecentData = data?.map(series => ({
-        name: series.name.capitalize(),
+        name: series.name.replaceAll("-", " ").capitalize(),
         data: series.data.reduce((acc, next) => acc.date > next.date ? acc : next)
     }));
 

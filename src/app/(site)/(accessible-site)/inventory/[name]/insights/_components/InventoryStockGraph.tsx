@@ -36,7 +36,7 @@ export default function InventoryStockGraph({ data, isLoading }: Props) {
                         dateTime
                         data={
                             data!.map(series => ({
-                                name: series.name.capitalize(),
+                                name: series.name.replaceAll("-", " ").capitalize(),
                                 data: series.data.map(seriesData => ({
                                     x: new Date(seriesData.date).getTime(),
                                     y: seriesData.value

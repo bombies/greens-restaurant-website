@@ -56,3 +56,19 @@ export async function PATCH(req: Request, { params }: RouteContext) {
         return NextResponse.json(updatedInventory);
     }, Permission.CREATE_INVENTORY);
 }
+
+export async function DELETE(req: Request, { params }: RouteContext) {
+    return authenticated(req, async () => {
+        const fetchResult = await fetchInventory(params.name);
+        if (fetchResult.error)
+            return fetchResult.error;
+
+        const deletedInventory = await prisma.inventory.delete({
+            where: {
+                name: params.name
+            }
+        });
+
+        return NextResponse.json(deletedInventory);
+    }, Permission.CREATE_INVENTORY);
+}
