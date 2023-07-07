@@ -1,4 +1,4 @@
-export const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g
+export const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g;
 
 /**
  * Must start with a letter
@@ -6,7 +6,7 @@ export const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*
  * Can contain hyphens
  * Must be between 2 and 16 characters long
  */
-export const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/
+export const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/;
 
 /**
  * Must contain one uppercase character
@@ -15,9 +15,11 @@ export const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/
  * Can contain special characters
  * Must be at least 8 characters
  */
-export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\S]{8,}$/
+export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\S]{8,}$/;
 
 // Support unicode characters
-export const NAME_REGEX = /^[\p{L}'-]{1,50}$/u
+export const NAME_REGEX = /^[\p{L}'-]{1,50}$/u;
 
-export const INVENTORY_NAME_REGEX = /^[a-zA-Z][a-z-A-Z0-9\s]{0,29}$/
+export const INVENTORY_NAME_REGEX = /^[a-zA-Z][a-z-A-Z0-9\s]{0,29}$/;
+export const COMPANY_NAME_REGEX = /^[A-Za-z0-9\s.&'()-]{1,100}$/;
+export const CUSTOMER_NAME_REGEX = /^[A-Za-z\s.&'()-]{1,100}$/
