@@ -23,7 +23,7 @@
     "framer-motion": "^10.12.18",
     "generate-password-ts": "^1.6.3",
     "loader-utils": "^3.2.1",
-    "next": "^13.4.8",
+    "next": "^13.4.9",
     "next-auth": "^4.22.1",
     "next-cloudinary": "4.13.0",
     "next-redux-wrapper": "^8.1.0",
