@@ -4,7 +4,7 @@ import Title from "../../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
 import { useUserData } from "../../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { FetchInvoiceCustomer } from "../../components/InvoiceCustomerLayout";
 import InvoiceControlBar from "./control-bar/InvoiceControlBar";
@@ -12,7 +12,9 @@ import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 import { Invoice, InvoiceItem } from "@prisma/client";
 import SubTitle from "../../../../../../_components/text/SubTitle";
-import InvoiceTable from "./InvoiceTable";
+import InvoiceTable from "./table/InvoiceTable";
+import { Divider } from "@nextui-org/divider";
+import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 
 type Props = {
     customerId: string,
@@ -40,6 +42,7 @@ export default function InvoiceLayout({ customerId, invoiceId }: Props) {
         )
             router.replace("/home");
     }, [router, userData, userDataIsLoading]);
+
     return (
         <div>
             <div className="flex gap-x-6">
@@ -53,6 +56,13 @@ export default function InvoiceLayout({ customerId, invoiceId }: Props) {
                         {invoiceIsLoading ? "Unknown" : invoice?.title}
                     </SubTitle>
                     <p className="text-neutral-500 max-w-fit break-words">{invoiceIsLoading ? "Unknown" : invoice?.description}</p>
+                    <Divider className="my-3" />
+                    <p className="font-semibold">Total: <span className="text-primary">{
+                        dollarFormat.format(Number(invoice?.invoiceItems
+                            .map(item => item.quantity * item.price)
+                            .reduce((prev, acc) => prev + acc, 0)))
+
+                    }</span></p>
                 </div>
             </div>
             <Spacer y={6} />

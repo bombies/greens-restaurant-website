@@ -28,17 +28,18 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
             type={type === "password" ? (passwordVisible ? "text" : "password") : type}
             radius={radius || "xl"}
             startContent={
-                iconLeft && <GenericImage src={iconLeft} width={1.25} />
+                props.startContent || (iconLeft && <GenericImage src={iconLeft} width={1.25} />)
             }
             endContent={
-                type === "password" ?
+                props.endContent ||
+                (type === "password" ?
                     <GenericImage
                         src={passwordVisible ? lockIcon : unlockIcon}
                         onClick={togglePasswordVisibility}
                         width={1.25}
                     />
                     :
-                    iconRight && <GenericImage src={iconRight} width={1.25} />
+                    iconRight && <GenericImage src={iconRight} width={1.25} />)
             }
             classNames={{
                 inputWrapper: clsx(

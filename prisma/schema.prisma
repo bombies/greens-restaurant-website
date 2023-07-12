@@ -120,7 +120,7 @@ model Invoice {
 model InvoiceItem {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  quantity    String
+  quantity    Int
   price       Float
   description String
 

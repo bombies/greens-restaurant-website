@@ -71,3 +71,8 @@ String.prototype.capitalize = function() {
         (g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
     );
 };
+
+export const dollarFormat = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+});
