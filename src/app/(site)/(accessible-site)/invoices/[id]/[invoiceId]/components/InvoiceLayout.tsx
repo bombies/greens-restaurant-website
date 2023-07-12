@@ -52,7 +52,7 @@ export default function InvoiceLayout({ customerId, invoiceId }: Props) {
                     </span>
                 </Title>
                 <div className="default-container w-1/3 tablet:w-full tablet:mt-6 p-6">
-                    <SubTitle className="self-center capitalize">
+                    <SubTitle className="self-center capitalize break-words">
                         {invoiceIsLoading ? "Unknown" : invoice?.title}
                     </SubTitle>
                     <p className="text-neutral-500 max-w-fit break-words">{invoiceIsLoading ? "Unknown" : invoice?.description}</p>

@@ -63,10 +63,11 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                 >
                     <div className="flex flex-col gap-2">
                         <p>{invoice.title}</p>
+                        <Divider />
                         {invoice.description && <>
-                            <Divider />
                             <p className="text-sm text-neutral-500 max-w-[17rem] tablet:max-w-[10rem] whitespace-nowrap overflow-hidden overflow-ellipsis">{invoice.description}</p>
                         </>}
+                        <p className="text-xs text-neutral-500">Created: {new Date(invoice.createdAt).toDateString()}</p>
                     </div>
                 </LinkCard>
             ));
