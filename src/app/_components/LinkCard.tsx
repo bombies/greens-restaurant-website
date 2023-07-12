@@ -23,9 +23,12 @@ export default function LinkCard({ href, children, toolTip }: Props) {
 
     return toolTip ?
         (
-            <Popover classNames={{
-                base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20"
-            }}>
+            <Popover
+                backdrop="opaque"
+                classNames={{
+                    base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20"
+                }}
+            >
                 <PopoverTrigger>
                     <Badge
                         color="secondary"
