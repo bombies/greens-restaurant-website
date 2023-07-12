@@ -1,15 +1,15 @@
-import { Invoice, InvoiceCustomer } from "@prisma/client";
+import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import { Spacer } from "@nextui-org/react";
 import React, { useState } from "react";
 import BackIcon from "../../../../../../../_components/icons/BackIcon";
 import Link from "next/link";
 import EditInvoiceButton from "./EditInvoiceButton";
-import ExportInvoiceButton from "./ExportInvoiceButton";
+import ExportInvoiceButton from "./export/ExportInvoiceButton";
 import DeleteInvoiceButton from "./DeleteInvoiceButton";
 
 type Props = {
     customer?: InvoiceCustomer,
-    invoice?: Invoice,
+    invoice?: Invoice & { invoiceItems: InvoiceItem[] },
     controlsEnabled?: boolean
 }
 
@@ -25,7 +25,7 @@ export default function InvoiceControlBar({ customer, invoice, controlsEnabled }
                     disabled={!controlsEnabled}
                 />
                 <ExportInvoiceButton
-                    customerId={customer?.id}
+                    customer={customer}
                     invoice={invoice}
                     disabled={!controlsEnabled}
                 />

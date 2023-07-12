@@ -4,7 +4,7 @@ import Title from "../../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
 import { useUserData } from "../../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { FetchInvoiceCustomer } from "../../components/InvoiceCustomerLayout";
 import InvoiceControlBar from "./control-bar/InvoiceControlBar";
@@ -45,24 +45,28 @@ export default function InvoiceLayout({ customerId, invoiceId }: Props) {
 
     return (
         <div>
-            <div className="flex gap-x-6">
+            <div className="flex tablet:flex-col gap-x-6">
                 <Title className="self-center">Invoices -
                     <span className="text-primary capitalize">
                         {customerIsLoading ? "Unknown" : customer?.customerName}
                     </span>
                 </Title>
-                <div className="default-container w-1/3 p-6">
+                <div className="default-container w-1/3 tablet:w-full tablet:mt-6 p-6">
                     <SubTitle className="self-center capitalize">
                         {invoiceIsLoading ? "Unknown" : invoice?.title}
                     </SubTitle>
                     <p className="text-neutral-500 max-w-fit break-words">{invoiceIsLoading ? "Unknown" : invoice?.description}</p>
                     <Divider className="my-3" />
-                    <p className="font-semibold">Total: <span className="text-primary">{
-                        dollarFormat.format(Number(invoice?.invoiceItems
-                            .map(item => item.quantity * item.price)
-                            .reduce((prev, acc) => prev + acc, 0)))
-
-                    }</span></p>
+                    {
+                        invoice &&
+                        <p className="font-semibold">
+                            Total: <span className="text-primary">{
+                            dollarFormat.format(Number(invoice.invoiceItems
+                                .map(item => item.quantity * item.price)
+                                .reduce((prev, acc) => prev + acc, 0)))
+                            }</span>
+                        </p>
+                    }
                 </div>
             </div>
             <Spacer y={6} />

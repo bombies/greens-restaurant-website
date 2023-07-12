@@ -53,7 +53,7 @@ export default function InvoiceTable({ customerId, invoice, mutationAllowed }: P
                 return invoice.description;
             }
             case "invoice_quantity": {
-                return dollarFormat.format(invoice.quantity);
+                return invoice.quantity
             }
             case "invoice_price_per": {
                 return dollarFormat.format(invoice.price);

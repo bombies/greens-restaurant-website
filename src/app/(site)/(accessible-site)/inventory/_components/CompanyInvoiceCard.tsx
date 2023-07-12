@@ -22,7 +22,7 @@ type Props = {
     controlsEnabled?: boolean
 }
 
-const FetchCompanyInfo = () => {
+export const FetchCompanyInfo = () => {
     return useSWR("/api/invoices/company", fetcher<InvoiceInformation>);
 };
 
