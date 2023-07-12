@@ -16,7 +16,7 @@ type Props = {
     id: string,
 }
 
-const FetchInvoiceCustomer = (id: string) => {
+export const FetchInvoiceCustomer = (id: string) => {
     return useSWR(`/api/invoices/customer/${id}/invoices`, fetcher<InvoiceCustomer & {
         invoices: Invoice[]
     }>);

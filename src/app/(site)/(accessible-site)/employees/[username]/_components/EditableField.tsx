@@ -150,7 +150,7 @@ export function DataContainer({ label, field, onEdit, capitalizeField, editAllow
             <Spacer y={2} />
             {
                 children || <p className={clsx(
-                    "max-w-sm overflow-clip",
+                    "max-w-fit break-all",
                     capitalizeField && "capitalize"
                 )}>{field}</p>
             }

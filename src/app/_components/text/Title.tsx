@@ -1,7 +1,10 @@
 import React from "react";
+import clsx from "clsx";
 
-interface Props extends React.PropsWithChildren {}
+interface Props extends React.PropsWithChildren {
+    className?: string;
+}
 
-export default function Title({ children }: Props) {
-    return <h1 className='phone:text-3xl'>{children}</h1>
+export default function Title({ children, className }: Props) {
+    return <h1 className={clsx(className, "phone:text-3xl")}>{children}</h1>;
 }

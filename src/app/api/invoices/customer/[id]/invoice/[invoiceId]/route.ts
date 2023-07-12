@@ -1,10 +1,11 @@
-import { authenticatedAny, respondWithInit } from "../../../../../../../utils/api/ApiUtils";
+import { authenticated, authenticatedAny, respondWithInit } from "../../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../../libs/types/permission";
 import { fetchCustomerInfo } from "../../route";
 import { NextResponse } from "next/server";
 import { Invoice, InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../libs/prisma";
 import { Either } from "../../../../../inventory/[name]/utils";
+import { CreateInvoiceDto } from "../../invoices/route";
 
 type Context = {
     params: {
@@ -39,7 +40,7 @@ export const fetchInvoice = async (customerId: string, invoiceId: string, withIt
     return new Either<Invoice & { invoiceItems?: InvoiceItem[] }, NextResponse>(thisInvoice);
 };
 
-export type CreateInvoiceDto = Omit<InvoiceItem, "id" | "createdAt" | "updatedAt">[]
+export type CreateInvoiceItemsDto = Omit<InvoiceItem, "id" | "createdAt" | "updatedAt">[]
 
 export function POST(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
@@ -47,7 +48,7 @@ export function POST(req: Request, { params }: Context) {
         if (invoice.error)
             return invoice.error;
 
-        const body = (await req.json()) as CreateInvoiceDto;
+        const body = (await req.json()) as CreateInvoiceItemsDto;
         if (!body)
             return respondWithInit({
                 message: "You are missing the body for this request!",
@@ -65,6 +66,32 @@ export function POST(req: Request, { params }: Context) {
 
         return NextResponse.json(createdItems);
     }, [Permission.CREATE_INVOICE]);
+}
+
+export type UpdateInvoiceDto = Partial<CreateInvoiceDto>;
+
+export function PATCH(req: Request, { params }: Context) {
+    return authenticated(req, async () => {
+        const invoice = await fetchInvoice(params.id, params.invoiceId);
+        if (invoice.error)
+            return invoice.error;
+
+        const body = (await req.json()) as UpdateInvoiceDto;
+        if (!body)
+            return respondWithInit({
+                message: "You must provide a body for this request!",
+                status: 401
+            });
+
+        const updatedInvoice = await prisma.invoice.update({
+            where: {
+                id: params.invoiceId
+            },
+            data: body
+        });
+
+        return NextResponse.json(updatedInvoice);
+    }, Permission.CREATE_INVOICE);
 }
 
 export function DELETE(req: Request, { params }: Context) {
