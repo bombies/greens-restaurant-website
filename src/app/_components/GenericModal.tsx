@@ -19,7 +19,7 @@ export default function GenericModal({ title, children, footerContent, ...modalP
                 modalProps.className,
                 "!bg-neutral-950/90 backdrop-blur-md"
             )}
-            showCloseButton={true}
+            showCloseButton
             backdrop="blur"
             placement="center"
         >

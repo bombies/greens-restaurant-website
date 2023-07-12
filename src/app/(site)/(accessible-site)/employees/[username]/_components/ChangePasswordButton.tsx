@@ -3,8 +3,6 @@
 import passwordIcon from "/public/icons/password.svg";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import React, { useEffect, useState } from "react";
-import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/modal";
-import SubTitle from "../../../../../_components/text/SubTitle";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
@@ -14,6 +12,7 @@ import axios from "axios";
 import { User } from "@prisma/client";
 import useSWRMutation from "swr/mutation";
 import { useSWRConfig } from "swr";
+import GenericModal from "../../../../../_components/GenericModal";
 
 const ChangePassword = (username: string, password: string, nonAdmin?: boolean) => {
     const dto: Partial<User> = {
@@ -127,73 +126,59 @@ export default function ChangePasswordButton({ username, allowed, checkPrevious,
     return (
         <>
             <GenericButton
-                shadow
                 icon={passwordIcon}
-                onClick={() => setModalOpen(true)}
+                onPress={() => setModalOpen(true)}
                 disabled={!allowed}
             >
                 Change Password
             </GenericButton>
-            <Modal
-                size="2xl"
-                className="bg-neutral-800"
+            <GenericModal
+                title="Change Password"
                 isOpen={modalOpen && allowed}
                 onClose={() => setModalOpen(false)}
-                showCloseButton={true}
-                backdrop="opaque"
             >
-                <ModalContent>
-                    <ModalHeader>
-                        <SubTitle thick>Change Password</SubTitle>
-                    </ModalHeader>
-                    <ModalBody>
-                        <div className="p-6">
-                            <form onSubmit={handleSubmit(onSubmit)}>
-                                {
-                                    checkPrevious &&
-                                    <>
-                                        <GenericInput
-                                            register={register}
-                                            disabled={passwordIsChanging || oldPasswordChecking}
-                                            type="password"
-                                            id="oldPassword"
-                                            label="Old Password"
-                                            required
-                                        />
-                                        <Spacer y={6} />
-                                    </>
-                                }
-                                <GenericInput
-                                    register={register}
-                                    disabled={passwordIsChanging || oldPasswordChecking}
-                                    type="password"
-                                    id="password"
-                                    label="New Password"
-                                    required
-                                />
-                                <Spacer y={6} />
-                                <GenericInput
-                                    register={register}
-                                    disabled={passwordIsChanging || oldPasswordChecking}
-                                    type="password"
-                                    id="confirmedPassword"
-                                    label="Confirm New Password"
-                                    required
-                                />
-                                <Spacer y={6} />
-                                <GenericButton
-                                    type="submit"
-                                    disabled={passwordIsChanging || oldPasswordChecking}
-                                    loading={passwordIsChanging || oldPasswordChecking}
-                                    shadow
-                                >
-                                    Change Password
-                                </GenericButton>
-                            </form>
-                        </div>
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    {
+                        checkPrevious &&
+                        <>
+                            <GenericInput
+                                register={register}
+                                disabled={passwordIsChanging || oldPasswordChecking}
+                                type="password"
+                                id="oldPassword"
+                                label="Old Password"
+                                required
+                            />
+                            <Spacer y={6} />
+                        </>
+                    }
+                    <GenericInput
+                        register={register}
+                        disabled={passwordIsChanging || oldPasswordChecking}
+                        type="password"
+                        id="password"
+                        label="New Password"
+                        required
+                    />
+                    <Spacer y={6} />
+                    <GenericInput
+                        register={register}
+                        disabled={passwordIsChanging || oldPasswordChecking}
+                        type="password"
+                        id="confirmedPassword"
+                        label="Confirm New Password"
+                        required
+                    />
+                    <Spacer y={6} />
+                    <GenericButton
+                        type="submit"
+                        disabled={passwordIsChanging || oldPasswordChecking}
+                        isLoading={passwordIsChanging || oldPasswordChecking}
+                    >
+                        Change Password
+                    </GenericButton>
+                </form>
+            </GenericModal>
         </>
     );
 }

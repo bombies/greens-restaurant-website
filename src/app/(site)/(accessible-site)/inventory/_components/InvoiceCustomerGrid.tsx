@@ -21,7 +21,7 @@ export default function InvoiceCustomerGrid() {
     ));
 
     return (
-        <div className="default-container p-12 w-[50%] phone:w-full">
+        <div className="default-container p-12 w-[50%] tablet:w-full">
             <SubTitle>Select a customer</SubTitle>
             <Spacer y={6} />
             <div className="grid grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-4">

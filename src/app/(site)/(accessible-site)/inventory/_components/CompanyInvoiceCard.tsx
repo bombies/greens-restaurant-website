@@ -80,7 +80,7 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                 }}
                 onReject={() => setProposedCompanyInfo(undefined)}
             />
-            <div className="default-container p-12 phone:px-3 w-[50%] phone:w-full h-fit">
+            <div className="default-container p-12 phone:px-3 w-[50%] tablet:w-full h-fit">
                 {
                     isLoading ?
                         <div className="flex justify-center">

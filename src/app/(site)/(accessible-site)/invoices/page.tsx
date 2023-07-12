@@ -38,7 +38,7 @@ export default function InvoicesPage() {
                     )}
             />
             <Spacer y={6} />
-            <div className="flex gap-6 phone:flex-col">
+            <div className="flex gap-6 tablet:flex-col">
                 <InvoiceCustomerGrid />
                 <CompanyInvoiceCard />
             </div>

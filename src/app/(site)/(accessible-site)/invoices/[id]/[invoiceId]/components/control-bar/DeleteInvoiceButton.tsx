@@ -47,8 +47,7 @@ export default function DeleteInvoiceButton({ customerId, invoice, disabled }: P
                                 error: e,
                                 description: "There was an error deleting this invoice!"
                             });
-                        })
-                    ;
+                        });
                 }}
             />
             <GenericButton
