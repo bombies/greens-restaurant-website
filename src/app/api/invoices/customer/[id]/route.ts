@@ -1,9 +1,11 @@
-import { authenticatedAny, respondWithInit } from "../../../../../utils/api/ApiUtils";
+import { authenticated, authenticatedAny, respondWithInit } from "../../../../../utils/api/ApiUtils";
 import { CUSTOMER_NAME_REGEX, EMAIL_REGEX } from "../../../../../utils/regex";
 import prisma from "../../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import Permission from "../../../../../libs/types/permission";
-import { CreateCustomerBody } from "../route";
+import { CreateInvoiceCustomerDto } from "../route";
+import { Either } from "../../../inventory/[name]/utils";
+import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 
 type Context = {
     params: {
@@ -11,7 +13,39 @@ type Context = {
     }
 }
 
-type UpdateCustomerBody = Partial<CreateCustomerBody>
+export type UpdateCustomerDto = Partial<CreateInvoiceCustomerDto>
+
+export function GET(req: Request, { params }: Context) {
+    return authenticatedAny(req, async () => {
+        const customer = await fetchCustomerInfo(params.id);
+        if (customer.error)
+            return customer.error;
+        return NextResponse.json(customer.success);
+    }, [Permission.VIEW_INVOICES, Permission.CREATE_INVOICE]);
+}
+
+export const fetchCustomerInfo = async (id: string, withInvoices?: boolean, withInvoiceItems?: boolean): Promise<Either<InvoiceCustomer & {
+    invoices?: (Invoice & { invoiceItems?: InvoiceItem[] })[]
+}, NextResponse>> => {
+    const existingCustomer = await prisma.invoiceCustomer.findUnique({
+        where: { id },
+        include: {
+            invoices: withInvoices && {
+                include: {
+                    invoiceItems: withInvoiceItems
+                }
+            }
+        }
+    });
+
+    if (!existingCustomer)
+        return new Either<InvoiceCustomer, NextResponse>(undefined, respondWithInit({
+            message: `There is no customer with the id: ${id}`,
+            status: 404
+        }));
+
+    return new Either<InvoiceCustomer, NextResponse>(existingCustomer);
+};
 
 export function PATCH(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
@@ -27,7 +61,7 @@ export function PATCH(req: Request, { params }: Context) {
                 status: 404
             });
 
-        const body = (await req.json()) as UpdateCustomerBody;
+        const body = (await req.json()) as UpdateCustomerDto;
 
         let newName: string | undefined = undefined;
         if (body.customerName) {
@@ -38,7 +72,6 @@ export function PATCH(req: Request, { params }: Context) {
                 });
 
             const validName = body.customerName
-                .toLowerCase()
                 .trim()
                 .replaceAll(/\s{2,}/g, " ");
 
@@ -93,4 +126,20 @@ export function PATCH(req: Request, { params }: Context) {
             })
         );
     }, [Permission.CREATE_INVOICE]);
+}
+
+export function DELETE(req: Request, { params }: Context) {
+    return authenticated(req, async () => {
+        const customer = await fetchCustomerInfo(params.id);
+        if (customer.error)
+            return customer.error;
+
+        const deletedCustomer = await prisma.invoiceCustomer.delete({
+            where: {
+                id: customer.success!.id
+            }
+        });
+
+        return NextResponse.json(deletedCustomer);
+    }, Permission.CREATE_INVOICE);
 }

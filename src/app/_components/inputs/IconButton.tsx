@@ -4,18 +4,19 @@ import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
 import React, { ReactElement } from "react";
 import { UseDropdownProps } from "@nextui-org/dropdown/dist/use-dropdown";
+import { DropdownInputProps } from "./DropdownInput";
 
 type Props = {
     toolTip: string,
     icon: string | StaticImageData;
     width?: number
-    withDropdown?: ReactElement<DropdownMenuProps>
+    withDropdown?: ReactElement<DropdownMenuProps> | ReactElement<DropdownInputProps>
     dropdownProps?: UseDropdownProps
 } & ButtonProps
 
 export default function IconButton({ toolTip, icon, color, width, withDropdown, dropdownProps, ...buttonProps }: Props) {
     const button = (
-        <Button {...buttonProps} isIconOnly variant="light" color={color || "secondary"}>
+        <Button {...buttonProps} isIconOnly variant={buttonProps.variant || "light"} color={color || "secondary"}>
             <GenericImage className="self-center" src={icon} width={width || 1.35} />
         </Button>
     );

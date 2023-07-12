@@ -13,7 +13,7 @@ import Permission, { permissionCheck } from "../../../../../../libs/types/permis
 import { compare } from "../../../../../../utils/GeneralUtils";
 import ChangesMadeBar from "./ChangesMadeBar";
 import { sendToast } from "../../../../../../utils/Hooks";
-import EditableEmployeeField from "./EditableEmployeeField";
+import EditableField from "./EditableField";
 import { EMAIL_REGEX, NAME_REGEX, USERNAME_REGEX } from "../../../../../../utils/regex";
 import ChangePasswordButton from "./ChangePasswordButton";
 import DeleteEmployeeButton from "./DeleteEmployeeButton";
@@ -22,7 +22,7 @@ import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import useSWRImmutable from "swr/immutable";
 import ContainerSkeleton from "../../../../../_components/skeletons/ContainerSkeleton";
-import clsx from "clsx";
+import { DataGroupContainer } from "../../../../../_components/DataGroupContainer";
 
 type Props = {
     username: string
@@ -129,6 +129,7 @@ export default function Employee({ username }: Props) {
             });
     };
 
+    // @ts-ignore
     return (
         <div>
             <ChangesMadeBar
@@ -171,7 +172,7 @@ export default function Employee({ username }: Props) {
                                     <div className="default-container p-6 phone:p-3 w-3/4 tablet:w-full">
                                         <SubTitle>Account Settings</SubTitle>
                                         <DataGroupContainer>
-                                            <EditableEmployeeField
+                                            <EditableField
                                                 label="username"
                                                 editAllowed={editAllowed}
                                                 field={currentData?.username}
@@ -193,7 +194,7 @@ export default function Employee({ username }: Props) {
                                         <Divider />
                                         <Spacer y={6} />
                                         <DataGroupContainer>
-                                            <EditableEmployeeField
+                                            <EditableField
                                                 label="first name"
                                                 editAllowed={editAllowed}
                                                 field={currentData?.firstName}
@@ -209,7 +210,7 @@ export default function Employee({ username }: Props) {
                                                     firstName: value.toLowerCase()
                                                 }))}
                                             />
-                                            <EditableEmployeeField
+                                            <EditableField
                                                 label="last name"
                                                 editAllowed={editAllowed}
                                                 field={currentData?.lastName}
@@ -230,7 +231,7 @@ export default function Employee({ username }: Props) {
                                         <Divider />
                                         <Spacer y={6} />
                                         <DataGroupContainer>
-                                            <EditableEmployeeField
+                                            <EditableField
                                                 label="email address"
                                                 editAllowed={editAllowed}
                                                 field={currentData?.email}
@@ -256,7 +257,7 @@ export default function Employee({ username }: Props) {
                                                 label="Select Permissions"
                                                 value={selectedPermissions}
                                                 isDisabled={!editAllowed}
-                                                onChange={values => {
+                                                onChange={(values: string[]) => {
                                                     setSelectedPermissions(values);
 
                                                     const permissions = values.length ? values.map(val => Number(val)).reduce((prev, curr) => {
@@ -321,17 +322,3 @@ function GoBackButton() {
     );
 }
 
-type DataGroupContainerProps = {
-    direction?: "horizontal" | "vertical"
-} & React.PropsWithChildren
-
-export function DataGroupContainer({ direction, children }: DataGroupContainerProps) {
-    return (
-        <div className={clsx(
-            "flex phone:flex-col gap-12 p-3",
-            direction === "vertical" ? "flex-col" : ""
-        )}>
-            {children}
-        </div>
-    );
-}

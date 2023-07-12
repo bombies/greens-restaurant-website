@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import LinkCard from "../../../../_components/LinkCard";
 
 type Props = {
     name: string
@@ -8,10 +9,8 @@ type Props = {
 
 export default function InventoryCard({ name }: Props) {
     return (
-        <Link href={`/inventory/${name}`}>
-            <div className="default-container p-6 transition-fast hover:-translate-y-1 hover:border-primary flex gap-4">
-                <p className="capitalize">{name.replaceAll("-", " ")}</p>
-            </div>
-        </Link>
+        <LinkCard href={`/inventory/${name}`}>
+            <p className="capitalize">{name.replaceAll("-", " ")}</p>
+        </LinkCard>
     );
 }

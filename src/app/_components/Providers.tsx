@@ -27,7 +27,7 @@ export default function Providers(props: Props) {
                     <NextUIProvider>
                         <SessionProvider session={props.session}>
                             <Toaster
-                                position="top-right"
+                                position="top-center"
                                 reverseOrder={false}
                             />
                             {props.children}

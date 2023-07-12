@@ -68,6 +68,7 @@ export default function HistoricTopStockGraph({ data, isLoading }: Props) {
                     variant="flat"
                     selectionRequired
                     selectedKeys={[selectedTopMax]}
+                    selectedValueLabel
                     setSelectedKeys={(keys) => {
                         setSelectedTopMax((Array.from(keys) as string[])[0]);
                     }}

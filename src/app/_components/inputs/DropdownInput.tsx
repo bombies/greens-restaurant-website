@@ -5,9 +5,9 @@ import { useMemo } from "react";
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
 
-type Props = {
+export type DropdownInputProps = {
     label?: string,
-    variant?: "light" | "shadow" | "flat" | "solid" | "bordered" | "faded"  & Partial<"ghost">
+    variant?: "light" | "shadow" | "flat" | "solid" | "bordered" | "faded" & Partial<"ghost">
     multiSelect?: boolean,
     selectionRequired?: boolean,
     keys: string[],
@@ -15,6 +15,8 @@ type Props = {
     setSelectedKeys: (keys: Selection) => any
     icon?: string | StaticImageData
     disabled?: boolean,
+    selectedValueLabel?: boolean
+    labelIsIcon?: boolean
 }
 
 export default function DropdownInput({
@@ -26,8 +28,10 @@ export default function DropdownInput({
                                           selectedKeys,
                                           setSelectedKeys,
                                           disabled,
-                                          icon
-                                      }: Props) {
+                                          icon,
+                                          selectedValueLabel,
+                                          labelIsIcon
+                                      }: DropdownInputProps) {
     const keyElements = keys.map(key => (
         <DropdownItem
             key={key.toLowerCase().replaceAll(" ", "_")}
@@ -52,13 +56,14 @@ export default function DropdownInput({
             <Dropdown>
                 <DropdownTrigger>
                     <Button
+                        isIconOnly={labelIsIcon}
                         variant={variant}
                         disabled={disabled}
                         color="primary"
                         className="capitalize"
                         endContent={icon && <GenericImage src={icon} width={1} />}
                     >
-                        {selectedValue}
+                        {selectedValueLabel && selectedValue}
                     </Button>
                 </DropdownTrigger>
                 <DropdownMenu

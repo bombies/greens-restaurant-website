@@ -5,8 +5,8 @@ import { NextResponse } from "next/server";
 import { INVENTORY_NAME_REGEX } from "../../../../utils/regex";
 import { StockSnapshotPostDto } from "./currentsnapshot/stock/route";
 
-export class Either<A, B> {
-    constructor(public readonly success?: A, public readonly error?: B) {
+export class Either<S, E> {
+    constructor(public readonly success?: S, public readonly error?: E) {
     }
 }
 

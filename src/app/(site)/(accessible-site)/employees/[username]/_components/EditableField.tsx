@@ -26,7 +26,7 @@ interface Props {
     editAllowed: boolean
 }
 
-export default function EditableEmployeeField({
+export default function EditableField({
                                                   label,
                                                   field,
                                                   capitalizeField,

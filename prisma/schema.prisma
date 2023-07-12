@@ -104,10 +104,12 @@ model InvoiceCustomer {
 }
 
 model Invoice {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
 
   customerId String          @db.ObjectId
-  customer   InvoiceCustomer @relation(fields: [customerId], references: [id])
+  customer   InvoiceCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   invoiceItems InvoiceItem[] @relation()
 
@@ -122,7 +124,7 @@ model InvoiceItem {
   price       Float
   description String
 
-  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   invoiceId String  @db.ObjectId
 
   createdAt DateTime @default(now())

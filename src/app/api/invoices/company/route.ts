@@ -13,16 +13,16 @@ const defaultInfo: Omit<InvoiceInformation, "createdAt" | "updatedAt" | "id"> = 
 
 export function GET(req: Request) {
     return authenticatedAny(req, async () => {
-        return NextResponse.json(fetchCompanyInfo());
+        return NextResponse.json(await fetchCompanyInfo());
     }, [Permission.CREATE_INVOICE, Permission.VIEW_INVOICES]);
 }
 
-type UpdateInformationBody = Omit<InvoiceInformation, "createdAt" | "updatedAt" | "id">
+export type UpdateCompanyInformationDto = Omit<Partial<InvoiceInformation>, "createdAt" | "updatedAt" | "id">
 
 export function PATCH(req: Request) {
     return authenticatedAny(req, async () => {
         const info = await fetchCompanyInfo();
-        const body = (await req.json()) as UpdateInformationBody;
+        const body = (await req.json()) as UpdateCompanyInformationDto;
 
         let newName: string | undefined = undefined;
         if (body.companyName) {

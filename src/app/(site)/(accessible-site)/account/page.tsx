@@ -10,14 +10,15 @@ import { User } from "@prisma/client";
 import useSWRImmutable from "swr/immutable";
 import { fetcher } from "../employees/_components/EmployeeGrid";
 import { compare } from "../../../../utils/GeneralUtils";
-import { DataGroupContainer, UpdateUser } from "../employees/[username]/_components/Employee";
+import { UpdateUser } from "../employees/[username]/_components/Employee";
 import { sendToast } from "../../../../utils/Hooks";
 import ChangesMadeBar from "../employees/[username]/_components/ChangesMadeBar";
-import EditableEmployeeField, { DataContainer } from "../employees/[username]/_components/EditableEmployeeField";
+import EditableField, { DataContainer } from "../employees/[username]/_components/EditableField";
 import { EMAIL_REGEX, NAME_REGEX, USERNAME_REGEX } from "../../../../utils/regex";
 import { Divider } from "@nextui-org/divider";
 import ChangePasswordButton from "../employees/[username]/_components/ChangePasswordButton";
 import ContainerSkeleton from "../../../_components/skeletons/ContainerSkeleton";
+import { DataGroupContainer } from "../../../_components/DataGroupContainer";
 
 const useSelfData = () => {
     return useSWRImmutable(`/api/users/me`, fetcher<User>);
@@ -141,7 +142,7 @@ export default function AccountPage() {
                             <Spacer y={12} />
                             <div className="default-container p-12 tablet:px-6 phone:px-2 w-3/4 tablet:w-full">
                                 <DataGroupContainer>
-                                    <EditableEmployeeField
+                                    <EditableField
                                         label="username"
                                         editAllowed={false}
                                         field={currentData?.username}
@@ -163,7 +164,7 @@ export default function AccountPage() {
                                 <Divider />
                                 <Spacer y={6} />
                                 <DataGroupContainer>
-                                    <EditableEmployeeField
+                                    <EditableField
                                         label="first name"
                                         editAllowed={false}
                                         field={currentData?.firstName}
@@ -179,7 +180,7 @@ export default function AccountPage() {
                                             firstName: value.toLowerCase()
                                         }))}
                                     />
-                                    <EditableEmployeeField
+                                    <EditableField
                                         label="last name"
                                         editAllowed={false}
                                         field={currentData?.lastName}
@@ -200,7 +201,7 @@ export default function AccountPage() {
                                 <Divider />
                                 <Spacer y={6} />
                                 <DataGroupContainer direction="vertical">
-                                    <EditableEmployeeField
+                                    <EditableField
                                         label="email address"
                                         editAllowed={true}
                                         field={currentData?.email}

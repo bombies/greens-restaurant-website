@@ -2,7 +2,7 @@
 
 import addIcon from "/public/icons/add.svg";
 import GenericButton from "../../../../_components/inputs/GenericButton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import GenericInput from "../../../../_components/inputs/GenericInput";
 import GenericModal from "../../../../_components/GenericModal";
 import { Spacer } from "@nextui-org/react";
@@ -17,15 +17,20 @@ type Props = {
     disabled?: boolean
 }
 
-export const CreateInventory = (dto?: CreateInventoryDto) => {
-    const mutator = (url: string) => axios.post(url, dto);
+type CreateInventoryArgs = {
+    arg: {
+        dto: CreateInventoryDto
+    }
+}
+
+export const CreateInventory = () => {
+    const mutator = (url: string, { arg }: CreateInventoryArgs) => axios.post(url, arg.dto);
     return useSWRMutation(`/api/inventory`, mutator);
 };
 
-export default function CreateInventoryButton({disabled}: Props) {
+export default function CreateInventoryButton({ disabled }: Props) {
     const session = useSession();
     const [modalOpen, setModalOpen] = useState(false);
-    const [dto, setDto] = useState<CreateInventoryDto>();
     const {
         register,
         handleSubmit,
@@ -33,13 +38,16 @@ export default function CreateInventoryButton({disabled}: Props) {
             errors
         }
     } = useForm<FieldValues>();
-    const { trigger: triggerCreateInventory, isMutating: creatingInventory } = CreateInventory(dto);
+    const { trigger: triggerCreateInventory, isMutating: creatingInventory } = CreateInventory();
 
-    useEffect(() => {
-        if (!dto || disabled || creatingInventory)
-            return;
-
-        triggerCreateInventory()
+    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+        const { name } = data;
+        triggerCreateInventory({
+            dto: {
+                name,
+                createdBy: session.data?.user?.id
+            }
+        })
             .then(() => {
                 sendToast({
                     description: "Successfully created that category!"
@@ -56,24 +64,15 @@ export default function CreateInventoryButton({disabled}: Props) {
                     position: "top-center"
                 });
             });
-    }, [dto, triggerCreateInventory]);
-
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        const { name } = data;
-        setDto({
-            name,
-            createdBy: session.data?.user?.id
-        });
     };
 
     return (
         <>
             <GenericButton
-                shadow
                 icon={addIcon}
                 disabled={disabled}
                 size="md"
-                onClick={() => setModalOpen(true)}
+                onPress={() => setModalOpen(true)}
             >
                 Create New Inventory
             </GenericButton>
@@ -101,8 +100,7 @@ export default function CreateInventoryButton({disabled}: Props) {
                             type="submit"
                             icon={addIcon}
                             disabled={creatingInventory || disabled}
-                            loading={creatingInventory}
-                            shadow
+                            isLoading={creatingInventory}
                         >
                             Create
                         </GenericButton>

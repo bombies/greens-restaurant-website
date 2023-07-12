@@ -22,4 +22,4 @@ export const NAME_REGEX = /^[\p{L}'-]{1,50}$/u;
 
 export const INVENTORY_NAME_REGEX = /^[a-zA-Z][a-z-A-Z0-9\s]{0,29}$/;
 export const COMPANY_NAME_REGEX = /^[A-Za-z0-9\s.&'()-]{1,100}$/;
-export const CUSTOMER_NAME_REGEX = /^[A-Za-z\s.&'()-]{1,100}$/
+export const CUSTOMER_NAME_REGEX = /^[A-Za-z0-9\s.&'()-]{1,100}$/

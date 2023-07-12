@@ -32,18 +32,16 @@ export default function ChangesMadeBar({ changesMade, onAccept, onReject, isChan
                     <p className="text-xl phone:text-lg self-center">Careful - You have unsaved changes!</p>
                     <div className="flex tablet:flex-col gap-4">
                         <GenericButton
-                            shadow
-                            onClick={() => onAccept()}
+                            onPress={() => onAccept()}
                             disabled={!changesMade || isChanging}
-                            loading={isChanging}
+                            isLoading={isChanging}
                             icon={saveIcon}
                         >
                             Save
                         </GenericButton>
                         <GenericButton
                             color="danger"
-                            shadow
-                            onClick={() => onReject()}
+                            onPress={() => onReject()}
                             disabled={!changesMade || isChanging}
                             icon={trashIcon}
                         >
@@ -53,7 +51,5 @@ export default function ChangesMadeBar({ changesMade, onAccept, onReject, isChan
                 </div>
             </CSSTransition>
         </div>
-
-
     );
 }

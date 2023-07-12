@@ -14,13 +14,14 @@ export default function GenericModal({ title, children, footerContent, ...modalP
     return (
         <Modal
             {...modalProps}
-            size="2xl"
+            size={modalProps.size || "2xl"}
             className={clsx(
                 modalProps.className,
                 "!bg-neutral-950/90 backdrop-blur-md"
             )}
             showCloseButton={true}
             backdrop="blur"
+            placement="center"
         >
             <ModalContent>
                 <ModalHeader>

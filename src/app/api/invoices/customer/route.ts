@@ -12,11 +12,11 @@ export function GET(req: Request) {
     }, [Permission.VIEW_INVOICES, Permission.CREATE_INVOICE]);
 }
 
-export type CreateCustomerBody = Omit<InvoiceCustomer, "createdAt" | "updatedAt" | "id">
+export type CreateInvoiceCustomerDto = Omit<InvoiceCustomer, "createdAt" | "updatedAt" | "id">
 
 export function POST(req: Request) {
     return authenticatedAny(req, async () => {
-        const body = (await req.json()) as CreateCustomerBody;
+        const body = (await req.json()) as CreateInvoiceCustomerDto;
 
         if (!CUSTOMER_NAME_REGEX.test(body.customerName))
             return respondWithInit({
