@@ -74,14 +74,6 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                                 at {new Date(invoice.updatedAt).toLocaleTimeString()} on {new Date(invoice.updatedAt).toDateString()}</p>
                         </div>
                     }
-                    toolTipProps={{
-                        delay: 1000,
-                        closeDelay: 100,
-                        offset: 6,
-                        classNames: {
-                            base: "bg-secondary/20 backdrop-blur-md"
-                        }
-                    }}
                 >
                     <div className="flex flex-col gap-2">
                         <p>{invoice.title}</p>
