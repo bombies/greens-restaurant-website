@@ -4,13 +4,15 @@ import { Invoice, InvoiceCustomer } from "@prisma/client";
 import LinkCard from "../../../../../_components/LinkCard";
 import { Divider } from "@nextui-org/divider";
 import SubTitle from "../../../../../_components/text/SubTitle";
-import { Spacer } from "@nextui-org/react";
+import { Spacer, Tooltip } from "@nextui-org/react";
 import filterIcon from "/public/icons/green-filter.svg";
 import searchIcon from "/public/icons/search.svg";
 import DropdownInput from "../../../../../_components/inputs/DropdownInput";
 import { useMemo, useState } from "react";
 import "../../../../../../utils/GeneralUtils";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
+import CardSkeleton from "../../../../../_components/skeletons/CardSkeleton";
+import Title from "../../../../../_components/text/Title";
 
 type Props = {
     customerIsLoading: boolean,
@@ -60,6 +62,26 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                 <LinkCard
                     key={invoice.id}
                     href={`/invoices/${customer?.id}/${invoice.id}`}
+                    toolTip={
+                        <div className="p-6">
+                            <p className="text-primary text-xl max-w-md break-words font-bold drop-shadow">{invoice.title}</p>
+                            <Spacer y={3} />
+                            <p className="max-w-lg break-words">{invoice.description}</p>
+                            <Divider className="my-3" />
+                            <p className="text-neutral-500 text-sm">Created
+                                on {new Date(invoice.createdAt).toDateString()}</p>
+                            <p className="text-neutral-500 text-sm">Last updated
+                                at {new Date(invoice.updatedAt).toLocaleTimeString()} on {new Date(invoice.updatedAt).toDateString()}</p>
+                        </div>
+                    }
+                    toolTipProps={{
+                        delay: 1000,
+                        closeDelay: 100,
+                        offset: 6,
+                        classNames: {
+                            base: "bg-secondary/20 backdrop-blur-md"
+                        }
+                    }}
                 >
                     <div className="flex flex-col gap-2">
                         <p>{invoice.title}</p>
@@ -103,7 +125,14 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
             <div className="grid grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-6">
                 {
                     customerIsLoading ?
-                        "Loading..."
+                        <>
+                            <CardSkeleton />
+                            <CardSkeleton />
+                            <CardSkeleton />
+                            <CardSkeleton />
+                            <CardSkeleton />
+                            <CardSkeleton />
+                        </>
                         :
                         invoiceCards
 

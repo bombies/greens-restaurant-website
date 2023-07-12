@@ -15,6 +15,7 @@ import SubTitle from "../../../../../../_components/text/SubTitle";
 import InvoiceTable from "./table/InvoiceTable";
 import { Divider } from "@nextui-org/divider";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
+import { Spinner } from "@nextui-org/spinner";
 
 type Props = {
     customerId: string,
@@ -51,21 +52,30 @@ export default function InvoiceLayout({ customerId, invoiceId }: Props) {
                         {customerIsLoading ? "Unknown" : customer?.customerName}
                     </span>
                 </Title>
-                <div className="default-container w-1/3 tablet:w-full tablet:mt-6 p-6">
-                    <SubTitle className="self-center capitalize break-words">
-                        {invoiceIsLoading ? "Unknown" : invoice?.title}
-                    </SubTitle>
-                    <p className="text-neutral-500 max-w-fit break-words">{invoiceIsLoading ? "Unknown" : invoice?.description}</p>
-                    <Divider className="my-3" />
+                <div className="default-container max-w-[40%] min-w-[25%] tablet:w-full tablet:mt-6 p-6">
                     {
-                        invoice &&
-                        <p className="font-semibold">
-                            Total: <span className="text-primary">{
-                            dollarFormat.format(Number(invoice.invoiceItems
-                                .map(item => item.quantity * item.price)
-                                .reduce((prev, acc) => prev + acc, 0)))
-                            }</span>
-                        </p>
+                        invoiceIsLoading ?
+                            <div className="flex justify-center">
+                                <Spinner size="lg" />
+                            </div>
+                            :
+                            <>
+                                <SubTitle className="self-center capitalize break-words">
+                                    {invoice?.title}
+                                </SubTitle>
+                                <p className="text-neutral-500 max-w-fit break-words">{invoice?.description}</p>
+                                <Divider className="my-3" />
+                                {
+                                    invoice &&
+                                    <p className="font-semibold">
+                                        Total: <span className="text-primary">{
+                                        dollarFormat.format(Number(invoice.invoiceItems
+                                            .map(item => item.quantity * item.price)
+                                            .reduce((prev, acc) => prev + acc, 0)))
+                                    }</span>
+                                    </p>
+                                }
+                            </>
                     }
                 </div>
             </div>
