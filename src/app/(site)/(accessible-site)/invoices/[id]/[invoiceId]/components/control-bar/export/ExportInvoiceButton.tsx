@@ -1,10 +1,9 @@
 "use client";
 
 import GenericButton from "../../../../../../../../_components/inputs/GenericButton";
-import { Invoice, InvoiceCustomer, InvoiceInformation, InvoiceItem } from "@prisma/client";
-import { Document, Font, Page, PDFDownloadLink, StyleSheet, Text, View, Image } from "@react-pdf/renderer";
+import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { FetchCompanyInfo } from "../../../../../../inventory/_components/CompanyInvoiceCard";
-import { dollarFormat } from "../../../../../../../../../utils/GeneralUtils";
 import InvoicePDF from "./pdf/InvoicePDF";
 
 type Props = {
