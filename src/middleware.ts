@@ -13,5 +13,6 @@ export const config = {
         "/inventory/:path*",
         "/management/:path*",
         "/account/:path*",
+        "/invoices/:path*",
     ]
 };
