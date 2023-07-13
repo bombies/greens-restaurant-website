@@ -10,6 +10,7 @@ import { sendToast } from "../../../../../../../../utils/Hooks";
 import { InvoiceItemChangeAction } from "../InvoiceItemsProvider";
 
 type Props = {
+    disabled: boolean,
     customerId?: string,
     item: InvoiceItem,
     dispatchItems: Dispatch<{
@@ -24,7 +25,7 @@ const DeleteItem = (customerId?: string, invoiceId?: string, invoiceItemId?: str
     return useSWRMutation(`/api/invoices/customer/${customerId}/invoice/${invoiceId}/${invoiceItemId}`, mutator);
 };
 
-export default function DeleteInvoiceItemButton({ customerId, item, setSelectedKeys, dispatchItems }: Props) {
+export default function DeleteInvoiceItemButton({ customerId, item, setSelectedKeys, dispatchItems, disabled }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const {
         trigger: triggerItemDeletion,
@@ -40,6 +41,9 @@ export default function DeleteInvoiceItemButton({ customerId, item, setSelectedK
                 title={`Delete ${item.name}`}
                 message={`Are you sure you want to delete ${item.name}`}
                 onAccept={() => {
+                    if (disabled)
+                        return;
+
                     triggerItemDeletion()
                         .then((data) => {
                             dispatchItems({
@@ -62,6 +66,7 @@ export default function DeleteInvoiceItemButton({ customerId, item, setSelectedK
                 }}
             />
             <GenericButton
+                disabled={disabled}
                 variant="flat"
                 color="danger"
                 onPress={() => setModalOpen(true)}

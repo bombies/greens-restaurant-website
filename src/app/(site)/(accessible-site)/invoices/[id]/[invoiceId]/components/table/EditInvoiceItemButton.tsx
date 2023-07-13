@@ -16,6 +16,7 @@ import { sendToast } from "../../../../../../../../utils/Hooks";
 import { InvoiceItemChangeAction } from "../InvoiceItemsProvider";
 
 type Props = {
+    disabled: boolean,
     customerId?: string,
     item: InvoiceItem,
     dispatchItems: Dispatch<{
@@ -56,7 +57,7 @@ const UpdateInvoiceItem = (customerId?: string, invoiceId?: string, invoiceItemI
     return useSWRMutation(`/api/invoices/customer/${customerId}/invoice/${invoiceId}/${invoiceItemId}`, mutator);
 };
 
-export default function EditInvoiceItemButton({ customerId, item, dispatchItems, setSelectedKeys }: Props) {
+export default function EditInvoiceItemButton({ customerId, item, dispatchItems, setSelectedKeys, disabled }: Props) {
     const [currentInfo, dispatchCurrentInfo] = useReducer(reducer, item);
     const [modalOpen, setModalOpen] = useState(false);
     const {
@@ -111,7 +112,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
             >
                 <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                     <GenericInput
-                        disabled={itemIsUpdating}
+                        disabled={itemIsUpdating || disabled}
                         register={register}
                         errors={errors}
                         id="name"
@@ -125,7 +126,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                         })}
                     />
                     <GenericInput
-                        disabled={itemIsUpdating}
+                        disabled={itemIsUpdating || disabled}
                         register={register}
                         errors={errors}
                         id="description"
@@ -140,7 +141,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                     />
                     <div className="flex phone:flex-col gap-6">
                         <GenericInput
-                            disabled={itemIsUpdating}
+                            disabled={itemIsUpdating || disabled}
                             register={register}
                             errors={errors}
                             id="quantity"
@@ -161,7 +162,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                             labelPlacement="outside"
                         />
                         <GenericInput
-                            disabled={itemIsUpdating}
+                            disabled={itemIsUpdating || disabled}
                             register={register}
                             errors={errors}
                             id="price"
@@ -183,7 +184,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                         />
                     </div>
                     <GenericButton
-                        isLoading={itemIsUpdating}
+                        isLoading={itemIsUpdating || disabled}
                         variant="flat"
                         type="submit"
                     >
@@ -192,6 +193,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                 </form>
             </GenericModal>
             <GenericButton
+                disabled={disabled}
                 variant="flat"
                 onPress={() => {
                     setModalOpen(true);

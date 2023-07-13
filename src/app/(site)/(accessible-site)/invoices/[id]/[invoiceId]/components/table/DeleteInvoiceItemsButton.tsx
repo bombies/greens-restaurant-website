@@ -13,6 +13,7 @@ import GenericButton from "../../../../../../../_components/inputs/GenericButton
 import axios from "axios";
 
 type Props = {
+    disabled: boolean,
     customerId?: string,
     items: InvoiceItem[],
     dispatchItems: Dispatch<{
@@ -35,12 +36,18 @@ const DeleteItems = (customerId?: string, invoiceId?: string) => {
     return useSWRMutation(`/api/invoices/customer/${customerId}/invoice/${invoiceId}/items`, mutator);
 };
 
-export default function DeleteInvoiceItemsButton({ customerId, items, setSelectedKeys, dispatchItems }: Props) {
+export default function DeleteInvoiceItemsButton({
+                                                     customerId,
+                                                     items,
+                                                     setSelectedKeys,
+                                                     dispatchItems,
+                                                     disabled
+                                                 }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const {
         trigger: triggerItemDeletion,
         isMutating: itemIsDeleting
-    } = DeleteItems(customerId, items[0].invoiceId);
+    } = DeleteItems(customerId, items[0]?.invoiceId);
 
     return (
         <>
@@ -51,6 +58,9 @@ export default function DeleteInvoiceItemsButton({ customerId, items, setSelecte
                 title={`Delete Items`}
                 message={`Are you sure you want to delete all ${items.length} items?`}
                 onAccept={() => {
+                    if (disabled)
+                        return;
+
                     triggerItemDeletion({
                         dto: {
                             itemsToDelete: items.map(item => item.id)
@@ -77,6 +87,7 @@ export default function DeleteInvoiceItemsButton({ customerId, items, setSelecte
                 }}
             />
             <GenericButton
+                disabled={disabled}
                 variant="flat"
                 color="danger"
                 onPress={() => setModalOpen(true)}

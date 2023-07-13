@@ -1,7 +1,7 @@
 "use client";
 
 import { Invoice, InvoiceItem, Prisma } from "@prisma/client";
-import { Key, useCallback, useState } from "react";
+import { Fragment, Key, useCallback, useState } from "react";
 import AddInvoiceItemButton from "./AddInvoiceItemButton";
 import { Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
 import clsx from "clsx";
@@ -74,12 +74,21 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
 
     return (
         <>
-            <SlidingBar visible={!!selectedKeys.length}>
+            <SlidingBar visible={!!selectedKeys.length && mutationAllowed}>
                 {
                     selectedKeys.length > 1 ?
                         <div className="flex phone:flex-col gap-12 phone:gap-2">
                             <p className="self-center">You have multiple items selected</p>
+                            <GenericButton
+                                disabled={!mutationAllowed}
+                                variant="flat"
+                                color="warning"
+                                onPress={() => setSelectedKeys([])}
+                            >
+                                Clear Selection
+                            </GenericButton>
                             <DeleteInvoiceItemsButton
+                                disabled={!mutationAllowed}
                                 customerId={customerId}
                                 items={items.filter(item => selectedKeys
                                     .map(key => key.toString().split("/")[0])
@@ -99,12 +108,22 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                                         <p className="self-center">What would you like to do?</p>
                                         <div className="flex phone:flex-col gap-4 phone:gap-2">
                                             <EditInvoiceItemButton
+                                                disabled={!mutationAllowed}
                                                 customerId={customerId}
                                                 item={items.find(item => item.id === selectedKeys[0].toString().split("/")[0])!}
                                                 dispatchItems={dispatchItems}
                                                 setSelectedKeys={setSelectedKeys}
                                             />
+                                            <GenericButton
+                                                disabled={!mutationAllowed}
+                                                variant="flat"
+                                                color="warning"
+                                                onPress={() => setSelectedKeys([])}
+                                            >
+                                                Clear Selection
+                                            </GenericButton>
                                             <DeleteInvoiceItemButton
+                                                disabled={!mutationAllowed}
                                                 customerId={customerId}
                                                 item={items.find(item => item.id === selectedKeys[0].toString().split("/")[0])!}
                                                 dispatchItems={dispatchItems}
@@ -122,7 +141,7 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
             <div className="!bg-neutral-950/50 border-1 border-white/20 rounded-2xl">
                 <Table
                     color="primary"
-                    selectionMode="multiple"
+                    selectionMode={mutationAllowed ? "multiple" : "none"}
                     selectedKeys={selectedKeys}
                     onSelectionChange={(keys) => {
                         setSelectedKeys(Array.from(keys));
@@ -145,14 +164,19 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                         )}
                     </TableBody>
                 </Table>
-                <Spacer y={3} />
-                <div className="p-6">
-                    <AddInvoiceItemButton
-                        disabled={!mutationAllowed}
-                        invoiceId={invoice?.id}
-                        customerId={customerId}
-                    />
-                </div>
+                {
+                    mutationAllowed &&
+                    <Fragment>
+                        <Spacer y={3} />
+                        <div className="p-6">
+                            <AddInvoiceItemButton
+                                disabled={!mutationAllowed}
+                                invoiceId={invoice?.id}
+                                customerId={customerId}
+                            />
+                        </div>
+                    </Fragment>
+                }
             </div>
         </>
     );
