@@ -66,7 +66,7 @@ export default function DropdownInput({
                         isLoading={isLoading}
                         color={color || "primary"}
                         className="capitalize"
-                        endContent={icon && <GenericImage src={icon} width={1} />}
+                        endContent={icon && <GenericImage src={icon} width={1.5} />}
                     >
                         {selectedValueLabel && selectedValue}
                     </Button>

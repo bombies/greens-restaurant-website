@@ -396,7 +396,6 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             </div>
                             <Spacer y={6} />
                             <Table
-                                isStriped={true}
                                 className="!bg-secondary/20"
                                 aria-label="Stock Table"
                             >

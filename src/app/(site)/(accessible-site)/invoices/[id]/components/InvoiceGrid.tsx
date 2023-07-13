@@ -4,17 +4,18 @@ import { Invoice, InvoiceCustomer } from "@prisma/client";
 import LinkCard from "../../../../../_components/LinkCard";
 import { Divider } from "@nextui-org/divider";
 import SubTitle from "../../../../../_components/text/SubTitle";
-import { Spacer, Tooltip } from "@nextui-org/react";
-import filterIcon from "/public/icons/green-filter.svg";
+import { Button, Checkbox, CheckboxGroup, Popover, PopoverContent, PopoverTrigger, Spacer } from "@nextui-org/react";
+import sortIcon from "/public/icons/green-filter.svg";
+import filterIcon from "/public/icons/filter-green.svg";
 import searchIcon from "/public/icons/search.svg";
 import DropdownInput from "../../../../../_components/inputs/DropdownInput";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import "../../../../../../utils/GeneralUtils";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
 import CardSkeleton from "../../../../../_components/skeletons/CardSkeleton";
-import Title from "../../../../../_components/text/Title";
 import { Chip } from "@nextui-org/chip";
-import InvoicePaidStatus from "../[invoiceId]/components/InvoicePaidStatus";
+import IconButton from "../../../../../_components/inputs/IconButton";
+import GenericImage from "../../../../../_components/GenericImage";
 
 type Props = {
     customerIsLoading: boolean,
@@ -26,6 +27,11 @@ enum SortMode {
     DESCENDING_TITLE = "Z-A",
     ASCENDING_DATE = "Oldest-Newest",
     DESCENDING_DATE = "Newest-Oldest"
+}
+
+enum FilterMode {
+    PAID = "paid",
+    UNPAID = "unpaid"
 }
 
 const getSortPredicate = (a: Invoice, b: Invoice, sortMode: SortMode): number => {
@@ -48,12 +54,25 @@ const getSortPredicate = (a: Invoice, b: Invoice, sortMode: SortMode): number =>
     }
 };
 
+const getFilterPredicate = (item: Invoice, filterModes?: FilterMode[]): boolean => {
+    if (!filterModes || !filterModes.length)
+        return true;
+
+    const paidPredicate = (): boolean => item.paid === true;
+    const unpaidPredicate = () => item.paid !== true;
+
+    return ((filterModes.includes(FilterMode.PAID)) && paidPredicate()) ||
+        ((filterModes.includes(FilterMode.UNPAID)) && unpaidPredicate());
+};
+
 export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
     const [sortMode, setSortMode] = useState([SortMode.DESCENDING_DATE]);
+    const [filterModes, setFilterModes] = useState<FilterMode[]>([]);
     const [search, setSearch] = useState<string>();
 
     const invoiceCards = useMemo(() => {
         return customer?.invoices
+            .filter(invoice => getFilterPredicate(invoice, filterModes))
             .filter(invoice => {
                 if (!search)
                     return true;
@@ -103,7 +122,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                     </div>
                 </LinkCard>
             ));
-    }, [customer?.id, customer?.invoices, search, sortMode]);
+    }, [customer?.id, customer?.invoices, search, sortMode, filterModes]);
 
     return (
         <div className="default-container p-12">
@@ -111,13 +130,36 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                 <SubTitle className="self-center">All Invoices</SubTitle>
                 <DropdownInput
                     labelIsIcon
-                    icon={filterIcon}
+                    icon={sortIcon}
                     variant="flat"
                     selectionRequired
                     keys={[SortMode.ASCENDING_TITLE, SortMode.DESCENDING_TITLE, SortMode.DESCENDING_DATE, SortMode.ASCENDING_DATE]}
                     selectedKeys={sortMode}
                     setSelectedKeys={(keys) => setSortMode((Array.from(keys) as SortMode[]))}
                 />
+                <Popover
+                    classNames={{
+                        base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6"
+                    }}
+                    placement="bottom"
+                >
+                    <PopoverTrigger>
+                        <Button isIconOnly variant="flat" color="secondary">
+                            <GenericImage className="self-center" src={filterIcon} width={1.35} />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        <CheckboxGroup
+                            label="Filter"
+                            color="secondary"
+                            value={filterModes}
+                            onValueChange={setFilterModes}
+                        >
+                            <Checkbox value={FilterMode.PAID}>Paid</Checkbox>
+                            <Checkbox value={FilterMode.UNPAID}>Unpaid</Checkbox>
+                        </CheckboxGroup>
+                    </PopoverContent>
+                </Popover>
             </div>
             <Divider className="my-6" />
             <div className="w-1/4 tablet:w-1/2 phone:w-full">
