@@ -104,10 +104,10 @@ export default function InvoiceLayout({ customerId }: Props) {
                     :
                     <InvoiceTable
                         customerId={customer?.id}
-                        mutationAllowed={hasAnyPermission(
+                        mutationAllowed={invoice?.paid === false ? hasAnyPermission(
                             userData?.permissions,
                             [Permission.CREATE_INVOICE]
-                        )}
+                        ) : false}
                     />
             }
 
