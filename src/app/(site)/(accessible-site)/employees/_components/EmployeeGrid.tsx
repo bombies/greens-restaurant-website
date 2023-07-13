@@ -20,6 +20,10 @@ export async function fetcher<T>(url: string): Promise<T | undefined> {
     }
 }
 
+export interface SWRArgs {
+    arg: any;
+}
+
 const useEmployeeInfo = () => {
     return useSWR("/api/users", fetcher<User[]>);
 };
@@ -46,9 +50,9 @@ export default function EmployeeGrid() {
     useEffect(() => {
         if (employeeInfo == null)
             return;
-        
-        const validEmployees = extractValidEmployees(employeeInfo, session.data?.user?.username)
-        
+
+        const validEmployees = extractValidEmployees(employeeInfo, session.data?.user?.username);
+
         if (search.length === 0) {
             setVisibleEmployees(validEmployees);
             return;

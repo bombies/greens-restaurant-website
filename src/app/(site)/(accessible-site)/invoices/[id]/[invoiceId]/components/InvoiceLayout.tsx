@@ -12,27 +12,23 @@ import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 import { Invoice, InvoiceItem } from "@prisma/client";
 import SubTitle from "../../../../../../_components/text/SubTitle";
-import InvoiceTable from "./table/InvoiceTable";
+import InvoiceTable, { invoiceColumns } from "./table/InvoiceTable";
 import { Divider } from "@nextui-org/divider";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 import { Spinner } from "@nextui-org/spinner";
-import { Chip } from "@nextui-org/chip";
 import InvoicePaidStatus from "./InvoicePaidStatus";
+import TableSkeleton from "../../../../../../_components/skeletons/TableSkeleton";
+import { useInvoice } from "./InvoiceProvider";
+import { useInvoiceItems } from "./InvoiceItemsProvider";
 
 type Props = {
-    customerId: string,
-    invoiceId: string
+    customerId: string
 }
 
-const FetchInvoice = (customerId: string, invoiceId: string) => {
-    return useSWR(`/api/invoices/customer/${customerId}/invoice/${invoiceId}`, fetcher<Invoice & {
-        invoiceItems: InvoiceItem[]
-    }>);
-};
-
-export default function InvoiceLayout({ customerId, invoiceId }: Props) {
+export default function InvoiceLayout({ customerId }: Props) {
     const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(customerId);
-    const { data: invoice, isLoading: invoiceIsLoading } = FetchInvoice(customerId, invoiceId);
+    const { data: invoice, isLoading: invoiceIsLoading } = useInvoice();
+    const { state: invoiceItems, dispatch: dispatchInvoiceItems } = useInvoiceItems();
     const { data: userData, isLoading: userDataIsLoading } = useUserData();
     const router = useRouter();
 
@@ -76,10 +72,10 @@ export default function InvoiceLayout({ customerId, invoiceId }: Props) {
                                 <p className="text-neutral-500 max-w-fit break-words">{invoice?.description}</p>
                                 <Divider className="my-3" />
                                 {
-                                    invoice &&
+                                    invoiceItems &&
                                     <p className="font-semibold">
                                         Total: <span className="text-primary">{
-                                        dollarFormat.format(Number(invoice.invoiceItems
+                                        dollarFormat.format(Number(invoiceItems
                                             .map(item => item.quantity * item.price)
                                             .reduce((prev, acc) => prev + acc, 0)))
                                     }</span>
@@ -100,14 +96,21 @@ export default function InvoiceLayout({ customerId, invoiceId }: Props) {
                     )}
             />
             <Spacer y={6} />
-            <InvoiceTable
-                customerId={customer?.id}
-                invoice={invoice}
-                mutationAllowed={hasAnyPermission(
-                    userData?.permissions,
-                    [Permission.CREATE_INVOICE]
-                )}
-            />
+            {
+                invoiceIsLoading ?
+                    <div className="!bg-neutral-950/50 border-1 border-white/20 rounded-2xl flex justify-center">
+                        <TableSkeleton columns={invoiceColumns} />
+                    </div>
+                    :
+                    <InvoiceTable
+                        customerId={customer?.id}
+                        mutationAllowed={hasAnyPermission(
+                            userData?.permissions,
+                            [Permission.CREATE_INVOICE]
+                        )}
+                    />
+            }
+
         </div>
     );
 }

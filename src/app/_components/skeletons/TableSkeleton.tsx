@@ -29,7 +29,6 @@ export default function TableSkeleton({ width, contentRepeat, columns }: Props) 
 
     return (
         <Table
-            isStriped={true}
             className="!bg-secondary/20"
             aria-label="Stock Table"
             style={{

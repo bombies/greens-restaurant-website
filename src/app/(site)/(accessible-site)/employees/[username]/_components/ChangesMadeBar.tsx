@@ -1,10 +1,9 @@
 "use client";
 
-import { CSSTransition } from "react-transition-group";
-import { useRef } from "react";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import saveIcon from "/public/icons/save.svg";
 import trashIcon from "/public/icons/trash.svg";
+import SlidingBar from "../../../../../_components/SlidingBar";
 
 type Props = {
     changesMade: boolean,
@@ -14,42 +13,27 @@ type Props = {
 }
 
 export default function ChangesMadeBar({ changesMade, onAccept, onReject, isChanging }: Props) {
-    const nodeRef = useRef(null);
-
     return (
-        <div className="fixed flex z-[200] pointer-events-none justify-center top-0 left-0 w-full h-full">
-            <CSSTransition
-                nodeRef={nodeRef}
-                in={changesMade}
-                timeout={500}
-                classNames="changes-made"
-                unmountOnExit
-            >
-                <div
-                    ref={nodeRef}
-                    className="flex gap-12 tablet:gap-4 absolute pointer-events-auto bottom-5 default-container p-12 backdrop-blur-md"
+        <SlidingBar visible={changesMade}>
+            <p className="text-xl phone:text-lg self-center">Careful - You have unsaved changes!</p>
+            <div className="flex tablet:flex-col gap-4">
+                <GenericButton
+                    onPress={() => onAccept()}
+                    disabled={!changesMade || isChanging}
+                    isLoading={isChanging}
+                    icon={saveIcon}
                 >
-                    <p className="text-xl phone:text-lg self-center">Careful - You have unsaved changes!</p>
-                    <div className="flex tablet:flex-col gap-4">
-                        <GenericButton
-                            onPress={() => onAccept()}
-                            disabled={!changesMade || isChanging}
-                            isLoading={isChanging}
-                            icon={saveIcon}
-                        >
-                            Save
-                        </GenericButton>
-                        <GenericButton
-                            color="danger"
-                            onPress={() => onReject()}
-                            disabled={!changesMade || isChanging}
-                            icon={trashIcon}
-                        >
-                            Discard
-                        </GenericButton>
-                    </div>
-                </div>
-            </CSSTransition>
-        </div>
+                    Save
+                </GenericButton>
+                <GenericButton
+                    color="danger"
+                    onPress={() => onReject()}
+                    disabled={!changesMade || isChanging}
+                    icon={trashIcon}
+                >
+                    Discard
+                </GenericButton>
+            </div>
+        </SlidingBar>
     );
 }

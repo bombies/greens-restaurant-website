@@ -1,4 +1,6 @@
 import InvoiceLayout from "./components/InvoiceLayout";
+import { InvoiceProvider } from "./components/InvoiceProvider";
+import { InvoiceItemsProvider } from "./components/InvoiceItemsProvider";
 
 type Context = {
     params: {
@@ -9,6 +11,10 @@ type Context = {
 
 export default function InvoicePage({ params }: Context) {
     return (
-        <InvoiceLayout customerId={params.id} invoiceId={params.invoiceId} />
+        <InvoiceProvider customerId={params.id} invoiceId={params.invoiceId}>
+            <InvoiceItemsProvider>
+                <InvoiceLayout customerId={params.id} />
+            </InvoiceItemsProvider>
+        </InvoiceProvider>
     );
 }
