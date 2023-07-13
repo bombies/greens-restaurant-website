@@ -68,7 +68,7 @@ export function POST(req: Request, { params }: Context) {
     }, [Permission.CREATE_INVOICE]);
 }
 
-export type UpdateInvoiceDto = Partial<CreateInvoiceDto>;
+export type UpdateInvoiceDto = Partial<CreateInvoiceDto> & { paid?: boolean };
 
 export function PATCH(req: Request, { params }: Context) {
     return authenticated(req, async () => {

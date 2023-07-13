@@ -104,9 +104,10 @@ model InvoiceCustomer {
 }
 
 model Invoice {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String?
+  paid        Boolean?
 
   customerId String          @db.ObjectId
   customer   InvoiceCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)

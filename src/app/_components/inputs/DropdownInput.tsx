@@ -7,6 +7,8 @@ import GenericImage from "../GenericImage";
 
 export type DropdownInputProps = {
     label?: string,
+    color?: "primary" | "secondary" | "success" | "danger" | "warning"
+    isLoading?: boolean,
     variant?: "light" | "shadow" | "flat" | "solid" | "bordered" | "faded" & Partial<"ghost">
     multiSelect?: boolean,
     selectionRequired?: boolean,
@@ -30,7 +32,9 @@ export default function DropdownInput({
                                           disabled,
                                           icon,
                                           selectedValueLabel,
-                                          labelIsIcon
+                                          color,
+                                          labelIsIcon,
+                                          isLoading
                                       }: DropdownInputProps) {
     const keyElements = keys.map(key => (
         <DropdownItem
@@ -58,8 +62,9 @@ export default function DropdownInput({
                     <Button
                         isIconOnly={labelIsIcon}
                         variant={variant}
-                        disabled={disabled}
-                        color="primary"
+                        disabled={disabled || isLoading}
+                        isLoading={isLoading}
+                        color={color || "primary"}
                         className="capitalize"
                         endContent={icon && <GenericImage src={icon} width={1} />}
                     >
@@ -67,13 +72,13 @@ export default function DropdownInput({
                     </Button>
                 </DropdownTrigger>
                 <DropdownMenu
-                    color="primary"
+                    color={color || "primary"}
                     variant={variant}
                     disallowEmptySelection={selectionRequired}
                     selectedKeys={selectedKeys}
                     onSelectionChange={setSelectedKeys}
                     selectionMode={multiSelect ? "multiple" : "single"}
-                    disabledKeys={disabled ? keys : undefined}
+                    disabledKeys={(disabled || isLoading) ? keys : undefined}
                 >
                     {keyElements}
                 </DropdownMenu>

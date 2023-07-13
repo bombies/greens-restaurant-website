@@ -13,6 +13,8 @@ import "../../../../../../utils/GeneralUtils";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
 import CardSkeleton from "../../../../../_components/skeletons/CardSkeleton";
 import Title from "../../../../../_components/text/Title";
+import { Chip } from "@nextui-org/chip";
+import InvoicePaidStatus from "../[invoiceId]/components/InvoicePaidStatus";
 
 type Props = {
     customerIsLoading: boolean,
@@ -64,7 +66,15 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                     href={`/invoices/${customer?.id}/${invoice.id}`}
                     toolTip={
                         <div className="p-6">
-                            <p className="text-primary text-xl max-w-md break-words font-bold drop-shadow">{invoice.title}</p>
+                            <div className="flex gap-4">
+                                <p className="text-primary text-xl max-w-md break-words font-bold drop-shadow self-center">{invoice.title}</p>
+                                <Chip
+                                    variant="flat"
+                                    color={invoice?.paid ? "success" : "danger"}
+                                >
+                                    {invoice?.paid ? "PAID" : "UNPAID"}
+                                </Chip>
+                            </div>
                             <Spacer y={3} />
                             <p className="max-w-lg break-words">{invoice.description}</p>
                             <Divider className="my-3" />
@@ -76,7 +86,15 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                     }
                 >
                     <div className="flex flex-col gap-2">
-                        <p>{invoice.title}</p>
+                        <div className="flex gap-4">
+                            <p className="break-words self-center">{invoice.title}</p>
+                            <Chip
+                                variant="flat"
+                                color={invoice?.paid ? "success" : "danger"}
+                            >
+                                {invoice?.paid ? "PAID" : "UNPAID"}
+                            </Chip>
+                        </div>
                         <Divider />
                         {invoice.description && <>
                             <p className="text-sm text-neutral-500 max-w-[17rem] tablet:max-w-[10rem] whitespace-nowrap overflow-hidden overflow-ellipsis">{invoice.description}</p>

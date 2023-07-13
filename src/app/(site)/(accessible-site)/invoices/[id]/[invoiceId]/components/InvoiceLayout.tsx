@@ -16,6 +16,8 @@ import InvoiceTable from "./table/InvoiceTable";
 import { Divider } from "@nextui-org/divider";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 import { Spinner } from "@nextui-org/spinner";
+import { Chip } from "@nextui-org/chip";
+import InvoicePaidStatus from "./InvoicePaidStatus";
 
 type Props = {
     customerId: string,
@@ -52,7 +54,7 @@ export default function InvoiceLayout({ customerId, invoiceId }: Props) {
                         {customerIsLoading ? "Unknown" : customer?.customerName}
                     </span>
                 </Title>
-                <div className="default-container max-w-[40%] min-w-[25%] tablet:w-full tablet:mt-6 p-6">
+                <div className="default-container max-w-[40%] min-w-[25%] tablet:max-w-full tablet:mt-6 p-6">
                     {
                         invoiceIsLoading ?
                             <div className="flex justify-center">
@@ -60,9 +62,17 @@ export default function InvoiceLayout({ customerId, invoiceId }: Props) {
                             </div>
                             :
                             <>
-                                <SubTitle className="self-center capitalize break-words">
-                                    {invoice?.title}
-                                </SubTitle>
+                                <div className="flex gap-4">
+                                    <SubTitle className="self-center capitalize break-words">
+                                        {invoice?.title}
+                                    </SubTitle>
+                                    <InvoicePaidStatus
+                                        initialStatus={invoice?.paid}
+                                        customerId={customer?.id}
+                                        invoiceId={invoice?.id}
+                                    />
+                                </div>
+
                                 <p className="text-neutral-500 max-w-fit break-words">{invoice?.description}</p>
                                 <Divider className="my-3" />
                                 {
