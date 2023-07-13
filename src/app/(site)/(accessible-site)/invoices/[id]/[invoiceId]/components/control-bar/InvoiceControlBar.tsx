@@ -9,11 +9,12 @@ import DeleteInvoiceButton from "./DeleteInvoiceButton";
 
 type Props = {
     customer?: InvoiceCustomer,
-    invoice?: Invoice & { invoiceItems: InvoiceItem[] },
+    invoice?: Invoice,
+    invoiceItems?: InvoiceItem[]
     controlsEnabled?: boolean
 }
 
-export default function InvoiceControlBar({ customer, invoice, controlsEnabled }: Props) {
+export default function InvoiceControlBar({ customer, invoice, invoiceItems, controlsEnabled }: Props) {
     return (
         <div className="default-container p-12">
             <GoBackButton customerId={customer?.id} />
@@ -27,6 +28,7 @@ export default function InvoiceControlBar({ customer, invoice, controlsEnabled }
                 <ExportInvoiceButton
                     customer={customer}
                     invoice={invoice}
+                    invoiceItems={invoiceItems}
                     disabled={!controlsEnabled}
                 />
                 <DeleteInvoiceButton

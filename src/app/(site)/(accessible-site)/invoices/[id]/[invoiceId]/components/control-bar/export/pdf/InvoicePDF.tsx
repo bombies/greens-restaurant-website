@@ -8,7 +8,8 @@ import InvoicePDFTable from "./table/InvoicePDFTable";
 type PDFProps = {
     companyInfo?: InvoiceInformation,
     customerInfo?: InvoiceCustomer,
-    invoice?: Invoice & { invoiceItems: InvoiceItem[] }
+    invoice?: Invoice,
+    invoiceItems?: InvoiceItem[]
 }
 
 const styles = StyleSheet.create({
@@ -19,13 +20,13 @@ const styles = StyleSheet.create({
     }
 });
 
-export default function InvoicePDF({ companyInfo, customerInfo, invoice }: PDFProps) {
+export default function InvoicePDF({ companyInfo, customerInfo, invoice, invoiceItems }: PDFProps) {
     return (
         <Document>
             <Page size="LETTER" style={styles.body}>
                 <InvoicePDFHeader invoice={invoice} companyInfo={companyInfo} />
                 <InvoicePDFRecipient companyInfo={companyInfo} customerInfo={customerInfo} />
-                <InvoicePDFTable invoiceItems={invoice?.invoiceItems} />
+                <InvoicePDFTable invoiceItems={invoiceItems} />
             </Page>
         </Document>
     );

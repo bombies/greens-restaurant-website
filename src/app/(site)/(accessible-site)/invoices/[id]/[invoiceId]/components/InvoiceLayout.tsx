@@ -28,7 +28,7 @@ type Props = {
 export default function InvoiceLayout({ customerId }: Props) {
     const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(customerId);
     const { data: invoice, isLoading: invoiceIsLoading } = useInvoice();
-    const { state: invoiceItems, dispatch: dispatchInvoiceItems } = useInvoiceItems();
+    const { state: invoiceItems } = useInvoiceItems();
     const { data: userData, isLoading: userDataIsLoading } = useUserData();
     const router = useRouter();
 
@@ -89,6 +89,7 @@ export default function InvoiceLayout({ customerId }: Props) {
             <InvoiceControlBar
                 customer={customer}
                 invoice={invoice}
+                invoiceItems={invoiceItems}
                 controlsEnabled={
                     hasAnyPermission(
                         userData?.permissions,

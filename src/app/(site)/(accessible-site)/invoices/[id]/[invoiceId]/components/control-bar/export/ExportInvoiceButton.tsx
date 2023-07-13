@@ -8,11 +8,12 @@ import InvoicePDF from "./pdf/InvoicePDF";
 
 type Props = {
     customer?: InvoiceCustomer
-    invoice?: Invoice & { invoiceItems: InvoiceItem[] }
+    invoice?: Invoice,
+    invoiceItems?: InvoiceItem[]
     disabled: boolean
 }
 
-export default function ExportInvoiceButton({ customer, invoice, disabled }: Props) {
+export default function ExportInvoiceButton({ customer, invoice, invoiceItems, disabled }: Props) {
     const { data: companyInfo, isLoading: companyInfoIsLoading } = FetchCompanyInfo();
 
     return (
@@ -22,6 +23,7 @@ export default function ExportInvoiceButton({ customer, invoice, disabled }: Pro
                     companyInfo={companyInfo}
                     customerInfo={customer}
                     invoice={invoice}
+                    invoiceItems={invoiceItems}
                 />}
                 fileName={`${invoice?.title}-${customer?.customerName}.pdf`}
             >

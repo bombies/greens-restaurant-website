@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
 });
 
 type Props = {
-    invoice?: Invoice & { invoiceItems: InvoiceItem[] },
+    invoice?: Invoice,
     companyInfo?: InvoiceInformation
 }
 
