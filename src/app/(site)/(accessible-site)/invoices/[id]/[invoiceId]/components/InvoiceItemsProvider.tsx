@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer } from "react";
 import { useInvoice } from "./InvoiceProvider";
 import { InvoiceItem } from "@prisma/client";
 import { UpdateInvoiceItemDto } from "../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/[itemId]/route";
@@ -8,20 +8,22 @@ import { UpdateInvoiceItemDto } from "../../../../../../api/invoices/customer/[i
 export enum InvoiceItemChangeAction {
     UPDATE,
     CLEAR,
-    SET
+    SET,
+    REMOVE,
+    REMOVE_MANY
 }
 
 const InvoiceItemsContext = React.createContext<{
     state: InvoiceItem[],
     dispatch: React.Dispatch<{
         type: InvoiceItemChangeAction,
-        payload?: { id: string } & UpdateInvoiceItemDto | InvoiceItem[]
+        payload?: { id: string } & UpdateInvoiceItemDto | InvoiceItem[] | string[]
     }>
 } | undefined>(undefined);
 
 const reducer = (state: InvoiceItem[], action: {
     type: InvoiceItemChangeAction,
-    payload?: { id: string } & UpdateInvoiceItemDto | InvoiceItem[]
+    payload?: { id: string } & UpdateInvoiceItemDto | InvoiceItem[] | string[]
 }) => {
     if (!action)
         return [];
@@ -49,7 +51,25 @@ const reducer = (state: InvoiceItem[], action: {
         case InvoiceItemChangeAction.SET: {
             if (!Array.isArray(action.payload))
                 throw new Error("The payload must be an array when setting new items!");
-            newState = action.payload;
+            newState = action.payload as InvoiceItem[];
+            break;
+        }
+        case InvoiceItemChangeAction.REMOVE: {
+            if (typeof action.payload !== "object")
+                throw new Error("The payload must be an object when removing an item!");
+
+            const index = state.findIndex(item => item.id === (action.payload as {
+                id: string
+            })?.id);
+
+            newState.splice(index);
+            break;
+        }
+        case InvoiceItemChangeAction.REMOVE_MANY: {
+            if (!Array.isArray(action.payload))
+                throw new Error("The payload must be an array when removing many items!");
+
+            newState = newState.filter(item => !(action.payload as string[]).includes(item.id));
             break;
         }
     }

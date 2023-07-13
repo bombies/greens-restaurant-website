@@ -131,6 +131,8 @@ export default function AddInvoiceItemButton({ customerId, invoiceId, disabled }
                     <GenericButton
                         variant="flat"
                         type="submit"
+                        disabled={itemIsAdding || disabled}
+                        isLoading={itemIsAdding}
                     >
                         Add Item
                     </GenericButton>

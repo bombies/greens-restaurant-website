@@ -11,6 +11,8 @@ import GenericButton from "../../../../../../../_components/inputs/GenericButton
 import EditInvoiceItemButton from "./EditInvoiceItemButton";
 import { useInvoice } from "../InvoiceProvider";
 import { useInvoiceItems } from "../InvoiceItemsProvider";
+import DeleteInvoiceItemButton from "./DeleteInvoiceItemButton";
+import DeleteInvoiceItemsButton from "./DeleteInvoiceItemsButton";
 
 type Column = {
     key: string,
@@ -77,7 +79,15 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                     selectedKeys.length > 1 ?
                         <div className="flex phone:flex-col gap-12 phone:gap-2">
                             <p className="self-center">You have multiple items selected</p>
-                            <GenericButton variant="flat" color="danger">Delete Items</GenericButton>
+                            <DeleteInvoiceItemsButton
+                                customerId={customerId}
+                                items={items.filter(item => selectedKeys
+                                    .map(key => key.toString().split("/")[0])
+                                    .includes(item.id)
+                                )}
+                                dispatchItems={dispatchItems}
+                                setSelectedKeys={setSelectedKeys}
+                            />
                         </div>
                         :
                         (selectedKeys.length === 1 ?
@@ -94,7 +104,12 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                                                 dispatchItems={dispatchItems}
                                                 setSelectedKeys={setSelectedKeys}
                                             />
-                                            <GenericButton variant="flat" color="danger">Delete</GenericButton>
+                                            <DeleteInvoiceItemButton
+                                                customerId={customerId}
+                                                item={items.find(item => item.id === selectedKeys[0].toString().split("/")[0])!}
+                                                dispatchItems={dispatchItems}
+                                                setSelectedKeys={setSelectedKeys}
+                                            />
                                         </div>
                                     </div>
                                 </div>

@@ -17,6 +17,10 @@ type Props = {
 export default function ConfirmationModal({ isOpen, setOpen, title, message, onAccept, accepting }: Props) {
     return (
         <GenericModal
+            classNames={{
+                wrapper: "z-[202]",
+                backdrop: "z-[201]"
+            }}
             title={title}
             isOpen={isOpen}
             onClose={() => setOpen(false)}
