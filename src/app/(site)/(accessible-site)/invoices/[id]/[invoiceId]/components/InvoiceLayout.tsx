@@ -4,7 +4,7 @@ import Title from "../../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
 import { useUserData } from "../../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { FetchInvoiceCustomer } from "../../components/InvoiceCustomerLayout";
 import InvoiceControlBar from "./control-bar/InvoiceControlBar";
@@ -85,17 +85,26 @@ export default function InvoiceLayout({ customerId }: Props) {
                     }
                 </div>
             </div>
-            <Spacer y={6} />
-            <InvoiceControlBar
-                customer={customer}
-                invoice={invoice}
-                invoiceItems={invoiceItems}
-                controlsEnabled={
-                    hasAnyPermission(
-                        userData?.permissions,
-                        [Permission.CREATE_INVOICE]
-                    )}
-            />
+            {
+                hasAnyPermission(
+                    userData?.permissions,
+                    [Permission.CREATE_INVOICE]
+                )
+                &&
+                <Fragment>
+                    <Spacer y={6} />
+                    <InvoiceControlBar
+                        customer={customer}
+                        invoice={invoice}
+                        invoiceItems={invoiceItems}
+                        controlsEnabled={
+                            hasAnyPermission(
+                                userData?.permissions,
+                                [Permission.CREATE_INVOICE]
+                            )}
+                    />
+                </Fragment>
+            }
             <Spacer y={6} />
             {
                 invoiceIsLoading ?

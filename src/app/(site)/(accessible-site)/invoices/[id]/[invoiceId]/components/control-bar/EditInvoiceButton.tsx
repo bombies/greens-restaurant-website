@@ -11,6 +11,7 @@ import ChangesMadeBar from "../../../../../employees/[username]/_components/Chan
 import { sendToast } from "../../../../../../../../utils/Hooks";
 import EditableField from "../../../../../employees/[username]/_components/EditableField";
 import { Spacer } from "@nextui-org/react";
+import editIcon from "/public/icons/edit-green.svg";
 
 type Props = {
     customerId?: string
@@ -98,6 +99,7 @@ export default function EditInvoiceButton({ customerId, invoice, disabled }: Pro
             <GenericButton
                 variant="flat"
                 onPress={() => setModalOpen(true)}
+                icon={editIcon}
             >
                 Edit Invoice Information
             </GenericButton>

@@ -8,6 +8,7 @@ import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../../../../utils/Hooks";
 import { InvoiceItemChangeAction } from "../InvoiceItemsProvider";
+import trashIcon from "/public/icons/red-trash.svg";
 
 type Props = {
     disabled: boolean,
@@ -70,6 +71,7 @@ export default function DeleteInvoiceItemButton({ customerId, item, setSelectedK
                 variant="flat"
                 color="danger"
                 onPress={() => setModalOpen(true)}
+                icon={trashIcon}
             >Delete</GenericButton>
         </>
     );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericModal from "../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import { InvoiceCustomer } from "@prisma/client";
@@ -13,6 +12,7 @@ import EditableField from "../../../../employees/[username]/_components/Editable
 import { Spacer } from "@nextui-org/react";
 import { CUSTOMER_NAME_REGEX, EMAIL_REGEX } from "../../../../../../../utils/regex";
 import { sendToast } from "../../../../../../../utils/Hooks";
+import editIcon from "/public/icons/edit-green.svg";
 
 type Props = {
     customer?: InvoiceCustomer,
@@ -121,6 +121,7 @@ export default function EditCustomerButton({ customer, disabled }: Props) {
                 variant="flat"
                 onPress={() => setModalOpen(true)}
                 disabled={disabled}
+                icon={editIcon}
             >
                 Edit Customer Information
             </GenericButton>

@@ -8,6 +8,7 @@ import ConfirmationModal from "../../../../../../../_components/ConfirmationModa
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { sendToast } from "../../../../../../../../utils/Hooks";
+import trashIcon from "/public/icons/red-trash.svg";
 
 type Props = {
     customerId?: string
@@ -55,6 +56,7 @@ export default function DeleteInvoiceButton({ customerId, invoice, disabled }: P
                 color="danger"
                 variant="flat"
                 onPress={() => setModalOpen(true)}
+                icon={trashIcon}
             >
                 Delete Invoice
             </GenericButton>

@@ -4,6 +4,8 @@ import GenericModal from "./GenericModal";
 import React, { Dispatch, SetStateAction } from "react";
 import GenericButton from "./inputs/GenericButton";
 import { Spacer } from "@nextui-org/react";
+import checkIcon from "/public/icons/check-circled.svg";
+import closeIcon from "/public/icons/close-red-circled.svg";
 
 type Props = {
     isOpen: boolean,
@@ -34,6 +36,7 @@ export default function ConfirmationModal({ isOpen, setOpen, title, message, onA
                         onAccept();
                     }}
                     isLoading={accepting}
+                    icon={checkIcon}
                 >
                     I&apos;m sure
                 </GenericButton>
@@ -44,6 +47,7 @@ export default function ConfirmationModal({ isOpen, setOpen, title, message, onA
                     onPress={() => {
                         setOpen(false);
                     }}
+                    icon={closeIcon}
                 >
                     Never mind
                 </GenericButton>

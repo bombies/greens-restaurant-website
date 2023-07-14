@@ -5,6 +5,7 @@ import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { FetchCompanyInfo } from "../../../../../../inventory/_components/CompanyInvoiceCard";
 import InvoicePDF from "./pdf/InvoicePDF";
+import exportIcon from "/public/icons/export-gold.svg";
 
 type Props = {
     customer?: InvoiceCustomer
@@ -33,6 +34,7 @@ export default function ExportInvoiceButton({ customer, invoice, invoiceItems, d
                         disabled={disabled || companyInfoIsLoading || loading}
                         color="warning"
                         variant="flat"
+                        icon={exportIcon}
                     >
                         {loading ? "Generating PDF" : "Export Invoice"}
                     </GenericButton>

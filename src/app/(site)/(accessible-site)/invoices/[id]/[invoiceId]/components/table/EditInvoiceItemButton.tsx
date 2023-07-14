@@ -14,6 +14,7 @@ import axios from "axios";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import { sendToast } from "../../../../../../../../utils/Hooks";
 import { InvoiceItemChangeAction } from "../InvoiceItemsProvider";
+import editIcon from "/public/icons/edit-green.svg";
 
 type Props = {
     disabled: boolean,
@@ -187,6 +188,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                         isLoading={itemIsUpdating || disabled}
                         variant="flat"
                         type="submit"
+                        icon={editIcon}
                     >
                         Edit Item
                     </GenericButton>
@@ -198,6 +200,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                 onPress={() => {
                     setModalOpen(true);
                 }}
+                icon={editIcon}
             >Edit</GenericButton>
         </>
     );

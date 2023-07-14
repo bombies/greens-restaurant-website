@@ -9,6 +9,7 @@ import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { useRouter } from "next/navigation";
 import { sendToast } from "../../../../../../../utils/Hooks";
+import trashIcon from "/public/icons/red-trash.svg";
 
 type Props = {
     customer?: InvoiceCustomer,
@@ -55,6 +56,7 @@ export default function DeleteCustomerButton({ customer, disabled }: Props) {
                 color="danger"
                 variant="flat"
                 onPress={() => setModalOpen(true)}
+                icon={trashIcon}
             >
                 Delete {customer?.customerName.capitalize()}
             </GenericButton>

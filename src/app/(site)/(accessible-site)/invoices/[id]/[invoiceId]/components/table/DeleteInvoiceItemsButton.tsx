@@ -11,6 +11,7 @@ import ConfirmationModal from "../../../../../../../_components/ConfirmationModa
 import { sendToast } from "../../../../../../../../utils/Hooks";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import axios from "axios";
+import trashIcon from "/public/icons/red-trash.svg";
 
 type Props = {
     disabled: boolean,
@@ -91,6 +92,7 @@ export default function DeleteInvoiceItemsButton({
                 variant="flat"
                 color="danger"
                 onPress={() => setModalOpen(true)}
+                icon={trashIcon}
             >Delete Items</GenericButton>
         </>
     );

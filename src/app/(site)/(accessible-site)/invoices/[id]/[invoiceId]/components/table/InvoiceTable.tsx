@@ -13,6 +13,8 @@ import { useInvoice } from "../InvoiceProvider";
 import { useInvoiceItems } from "../InvoiceItemsProvider";
 import DeleteInvoiceItemButton from "./DeleteInvoiceItemButton";
 import DeleteInvoiceItemsButton from "./DeleteInvoiceItemsButton";
+import closeIcon from "/public/icons/close-gold-circled.svg";
+
 
 type Column = {
     key: string,
@@ -84,6 +86,7 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                                 variant="flat"
                                 color="warning"
                                 onPress={() => setSelectedKeys([])}
+                                icon={closeIcon}
                             >
                                 Clear Selection
                             </GenericButton>
@@ -119,6 +122,7 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                                                 variant="flat"
                                                 color="warning"
                                                 onPress={() => setSelectedKeys([])}
+                                                icon={closeIcon}
                                             >
                                                 Clear Selection
                                             </GenericButton>
