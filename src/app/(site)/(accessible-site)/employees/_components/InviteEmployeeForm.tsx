@@ -58,6 +58,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
             .catch((err) => {
                 console.error(err);
                 sendToast({
+                    error: err,
                     description: "Could not send invitation!"
                 }, {
                     position: "top-center"
@@ -82,7 +83,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
             lastName: data.lastName,
             email: data.newEmail,
             username: data.newUsername,
-            permissions: selectedPermissions?.reduce((acc, next) => acc + next) || 0
+            permissions: selectedPermissions?.reduce((acc, next) => acc + next) ?? 0
         };
         setInviteInfo(inviteData);
     };

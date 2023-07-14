@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     return await authenticated(req, async () => {
         const { firstName, lastName, username, email, permissions }: InviteDto = await req.json();
 
-        if (!username || !email || !permissions)
+        if (!username || !email || permissions === undefined)
             return respond({ message: "Malformed payload!", init: { status: 401 } });
 
         const existingUser = await prisma.user.findMany({
