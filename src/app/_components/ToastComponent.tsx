@@ -5,7 +5,6 @@ import { StaticImageData } from "next/image";
 import GenericImage from "./GenericImage";
 import clsx from "clsx";
 import { JSX } from "react";
-import { NormalColors } from "@nextui-org/shared-utils";
 
 type Props = {
     toastObj: Toast
@@ -17,7 +16,6 @@ export type ToastDataProps = {
     description: string,
     icon?: string | StaticImageData
     svgIcon?: JSX.Element
-    type?: NormalColors
 }
 
 export default function ToastComponent(props: Props) {

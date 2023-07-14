@@ -43,18 +43,12 @@ export default function HomePage() {
                 if (cb?.error) {
                     sendToast({
                         description: "Invalid credentials! Please check your details and try again.",
-                        icon: close,
-                        type: "error"
-                    }, {
-                        position: "top-center"
+                        icon: close
                     });
                 } else if (cb?.ok) {
                     sendToast({
                         description: "Logged in!",
-                        icon: check,
-                        type: "primary"
-                    }, {
-                        position: "top-center"
+                        icon: check
                     });
                 }
             })

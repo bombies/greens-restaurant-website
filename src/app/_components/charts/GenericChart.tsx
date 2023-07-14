@@ -17,7 +17,6 @@ type Props = {
     type?: "line"
         | "area"
         | "bar"
-        | "histogram"
         | "pie"
         | "donut"
         | "radialBar"
