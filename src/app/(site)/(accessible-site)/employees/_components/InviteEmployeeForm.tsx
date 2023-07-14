@@ -7,7 +7,7 @@ import { Divider } from "@nextui-org/divider";
 import GenericButton from "../../../../_components/inputs/GenericButton";
 import inviteIcon from "/public/icons/invite.svg";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Permission, permissionCheck, Permissions } from "../../../../../libs/types/permission";
+import { Permission, Permissions } from "../../../../../libs/types/permission";
 import { InviteDto } from "../../../../api/users/invite/route";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
@@ -130,7 +130,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
             <CheckboxGroup
                 label="Permissions"
                 value={selectedPermissions?.map(permission => permission.toString())}
-                onChange={value => {
+                onValueChange={(value: string[]) => {
                     setSelectedPermissions(value.map(permissionString => Number(permissionString)));
                 }}
             >
