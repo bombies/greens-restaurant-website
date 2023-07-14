@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import close from "/public/icons/close-circled.svg";
-import check from '/public/icons/check-green-circled.svg';
-import signInIcon from '/public/icons/sign-in.svg';
+import check from "/public/icons/check-green-circled.svg";
+import signInIcon from "/public/icons/sign-in.svg";
 import { sendToast } from "../../utils/Hooks";
 import GenericImage from "../_components/GenericImage";
 import GenericInput from "../_components/inputs/GenericInput";
@@ -46,7 +46,7 @@ export default function HomePage() {
                         icon: close,
                         type: "error"
                     }, {
-                        position: 'top-center'
+                        position: "top-center"
                     });
                 } else if (cb?.ok) {
                     sendToast({
@@ -54,7 +54,7 @@ export default function HomePage() {
                         icon: check,
                         type: "primary"
                     }, {
-                        position: 'top-center'
+                        position: "top-center"
                     });
                 }
             })
@@ -68,12 +68,12 @@ export default function HomePage() {
             className="p-12 phone:p-6 flex justify-center min-h-screen"
             style={{
                 backgroundImage: "url(\"/images/mesh-bg.png\")",
-                backgroundRepeat: 'no-repeat'
+                backgroundRepeat: "no-repeat"
             }}
         >
             <div
                 className="w-96 h-fit bg-neutral-900/50 border-2 border-primary/50 p-16 phone:px-6 rounded-xl tablet:w-3/4 phone:w-full">
-                <GenericImage className='mx-auto mb-12' src='https://i.imgur.com/HLTQ78m.png' width={12} />
+                <GenericImage className="mx-auto mb-12" src="https://i.imgur.com/HLTQ78m.png" width={12} />
                 <form
                     className="flex flex-col self-center"
                     onSubmit={form.handleSubmit(handleLoginFormSubmit)}
@@ -81,7 +81,7 @@ export default function HomePage() {
                     <GenericInput
                         register={form.register}
                         required={true}
-                        label='Email/Username'
+                        label="Email/Username"
                         id="email"
                         autoComplete="email"
                         disabled={isAuthenticating}
@@ -91,19 +91,19 @@ export default function HomePage() {
                     <GenericInput
                         register={form.register}
                         required={true}
-                        label='Password'
+                        label="Password"
                         id="password"
-                        type='password'
+                        type="password"
                         autoComplete="password"
                         disabled={isAuthenticating}
                         placeholder="Enter your password"
                     />
                     <Spacer y={1.5} />
                     <GenericButton
-                        size='md'
-                        type='submit'
+                        size="md"
+                        type="submit"
                         disabled={isAuthenticating}
-                        loading={isAuthenticating}
+                        isLoading={isAuthenticating}
                         icon={signInIcon}
                         fullWidth
                     >
