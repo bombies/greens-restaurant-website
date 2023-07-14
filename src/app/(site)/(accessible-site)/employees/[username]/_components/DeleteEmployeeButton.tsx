@@ -5,11 +5,8 @@ import GenericButton from "../../../../../_components/inputs/GenericButton";
 import React, { useState } from "react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/modal";
-import SubTitle from "../../../../../_components/text/SubTitle";
 import { sendToast } from "../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
-import { Spacer } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import ConfirmationModal from "../../../../../_components/ConfirmationModal";
 
@@ -29,17 +26,15 @@ export default function DeleteEmployeeButton({ username, allowed }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const {
         trigger: triggerUserDelete,
-        isMutating: userIsDeleting,
-        error: userDeleteError
+        isMutating: userIsDeleting
     } = DeleteUser(username);
 
     return (
         <>
             <GenericButton
-                shadow
                 color="danger"
                 icon={trashIcon}
-                onClick={() => setModalOpen(true)}
+                onPress={() => setModalOpen(true)}
                 disabled={!allowed}
             >
                 Delete Employee
