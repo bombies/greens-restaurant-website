@@ -95,7 +95,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
                     id="firstName"
                     label="First Name"
                     register={register}
-                    required={true}
+                    isRequired
                     errors={errors}
                 />
                 <GenericInput
@@ -103,7 +103,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
                     id="lastName"
                     label="Last Name"
                     register={register}
-                    required={true}
+                    isRequired
                     errors={errors}
                 />
             </div>
@@ -113,7 +113,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
                 id="newEmail"
                 label="Email"
                 register={register}
-                required={true}
+                isRequired
                 type="email"
                 errors={errors}
             />
@@ -123,7 +123,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
                 id="newUsername"
                 label="Username"
                 register={register}
-                required={true}
+                isRequired
                 errors={errors}
             />
             <Spacer y={6} />
