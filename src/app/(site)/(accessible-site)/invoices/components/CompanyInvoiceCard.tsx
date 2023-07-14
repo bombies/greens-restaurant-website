@@ -19,7 +19,7 @@ import SubTitle from "../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 
 type Props = {
-    controlsEnabled?: boolean
+    controlsEnabled: boolean
 }
 
 export const FetchCompanyInfo = () => {
@@ -94,7 +94,7 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                                 <div className="w-1/2 phone:w-full self-center">
                                     <EditableField
                                         label="Company Name"
-                                        editAllowed={controlsEnabled || true}
+                                        editAllowed={controlsEnabled}
                                         field={proposedCompanyInfo?.companyName || data?.companyName}
                                         capitalizeField
                                         validate={{
@@ -111,26 +111,35 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                                         }}
                                     />
                                 </div>
-                                <CldUploadButton
-                                    options={{
-                                        maxFiles: 1,
-                                        maxFileSize: 3000000,
-                                        resourceType: "image"
-                                    }}
-                                    onUpload={handleImageUpload}
-                                    uploadPreset="kyyplgrx"
-                                >
-                                    <Avatar
-                                        isBordered={true}
-                                        className="self-center mx-auto transition-fast hover:brightness-150 cursor-pointer w-32 h-32"
-                                        src={(proposedCompanyInfo?.companyLogo || data!.companyLogo) || undefined}
-                                    />
-                                </CldUploadButton>
+                                {
+                                    controlsEnabled ?
+                                        <CldUploadButton
+                                            options={{
+                                                maxFiles: 1,
+                                                maxFileSize: 3000000,
+                                                resourceType: "image"
+                                            }}
+                                            onUpload={handleImageUpload}
+                                            uploadPreset="kyyplgrx"
+                                        >
+                                            <Avatar
+                                                isBordered={true}
+                                                className="self-center mx-auto transition-fast hover:brightness-150 cursor-pointer w-32 h-32"
+                                                src={(proposedCompanyInfo?.companyLogo || data!.companyLogo) || undefined}
+                                            />
+                                        </CldUploadButton>
+                                        :
+                                        <Avatar
+                                            isBordered={true}
+                                            className="self-center mx-auto w-32 h-32"
+                                            src={(proposedCompanyInfo?.companyLogo || data!.companyLogo) || undefined}
+                                        />
+                                }
                             </div>
                             <Spacer y={6} />
                             <EditableField
                                 label="Company Address"
-                                editAllowed={controlsEnabled || true}
+                                editAllowed={controlsEnabled}
                                 field={proposedCompanyInfo?.companyAddress || data?.companyAddress}
                                 capitalizeField
                                 onValueChange={(value) => {

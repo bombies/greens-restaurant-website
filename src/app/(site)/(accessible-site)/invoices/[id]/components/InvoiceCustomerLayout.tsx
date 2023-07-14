@@ -8,7 +8,7 @@ import { Spacer } from "@nextui-org/react";
 import InvoiceCustomerControlBar from "./control-bar/InvoiceCustomerControlBar";
 import { useUserData } from "../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import InvoiceGrid from "./InvoiceGrid";
 
@@ -43,15 +43,24 @@ export default function InvoiceCustomerLayout({ id }: Props) {
                 className="text-primary capitalize">{customerIsLoading ? "Unknown" : customer?.customerName}</span>
             </Title>
             <Spacer y={6} />
-            <InvoiceCustomerControlBar
-                customer={customer}
-                controlsEnabled={
-                    hasAnyPermission(
-                        userData?.permissions,
-                        [Permission.CREATE_INVOICE]
-                    )}
-            />
-            <Spacer y={6} />
+            {
+                hasAnyPermission(
+                    userData?.permissions,
+                    [Permission.CREATE_INVOICE]
+                )
+                &&
+                <Fragment>
+                    <InvoiceCustomerControlBar
+                        customer={customer}
+                        controlsEnabled={
+                            hasAnyPermission(
+                                userData?.permissions,
+                                [Permission.CREATE_INVOICE]
+                            )}
+                    />
+                    <Spacer y={6} />
+                </Fragment>
+            }
             <InvoiceGrid
                 customerIsLoading={customerIsLoading}
                 customer={customer}

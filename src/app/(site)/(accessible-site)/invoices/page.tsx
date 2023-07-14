@@ -4,11 +4,11 @@ import Title from "../../../_components/text/Title";
 import SubTitle from "../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
 import InvoiceControlBar from "./components/InvoiceControlBar";
-import CompanyInvoiceCard from "../inventory/_components/CompanyInvoiceCard";
+import CompanyInvoiceCard from "./components/CompanyInvoiceCard";
 import InvoiceCustomerGrid from "../inventory/_components/InvoiceCustomerGrid";
 import { hasAnyPermission, Permission } from "../../../../libs/types/permission";
 import { useUserData } from "../../../../utils/Hooks";
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function InvoicesPage() {
@@ -29,18 +29,29 @@ export default function InvoicesPage() {
         <div>
             <Title>Invoices</Title>
             <SubTitle>Create, delete and edit your invoices and invoice recipients</SubTitle>
-            <Spacer y={6} />
-            <InvoiceControlBar
-                controlsEnabled={
-                    hasAnyPermission(
-                        userData?.permissions,
-                        [Permission.CREATE_INVOICE]
-                    )}
-            />
+            {
+                hasAnyPermission(
+                    userData?.permissions,
+                    [Permission.CREATE_INVOICE]
+                ) &&
+                <Fragment>
+                    <Spacer y={6} />
+                    <InvoiceControlBar
+                        controlsEnabled={
+                            hasAnyPermission(
+                                userData?.permissions,
+                                [Permission.CREATE_INVOICE]
+                            )}
+                    />
+                </Fragment>
+            }
             <Spacer y={6} />
             <div className="flex gap-6 tablet:flex-col">
                 <InvoiceCustomerGrid />
-                <CompanyInvoiceCard />
+                <CompanyInvoiceCard controlsEnabled={hasAnyPermission(
+                    userData?.permissions,
+                    [Permission.CREATE_INVOICE]
+                )} />
             </div>
         </div>
     );

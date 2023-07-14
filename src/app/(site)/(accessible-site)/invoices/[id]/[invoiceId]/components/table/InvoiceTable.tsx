@@ -1,9 +1,18 @@
 "use client";
 
 import { Invoice, InvoiceItem, Prisma } from "@prisma/client";
-import { Fragment, Key, useCallback, useState } from "react";
+import { Fragment, Key, useCallback, useMemo, useState } from "react";
 import AddInvoiceItemButton from "./AddInvoiceItemButton";
-import { Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import {
+    SortDescriptor,
+    Spacer,
+    Table,
+    TableBody,
+    TableCell,
+    TableColumn,
+    TableHeader,
+    TableRow
+} from "@nextui-org/react";
 import clsx from "clsx";
 import { dollarFormat } from "../../../../../../../../utils/GeneralUtils";
 import SlidingBar from "../../../../../../../_components/SlidingBar";
@@ -14,6 +23,7 @@ import { useInvoiceItems } from "../InvoiceItemsProvider";
 import DeleteInvoiceItemButton from "./DeleteInvoiceItemButton";
 import DeleteInvoiceItemsButton from "./DeleteInvoiceItemsButton";
 import closeIcon from "/public/icons/close-gold-circled.svg";
+import { useAsyncList } from "@react-stately/data";
 
 
 type Column = {
@@ -50,9 +60,10 @@ type Props = {
 }
 
 export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
-    const { data: invoice } = useInvoice();
+    const { data: invoice, isLoading } = useInvoice();
     const { state: items, dispatch: dispatchItems } = useInvoiceItems();
     const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
 
     const getKeyValue = useCallback((invoice: InvoiceItem, key: Prisma.Key) => {
         switch (key) {
@@ -73,6 +84,43 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
             }
         }
     }, []);
+
+    const sortedItems = useMemo(() => {
+        return items?.sort((a, b) => {
+            if (!sortDescriptor)
+                return 0;
+
+            let cmp: number;
+            switch (sortDescriptor.column) {
+                case "invoice_item": {
+                    cmp = a.name.localeCompare(b.name);
+                    break;
+                }
+                case "invoice_quantity": {
+                    cmp = a.quantity < b.quantity ? -1 : 1;
+                    break;
+                }
+                case "invoice_price_per": {
+                    cmp = a.price < b.price ? -1 : 1;
+                    break;
+                }
+                case "invoice_total": {
+                    cmp = (a.quantity * a.price) < (b.quantity * b.price) ? -1 : 1;
+                    break;
+                }
+                default: {
+                    cmp = 0;
+                    break;
+                }
+            }
+
+            if (sortDescriptor.direction === "descending") {
+                cmp *= -1;
+            }
+
+            return cmp;
+        }) ?? [];
+    }, [items, sortDescriptor]);
 
     return (
         <>
@@ -150,15 +198,25 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                     onSelectionChange={(keys) => {
                         setSelectedKeys(Array.from(keys));
                     }}
-                    className="!bg-neutral-950/0"
+                    classNames={{
+                        wrapper: "!bg-secondary/20 rounded-2xl",
+                        th: "bg-neutral-950/50 backdrop-blur-md text-white uppercase"
+                    }}
                     aria-label="Invoice Table"
+                    sortDescriptor={sortDescriptor}
+                    onSortChange={setSortDescriptor}
                 >
                     <TableHeader columns={invoiceColumns}>
-                        {(column: Column) => <TableColumn key={column.key}>{column.value}</TableColumn>}
+                        {(column: Column) =>
+                            <TableColumn
+                                key={column.key}
+                                allowsSorting={["invoice_item", "invoice_quantity", "invoice_price_per", "invoice_total"].includes(column.key)}>
+                                {column.value}
+                            </TableColumn>}
                     </TableHeader>
                     <TableBody
-                        items={items ?? []}
-                        emptyContent="There are no items. Click on the button below to add an item."
+                        items={sortedItems}
+                        emptyContent={`There are no items.${mutationAllowed ? " Click on the button below to add an item." : ""}`}
                     >
                         {(item: InvoiceItem) => (
                             <TableRow key={`${item.id}/${item.name}`}>

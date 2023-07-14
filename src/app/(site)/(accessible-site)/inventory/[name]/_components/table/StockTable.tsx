@@ -2,6 +2,7 @@
 
 import { Prisma, Stock, StockSnapshot } from "@prisma/client";
 import {
+    SortDescriptor,
     Spacer,
     Table,
     TableBody,
@@ -16,7 +17,7 @@ import moreIcon from "/public/icons/more.svg";
 import IconButton from "../../../../../../_components/inputs/IconButton";
 import StockOptionsDropdown from "./StockOptionsDropdown";
 import AddStockModal from "./AddStockModal";
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import ConfirmationModal from "../../../../../../_components/ConfirmationModal";
 import RemoveStockModal from "./RemoveStockModal";
 import StockQuantityField from "./StockQuantityField";
@@ -122,6 +123,36 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
         isMutating: isUpdating
     } = SetStockItem(inventoryName);
     const { trigger: deleteStockItem, isMutating: stockIsDeleting } = DeleteStockItem(inventoryName);
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
+
+    const sortedItems = useMemo(() => {
+        return visibleStockState.sort((a, b) => {
+            if (!sortDescriptor)
+                return 0;
+            let cmp: number;
+
+            switch (sortDescriptor.column) {
+                case "stock_name": {
+                    cmp = a.name.localeCompare(b.name);
+                    break;
+                }
+                case "stock_quantity": {
+                    cmp = a.quantity < b.quantity ? -1 : 1;
+                    break;
+                }
+                default: {
+                    cmp = 0;
+                    break;
+                }
+            }
+
+            if (sortDescriptor.direction === "descending") {
+                cmp *= -1;
+            }
+
+            return cmp;
+        });
+    }, [sortDescriptor, visibleStockState]);
 
     useEffect(() => {
         if (!stockSearch) {
@@ -396,13 +427,24 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             </div>
                             <Spacer y={6} />
                             <Table
-                                className="!bg-secondary/20"
+                                classNames={{
+                                    wrapper: "!bg-secondary/20 rounded-2xl",
+                                    th: "bg-neutral-950/50 backdrop-blur-md text-white uppercase"
+                                }}
                                 aria-label="Stock Table"
+                                sortDescriptor={sortDescriptor}
+                                onSortChange={setSortDescriptor}
                             >
                                 <TableHeader columns={columns}>
-                                    {column => <TableColumn key={column.key}>{column.value}</TableColumn>}
+                                    {column =>
+                                        <TableColumn
+                                            key={column.key}
+                                            allowsSorting={["stock_name", "stock_quantity"].includes(column.key)}
+                                        >
+                                            {column.value}
+                                        </TableColumn>}
                                 </TableHeader>
-                                <TableBody items={visibleStockState}>
+                                <TableBody items={sortedItems}>
                                     {item => (
                                         <TableRow key={item.uid}>
                                             {columnKey => <TableCell

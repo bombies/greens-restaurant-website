@@ -29,7 +29,10 @@ export default function TableSkeleton({ width, contentRepeat, columns }: Props) 
 
     return (
         <Table
-            className="!bg-secondary/20"
+            classNames={{
+                wrapper: "!bg-secondary/20 rounded-2xl",
+                th: "bg-neutral-950/50 backdrop-blur-md text-white uppercase"
+            }}
             aria-label="Stock Table"
             style={{
                 width: width || "100%"

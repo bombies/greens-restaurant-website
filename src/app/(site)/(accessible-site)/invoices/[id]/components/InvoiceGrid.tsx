@@ -86,7 +86,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                     toolTip={
                         <div className="p-6">
                             <div className="flex gap-4">
-                                <p className="text-primary text-xl max-w-md break-words font-bold drop-shadow self-center">{invoice.title}</p>
+                                <p className="text-primary text-xl break-words font-bold drop-shadow self-center">{invoice.title}</p>
                                 <Chip
                                     variant="flat"
                                     color={invoice?.paid ? "success" : "danger"}
@@ -104,9 +104,9 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                         </div>
                     }
                 >
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 w-full">
                         <div className="flex gap-4">
-                            <p className="break-words self-center">{invoice.title}</p>
+                            <p className="overflow-hidden whitespace-nowrap overflow-ellipsis self-center max-w-1/2">{invoice.title}</p>
                             <Chip
                                 variant="flat"
                                 color={invoice?.paid ? "success" : "danger"}

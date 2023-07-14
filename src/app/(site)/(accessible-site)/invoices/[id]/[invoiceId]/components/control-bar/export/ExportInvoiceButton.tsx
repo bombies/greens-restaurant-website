@@ -3,7 +3,7 @@
 import GenericButton from "../../../../../../../../_components/inputs/GenericButton";
 import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { FetchCompanyInfo } from "../../../../../../inventory/_components/CompanyInvoiceCard";
+import { FetchCompanyInfo } from "../../../../../components/CompanyInvoiceCard";
 import InvoicePDF from "./pdf/InvoicePDF";
 import exportIcon from "/public/icons/export-gold.svg";
 
