@@ -17,7 +17,7 @@ export default function EmployeeCard({ user }: Props) {
             <div
                 className="default-container p-6 transition-fast hover:-translate-y-1 hover:border-primary flex gap-4"
                 onMouseEnter={() => {
-                    setAvatarColor("primary")
+                    setAvatarColor("success")
                 }}
                 onMouseLeave={() => {
                     setAvatarColor("default")
