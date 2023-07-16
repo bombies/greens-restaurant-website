@@ -6,6 +6,7 @@ import { Invoice, InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../libs/prisma";
 import { Either } from "../../../../../inventory/[name]/utils";
 import { CreateInvoiceDto } from "../../invoices/route";
+import { INVOICE_ITEM_NAME_REGEX } from "../../../../../../../utils/regex";
 
 type Context = {
     params: {
@@ -52,6 +53,20 @@ export function POST(req: Request, { params }: Context) {
         if (!body)
             return respondWithInit({
                 message: "You are missing the body for this request!",
+                status: 401
+            });
+
+        // Check item names
+        const invalidNames: string[] = [];
+        for (let i = 0; i < body.length; i++) {
+            const item = body[i];
+            if (!INVOICE_ITEM_NAME_REGEX.test(item.name))
+                invalidNames.push(item.name);
+        }
+
+        if (invalidNames)
+            return respondWithInit({
+                message: `Some item names are invalid! These include: ${invalidNames.toString()}. Item names must not include "/".`,
                 status: 401
             });
 

@@ -5,6 +5,7 @@ import { Either } from "../../../../../../inventory/[name]/utils";
 import { NextResponse } from "next/server";
 import { InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../../libs/prisma";
+import { INVOICE_ITEM_NAME_REGEX } from "../../../../../../../../utils/regex";
 
 type Context = {
     params: {
@@ -43,6 +44,12 @@ export function PATCH(req: Request, { params }: Context) {
         if (!body)
             return respondWithInit({
                 message: "You must provide a body for this request!",
+                status: 401
+            });
+
+        if (body.name && !INVOICE_ITEM_NAME_REGEX.test(body.name))
+            return respondWithInit({
+                message: "That name is invalid! The item name must not contain \"/\".",
                 status: 401
             });
 
