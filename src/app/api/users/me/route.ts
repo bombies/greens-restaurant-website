@@ -128,7 +128,6 @@ export async function PATCH(req: Request) {
                       <main>
                         <h1>Hello <span class="primary-text">${user.firstName}</span>,</h1>
                         <p>Your email for account with username <b>${user.username}</b> has been updated to this one. (${body.email})</p>
-                        <p>Please see the login details below to access your account.</p>
                       </main>
                     </div>
                   </body>
