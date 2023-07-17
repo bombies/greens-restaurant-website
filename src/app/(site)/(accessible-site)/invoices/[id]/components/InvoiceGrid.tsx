@@ -153,7 +153,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                             label="Filter"
                             color="secondary"
                             value={filterModes}
-                            onValueChange={setFilterModes}
+                            onValueChange={value => setFilterModes(value as FilterMode[])}
                         >
                             <Checkbox value={FilterMode.PAID}>Paid</Checkbox>
                             <Checkbox value={FilterMode.UNPAID}>Unpaid</Checkbox>
