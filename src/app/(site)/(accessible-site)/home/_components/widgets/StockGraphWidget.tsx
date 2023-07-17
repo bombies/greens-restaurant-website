@@ -3,10 +3,9 @@
 import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
 import { Inventory } from "@prisma/client";
-import { Spinner } from "@nextui-org/spinner";
 import { StockTimeSeries } from "../../../../../api/inventory/[name]/insights/stock/route";
 import { Fragment, useMemo, useState } from "react";
-import { Pagination, Spacer } from "@nextui-org/react";
+import { Pagination, Spacer, Spinner } from "@nextui-org/react";
 import GenericChart from "../../../../../_components/charts/GenericChart";
 import SubTitle from "../../../../../_components/text/SubTitle";
 
@@ -28,7 +27,8 @@ export default function StockGraphWidget() {
     })), [inventoryInsights]);
 
     return (
-        <div className="default-container backdrop-blur-md text-primary pt-6 px-6 phone:px-3 pb-12 w-96 h-96 phone:w-full">
+        <div
+            className="default-container backdrop-blur-md text-primary pt-6 px-6 phone:px-3 pb-12 w-96 h-96 phone:w-full">
             {
                 inventoriesLoading ?
                     <div className="flex justify-center items-center"><Spinner size="lg" /></div>
@@ -77,14 +77,7 @@ export default function StockGraphWidget() {
                                                                 }
                                                             }}
                                                             fill={{
-                                                                type: "gradient",
-                                                                gradient: {
-                                                                    shade: "light",
-                                                                    type: "vertical",
-                                                                    opacityFrom: 0.9,
-                                                                    opacityTo: 0.8,
-                                                                    shadeIntensity: 0
-                                                                }
+                                                                type: undefined
                                                             }}
                                                             dataLabels={{
                                                                 enabled: false

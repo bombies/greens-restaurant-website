@@ -1,7 +1,9 @@
 "use client";
 
-import ReactApexChart from "react-apexcharts";
+import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
+
+const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 type Props = {
     data: {
@@ -62,7 +64,7 @@ export default function GenericChart({
             }
         },
         dataLabels: {
-            enabled: false,
+            enabled: false
         },
         fill: {
             type: "gradient",
