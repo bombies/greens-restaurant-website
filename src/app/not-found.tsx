@@ -13,7 +13,14 @@ export default function NotFound() {
     const router = useRouter();
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen w-full">
+        <main
+            style={{
+                backgroundImage: "url(\"/images/mesh-bg-2.png\")",
+                backgroundRepeat: "no-repeat",
+                backgroundAttachment: "fixed"
+            }}
+            className="flex flex-col items-center justify-center h-screen w-full"
+        >
             <div className="flex justify-center">
                 <Link href="/home">
                     <GenericImage src="https://i.imgur.com/HLTQ78m.png" width={18} />
@@ -39,6 +46,6 @@ export default function NotFound() {
                     Go back
                 </GenericButton>
             </div>
-        </div>
+        </main>
     );
 }
