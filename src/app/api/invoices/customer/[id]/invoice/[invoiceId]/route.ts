@@ -64,7 +64,7 @@ export function POST(req: Request, { params }: Context) {
                 invalidNames.push(item.name);
         }
 
-        if (invalidNames)
+        if (invalidNames.length)
             return respondWithInit({
                 message: `Some item names are invalid! These include: ${invalidNames.toString()}. Item names must not include "/".`,
                 status: 401

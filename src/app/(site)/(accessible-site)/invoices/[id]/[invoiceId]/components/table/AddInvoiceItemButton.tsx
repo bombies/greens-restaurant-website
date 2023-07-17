@@ -41,6 +41,8 @@ export default function AddInvoiceItemButton({ customerId, invoiceId, disabled }
         if (!invoiceId)
             return;
 
+        console.log(data);
+
         triggerItemAdd({
             dto: [{
                 name: data.name,

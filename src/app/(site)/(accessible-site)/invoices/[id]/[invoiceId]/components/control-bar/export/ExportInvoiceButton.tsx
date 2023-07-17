@@ -2,10 +2,11 @@
 
 import GenericButton from "../../../../../../../../_components/inputs/GenericButton";
 import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import { FetchCompanyInfo } from "../../../../../components/CompanyInvoiceCard";
 import InvoicePDF from "./pdf/InvoicePDF";
 import exportIcon from "/public/icons/export-gold.svg";
+import { usePDF } from "@react-pdf/renderer";
+import { useEffect } from "react";
 
 type Props = {
     customer?: InvoiceCustomer
@@ -16,30 +17,45 @@ type Props = {
 
 export default function ExportInvoiceButton({ customer, invoice, invoiceItems, disabled }: Props) {
     const { data: companyInfo, isLoading: companyInfoIsLoading } = FetchCompanyInfo();
+    const [pdfInstance, updatePdfInstance] = usePDF({
+        document: <InvoicePDF
+            companyInfo={companyInfo}
+            customerInfo={customer}
+            invoice={invoice}
+            invoiceItems={invoiceItems}
+        />
+    });
+
+    useEffect(() => {
+        updatePdfInstance(<InvoicePDF
+            companyInfo={companyInfo}
+            customerInfo={customer}
+            invoice={invoice}
+            invoiceItems={invoiceItems}
+        />);
+    }, [companyInfo, customer, invoice, invoiceItems]);
 
     return (
         <>
-            <PDFDownloadLink
-                document={<InvoicePDF
-                    companyInfo={companyInfo}
-                    customerInfo={customer}
-                    invoice={invoice}
-                    invoiceItems={invoiceItems}
-                />}
-                fileName={`${invoice?.title}-${customer?.customerName}.pdf`}
+            <GenericButton
+                fullWidth
+                disabled={disabled || companyInfoIsLoading || pdfInstance.loading}
+                color="warning"
+                variant="flat"
+                icon={exportIcon}
+                onPress={() => {
+                    const aTag = document.createElement("a");
+                    if (pdfInstance.url) {
+                        aTag.href = pdfInstance.url;
+                        aTag.setAttribute("download", `${invoice?.title}-${customer?.customerName}.pdf`);
+                        document.body.appendChild(aTag);
+                        aTag.click();
+                    }
+                    aTag.remove();
+                }}
             >
-                {({ loading }) =>
-                    <GenericButton
-                        fullWidth
-                        disabled={disabled || companyInfoIsLoading || loading}
-                        color="warning"
-                        variant="flat"
-                        icon={exportIcon}
-                    >
-                        {loading ? "Generating PDF" : "Export Invoice"}
-                    </GenericButton>
-                }
-            </PDFDownloadLink>
+                {pdfInstance.loading ? "Generating PDF" : "Export Invoice"}
+            </GenericButton>
         </>
     );
 }
