@@ -1,0 +1,123 @@
+"use client";
+
+import useSWR from "swr";
+import { fetcher } from "../../../employees/_components/EmployeeGrid";
+import { Inventory } from "@prisma/client";
+import { Spinner } from "@nextui-org/spinner";
+import { StockTimeSeries } from "../../../../../api/inventory/[name]/insights/stock/route";
+import { Fragment, useMemo, useState } from "react";
+import { Pagination, Spacer } from "@nextui-org/react";
+import GenericChart from "../../../../../_components/charts/GenericChart";
+import SubTitle from "../../../../../_components/text/SubTitle";
+
+const FetchInventories = () => {
+    return useSWR("/api/inventory", fetcher<Inventory[]>);
+};
+
+export default function StockGraphWidget() {
+    const { data: inventories, isLoading: inventoriesLoading } = FetchInventories();
+    const [currentPage, setCurrentPage] = useState(1);
+    const {
+        data: inventoryInsights,
+        isLoading: inventoryInsightsLoading
+    } = useSWR(inventories ? `/api/inventory/${inventories[currentPage - 1].name}/insights/stock` : null, fetcher<StockTimeSeries[]>);
+
+    const mostRecentData = useMemo(() => inventoryInsights?.map(series => ({
+        name: series.name.replaceAll("-", " "),
+        data: series.data.reduce((acc, next) => acc.date > next.date ? acc : next)
+    })), [inventoryInsights]);
+
+    return (
+        <div className="default-container backdrop-blur-md text-primary pt-6 px-6 phone:px-3 pb-12 w-96 h-96 phone:w-full">
+            {
+                inventoriesLoading ?
+                    <div className="flex justify-center items-center"><Spinner size="lg" /></div>
+                    :
+                    (!inventories?.length ?
+                            <div className="h-fit">
+                                <h3 className="font-black text-lg capitalize px-3">
+                                    Current Stock
+                                </h3>
+                                <Spacer y={6} />
+                                <div className="default-container p-6">
+                                    <SubTitle>No Data...</SubTitle>
+                                </div>
+                            </div>
+                            :
+                            <div className="h-full">
+                                <h3 className="font-black text-lg capitalize px-3">
+                                    Current Stock
+                                    - {inventories[currentPage - 1].name.replaceAll("-", " ")}
+                                </h3>
+                                <Spacer y={4} />
+                                {
+                                    inventoryInsightsLoading ?
+                                        <div className="flex justify-center items-center h-full w-full">
+                                            <Spinner size="lg" />
+                                        </div>
+                                        :
+                                        (mostRecentData?.length ?
+                                                <Fragment>
+                                                    <div className="h-3/4">
+                                                        <GenericChart
+                                                            data={mostRecentData.map(data => data.data.value)}
+                                                            labels={mostRecentData.map(data => data.name)}
+                                                            type="donut"
+                                                            plotOptions={{
+                                                                pie: {
+                                                                    donut: {
+                                                                        size: "65%",
+                                                                        labels: {
+                                                                            show: true,
+                                                                            value: {
+                                                                                color: "#ffffff"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }}
+                                                            fill={{
+                                                                type: "gradient",
+                                                                gradient: {
+                                                                    shade: "light",
+                                                                    type: "vertical",
+                                                                    opacityFrom: 0.9,
+                                                                    opacityTo: 0.8,
+                                                                    shadeIntensity: 0
+                                                                }
+                                                            }}
+                                                            dataLabels={{
+                                                                enabled: false
+                                                            }}
+                                                            legend={{
+                                                                show: false
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    {
+                                                        (inventories.length > 1)
+                                                        &&
+                                                        <div className="flex justify-center">
+                                                            <Pagination
+                                                                variant="bordered"
+                                                                showShadow
+                                                                showControls
+                                                                total={inventories.length}
+                                                                page={currentPage}
+                                                                onChange={setCurrentPage}
+                                                            />
+                                                        </div>
+                                                    }
+                                                </Fragment>
+                                                :
+                                                <div className="default-container p-6 my-6">
+                                                    <SubTitle>No Data...</SubTitle>
+                                                </div>
+                                        )
+                                }
+                            </div>
+                    )
+            }
+        </div>
+    );
+}

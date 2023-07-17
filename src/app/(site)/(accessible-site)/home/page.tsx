@@ -9,6 +9,9 @@ import Title from "../../../_components/text/Title";
 import SubTitle from "../../../_components/text/SubTitle";
 import { hasAnyPermission, hasPermission, Permission } from "../../../../libs/types/permission";
 import { useUserData } from "../../../../utils/Hooks";
+import StockGraphWidget from "./_components/widgets/StockGraphWidget";
+import { Spacer } from "@nextui-org/react";
+import InvoiceWidget from "./_components/widgets/InvoiceWidget";
 
 export default function HomePage() {
     const session = useSession();
@@ -30,7 +33,7 @@ export default function HomePage() {
                         Permission.CREATE_INVOICE,
                         Permission.ADMINISTRATOR
                     ]) &&
-                    <div className={"w-3/4 phone:w-5/6 mt-12 p-12 phone:p-6 default-container"}>
+                    <div className={"w-[90%] mx-auto tablet:w-full mt-12 p-12 phone:p-6 default-container"}>
                         <h4 className="font-light text-xl phone:text-lg tracking-widest uppercase mb-12 phone:mb-6 phone:text-center">Quick
                             Actions</h4>
                         <div
@@ -66,8 +69,23 @@ export default function HomePage() {
                     </div>
                 )
             }
-            <div className="flex flex-col gap-8">
-
+            <Spacer y={12} />
+            <div className="flex justify-center phone:flex-col gap-12">
+                {
+                    hasAnyPermission(user?.permissions, [
+                        Permission.CREATE_INVENTORY,
+                        Permission.VIEW_INVENTORY,
+                        Permission.MUTATE_STOCK
+                    ]) &&
+                    <StockGraphWidget />
+                }
+                {
+                    hasAnyPermission(user?.permissions, [
+                        Permission.VIEW_INVOICES,
+                        Permission.CREATE_INVOICE
+                    ]) &&
+                    <InvoiceWidget />
+                }
             </div>
         </div>
     );

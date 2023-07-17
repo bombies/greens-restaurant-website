@@ -27,7 +27,7 @@ export default function HomeLayout(props: Props) {
             style={{
                 backgroundImage: "url(\"/images/mesh-bg-2.png\")",
                 backgroundRepeat: "no-repeat",
-                backgroundAttachment: "fixed"
+                backgroundAttachment: "fixed",
             }}
         >
         <Providers session={props.session}>

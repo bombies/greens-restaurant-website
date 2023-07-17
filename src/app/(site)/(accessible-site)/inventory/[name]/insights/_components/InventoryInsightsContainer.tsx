@@ -11,7 +11,7 @@ type Props = {
     inventoryName: string,
 }
 
-const FetchInsights = (inventoryName: string) => {
+export const FetchInsights = (inventoryName: string) => {
     return useSWR(`/api/inventory/${inventoryName}/insights/stock`, fetcher<StockTimeSeries[]>);
 };
 

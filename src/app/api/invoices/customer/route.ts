@@ -8,7 +8,11 @@ import "../../../../utils/GeneralUtils";
 
 export function GET(req: Request) {
     return authenticatedAny(req, async () => {
-        return NextResponse.json(await prisma.invoiceCustomer.findMany());
+        return NextResponse.json(await prisma.invoiceCustomer.findMany({
+            include: {
+                invoices: true
+            }
+        }));
     }, [Permission.VIEW_INVOICES, Permission.CREATE_INVOICE]);
 }
 
