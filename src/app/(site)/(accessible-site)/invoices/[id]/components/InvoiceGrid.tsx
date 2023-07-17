@@ -16,6 +16,7 @@ import CardSkeleton from "../../../../../_components/skeletons/CardSkeleton";
 import { Chip } from "@nextui-org/chip";
 import IconButton from "../../../../../_components/inputs/IconButton";
 import GenericImage from "../../../../../_components/GenericImage";
+import GenericCard from "../../../../../_components/GenericCard";
 
 type Props = {
     customerIsLoading: boolean,
@@ -186,7 +187,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                             <CardSkeleton />
                         </>
                         :
-                        invoiceCards
+                        (invoiceCards?.length ? invoiceCards : <GenericCard>There are no invoices...</GenericCard>)
 
                 }
             </div>

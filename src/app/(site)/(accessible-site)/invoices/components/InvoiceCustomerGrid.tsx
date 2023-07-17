@@ -7,6 +7,9 @@ import { fetcher } from "../../employees/_components/EmployeeGrid";
 import { InvoiceCustomer } from "@prisma/client";
 import SubTitle from "../../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
+import clsx from "clsx";
+import { Card, CardBody } from "@nextui-org/card";
+import GenericCard from "../../../../_components/GenericCard";
 
 const FetchCustomers = () => {
     return useSWR(`/api/invoices/customer`, fetcher<InvoiceCustomer[]>);
@@ -24,7 +27,10 @@ export default function InvoiceCustomerGrid() {
         <div className="default-container p-12 w-[50%] tablet:w-full">
             <SubTitle>Select a customer</SubTitle>
             <Spacer y={6} />
-            <div className="grid grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-4">
+            <div className={clsx(
+                "grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-4",
+                (customerElements?.length || isLoading) && "grid"
+            )}>
                 {
                     isLoading ?
                         <>
@@ -36,7 +42,8 @@ export default function InvoiceCustomerGrid() {
                             <CardSkeleton />
                         </>
                         :
-                        (customerElements?.length ? customerElements : <p>There are no customers!</p>)
+                        (customerElements?.length ? customerElements :
+                            <GenericCard>There are no customers...</GenericCard>)
                 }
             </div>
         </div>

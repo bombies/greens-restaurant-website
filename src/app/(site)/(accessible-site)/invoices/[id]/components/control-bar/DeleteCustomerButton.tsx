@@ -38,7 +38,7 @@ export default function DeleteCustomerButton({ customer, disabled }: Props) {
                     triggerCustomerDeletion()
                         .then(() => {
                             sendToast({
-                                description: `You have successfully deleted that ${customer?.customerName.capitalize()}!`
+                                description: `You have successfully deleted ${customer?.customerName.capitalize()}!`
                             });
                             router.push(`/invoices`);
                         })

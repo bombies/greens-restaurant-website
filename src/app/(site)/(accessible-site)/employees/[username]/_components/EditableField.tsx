@@ -1,7 +1,7 @@
 "use client";
 
 import React, { MouseEventHandler, useState } from "react";
-import { Spacer, Tooltip } from "@nextui-org/react";
+import { Skeleton, Spacer, Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
 import GenericImage from "../../../../../_components/GenericImage";
 import editIcon from "/public/icons/edit.svg";
@@ -16,6 +16,7 @@ import GenericModal from "../../../../../_components/GenericModal";
 interface Props {
     label: string,
     field?: string,
+    fieldIsLoaded?: boolean,
     capitalizeField?: boolean,
     onValueChange?: (value: string) => void
     validate?: {
@@ -27,14 +28,15 @@ interface Props {
 }
 
 export default function EditableField({
-                                                  label,
-                                                  field,
-                                                  capitalizeField,
-                                                  onValueChange,
-                                                  validate,
-                                                  successMessage,
-                                                  editAllowed
-                                              }: Props) {
+                                          label,
+                                          field,
+                                          fieldIsLoaded,
+                                          capitalizeField,
+                                          onValueChange,
+                                          validate,
+                                          successMessage,
+                                          editAllowed
+                                      }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const {
         register,
@@ -70,6 +72,7 @@ export default function EditableField({
             <DataContainer
                 label={label}
                 field={field}
+                fieldIsLoaded={fieldIsLoaded}
                 capitalizeField={capitalizeField}
                 onEdit={() => setModalOpen(true)}
                 editAllowed={editAllowed}
@@ -100,12 +103,21 @@ export default function EditableField({
 type DataContainerProps = {
     label: string,
     field?: string,
+    fieldIsLoaded?: boolean,
     onEdit?: MouseEventHandler<HTMLDivElement>
     capitalizeField?: boolean
     editAllowed: boolean
 } & React.PropsWithChildren
 
-export function DataContainer({ label, field, onEdit, capitalizeField, editAllowed, children }: DataContainerProps) {
+export function DataContainer({
+                                  label,
+                                  field,
+                                  fieldIsLoaded,
+                                  onEdit,
+                                  capitalizeField,
+                                  editAllowed,
+                                  children
+                              }: DataContainerProps) {
     const [editButtonShown, setEditButtonShown] = useState(false);
 
     return (
@@ -148,12 +160,20 @@ export function DataContainer({ label, field, onEdit, capitalizeField, editAllow
                 </Tooltip>
             </div>
             <Spacer y={2} />
-            {
-                children || <p className={clsx(
-                    "max-w-fit break-all",
-                    capitalizeField && "capitalize"
-                )}>{field}</p>
-            }
+            <Skeleton
+                isLoaded={fieldIsLoaded || fieldIsLoaded === undefined}
+                className={clsx(
+                    "rounded-2xl",
+                    (fieldIsLoaded || fieldIsLoaded === undefined) ? "!bg-transparent" : "w-1/2 h-5"
+                )}
+            >
+                {
+                    children || <p className={clsx(
+                        "max-w-fit break-all !bg-red",
+                        capitalizeField && "capitalize"
+                    )}>{field}</p>
+                }
+            </Skeleton>
         </div>
     );
 }

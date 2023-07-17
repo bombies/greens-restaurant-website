@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { fetcher } from "../../employees/_components/EmployeeGrid";
 import { InvoiceInformation } from "@prisma/client";
 import { Spinner } from "@nextui-org/spinner";
-import { Spacer } from "@nextui-org/react";
+import { Skeleton, Spacer } from "@nextui-org/react";
 import { Avatar } from "@nextui-org/avatar";
 import EditableField from "../../employees/[username]/_components/EditableField";
 import { COMPANY_NAME_REGEX } from "../../../../../utils/regex";
@@ -17,6 +17,7 @@ import ChangesMadeBar from "../../employees/[username]/_components/ChangesMadeBa
 import { sendToast } from "../../../../../utils/Hooks";
 import SubTitle from "../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
+import clsx from "clsx";
 
 type Props = {
     controlsEnabled: boolean
@@ -82,74 +83,83 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
             />
             <div className="default-container p-12 phone:px-3 w-[50%] tablet:w-full h-fit">
                 {
-                    isLoading ?
-                        <div className="flex justify-center">
-                            <Spinner size="lg" />
-                        </div>
-                        :
-                        <>
-                            <SubTitle>Company Information</SubTitle>
-                            <Divider className="my-6" />
-                            <div className="flex gap-6 phone:flex-col-reverse">
-                                <div className="w-1/2 phone:w-full self-center">
-                                    <EditableField
-                                        label="Company Name"
-                                        editAllowed={controlsEnabled}
-                                        field={proposedCompanyInfo?.companyName || data?.companyName}
-                                        capitalizeField
-                                        validate={{
-                                            test(value) {
-                                                return COMPANY_NAME_REGEX.test(value);
-                                            },
-                                            message: "Invalid company name! It must contain only alphanumeric characters with the exception of the following characters: &, ', (, ), -"
-                                        }}
-                                        onValueChange={(value) => {
-                                            setProposedCompanyInfo(prev => ({
-                                                ...prev,
-                                                companyName: value
-                                            }));
-                                        }}
-                                    />
-                                </div>
-                                {
-                                    controlsEnabled ?
-                                        <CldUploadButton
-                                            options={{
-                                                maxFiles: 1,
-                                                maxFileSize: 3000000,
-                                                resourceType: "image"
-                                            }}
-                                            onUpload={handleImageUpload}
-                                            uploadPreset="kyyplgrx"
-                                        >
-                                            <Avatar
-                                                isBordered={true}
-                                                className="self-center mx-auto transition-fast hover:brightness-150 cursor-pointer w-32 h-32"
-                                                src={(proposedCompanyInfo?.companyLogo || data!.companyLogo) || undefined}
-                                            />
-                                        </CldUploadButton>
-                                        :
-                                        <Avatar
-                                            isBordered={true}
-                                            className="self-center mx-auto w-32 h-32"
-                                            src={(proposedCompanyInfo?.companyLogo || data!.companyLogo) || undefined}
-                                        />
-                                }
+                    <>
+                        <SubTitle>Company Information</SubTitle>
+                        <Divider className="my-6" />
+                        <div className="flex gap-6 phone:flex-col-reverse">
+                            <div className="w-1/2 phone:w-full self-center">
+                                <EditableField
+                                    label="Company Name"
+                                    editAllowed={controlsEnabled}
+                                    field={proposedCompanyInfo?.companyName || data?.companyName}
+                                    fieldIsLoaded={!isLoading}
+                                    capitalizeField
+                                    validate={{
+                                        test(value) {
+                                            return COMPANY_NAME_REGEX.test(value);
+                                        },
+                                        message: "Invalid company name! It must contain only alphanumeric characters with the exception of the following characters: &, ', (, ), -"
+                                    }}
+                                    onValueChange={(value) => {
+                                        setProposedCompanyInfo(prev => ({
+                                            ...prev,
+                                            companyName: value
+                                        }));
+                                    }}
+                                />
                             </div>
-                            <Spacer y={6} />
-                            <EditableField
-                                label="Company Address"
-                                editAllowed={controlsEnabled}
-                                field={proposedCompanyInfo?.companyAddress || data?.companyAddress}
-                                capitalizeField
-                                onValueChange={(value) => {
-                                    setProposedCompanyInfo(prev => ({
-                                        ...prev,
-                                        companyAddress: value
-                                    }));
-                                }}
-                            />
-                        </>
+                            {
+                                controlsEnabled ?
+                                    <CldUploadButton
+                                        options={{
+                                            maxFiles: 1,
+                                            maxFileSize: 3000000,
+                                            resourceType: "image"
+                                        }}
+                                        onUpload={handleImageUpload}
+                                        uploadPreset="kyyplgrx"
+                                    >
+                                        <Skeleton
+                                            isLoaded={!isLoading}
+                                            className={clsx(
+                                                "rounded-full w-36 h-36 flex items-center justify-center",
+                                                !isLoading && "!bg-transparent"
+                                            )}>
+                                            <Avatar
+                                                isBordered
+                                                className="self-center mx-auto transition-fast hover:brightness-150 cursor-pointer w-32 h-32"
+                                                src={(proposedCompanyInfo?.companyLogo || data?.companyLogo) || undefined}
+                                            />
+                                        </Skeleton>
+                                    </CldUploadButton>
+                                    :
+                                    <Skeleton isLoaded={!isLoading} className={clsx(
+                                        "rounded-full w-36 h-36 flex items-center justify-center",
+                                        !isLoading && "!bg-transparent"
+                                    )}>
+                                        <Avatar
+                                            isBordered
+                                            className="self-center mx-auto w-32 h-32"
+                                            src={(proposedCompanyInfo?.companyLogo || data?.companyLogo) || undefined}
+                                        />
+                                    </Skeleton>
+                            }
+                        </div>
+                        <Spacer y={6} />
+                        <EditableField
+                            label="Company Address"
+                            editAllowed={controlsEnabled}
+                            field={proposedCompanyInfo?.companyAddress || data?.companyAddress}
+                            fieldIsLoaded={!isLoading}
+                            capitalizeField
+                            onValueChange={(value) => {
+                                setProposedCompanyInfo(prev => ({
+                                    ...prev,
+                                    companyAddress: value
+                                }));
+                            }}
+                        />
+                    </>
                 } </div>
         </>
     );

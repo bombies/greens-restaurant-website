@@ -57,7 +57,11 @@ export default function DropdownInput({
     return (
         <>
             {label && <p>{label}</p>}
-            <Dropdown>
+            <Dropdown
+                classNames={{
+                    base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6"
+                }}
+            >
                 <DropdownTrigger>
                     <Button
                         isIconOnly={labelIsIcon}
