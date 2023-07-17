@@ -196,7 +196,9 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                     selectionMode={mutationAllowed ? "multiple" : "none"}
                     selectedKeys={selectedKeys}
                     onSelectionChange={(keys) => {
-                        setSelectedKeys(Array.from(keys));
+                        if (keys === "all")
+                            setSelectedKeys(sortedItems.map(item => `${item.id}/${item.name}`));
+                        else setSelectedKeys(Array.from(keys));
                     }}
                     classNames={{
                         wrapper: "!bg-secondary/20 rounded-2xl",
