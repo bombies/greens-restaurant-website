@@ -39,7 +39,7 @@ export default function StockGraphWidget() {
                                     Current Stock
                                 </h3>
                                 <Spacer y={6} />
-                                <div className="default-container p-6">
+                                <div className="flex justify-center h-full items-center">
                                     <SubTitle>No Data...</SubTitle>
                                 </div>
                             </div>
