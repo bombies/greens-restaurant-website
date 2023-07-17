@@ -19,7 +19,7 @@ export default function StockGraphWidget() {
     const {
         data: inventoryInsights,
         isLoading: inventoryInsightsLoading
-    } = useSWR(inventories ? `/api/inventory/${inventories[currentPage - 1].name}/insights/stock` : null, fetcher<StockTimeSeries[]>);
+    } = useSWR(inventories?.length ? `/api/inventory/${inventories[currentPage - 1].name}/insights/stock` : null, fetcher<StockTimeSeries[]>);
 
     const mostRecentData = useMemo(() => inventoryInsights?.map(series => ({
         name: series.name.replaceAll("-", " "),
