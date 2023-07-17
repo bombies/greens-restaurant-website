@@ -21,7 +21,7 @@
     "apexcharts": "^3.41.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
-    "clsx": "^1.2.1",
+    "clsx": "^2.0.0",
     "framer-motion": "^10.12.20",
     "generate-password-ts": "^1.6.3",
     "loader-utils": "^3.2.1",
