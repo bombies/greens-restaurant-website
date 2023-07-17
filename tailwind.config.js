@@ -22,7 +22,9 @@ module.exports = {
         },
         extend: {
             colors: {
-                dark: "#101010",
+                "dark": "#100f10",
+                "dark-2": "#1b1b1b",
+                "dark-3": "#242424",
                 primary: "#00D615",
                 secondary: "#007d0d",
                 danger: "#ff2c2c",
@@ -100,6 +102,6 @@ module.exports = {
                 background: "#151515"
             }
         },
-        defaultTheme: 'dark'
-    })],
+        defaultTheme: "dark"
+    })]
 };

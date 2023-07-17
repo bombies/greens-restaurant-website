@@ -13,7 +13,7 @@ $transition-fastest: 75ms;
 
 @layer components {
   .default-container {
-    background-color: rgb(23 23 23 / 0.5);
+    background-color: #100f1095;
     border-width: theme('borderWidth.2');
     border-color: rgb(255 255 255 / 0.05);
     border-radius: theme('borderRadius.3xl');
@@ -104,10 +104,6 @@ html {
 .stock-quantity-value-exit-active {
   opacity: 0;
   transition: all 200ms ease;
-}
-
-.bg-blurred {
-  background-image: url(https://i.imgur.com/GYsutX5.jpg);
 }
 
 .transition-slow {

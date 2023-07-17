@@ -8,6 +8,7 @@ import clsx from "clsx";
 import { useState } from "react";
 import lockIcon from "/public/icons/lock.svg";
 import unlockIcon from "/public/icons/unlocked.svg";
+import { SlotsToClasses } from "@nextui-org/react";
 
 interface Props extends InputProps {
     id: string;
@@ -21,12 +22,23 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
     const [passwordVisible, setPasswordVisible] = useState(false);
     const togglePasswordVisibility = () => setPasswordVisible(prev => !prev);
 
+    const className: SlotsToClasses<"description" | "errorMessage" | "label" | "base" | "mainWrapper" | "inputWrapper" | "innerWrapper" | "input" | "clearButton" | "helperWrapper"> | undefined
+        = {
+        inputWrapper: clsx(
+            "transition-fast ring-2 bg-dark ring-neutral-800 hover:ring-primary hover:-translate-y-[0.15rem]",
+            "group-data-[focused=true]:ring-primary",
+            errors && (errors[id] && "ring-danger")
+        ),
+        input: "placeholder:text-neutral-600",
+        label: "text-neutral-100",
+    };
+
     const input = register ?
         <Input
             {...register(id, { required: props.required })}
             {...props}
             type={type === "password" ? (passwordVisible ? "text" : "password") : type}
-            radius={radius || "xl"}
+            radius={radius || "lg"}
             startContent={
                 props.startContent || (iconLeft && <GenericImage src={iconLeft} width={1.25} />)
             }
@@ -41,18 +53,13 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
                     :
                     iconRight && <GenericImage src={iconRight} width={1.25} />)
             }
-            classNames={{
-                inputWrapper: clsx(
-                    "transition-fast ring-2 ring-neutral-800 hover:ring-primary hover:-translate-y-[0.15rem]",
-                    errors && (errors[id] && "ring-danger")
-                )
-            }}
+            classNames={className}
         />
         :
         <Input
             {...props}
             type={type === "password" ? (passwordVisible ? "text" : "password") : type}
-            radius={radius || "xl"}
+            radius={radius || "lg"}
             startContent={
                 iconLeft && <GenericImage src={iconLeft} width={1.25} />
             }
@@ -66,11 +73,7 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
                     :
                     iconRight && <GenericImage src={iconRight} width={1.25} />
             }
-            classNames={{
-                inputWrapper: clsx(
-                    "transition-fast ring-2 ring-neutral-800 hover:ring-primary hover:-translate-y-[0.15rem]"
-                )
-            }}
+            classNames={className}
         />;
 
     return (
