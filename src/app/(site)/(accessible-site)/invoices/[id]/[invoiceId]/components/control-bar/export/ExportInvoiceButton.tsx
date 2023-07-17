@@ -33,7 +33,7 @@ export default function ExportInvoiceButton({ customer, invoice, invoiceItems, d
             invoice={invoice}
             invoiceItems={invoiceItems}
         />);
-    }, [companyInfo, customer, invoice, invoiceItems]);
+    }, [companyInfo, customer, invoice, invoiceItems, updatePdfInstance]);
 
     return (
         <>
