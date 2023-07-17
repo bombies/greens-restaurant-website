@@ -34,7 +34,7 @@ export default function StockGraphWidget() {
                     <div className="flex justify-center items-center"><Spinner size="lg" /></div>
                     :
                     (!inventories?.length ?
-                            <div className="h-fit">
+                            <div className="h-full">
                                 <h3 className="font-black text-lg capitalize px-3">
                                     Current Stock
                                 </h3>
