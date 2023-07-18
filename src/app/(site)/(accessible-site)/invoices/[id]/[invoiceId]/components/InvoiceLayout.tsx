@@ -70,13 +70,23 @@ export default function InvoiceLayout({ customerId }: Props) {
                                 <Divider className="my-3" />
                                 {
                                     invoiceItems &&
-                                    <p className="font-semibold">
-                                        Total: <span className="text-primary">{
-                                        dollarFormat.format(Number(invoiceItems
-                                            .map(item => item.quantity * item.price)
-                                            .reduce((prev, acc) => prev + acc, 0)))
-                                    }</span>
-                                    </p>
+                                    <Fragment>
+                                        <p className="font-semibold">
+                                            Grand Total: <span className="text-primary">{
+                                            dollarFormat.format(Number(invoiceItems
+                                                .map(item => item.quantity * item.price)
+                                                .reduce((prev, acc) => prev + acc, 0)))
+                                        }</span>
+                                        </p>
+                                        <p className="font-semibold">
+                                            Total Items: <span className="text-primary">{
+                                            invoiceItems
+                                                .map(item => item.quantity)
+                                                .reduce((prev, acc) => prev + acc, 0)
+                                        }</span>
+                                        </p>
+                                    </Fragment>
+
                                 }
                             </>
                     }
