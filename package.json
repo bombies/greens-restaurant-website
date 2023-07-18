@@ -41,7 +41,7 @@
     "react-redux": "8.1.1",
     "react-transition-group": "^4.4.5",
     "redux-persist": "^6.0.0",
-    "sharp": "^0.32.2",
+    "sharp": "^0.32.3",
     "swr": "^2.2.0",
     "uuid": "^9.0.0"
   },
