@@ -23,9 +23,7 @@ export default function ToastComponent(props: Props) {
     return (
         <div
             className={clsx(`
-                dark:bg-dark/50
-                rounded-xl
-                bg-neutral-200/75
+                default-container
                 backdrop-blur-sm p-6
                 min-w-96 max-w-[32rem]
                 flex

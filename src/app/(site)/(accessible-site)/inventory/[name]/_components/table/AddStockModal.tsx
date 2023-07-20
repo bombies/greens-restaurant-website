@@ -15,10 +15,11 @@ type Props = {
     setOpen: Dispatch<SetStateAction<boolean>>
     onClose: () => void
     item?: StockSnapshot,
-    onSubmit: SubmitHandler<FieldValues>
+    onSubmit: SubmitHandler<FieldValues>,
+    isUpdating: boolean
 }
 
-export default function AddStockModal({ isOpen, setOpen, onClose, item, onSubmit, disabled }: Props) {
+export default function AddStockModal({ isOpen, setOpen, onClose, item, onSubmit, isUpdating, disabled }: Props) {
     const {
         register,
         handleSubmit,
@@ -43,7 +44,7 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item, onSubmit
         >
             <form onSubmit={handleSubmit(onSubmit)}>
                 <GenericInput
-                    isDisabled={disabled}
+                    isDisabled={disabled || isUpdating}
                     register={register}
                     errors={errors}
                     id="quantity"
@@ -56,8 +57,8 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item, onSubmit
                 <Spacer y={6} />
                 <GenericButton
                     icon={addIcon}
-                    disabled={disabled}
-                    isLoading={disabled}
+                    disabled={disabled || isUpdating}
+                    isLoading={isUpdating}
                     type="submit"
                 >
                     Add Stock

@@ -70,7 +70,8 @@ const SetStockItem = (inventoryName: string) => {
 
 enum StockAction {
     UPDATE,
-    DELETE
+    DELETE,
+    SET
 }
 
 type DeleteStockItemProps = {
@@ -84,12 +85,18 @@ const DeleteStockItem = (inventoryName: string) => {
     return useSWRMutation(`/api/inventory/${inventoryName}/stock/{item_id}`, mutator);
 };
 
-const reducer = (state: StockSnapshot[], action: { type: StockAction, payload: Partial<StockSnapshot> }) => {
+const reducer = (state: StockSnapshot[], action: {
+    type: StockAction,
+    payload: Partial<StockSnapshot> | StockSnapshot[]
+}) => {
     let newState = [...state];
 
     switch (action.type) {
         case StockAction.UPDATE: {
-            const index = state.findIndex(item => item.uid === action.payload.uid);
+            if (typeof action.payload !== "object")
+                throw new Error("The payload must be an object when the action type is StockAction.UPDATE");
+
+            const index = state.findIndex(item => item.uid === (action.payload as Partial<StockSnapshot>).uid);
             newState[index] = {
                 ...newState[index],
                 ...action.payload
@@ -97,8 +104,17 @@ const reducer = (state: StockSnapshot[], action: { type: StockAction, payload: P
             break;
         }
         case StockAction.DELETE: {
-            const index = state.findIndex(item => item.uid === action.payload.uid);
+
+            if (typeof action.payload !== "object")
+                throw new Error("The payload must be an object when the action type is StockAction.DELETE");
+
+            const index = state.findIndex(item => item.uid === (action.payload as Partial<StockSnapshot>).uid);
             newState.splice(index);
+            break;
+        }
+        case StockAction.SET: {
+            newState = action.payload as StockSnapshot[];
+            console.log("new state", newState);
             break;
         }
         default: {
@@ -124,6 +140,16 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
     } = SetStockItem(inventoryName);
     const { trigger: deleteStockItem, isMutating: stockIsDeleting } = DeleteStockItem(inventoryName);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
+
+    useEffect(() => {
+        if (!stock)
+            return;
+
+        dispatchStockState({
+            type: StockAction.SET,
+            payload: stock
+        });
+    }, [stock]);
 
     const sortedItems = useMemo(() => {
         return visibleStockState.sort((a, b) => {
@@ -190,6 +216,8 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             });
                             sendToast({
                                 description: `Successfully updated ${item.name}!`
+                            }, {
+                                position: "top-right"
                             });
                             setEditMode(false);
                         })
@@ -198,6 +226,8 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             sendToast({
                                 error: e,
                                 description: `Failed to update ${item.name}!`
+                            }, {
+                                position: "top-right"
                             });
                         });
                 }}
@@ -211,6 +241,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             isDisabled={isUpdating || !mutationAllowed || stockIsDeleting}
                             icon={addIcon}
                             toolTip="Increment"
+                            cooldown={1}
                             onPress={() => {
                                 setSelectedItem(item);
                                 triggerStockUpdate({ item, quantity: item.quantity + 1 })
@@ -224,6 +255,8 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                         });
                                         sendToast({
                                             description: `Successfully incremented ${item.name}!`
+                                        }, {
+                                            position: "top-right"
                                         });
                                     })
                                     .catch(e => {
@@ -231,6 +264,8 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                         sendToast({
                                             error: e,
                                             description: `Failed to increment ${item.name}!`
+                                        }, {
+                                            position: "top-right"
                                         });
                                     });
                             }}
@@ -239,6 +274,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             isDisabled={isUpdating || !mutationAllowed || stockIsDeleting}
                             icon={minusIcon}
                             toolTip="Decrement"
+                            cooldown={1}
                             onPress={() => {
                                 setSelectedItem(item);
                                 triggerStockUpdate({ item, quantity: item.quantity - 1 })
@@ -252,6 +288,8 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                         });
                                         sendToast({
                                             description: `Successfully decremented ${item.name}!`
+                                        }, {
+                                            position: "top-right"
                                         });
                                     })
                                     .catch(e => {
@@ -259,6 +297,8 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                         sendToast({
                                             error: e,
                                             description: `Failed to decrement ${item.name}!`
+                                        }, {
+                                            position: "top-right"
                                         });
                                     });
                             }}
@@ -324,14 +364,16 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             });
                         });
                 }}
-                disabled={isUpdating}
+                isUpdating={isUpdating}
+                disabled={isUpdating || !mutationAllowed}
                 isOpen={addStockModalOpen}
                 setOpen={setAddStockModalOpen}
                 onClose={() => setSelectedItem(undefined)}
                 item={selectedItem}
             />
             <RemoveStockModal
-                disabled={isUpdating}
+                disabled={isUpdating || !mutationAllowed}
+                isUpdating={isUpdating}
                 onSubmit={(data) => {
                     if (!mutationAllowed)
                         return;
@@ -370,6 +412,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                 isOpen={deleteStockModalOpen}
                 setOpen={setDeleteStockModalOpen}
                 title={`Delete ${selectedItem?.name}`}
+                accepting={stockIsDeleting}
                 message={
                     `Are you sure you want to delete ${selectedItem?.name
                         ?.replace(
@@ -395,7 +438,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             sendToast({
                                 description: `Successfully removed ${data.name.capitalize()}`
                             }, {
-                                position: "top-center"
+                                position: "top-right"
                             });
 
                             setDeleteStockModalOpen(false);
@@ -406,7 +449,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                 error: e,
                                 description: "Couldn't remove that item!"
                             }, {
-                                position: "top-center"
+                                position: "top-right"
                             });
                         });
                 }}

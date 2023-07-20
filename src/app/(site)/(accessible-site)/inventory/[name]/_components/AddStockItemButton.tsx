@@ -76,7 +76,7 @@ export default function AddStockItemButton({ inventoryName, disabled }: Props) {
         <>
             <GenericButton
                 fullWidth
-                disabled={disabled}
+                disabled={disabled || addingStock}
                 icon={addIcon}
                 onPress={() => setModalOpen(true)}
             >
@@ -94,7 +94,8 @@ export default function AddStockItemButton({ inventoryName, disabled }: Props) {
                         label="Item Name"
                         register={register}
                         errors={errors}
-                        isRequired={true}
+                        isRequired
+                        isClearable
                     />
                     <Spacer y={4} />
                     <GenericButton
