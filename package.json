@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
-    "@nextui-org/react": "^0.0.0-dev-v2-20230716194106",
+    "@nextui-org/react": "^0.0.0-dev-v2-20230724140319",
     "@prisma/client": "^5.0.0",
     "@react-pdf/renderer": "^3.1.12",
     "@react-stately/data": "^3.10.0",
