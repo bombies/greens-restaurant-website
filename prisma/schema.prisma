@@ -92,10 +92,10 @@ model InvoiceInformation {
 }
 
 model InvoiceCustomer {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
-  customerName    String @unique
-  customerEmail   String @unique
-  customerAddress String
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  customerName    String  @unique
+  customerEmail   String? @unique
+  customerAddress String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

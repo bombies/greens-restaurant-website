@@ -36,7 +36,7 @@ export default function CreateCustomerButton({ disabled }: Props) {
         triggerCustomerCreation({
             dto: {
                 customerName: data.customerName,
-                customerAddress: data.customerAddress,
+                customerAddress: data.customerAddress || null,
                 customerEmail: data.customerEmail
             }
         }).then(() => {
@@ -70,7 +70,7 @@ export default function CreateCustomerButton({ disabled }: Props) {
                             id="customerName"
                             register={register}
                             label="Customer Name"
-                            isRequired={true}
+                            isRequired
                             isDisabled={customerIsCreating || disabled}
                             isClearable
                             maxLength={30}
@@ -80,7 +80,6 @@ export default function CreateCustomerButton({ disabled }: Props) {
                             id="customerEmail"
                             register={register}
                             label="Email"
-                            isRequired
                             isDisabled={customerIsCreating || disabled}
                             type="email"
                             isClearable
@@ -92,13 +91,18 @@ export default function CreateCustomerButton({ disabled }: Props) {
                         id="customerAddress"
                         register={register}
                         label="Address"
-                        isRequired={true}
                         isDisabled={customerIsCreating || disabled}
                         isClearable
                         placeholder="Enter the address of the customer"
                     />
                     <Spacer y={6} />
-                    <GenericButton type="submit">Create Customer</GenericButton>
+                    <GenericButton
+                        isLoading={customerIsCreating}
+                        isDisabled={customerIsCreating || disabled}
+                        type="submit"
+                    >
+                        Create Customer
+                    </GenericButton>
                 </form>
             </GenericModal>
             <GenericButton

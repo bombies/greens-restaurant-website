@@ -45,29 +45,31 @@ export function POST(req: Request) {
                 status: 401
             });
 
-        if (!EMAIL_REGEX.test(body.customerEmail))
-            return respondWithInit({
-                message: "That is an invalid email!",
-                status: 401
+        if (body.customerEmail) {
+            if (!EMAIL_REGEX.test(body.customerEmail))
+                return respondWithInit({
+                    message: "That is an invalid email!",
+                    status: 401
+                });
+
+            const existingEmail = await prisma.invoiceCustomer.findUnique({
+                where: {
+                    customerEmail: body.customerEmail.toLowerCase()
+                }
             });
 
-        const existingEmail = await prisma.invoiceCustomer.findUnique({
-            where: {
-                customerEmail: body.customerEmail.toLowerCase()
-            }
-        });
-
-        if (existingEmail)
-            return respondWithInit({
-                message: "There is already a customer with that email address!",
-                status: 401
-            });
+            if (existingEmail)
+                return respondWithInit({
+                    message: "There is already a customer with that email address!",
+                    status: 401
+                });
+        }
 
         return NextResponse.json(
             await prisma.invoiceCustomer.create({
                 data: {
                     ...body,
-                    customerEmail: body.customerEmail.toLowerCase()
+                    customerEmail: body.customerEmail?.toLowerCase()
                 }
             })
         );

@@ -5,6 +5,7 @@ import React, { ReactElement, useCallback, useMemo, useState } from "react";
 import { UseDropdownProps } from "@nextui-org/dropdown/dist/use-dropdown";
 import { DropdownInputProps } from "./DropdownInput";
 import { sendToast } from "../../../utils/Hooks";
+import { PressEvent } from "@react-types/shared";
 
 type Props = {
     toolTip?: string,
@@ -43,7 +44,7 @@ export default function IconButton({
             isIconOnly
             variant={buttonProps.variant || "light"}
             color={color || "secondary"}
-            onPress={(e) => {
+            onPress={(e: PressEvent) => {
                 if (!isOnCoolDown()) {
                     if (buttonProps.onPress)
                         buttonProps.onPress(e);

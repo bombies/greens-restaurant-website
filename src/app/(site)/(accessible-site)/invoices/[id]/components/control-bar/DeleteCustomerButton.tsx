@@ -10,10 +10,14 @@ import useSWRMutation from "swr/mutation";
 import { useRouter } from "next/navigation";
 import { sendToast } from "../../../../../../../utils/Hooks";
 import trashIcon from "/public/icons/red-trash.svg";
+import IconButton from "../../../../../../_components/inputs/IconButton";
 
 type Props = {
     customer?: InvoiceCustomer,
-    disabled?: boolean
+    disabled?: boolean,
+    iconOnly?: boolean,
+    onSuccess?: (data: InvoiceCustomer) => void,
+    noReroute?: boolean,
 }
 
 const DeleteCustomer = (customerId?: string) => {
@@ -21,7 +25,7 @@ const DeleteCustomer = (customerId?: string) => {
     return useSWRMutation(`/api/invoices/customer/${customerId}`, mutator);
 };
 
-export default function DeleteCustomerButton({ customer, disabled }: Props) {
+export default function DeleteCustomerButton({ customer, disabled, iconOnly, onSuccess, noReroute }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const { trigger: triggerCustomerDeletion, isMutating: customerIsDeleting } = DeleteCustomer(customer?.id);
     const router = useRouter();
@@ -36,11 +40,16 @@ export default function DeleteCustomerButton({ customer, disabled }: Props) {
                 message={`Are you sure you want to delete ${customer?.customerName.capitalize()}`}
                 onAccept={() => {
                     triggerCustomerDeletion()
-                        .then(() => {
+                        .then((data) => {
                             sendToast({
                                 description: `You have successfully deleted ${customer?.customerName.capitalize()}!`
                             });
-                            router.push(`/invoices`);
+
+                            if (!noReroute)
+                                router.push(`/invoices`);
+
+                            if (onSuccess)
+                                onSuccess(data.data);
                         })
                         .catch(e => {
                             console.error(e);
@@ -51,15 +60,26 @@ export default function DeleteCustomerButton({ customer, disabled }: Props) {
                         });
                 }}
             />
-            <GenericButton
-                disabled={disabled}
-                color="danger"
-                variant="flat"
-                onPress={() => setModalOpen(true)}
-                icon={trashIcon}
-            >
-                Delete {customer?.customerName.capitalize()}
-            </GenericButton>
+            {
+                iconOnly ?
+                    <IconButton
+                        icon={trashIcon}
+                        toolTip="Delete"
+                        variant="flat"
+                        color="danger"
+                        onPress={() => setModalOpen(true)}
+                    />
+                    :
+                    <GenericButton
+                        disabled={disabled}
+                        color="danger"
+                        variant="flat"
+                        onPress={() => setModalOpen(true)}
+                        icon={trashIcon}
+                    >
+                        Delete {customer?.customerName.capitalize()}
+                    </GenericButton>
+            }
         </>
     );
 }

@@ -11,7 +11,7 @@ import { hasAnyPermission, hasPermission, Permission } from "../../../../libs/ty
 import { useUserData } from "../../../../utils/Hooks";
 import StockGraphWidget from "./_components/widgets/StockGraphWidget";
 import { Spacer } from "@nextui-org/react";
-import InvoiceWidget from "./_components/widgets/InvoiceWidget";
+import InvoiceWidget from "./_components/widgets/invoice/InvoiceWidget";
 
 export default function HomePage() {
     const session = useSession();

@@ -12,11 +12,15 @@ import EditableField from "../../../../employees/[username]/_components/Editable
 import { Spacer } from "@nextui-org/react";
 import { CUSTOMER_NAME_REGEX, EMAIL_REGEX } from "../../../../../../../utils/regex";
 import { sendToast } from "../../../../../../../utils/Hooks";
-import editIcon from "/public/icons/edit-green.svg";
+import editIconGreen from "/public/icons/edit-green.svg";
+import editIcon from "/public/icons/edit.svg";
+import IconButton from "../../../../../../_components/inputs/IconButton";
 
 type Props = {
     customer?: InvoiceCustomer,
-    disabled?: boolean
+    disabled?: boolean,
+    iconOnly?: boolean,
+    onSuccess?: (data: InvoiceCustomer) => void;
 }
 
 type UpdateCustomerInfoArgs = {
@@ -30,7 +34,7 @@ const UpdateCustomerInfo = (customerId?: string) => {
     return useSWRMutation(`/api/invoices/customer/${customerId}`, mutator);
 };
 
-export default function EditCustomerButton({ customer, disabled }: Props) {
+export default function EditCustomerButton({ customer, disabled, iconOnly, onSuccess }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const [proposedChanges, setProposedChanges] = useState<UpdateCustomerDto>();
     const [changesMade, setChangesMade] = useState(false);
@@ -55,12 +59,15 @@ export default function EditCustomerButton({ customer, disabled }: Props) {
                         triggerCustomerUpdate({
                             dto: proposedChanges
                         })
-                            .then(() => {
+                            .then((data) => {
                                 setProposedChanges(undefined);
                                 setModalOpen(false);
                                 sendToast({
                                     description: "Successfully updated this customer!"
                                 });
+
+                                if (onSuccess)
+                                    onSuccess(data.data);
                             })
                             .catch(e => {
                                 console.error(e);
@@ -117,14 +124,26 @@ export default function EditCustomerButton({ customer, disabled }: Props) {
                 </div>
                 <Spacer y={24} />
             </GenericModal>
-            <GenericButton
-                variant="flat"
-                onPress={() => setModalOpen(true)}
-                disabled={disabled}
-                icon={editIcon}
-            >
-                Edit Customer Information
-            </GenericButton>
+            {
+                iconOnly ?
+                    <IconButton
+                        icon={editIcon}
+                        toolTip="Edit"
+                        variant="flat"
+                        color="default"
+                        onPress={() => setModalOpen(true)}
+                    />
+                    :
+                    <GenericButton
+                        variant="flat"
+                        onPress={() => setModalOpen(true)}
+                        disabled={disabled}
+                        icon={editIconGreen}
+                    >
+                        Edit Customer Information
+                    </GenericButton>
+            }
+
         </>
     );
 }
