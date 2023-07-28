@@ -56,8 +56,9 @@ export default function StockGraphWidget() {
                                             <Spinner size="lg" />
                                         </div>
                                         :
-                                        (mostRecentData?.length ?
-                                                <Fragment>
+                                        <Fragment>
+                                            {
+                                                mostRecentData?.length ?
                                                     <div className="h-3/4">
                                                         <GenericChart
                                                             data={mostRecentData.map(data => data.data.value)}
@@ -87,26 +88,26 @@ export default function StockGraphWidget() {
                                                             }}
                                                         />
                                                     </div>
-                                                    {
-                                                        (inventories.length > 1)
-                                                        &&
-                                                        <div className="flex justify-center">
-                                                            <Pagination
-                                                                variant="bordered"
-                                                                showShadow
-                                                                showControls
-                                                                total={inventories.length}
-                                                                page={currentPage}
-                                                                onChange={setCurrentPage}
-                                                            />
-                                                        </div>
-                                                    }
-                                                </Fragment>
-                                                :
-                                                <div className="default-container p-6 my-6">
-                                                    <SubTitle>No Data...</SubTitle>
+                                                    :
+                                                    <div className="default-container p-6 my-6">
+                                                        <SubTitle>No Data...</SubTitle>
+                                                    </div>
+                                            }
+                                            {
+                                                (inventories.length > 1)
+                                                &&
+                                                <div className="flex justify-center">
+                                                    <Pagination
+                                                        variant="bordered"
+                                                        showShadow
+                                                        showControls
+                                                        total={inventories.length}
+                                                        page={currentPage}
+                                                        onChange={setCurrentPage}
+                                                    />
                                                 </div>
-                                        )
+                                            }
+                                        </Fragment>
                                 }
                             </div>
                     )
