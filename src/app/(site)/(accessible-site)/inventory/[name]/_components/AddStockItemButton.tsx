@@ -2,7 +2,7 @@
 
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import addIcon from "/public/icons/add.svg";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericModal from "../../../../../_components/GenericModal";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
