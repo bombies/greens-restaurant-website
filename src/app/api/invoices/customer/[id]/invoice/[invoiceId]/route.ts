@@ -5,7 +5,6 @@ import { NextResponse } from "next/server";
 import { Invoice, InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../libs/prisma";
 import { Either } from "../../../../../inventory/[name]/utils";
-import { CreateInvoiceDto } from "../../invoices/route";
 import { INVOICE_ITEM_NAME_REGEX } from "../../../../../../../utils/regex";
 
 type Context = {
@@ -83,7 +82,10 @@ export function POST(req: Request, { params }: Context) {
     }, [Permission.CREATE_INVOICE]);
 }
 
-export type UpdateInvoiceDto = Partial<CreateInvoiceDto> & { paid?: boolean };
+export type UpdateInvoiceDto = Partial<{
+    title: string,
+    description: string
+}> & { paid?: boolean };
 
 export function PATCH(req: Request, { params }: Context) {
     return authenticated(req, async () => {

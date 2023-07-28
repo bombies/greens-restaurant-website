@@ -47,6 +47,7 @@ export default function EditInvoiceButton({ customerId, invoice, disabled }: Pro
         <>
             <GenericModal
                 title="Update Invoice Information"
+                size="3xl"
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
             >
@@ -94,7 +95,7 @@ export default function EditInvoiceButton({ customerId, invoice, disabled }: Pro
                         }))}
                     />
                 </div>
-                <Spacer y={24} />
+                <Spacer y={36} />
             </GenericModal>
             <GenericButton
                 variant="flat"

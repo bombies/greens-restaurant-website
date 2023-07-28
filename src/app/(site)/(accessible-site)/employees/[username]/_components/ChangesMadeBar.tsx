@@ -14,7 +14,7 @@ type Props = {
 
 export default function ChangesMadeBar({ changesMade, onAccept, onReject, isChanging }: Props) {
     return (
-        <SlidingBar visible={changesMade}>
+        <SlidingBar visible={changesMade} className="justify-between">
             <p className="text-xl phone:text-lg self-center">Careful - You have unsaved changes!</p>
             <div className="flex tablet:flex-col gap-4">
                 <GenericButton
