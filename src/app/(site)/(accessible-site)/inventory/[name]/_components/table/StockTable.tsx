@@ -465,7 +465,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                     label="Search for an item"
                                     placeholder="Search..."
                                     value={stockSearch}
-                                    onChange={(e) => setStockSearch(e.target.value)}
+                                    onValueChange={(value: string | undefined) => setStockSearch(value)}
                                 />
                             </div>
                             <Spacer y={6} />

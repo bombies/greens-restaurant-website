@@ -211,10 +211,10 @@ export default function SelectMenu(props: Props) {
                     id={`select_menu_search:${props.id}`}
                     placeholder="Search..."
                     value={searchValue}
-                    onChange={e => {
+                    onValueChange={(value: string | undefined) => {
                         if (!expanded)
                             return;
-                        setSearchValue(e.target.value);
+                        setSearchValue(value || "");
                     }}
                 />
                 <div

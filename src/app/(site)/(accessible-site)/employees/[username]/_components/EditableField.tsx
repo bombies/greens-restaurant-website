@@ -15,7 +15,7 @@ import GenericModal from "../../../../../_components/GenericModal";
 
 interface Props {
     label: string,
-    field?: string,
+    field?: string | null,
     fieldIsLoaded?: boolean,
     capitalizeField?: boolean,
     onValueChange?: (value: string) => void
@@ -102,7 +102,7 @@ export default function EditableField({
 
 type DataContainerProps = {
     label: string,
-    field?: string,
+    field?: string | null,
     fieldIsLoaded?: boolean,
     onEdit?: MouseEventHandler<HTMLDivElement>
     capitalizeField?: boolean

@@ -168,7 +168,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                     iconLeft={searchIcon}
                     id="invoiceSearch"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onValueChange={(value: string | undefined) => setSearch(value)}
                     label="Search"
                     placeholder="Search for an invoice..."
                     width={24}

@@ -4,6 +4,7 @@ import clsx from "clsx";
 import GenericImage from "../GenericImage";
 import { Button, ButtonProps } from "@nextui-org/react";
 import { sendToast } from "../../../utils/Hooks";
+import { PressEvent } from "@react-types/shared";
 
 type Props =
     ButtonProps
@@ -35,7 +36,7 @@ export default function GenericButton({ icon, cooldown, children, ...props }: Pr
                 className={clsx(
                     "z-0 rounded-xl self-center cursor-pointer transition-fast hover:-translate-y-[.25rem] disabled:opacity-50 disabled:cursor-not-allowed p-6"
                 )}
-                onPress={(e) => {
+                onPress={(e: PressEvent) => {
                     if (!isOnCoolDown()) {
                         if (props.onPress)
                             props.onPress(e);

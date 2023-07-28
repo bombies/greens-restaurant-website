@@ -121,9 +121,9 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                         placeholder="Enter the name of the item"
                         labelPlacement="outside"
                         value={currentInfo.name}
-                        onChange={e => dispatchCurrentInfo({
+                        onValueChange={(value: string | undefined) => dispatchCurrentInfo({
                             type: EditItemAction.UPDATE,
-                            payload: { name: e.target.value }
+                            payload: { name: value }
                         })}
                     />
                     <GenericInput
@@ -135,9 +135,9 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                         placeholder="Enter the description of the item"
                         labelPlacement="outside"
                         value={currentInfo.description}
-                        onChange={e => dispatchCurrentInfo({
+                        onValueChange={(value: string | undefined) => dispatchCurrentInfo({
                             type: EditItemAction.UPDATE,
-                            payload: { description: e.target.value }
+                            payload: { description: value }
                         })}
                     />
                     <div className="flex phone:flex-col gap-6">
@@ -149,9 +149,9 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                             label="Item Quantity"
                             placeholder="Enter the quantity of the item"
                             value={currentInfo.quantity.toString()}
-                            onChange={e => dispatchCurrentInfo({
+                            onChange={(value: string | undefined) => dispatchCurrentInfo({
                                 type: EditItemAction.UPDATE,
-                                payload: { quantity: Number(e.target.value) }
+                                payload: { quantity: Number(value) }
                             })}
                             endContent={
                                 <div className="pointer-events-none flex items-center">
@@ -175,9 +175,9 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                                 </div>
                             }
                             value={currentInfo.price.toString()}
-                            onChange={e => dispatchCurrentInfo({
+                            onChange={(value: string | undefined) => dispatchCurrentInfo({
                                 type: EditItemAction.UPDATE,
-                                payload: { price: Number(e.target.value) }
+                                payload: { price: Number(value) }
                             })}
                             type="number"
                             min={0}

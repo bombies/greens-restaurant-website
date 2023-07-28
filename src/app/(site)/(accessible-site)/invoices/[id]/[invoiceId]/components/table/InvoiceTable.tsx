@@ -4,6 +4,7 @@ import { Invoice, InvoiceItem, Prisma } from "@prisma/client";
 import { Fragment, Key, useCallback, useMemo, useState } from "react";
 import AddInvoiceItemButton from "./AddInvoiceItemButton";
 import {
+    Selection,
     SortDescriptor,
     Spacer,
     Table,
@@ -195,7 +196,7 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                     color="primary"
                     selectionMode={mutationAllowed ? "multiple" : "none"}
                     selectedKeys={selectedKeys}
-                    onSelectionChange={(keys) => {
+                    onSelectionChange={(keys: Selection) => {
                         if (keys === "all")
                             setSelectedKeys(sortedItems.map(item => `${item.id}/${item.name}`));
                         else setSelectedKeys(Array.from(keys));

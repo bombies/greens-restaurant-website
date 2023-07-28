@@ -80,7 +80,7 @@ export default function EmployeeGrid() {
                     iconLeft={searchIcon}
                     placeholder="Search for an employee..."
                     value={search}
-                    onChange={e => setSearch(e.target.value)}
+                    onValueChange={(value: string | undefined) => setSearch(value || "")}
                 />
             </div>
             <Spacer y={12} />
