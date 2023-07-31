@@ -22,7 +22,7 @@
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "clsx": "^2.0.0",
-    "framer-motion": "^10.12.22",
+    "framer-motion": "^10.15.0",
     "generate-password-ts": "^1.6.3",
     "loader-utils": "^3.2.1",
     "next": "^13.4.10",
