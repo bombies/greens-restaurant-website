@@ -9,6 +9,7 @@ import InventoryCard from "./InventoryCard";
 import { Spacer } from "@nextui-org/react";
 import ContainerSkeleton from "../../../../_components/skeletons/ContainerSkeleton";
 import CardSkeleton from "../../../../_components/skeletons/CardSkeleton";
+import GenericCard from "../../../../_components/GenericCard";
 
 const useInventoryData = () => {
     return useSWR("/api/inventory", fetcher<Inventory[]>);
@@ -44,7 +45,8 @@ export default function InventoryGrid() {
                         </>
                         :
                         <>
-                            {inventoryCards}
+                            {inventoryCards.length ? inventoryCards :
+                                <GenericCard>There are no inventories...</GenericCard>}
                         </>
                 }
             </div>
