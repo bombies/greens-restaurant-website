@@ -83,25 +83,5 @@ module.exports = {
         }
     },
     darkMode: "class",
-    plugins: [nextui({
-        themes: {
-            light: {
-                primary: "#00D615",
-                brand: "#00D615",
-                secondary: "#007d0d",
-                danger: "#ff2c2c",
-                warning: "#ffa700",
-                background: "#f1f1f1"
-            },
-            dark: {
-                primary: "#00D615",
-                brand: "#00D615",
-                secondary: "#007d0d",
-                danger: "#ff2c2c",
-                warning: "#ffa700",
-                background: "#151515"
-            }
-        },
-        defaultTheme: "dark"
-    })]
+    plugins: [nextui()]
 };

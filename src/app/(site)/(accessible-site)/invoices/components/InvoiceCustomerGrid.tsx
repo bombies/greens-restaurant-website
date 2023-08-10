@@ -19,7 +19,7 @@ export default function InvoiceCustomerGrid() {
     const { data: customers, isLoading } = FetchCustomers();
     const customerElements = customers?.map(customer => (
         <LinkCard key={customer.id} href={`/invoices/${customer.id}`}>
-            <p className="capitalize">{customer.customerName}</p>
+            <p className="capitalize overflow-hidden whitespace-nowrap overflow-ellipsis">{customer.customerName}</p>
         </LinkCard>
     ));
 
