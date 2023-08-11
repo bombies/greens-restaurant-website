@@ -1,6 +1,6 @@
 "use client";
 
-import { Invoice, InvoiceItem, Prisma } from "@prisma/client";
+import { InvoiceItem } from "@prisma/client";
 import { Fragment, Key, useCallback, useMemo, useState } from "react";
 import AddInvoiceItemButton from "./AddInvoiceItemButton";
 import {
@@ -24,7 +24,6 @@ import { useInvoiceItems } from "../InvoiceItemsProvider";
 import DeleteInvoiceItemButton from "./DeleteInvoiceItemButton";
 import DeleteInvoiceItemsButton from "./DeleteInvoiceItemsButton";
 import closeIcon from "/public/icons/close-gold-circled.svg";
-import { useAsyncList } from "@react-stately/data";
 
 
 type Column = {
@@ -66,7 +65,7 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
     const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
 
-    const getKeyValue = useCallback((invoice: InvoiceItem, key: Prisma.Key) => {
+    const getKeyValue = useCallback((invoice: InvoiceItem, key: Key) => {
         switch (key) {
             case "invoice_item": {
                 return invoice.name;
@@ -223,7 +222,7 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                     >
                         {(item: InvoiceItem) => (
                             <TableRow key={`${item.id}/${item.name}`}>
-                                {columnKey => <TableCell
+                                {(columnKey: Key) => <TableCell
                                     className={clsx(columnKey !== "invoice_desc" && "capitalize")}>{getKeyValue(item, columnKey)}</TableCell>}
                             </TableRow>
                         )}

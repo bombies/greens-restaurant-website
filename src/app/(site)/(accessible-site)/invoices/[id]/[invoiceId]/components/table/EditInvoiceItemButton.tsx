@@ -149,7 +149,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                             label="Item Quantity"
                             placeholder="Enter the quantity of the item"
                             value={currentInfo.quantity.toString()}
-                            onChange={(value: string | undefined) => dispatchCurrentInfo({
+                            onValueChange={(value: string | undefined) => dispatchCurrentInfo({
                                 type: EditItemAction.UPDATE,
                                 payload: { quantity: Number(value) }
                             })}
@@ -175,7 +175,7 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                                 </div>
                             }
                             value={currentInfo.price.toString()}
-                            onChange={(value: string | undefined) => dispatchCurrentInfo({
+                            onValueChange={(value: string | undefined) => dispatchCurrentInfo({
                                 type: EditItemAction.UPDATE,
                                 payload: { price: Number(value) }
                             })}

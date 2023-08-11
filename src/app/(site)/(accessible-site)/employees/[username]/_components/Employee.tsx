@@ -257,7 +257,7 @@ export default function Employee({ username }: Props) {
                                                 label="Select Permissions"
                                                 value={selectedPermissions}
                                                 isDisabled={!editAllowed}
-                                                onChange={(values: string[]) => {
+                                                onValueChange={(values: string[]) => {
                                                     setSelectedPermissions(values);
 
                                                     const permissions = values.length ? values.map(val => Number(val)).reduce((prev, curr) => {

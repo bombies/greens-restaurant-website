@@ -17,7 +17,7 @@ import moreIcon from "/public/icons/more.svg";
 import IconButton from "../../../../../../_components/inputs/IconButton";
 import StockOptionsDropdown from "./StockOptionsDropdown";
 import AddStockModal from "./AddStockModal";
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import { Key, useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import ConfirmationModal from "../../../../../../_components/ConfirmationModal";
 import RemoveStockModal from "./RemoveStockModal";
 import StockQuantityField from "./StockQuantityField";
@@ -195,7 +195,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
         );
     }, [stockSearch, stockState]);
 
-    const getKeyValue = useCallback((item: StockSnapshot, key: Prisma.Key) => {
+    const getKeyValue = useCallback((item: StockSnapshot, key: Key) => {
         if (key === "stock_name")
             return item.name.replaceAll("-", " ");
         if (key === "stock_quantity")
@@ -490,7 +490,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                 <TableBody items={sortedItems}>
                                     {item => (
                                         <TableRow key={item.uid}>
-                                            {columnKey => <TableCell
+                                            {(columnKey: Key) => <TableCell
                                                 className="capitalize">{getKeyValue(item, columnKey)}</TableCell>}
                                         </TableRow>
                                     )}

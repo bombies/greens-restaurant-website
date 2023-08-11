@@ -1,6 +1,7 @@
 "use client";
 
-import { Skeleton, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import { Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import { Key } from "react";
 
 type Column = {
     key: string,
@@ -18,7 +19,7 @@ export default function TableSkeleton({ width, contentRepeat, columns }: Props) 
     for (let i = 0; i < (contentRepeat || 10); i++) {
         content.push(
             <TableRow key={i}>
-                {columnKey => (
+                {(columnKey: Key) => (
                     <TableCell key={columnKey}>
                         <Skeleton className="rounded-2xl w-full h-3" />
                     </TableCell>
