@@ -25,7 +25,7 @@
     "framer-motion": "^10.15.1",
     "generate-password-ts": "^1.6.3",
     "loader-utils": "^3.2.1",
-    "next": "^13.4.13",
+    "next": "^13.4.12",
     "next-auth": "^4.22.3",
     "next-cloudinary": "4.16.3",
     "next-redux-wrapper": "^8.1.0",
