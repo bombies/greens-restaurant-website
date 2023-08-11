@@ -25,7 +25,7 @@ export default function Providers(props: Props) {
         >
             <ReduxProvider>
                     <NextUIProvider>
-                        <ThemeProvider attribute="class" defaultTheme="light">
+                        <ThemeProvider attribute="class" defaultTheme="dark">
                             <SessionProvider session={props.session}>
                                 <Toaster
                                     position="top-center"
