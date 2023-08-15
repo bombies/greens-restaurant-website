@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
-import { Invoice, InvoiceCustomer } from "@prisma/client";
+import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import Title from "../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
 import InvoiceCustomerControlBar from "./control-bar/InvoiceCustomerControlBar";
@@ -18,7 +18,7 @@ type Props = {
 
 export const FetchInvoiceCustomer = (id: string) => {
     return useSWR(`/api/invoices/customer/${id}/invoices`, fetcher<InvoiceCustomer & {
-        invoices: Invoice[]
+        invoices: (Invoice & { invoiceItems: InvoiceItem[] })[]
     }>);
 };
 

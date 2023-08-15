@@ -143,7 +143,6 @@ export default function EditCustomerButton({ customer, disabled, iconOnly, onSuc
                         Edit
                     </GenericButton>
             }
-
         </>
     );
 }
