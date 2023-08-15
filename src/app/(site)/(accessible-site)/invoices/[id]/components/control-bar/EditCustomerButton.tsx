@@ -140,7 +140,7 @@ export default function EditCustomerButton({ customer, disabled, iconOnly, onSuc
                         disabled={disabled}
                         icon={editIconGreen}
                     >
-                        Edit Customer Information
+                        Edit
                     </GenericButton>
             }
 
