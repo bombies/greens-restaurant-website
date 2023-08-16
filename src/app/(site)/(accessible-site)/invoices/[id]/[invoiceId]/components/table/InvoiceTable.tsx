@@ -24,9 +24,11 @@ import { useInvoiceItems } from "../InvoiceItemsProvider";
 import DeleteInvoiceItemButton from "./DeleteInvoiceItemButton";
 import DeleteInvoiceItemsButton from "./DeleteInvoiceItemsButton";
 import closeIcon from "/public/icons/close-gold-circled.svg";
+import GenericTable from "../../../../../../../_components/table/GenericTable";
+import { columns } from "../../../../../inventory/[name]/_components/table/StockTable";
 
 
-type Column = {
+export type Column = {
     key: string,
     value: string,
 }
@@ -191,43 +193,29 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                 }
             </SlidingBar>
             <div className="!bg-neutral-950/50 border-1 border-white/20 rounded-2xl">
-                <Table
-                    color="primary"
+                <GenericTable
                     selectionMode={mutationAllowed ? "multiple" : "none"}
+                    columns={invoiceColumns}
+                    items={sortedItems}
+                    sortableColumns={["invoice_item", "invoice_quantity", "invoice_price_per", "invoice_total"]}
+                    emptyContent={`There are no items.${mutationAllowed ? " Click on the button below to add an item." : ""}`}
+                    aria-label="Invoice Table"
+                    sortDescriptor={sortDescriptor}
+                    onSortChange={setSortDescriptor}
                     selectedKeys={selectedKeys}
                     onSelectionChange={(keys: Selection) => {
                         if (keys === "all")
                             setSelectedKeys(sortedItems.map(item => `${item.id}/${item.name}`));
                         else setSelectedKeys(Array.from(keys));
                     }}
-                    classNames={{
-                        wrapper: "!bg-secondary/20 rounded-2xl",
-                        th: "bg-neutral-950/50 backdrop-blur-md text-white uppercase"
-                    }}
-                    aria-label="Invoice Table"
-                    sortDescriptor={sortDescriptor}
-                    onSortChange={setSortDescriptor}
                 >
-                    <TableHeader columns={invoiceColumns}>
-                        {(column: Column) =>
-                            <TableColumn
-                                key={column.key}
-                                allowsSorting={["invoice_item", "invoice_quantity", "invoice_price_per", "invoice_total"].includes(column.key)}>
-                                {column.value}
-                            </TableColumn>}
-                    </TableHeader>
-                    <TableBody
-                        items={sortedItems}
-                        emptyContent={`There are no items.${mutationAllowed ? " Click on the button below to add an item." : ""}`}
-                    >
-                        {(item: InvoiceItem) => (
-                            <TableRow key={`${item.id}/${item.name}`}>
-                                {(columnKey: Key) => <TableCell
-                                    className={clsx(columnKey !== "invoice_desc" && "capitalize")}>{getKeyValue(item, columnKey)}</TableCell>}
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                    {(item) => (
+                        <TableRow key={`${item.id}/${item.name}`}>
+                            {(columnKey: Key) => <TableCell
+                                className={clsx(columnKey !== "invoice_desc" && "capitalize")}>{getKeyValue(item, columnKey)}</TableCell>}
+                        </TableRow>
+                    )}
+                </GenericTable>
                 {
                     mutationAllowed &&
                     <Fragment>

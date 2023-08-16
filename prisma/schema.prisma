@@ -82,20 +82,22 @@ model StockSnapshot {
 }
 
 model InvoiceInformation {
-  id             String  @id @default(auto()) @map("_id") @db.ObjectId
-  companyName    String  @unique
-  companyAddress String
-  companyLogo    String?
+  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
+  companyName        String  @unique
+  companyAddress     String
+  companyLogo        String?
+  termsAndConditions String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model InvoiceCustomer {
-  id              String  @id @default(auto()) @map("_id") @db.ObjectId
-  customerName    String  @unique
-  customerEmail   String? @unique
-  customerAddress String?
+  id                  String  @id @default(auto()) @map("_id") @db.ObjectId
+  customerName        String  @unique
+  customerEmail       String? @unique
+  customerAddress     String?
+  customerDescription String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

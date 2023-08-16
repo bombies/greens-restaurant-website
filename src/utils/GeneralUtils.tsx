@@ -72,7 +72,7 @@ String.prototype.capitalize = function() {
     );
 };
 
-export const dollarFormat = new Intl.NumberFormat("en-US", {
+export const dollarFormat = new Intl.NumberFormat("en-JM", {
     style: "currency",
-    currency: "USD"
+    currency: "JMD",
 });

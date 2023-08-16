@@ -6,33 +6,33 @@ import { InvoiceCustomer, InvoiceInformation } from "@prisma/client";
 type Props = {
     customerInfo?: InvoiceCustomer
     companyInfo?: InvoiceInformation
+    invoiceCreationDate?: Date
 }
 
 const styles = StyleSheet.create({
     headerView: {
         display: "flex",
+        flexDirection: "row",
         gap: "16",
         justifyContent: "space-between"
     },
     companyInfo: {
         padding: 12,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: "rgb(0,0,0)"
     }
 });
 
-export default function InvoicePDFRecipient({ customerInfo, companyInfo }: Props) {
+export default function InvoicePDFRecipient({ customerInfo, companyInfo, invoiceCreationDate }: Props) {
     return (
         <View style={styles.headerView}>
-            <View style={styles.companyInfo}>
+            <View>
                 <Text style={{
                     fontSize: 14,
                     fontWeight: "bold",
-                    marginBottom: 12
+                    marginBottom: 6,
+                    color: "#007d0d"
                 }}>BILLED TO</Text>
                 <Text style={{
-                    fontSize: 16,
+                    fontSize: 12,
                     textTransform: "capitalize",
                     maxWidth: "200",
                     justifyContent: "flex-start"
@@ -43,23 +43,19 @@ export default function InvoicePDFRecipient({ customerInfo, companyInfo }: Props
                     maxWidth: "500"
                 }}>{customerInfo?.customerAddress}</Text>
             </View>
-            <View style={styles.companyInfo}>
+            <View>
                 <Text style={{
                     fontSize: 14,
                     fontWeight: "bold",
-                    marginBottom: 12
-                }}>PAY TO</Text>
+                    marginBottom: 6,
+                    color: "#007d0d"
+                }}>INVOICE DATE</Text>
                 <Text style={{
-                    fontSize: 16,
+                    fontSize: 12,
                     textTransform: "capitalize",
                     maxWidth: "200",
-                    justifyContent: "flex-end"
-                }}>{companyInfo?.companyName}</Text>
-                <Text style={{
-                    justifyContent: "flex-end",
-                    fontSize: 12,
-                    maxWidth: "500"
-                }}>{companyInfo?.companyAddress}</Text>
+                    justifyContent: "flex-start"
+                }}>{invoiceCreationDate?.toDateString()}</Text>
             </View>
         </View>
     );

@@ -1,4 +1,4 @@
-import { authenticatedAny, respond, respondWithInit } from "../../../../utils/api/ApiUtils";
+import { authenticatedAny, respondWithInit } from "../../../../utils/api/ApiUtils";
 import Permission from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { InvoiceInformation } from "@prisma/client";
@@ -8,7 +8,8 @@ import { COMPANY_NAME_REGEX } from "../../../../utils/regex";
 const defaultInfo: Omit<InvoiceInformation, "createdAt" | "updatedAt" | "id"> = {
     companyName: "green's restaurant & pub",
     companyAddress: "41 Lyndhurst Road, Kingston",
-    companyLogo: ""
+    companyLogo: "",
+    termsAndConditions: ""
 };
 
 export function GET(req: Request) {
@@ -47,7 +48,8 @@ export function PATCH(req: Request) {
             data: {
                 companyName: newName || info.companyName,
                 companyLogo: body.companyLogo || info.companyLogo,
-                companyAddress: body.companyAddress || info.companyAddress
+                companyAddress: body.companyAddress || info.companyAddress,
+                termsAndConditions: body.termsAndConditions || info.termsAndConditions
             }
         }));
     }, [Permission.CREATE_INVOICE]);

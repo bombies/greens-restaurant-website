@@ -3,9 +3,11 @@
 import { InvoiceItem } from "@prisma/client";
 import { dollarFormat } from "../../../../../../../../../../../utils/GeneralUtils";
 import { StyleSheet, View, Text } from "@react-pdf/renderer";
+import { Fragment } from "react";
 
 type Props = {
-    items?: InvoiceItem[]
+    items?: InvoiceItem[],
+    termsAndConditions?: String
 }
 
 const borderColor = "#232323";
@@ -33,7 +35,7 @@ const styles = StyleSheet.create({
     }
 });
 
-export default function InvoicePDFTableFooter({ items }: Props) {
+export default function InvoicePDFTableFooter({ items, termsAndConditions }: Props) {
     const totalCost = dollarFormat.format(Number(items
         ?.map(item => item.quantity * item.price)
         .reduce((prev, acc) => prev + acc, 0)));
@@ -43,9 +45,33 @@ export default function InvoicePDFTableFooter({ items }: Props) {
         .reduce((prev, acc) => prev + acc, 0)));
 
     return (
-        <View style={styles.row}>
-            <Text style={styles.description}>TOTAL</Text>
-            <Text style={styles.total}>{totalCost}</Text>
+        <View>
+            <View style={styles.row}>
+                <Text style={styles.description}>TOTAL</Text>
+                <Text style={styles.total}>{totalCost}</Text>
+            </View>
+            <View style={{
+                display: 'flex',
+                marginTop: 24,
+            }}>
+                {
+                    termsAndConditions &&
+                    <Fragment>
+                        <Text style={{
+                            fontSize: 14,
+                            fontWeight: "bold",
+                            marginBottom: 6,
+                            color: "#007d0d"
+                        }}>TERMS &amp; CONDITIONS</Text>
+                        <Text style={{
+                            fontSize: 12
+                        }}>
+                            {termsAndConditions}
+                        </Text>
+                    </Fragment>
+                }
+            </View>
         </View>
+
     );
 }

@@ -25,8 +25,15 @@ export default function InvoicePDF({ companyInfo, customerInfo, invoice, invoice
         <Document>
             <Page size="LETTER" style={styles.body}>
                 <InvoicePDFHeader invoice={invoice} companyInfo={companyInfo} />
-                <InvoicePDFRecipient companyInfo={companyInfo} customerInfo={customerInfo} />
-                <InvoicePDFTable invoiceItems={invoiceItems} />
+                <InvoicePDFRecipient
+                    companyInfo={companyInfo}
+                    customerInfo={customerInfo}
+                    invoiceCreationDate={new Date(invoice?.createdAt ?? 0)}
+                />
+                <InvoicePDFTable
+                    invoiceItems={invoiceItems}
+                    termsAndConditions={companyInfo?.termsAndConditions ?? undefined}
+                />
             </Page>
         </Document>
     );

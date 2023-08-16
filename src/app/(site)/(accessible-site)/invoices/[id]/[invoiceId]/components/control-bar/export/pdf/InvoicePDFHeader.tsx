@@ -1,7 +1,7 @@
 "use client";
 
 import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
-import { Invoice, InvoiceInformation, InvoiceItem } from "@prisma/client";
+import { Invoice, InvoiceInformation } from "@prisma/client";
 
 const styles = StyleSheet.create({
     companyImage: {
@@ -44,6 +44,18 @@ export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
                     textTransform: "capitalize",
                     maxWidth: "500"
                 }}>{invoice?.description}</Text>
+                <Text style={{
+                    fontSize: 12,
+                    textTransform: "capitalize",
+                    maxWidth: "200",
+                    justifyContent: "flex-end",
+                    marginTop: 14
+                }}>{companyInfo?.companyName}</Text>
+                <Text style={{
+                    justifyContent: "flex-end",
+                    fontSize: 12,
+                    maxWidth: "500"
+                }}>{companyInfo?.companyAddress}</Text>
             </View>
             {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image

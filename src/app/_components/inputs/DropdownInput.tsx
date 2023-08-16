@@ -1,12 +1,14 @@
 "use client";
 
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Selection } from "@nextui-org/react";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
+import clsx from "clsx";
 
 export type DropdownInputProps = {
     label?: string,
+    labelPlacement?: "beside" | "above",
     color?: "primary" | "secondary" | "success" | "danger" | "warning"
     isLoading?: boolean,
     variant?: "light" | "shadow" | "flat" | "solid" | "bordered" | "faded" & Partial<"ghost">
@@ -23,6 +25,7 @@ export type DropdownInputProps = {
 
 export default function DropdownInput({
                                           label,
+                                          labelPlacement,
                                           variant,
                                           multiSelect,
                                           selectionRequired,
@@ -55,8 +58,9 @@ export default function DropdownInput({
     );
 
     return (
-        <>
-            {label && <p>{label}</p>}
+        <div className={clsx("flex gap-6", labelPlacement === "above" && "flex-col")}>
+            {label &&
+                <p className="default-container px-8 py-2 w-fit mx-auto uppercase text-[.75rem] tracking-tight font-semibold">{label}</p>}
             <Dropdown
                 classNames={{
                     base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6"
@@ -64,6 +68,7 @@ export default function DropdownInput({
             >
                 <DropdownTrigger>
                     <Button
+                        fullWidth
                         isIconOnly={labelIsIcon}
                         variant={variant}
                         disabled={disabled || isLoading}
@@ -87,6 +92,6 @@ export default function DropdownInput({
                     {keyElements}
                 </DropdownMenu>
             </Dropdown>
-        </>
+        </div>
     );
 }

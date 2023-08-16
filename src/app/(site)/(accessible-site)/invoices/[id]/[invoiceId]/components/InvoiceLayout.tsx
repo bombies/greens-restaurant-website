@@ -2,9 +2,9 @@
 
 import Title from "../../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
-import { useUserData } from "../../../../../../../utils/Hooks";
+import { sendToast, useUserData } from "../../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { FetchInvoiceCustomer } from "../../components/InvoiceCustomerLayout";
 import InvoiceControlBar from "./control-bar/InvoiceControlBar";
@@ -13,21 +13,39 @@ import InvoiceTable, { invoiceColumns } from "./table/InvoiceTable";
 import { Divider } from "@nextui-org/divider";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 import { Spinner } from "@nextui-org/spinner";
-import InvoicePaidStatus from "./InvoicePaidStatus";
+import InvoicePaidStatus, { PaidStatus } from "./InvoicePaidStatus";
 import TableSkeleton from "../../../../../../_components/skeletons/TableSkeleton";
 import { useInvoice } from "./InvoiceProvider";
 import { useInvoiceItems } from "./InvoiceItemsProvider";
+import axios from "axios";
+import useSWRMutation from "swr/mutation";
 
 type Props = {
     customerId: string
 }
+
+type ChangePaidStatusArgs = {
+    arg: {
+        invoiceId: string,
+        status: boolean
+    }
+}
+
+const ChangePaidStatus = (customerId?: string) => {
+    const mutator = (url: string, { arg }: ChangePaidStatusArgs) => axios.patch(url.replace("{invoice_id}", arg.invoiceId), {
+        paid: arg.status
+    });
+    return useSWRMutation(`/api/invoices/customer/${customerId}/invoice/{invoice_id}`, mutator);
+};
 
 export default function InvoiceLayout({ customerId }: Props) {
     const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(customerId);
     const { data: invoice, isLoading: invoiceIsLoading } = useInvoice();
     const { state: invoiceItems } = useInvoiceItems();
     const { data: userData, isLoading: userDataIsLoading } = useUserData();
+    const { trigger: triggerStatusChange, isMutating: statusIsChanging } = ChangePaidStatus(customerId);
     const router = useRouter();
+    const [selectedStatus, setSelectedStatus] = useState<PaidStatus>(invoice?.paid ? PaidStatus.PAID : PaidStatus.UNPAID);
 
     useEffect(() => {
         if (!userDataIsLoading &&
@@ -60,9 +78,24 @@ export default function InvoiceLayout({ customerId }: Props) {
                                         {invoice?.title}
                                     </SubTitle>
                                     <InvoicePaidStatus
-                                        initialStatus={invoice?.paid}
-                                        customerId={customer?.id}
-                                        invoiceId={invoice?.id}
+                                        selectedStatus={selectedStatus}
+                                        statusIsChanging={statusIsChanging}
+                                        onStatusChange={(status) => {
+                                            triggerStatusChange({
+                                                invoiceId: invoice?.id ?? "",
+                                                status: status === PaidStatus.PAID
+                                            })
+                                                .then((res) => {
+                                                    setSelectedStatus(status as PaidStatus);
+                                                })
+                                                .catch(e => {
+                                                    console.error(e);
+                                                    sendToast({
+                                                        error: e,
+                                                        description: "There was an error updating the paid status!"
+                                                    });
+                                                });
+                                        }}
                                     />
                                 </div>
 

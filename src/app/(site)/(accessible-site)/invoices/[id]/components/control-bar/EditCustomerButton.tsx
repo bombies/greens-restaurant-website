@@ -121,6 +121,16 @@ export default function EditCustomerButton({ customer, disabled, iconOnly, onSuc
                             customerAddress: value
                         }))}
                     />
+                    <EditableField
+                        label="Customer Description"
+                        textArea
+                        field={proposedChanges?.customerDescription || customer?.customerDescription}
+                        editAllowed={!disabled}
+                        onValueChange={value => setProposedChanges(prev => ({
+                            ...prev,
+                            customerDescription: value
+                        }))}
+                    />
                 </div>
                 <Spacer y={24} />
             </GenericModal>

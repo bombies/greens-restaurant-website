@@ -2,12 +2,12 @@
 
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
 
-const borderColor = "#232323";
+const borderColor = "#007d0d";
 const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         borderColor: borderColor,
-        backgroundColor: "#191919",
+        backgroundColor: "#007d0d",
         borderWidth: 1,
         alignItems: "center",
         height: 24,

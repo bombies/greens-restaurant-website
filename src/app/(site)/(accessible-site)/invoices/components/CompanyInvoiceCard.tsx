@@ -159,6 +159,21 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                                 }));
                             }}
                         />
+                        <Spacer y={6} />
+                        <EditableField
+                            textArea
+                            label="Terms & Conditions"
+                            editAllowed={controlsEnabled}
+                            field={proposedCompanyInfo?.termsAndConditions || data?.termsAndConditions}
+                            fieldIsLoaded={!isLoading}
+                            capitalizeField
+                            onValueChange={(value) => {
+                                setProposedCompanyInfo(prev => ({
+                                    ...prev,
+                                    termsAndConditions: value
+                                }));
+                            }}
+                        />
                     </>
                 } </div>
         </>
