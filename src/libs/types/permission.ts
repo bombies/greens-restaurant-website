@@ -33,7 +33,8 @@ export const permissionCheck = (userPermissions: number = 0, permission: Permiss
 
 type PermissionObject = {
     label: string,
-    value: Permission
+    description?: string,
+    value: Permission,
 }
 
 type PermissionGroup = {
@@ -47,11 +48,11 @@ export const Permissions: PermissionObject[] = [
         value: Permission.ADMINISTRATOR
     },
     {
-        label: "Create Inventories",
+        label: "Create Inventory",
         value: Permission.CREATE_INVENTORY
     },
     {
-        label: "View Inventories",
+        label: "View Inventory",
         value: Permission.VIEW_INVENTORY
     },
     {
@@ -59,7 +60,7 @@ export const Permissions: PermissionObject[] = [
         value: Permission.MUTATE_STOCK
     },
     {
-        label: "Create Invoices",
+        label: "Create Invoice",
         value: Permission.CREATE_INVOICE
     },
     {
@@ -74,7 +75,7 @@ export const PermissionGroups: PermissionGroup[] = [
         value: [Permission.ADMINISTRATOR]
     },
     {
-        label: "Manage Inventories",
+        label: "Manage Inventory",
         value: [Permission.CREATE_INVENTORY, Permission.VIEW_INVENTORY, Permission.MUTATE_STOCK]
     },
     {
