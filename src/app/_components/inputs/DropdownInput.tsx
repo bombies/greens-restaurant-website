@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Selection } from "@nextui-org/react";
-import { Fragment, useMemo } from "react";
+import { useMemo } from "react";
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
 import clsx from "clsx";

@@ -17,7 +17,7 @@ import { Chip } from "@nextui-org/chip";
 import GenericImage from "../../../../../_components/GenericImage";
 import GenericCard from "../../../../../_components/GenericCard";
 import { dollarFormat } from "../../../../../../utils/GeneralUtils";
-import { fetchDueAt, invoiceIsOverdue } from "../../components/invoice-utils";
+import { fetchDueAt, generateInvoiceTotal, invoiceIsOverdue } from "../../components/invoice-utils";
 
 type Props = {
     customerIsLoading: boolean,
@@ -27,8 +27,10 @@ type Props = {
 enum SortMode {
     ASCENDING_TITLE = "A-Z",
     DESCENDING_TITLE = "Z-A",
-    ASCENDING_DATE = "Oldest-Newest",
-    DESCENDING_DATE = "Newest-Oldest"
+    ASCENDING_DATE = "Oldest - Newest",
+    DESCENDING_DATE = "Newest - Oldest",
+    ASCENDING_TOTAL = "Lowest Total - Highest Total",
+    DESCENDING_TOTAL = "Highest Total - Lowest Total",
 }
 
 enum FilterMode {
@@ -37,7 +39,9 @@ enum FilterMode {
     OVERDUE = "overdue",
 }
 
-const getSortPredicate = (a: Invoice, b: Invoice, sortMode: SortMode): number => {
+const getSortPredicate = (a: (Invoice & { invoiceItems: InvoiceItem[] }), b: (Invoice & {
+    invoiceItems: InvoiceItem[]
+}), sortMode: SortMode): number => {
     switch (sortMode.capitalize()) {
         case SortMode.ASCENDING_DATE: {
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
@@ -50,6 +54,12 @@ const getSortPredicate = (a: Invoice, b: Invoice, sortMode: SortMode): number =>
         }
         case SortMode.DESCENDING_TITLE: {
             return b.title.localeCompare(a.title);
+        }
+        case SortMode.ASCENDING_TOTAL: {
+            return generateInvoiceTotal(a) - generateInvoiceTotal(b);
+        }
+        case SortMode.DESCENDING_TOTAL: {
+            return generateInvoiceTotal(b) - generateInvoiceTotal(a);
         }
         default: {
             return 0;
@@ -161,7 +171,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                     icon={sortIcon}
                     variant="flat"
                     selectionRequired
-                    keys={[SortMode.ASCENDING_TITLE, SortMode.DESCENDING_TITLE, SortMode.DESCENDING_DATE, SortMode.ASCENDING_DATE]}
+                    keys={[SortMode.ASCENDING_TITLE, SortMode.DESCENDING_TITLE, SortMode.DESCENDING_DATE, SortMode.ASCENDING_DATE, SortMode.DESCENDING_TOTAL, SortMode.ASCENDING_TOTAL]}
                     selectedKeys={sortMode}
                     setSelectedKeys={(keys) => setSortMode((Array.from(keys) as SortMode[]))}
                 />
