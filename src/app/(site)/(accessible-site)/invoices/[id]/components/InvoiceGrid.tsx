@@ -14,10 +14,10 @@ import "../../../../../../utils/GeneralUtils";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
 import CardSkeleton from "../../../../../_components/skeletons/CardSkeleton";
 import { Chip } from "@nextui-org/chip";
-import IconButton from "../../../../../_components/inputs/IconButton";
 import GenericImage from "../../../../../_components/GenericImage";
 import GenericCard from "../../../../../_components/GenericCard";
 import { dollarFormat } from "../../../../../../utils/GeneralUtils";
+import { fetchDueAt, invoiceIsOverdue } from "../../components/invoice-utils";
 
 type Props = {
     customerIsLoading: boolean,
@@ -33,7 +33,8 @@ enum SortMode {
 
 enum FilterMode {
     PAID = "paid",
-    UNPAID = "unpaid"
+    UNPAID = "unpaid",
+    OVERDUE = "overdue",
 }
 
 const getSortPredicate = (a: Invoice, b: Invoice, sortMode: SortMode): number => {
@@ -62,9 +63,11 @@ const getFilterPredicate = (item: Invoice, filterModes?: FilterMode[]): boolean 
 
     const paidPredicate = (): boolean => item.paid === true;
     const unpaidPredicate = () => item.paid !== true;
+    const overduePredicate = () => invoiceIsOverdue(item);
 
     return ((filterModes.includes(FilterMode.PAID)) && paidPredicate()) ||
-        ((filterModes.includes(FilterMode.UNPAID)) && unpaidPredicate());
+        ((filterModes.includes(FilterMode.UNPAID)) && unpaidPredicate()) ||
+        ((filterModes.includes(FilterMode.OVERDUE)) && overduePredicate());
 };
 
 export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
@@ -99,8 +102,11 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                                     <Chip
                                         variant="flat"
                                         color={invoice?.paid ? "success" : "danger"}
+                                        classNames={{
+                                            content: "font-semibold"
+                                        }}
                                     >
-                                        {invoice?.paid ? "PAID" : "UNPAID"}
+                                        {invoice?.paid ? "PAID" : (!invoiceIsOverdue(invoice) ? "UNPAID" : "OVERDUE")}
                                     </Chip>
                                 </div>
                                 <Spacer y={3} />
@@ -110,6 +116,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                                 <Divider className="my-3" />
                                 <p className="text-neutral-500 text-sm">Created
                                     on {new Date(invoice.createdAt).toDateString()}</p>
+                                <p className="text-sm text-neutral-500">Due By: {fetchDueAt(invoice).toDateString()}</p>
                                 <p className="text-neutral-500 text-sm">Last updated
                                     at {new Date(invoice.updatedAt).toLocaleTimeString()} on {new Date(invoice.updatedAt).toDateString()}</p>
                             </div>
@@ -122,18 +129,23 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                                 </p>
                                 <Chip
                                     variant="flat"
-                                    className="self-center"
                                     color={invoice?.paid ? "success" : "danger"}
+                                    classNames={{
+                                        content: "font-semibold"
+                                    }}
                                 >
-                                    {invoice?.paid ? "PAID" : "UNPAID"}
+                                    {invoice?.paid ? "PAID" : (!invoiceIsOverdue(invoice) ? "UNPAID" : "OVERDUE")}
                                 </Chip>
                             </div>
-                            <Divider />
+                            <Divider className="mb-4" />
                             <p className="text-primary w-fit font-bold default-container py-2 px-4 rounded-xl">
                                 {invoiceTotal}
                             </p>
-                            {invoice.description && <p className="text-sm text-neutral-500 max-w-[17rem] tablet:max-w-[10rem] whitespace-nowrap overflow-hidden overflow-ellipsis">{invoice.description}</p>}
+                            {invoice.description &&
+                                <p className="text-sm text-neutral-500 max-w-[17rem] tablet:max-w-[10rem] whitespace-nowrap overflow-hidden overflow-ellipsis">{invoice.description}</p>}
+                            <Divider className="my-4" />
                             <p className="text-xs text-neutral-500">Created: {new Date(invoice.createdAt).toDateString()}</p>
+                            <p className="text-xs text-neutral-500">Due By: {fetchDueAt(invoice).toDateString()}</p>
                         </div>
                     </LinkCard>
                 );
@@ -173,6 +185,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                         >
                             <Checkbox value={FilterMode.PAID}>Paid</Checkbox>
                             <Checkbox value={FilterMode.UNPAID}>Unpaid</Checkbox>
+                            <Checkbox value={FilterMode.OVERDUE}>Overdue</Checkbox>
                         </CheckboxGroup>
                     </PopoverContent>
                 </Popover>

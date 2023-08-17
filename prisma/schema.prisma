@@ -116,8 +116,9 @@ model Invoice {
 
   invoiceItems InvoiceItem[] @relation()
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  dueAt     DateTime?
+  updatedAt DateTime  @updatedAt
 }
 
 model InvoiceItem {

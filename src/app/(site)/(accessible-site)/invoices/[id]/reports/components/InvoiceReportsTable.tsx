@@ -1,12 +1,12 @@
 "use client";
 
-import { FC, Key, useCallback, useMemo, useState } from "react";
+import React, { FC, Key, useCallback, useMemo, useState } from "react";
 import { Invoice, InvoiceItem } from "@prisma/client";
 import GenericTable from "../../../../../../_components/table/GenericTable";
 import { Column } from "../../[invoiceId]/components/table/InvoiceTable";
 import { SortDescriptor, TableCell, TableRow } from "@nextui-org/react";
 import { Spinner } from "@nextui-org/spinner";
-import { formatDateDDMMYYYY, generateInvoiceTotal } from "../../../components/invoice-utils";
+import { formatDateDDMMYYYY, generateInvoiceTotal, invoiceIsOverdue } from "../../../components/invoice-utils";
 import { Chip } from "@nextui-org/chip";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 
@@ -56,10 +56,15 @@ export const InvoiceReportsTable: FC<Props> = ({ invoices, customerIsLoading }) 
                 return dollarFormat.format(generateInvoiceTotal(invoice));
             }
             case "invoice_status": {
-                return invoice.paid ?
-                    <Chip color="success" variant="flat">PAID</Chip>
-                    :
-                    <Chip color="danger" variant="flat">UNPAID</Chip>;
+                return <Chip
+                    variant="flat"
+                    color={invoice.paid ? "success" : "danger"}
+                    classNames={{
+                        content: "font-semibold"
+                    }}
+                >
+                    {invoice.paid ? "PAID" : (!invoiceIsOverdue(invoice) ? "UNPAID" : "OVERDUE")}
+                </Chip>;
             }
         }
     }, []);

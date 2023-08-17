@@ -82,10 +82,7 @@ export function POST(req: Request, { params }: Context) {
     }, [Permission.CREATE_INVOICE]);
 }
 
-export type UpdateInvoiceDto = Partial<{
-    title: string,
-    description: string
-}> & { paid?: boolean };
+export type UpdateInvoiceDto = Partial<Omit<Invoice, "createdAt" | "updatedAt" | "customerId" | "id">>;
 
 export function PATCH(req: Request, { params }: Context) {
     return authenticated(req, async () => {

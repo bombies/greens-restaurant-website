@@ -8,7 +8,7 @@ interface Props {
     dispatchReportParams: Dispatch<{ type: ReportParamsActionType, payload: Partial<ReportParamsState> }>
 }
 
-export const ChangeInvoiceReportStatusButton: FC<Props> = ({disabled, dispatchReportParams}) => {
+export const ChangeInvoiceReportStatusButton: FC<Props> = ({ disabled, dispatchReportParams }) => {
     const [selectedStatus, setSelectedStatus] = useState<PaidStatus>(PaidStatus.ALL);
 
     useEffect(() => {
@@ -31,7 +31,7 @@ export const ChangeInvoiceReportStatusButton: FC<Props> = ({disabled, dispatchRe
                 });
                 break;
             }
-            case "ALL": {
+            case PaidStatus.ALL: {
                 dispatchReportParams({
                     type: ReportParamsActionType.SET,
                     payload: {
@@ -39,6 +39,14 @@ export const ChangeInvoiceReportStatusButton: FC<Props> = ({disabled, dispatchRe
                     }
                 });
                 break;
+            }
+            case PaidStatus.OVERDUE: {
+                dispatchReportParams({
+                    type: ReportParamsActionType.SET,
+                    payload: {
+                        status: "overdue"
+                    }
+                });
             }
         }
     }, [dispatchReportParams, selectedStatus]);
@@ -49,9 +57,9 @@ export const ChangeInvoiceReportStatusButton: FC<Props> = ({disabled, dispatchRe
             label="Status"
             labelPlacement="above"
             variant="flat"
-            color={selectedStatus === PaidStatus.PAID ? "success" : (selectedStatus === PaidStatus.UNPAID ? "danger" : "warning")}
+            color={selectedStatus === PaidStatus.PAID ? "success" : ((selectedStatus === PaidStatus.UNPAID || selectedStatus === PaidStatus.OVERDUE) ? "danger" : "warning")}
             selectedValueLabel
-            keys={[PaidStatus.UNPAID, PaidStatus.PAID, PaidStatus.ALL]}
+            keys={[PaidStatus.UNPAID, PaidStatus.OVERDUE, PaidStatus.PAID, PaidStatus.ALL]}
             selectedKeys={[selectedStatus]}
             setSelectedKeys={(keys) => {
                 const status = (Array.from(keys) as PaidStatus[])[0].toUpperCase();
@@ -60,5 +68,5 @@ export const ChangeInvoiceReportStatusButton: FC<Props> = ({disabled, dispatchRe
                 setSelectedStatus(status as (PaidStatus));
             }}
         />
-    )
-}
+    );
+};

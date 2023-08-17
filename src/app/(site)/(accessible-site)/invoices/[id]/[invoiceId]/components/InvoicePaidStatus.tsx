@@ -9,7 +9,8 @@ import { sendToast } from "../../../../../../../utils/Hooks";
 export enum PaidStatus {
     PAID = "PAID",
     UNPAID = "UNPAID",
-    ALL = "ALL"
+    ALL = "ALL",
+    OVERDUE = "OVERDUE"
 }
 
 type Props = {
@@ -24,6 +25,7 @@ export default function InvoicePaidStatus({ selectedStatus, statusIsChanging, on
     return (
         <DropdownInput
             variant="flat"
+            buttonClassName="font-semibold"
             color={selectedStatus === PaidStatus.PAID ? "success" : "danger"}
             isLoading={statusIsChanging}
             selectedValueLabel

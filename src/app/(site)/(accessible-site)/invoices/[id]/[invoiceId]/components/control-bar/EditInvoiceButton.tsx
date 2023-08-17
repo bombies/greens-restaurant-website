@@ -9,9 +9,11 @@ import GenericModal from "../../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import ChangesMadeBar from "../../../../../employees/[username]/_components/ChangesMadeBar";
 import { sendToast } from "../../../../../../../../utils/Hooks";
-import EditableField from "../../../../../employees/[username]/_components/EditableField";
+import EditableField, { DataContainer } from "../../../../../employees/[username]/_components/EditableField";
 import { Spacer } from "@nextui-org/react";
 import editIcon from "/public/icons/edit-green.svg";
+import { GenericDatePicker } from "../../../../../../../_components/GenericDatePicker";
+import { fetchDueAt } from "../../../../components/invoice-utils";
 
 type Props = {
     customerId?: string
@@ -86,6 +88,7 @@ export default function EditInvoiceButton({ customerId, invoice, disabled }: Pro
                         }))}
                     />
                     <EditableField
+                        textArea
                         label="Invoice Description"
                         field={(proposedChanges?.description || invoice?.description) || undefined}
                         editAllowed={!disabled}
@@ -94,6 +97,17 @@ export default function EditInvoiceButton({ customerId, invoice, disabled }: Pro
                             description: value
                         }))}
                     />
+                    <DataContainer label="Invoice Due At" editAllowed={false}>
+                        <GenericDatePicker
+                            id="invoice_due_at"
+                            value={proposedChanges?.dueAt ?? fetchDueAt(invoice)}
+                            onDateChange={(date) => setProposedChanges(prev => ({
+                                ...prev,
+                                dueAt: date
+                            }))}
+                            min={invoice && new Date(invoice?.createdAt.toString())}
+                        />
+                    </DataContainer>
                 </div>
                 <Spacer y={36} />
             </GenericModal>

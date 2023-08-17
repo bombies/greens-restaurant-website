@@ -14,7 +14,7 @@ import PDFIcon from "../../../../../../../_components/icons/PDFIcon";
 import { Invoice, InvoiceItem } from "@prisma/client";
 import { sendToast } from "../../../../../../../../utils/Hooks";
 import { downloadFileFromBlob } from "../../../../../../../../utils/client-utils";
-import { formatDateDDMMYYYY, generateInvoiceTotal } from "../../../../components/invoice-utils";
+import { formatDateDDMMYYYY, generateInvoiceTotal, invoiceIsOverdue } from "../../../../components/invoice-utils";
 import Exceljs from "exceljs";
 
 interface Props {
@@ -116,7 +116,7 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                                             description: item.description,
                                             date: new Date(item.createdAt.toString()),
                                             total: generateInvoiceTotal(item),
-                                            status: item.paid ? "PAID" : "UNPAID"
+                                            status: item.paid ? "PAID" : (!invoiceIsOverdue(item) ? "UNPAID" : "OVERDUE")
                                         });
                                         lastRow++;
                                     });

@@ -5,15 +5,27 @@ import { formatDate } from "../(site)/(accessible-site)/invoices/components/invo
 
 interface Props {
     id: string,
+    value?: Date,
     labelPlacement?: "beside" | "above",
     label?: string,
     onDateChange?: (date?: Date) => void,
     min?: Date,
     max?: Date,
-    disabled?: boolean
+    disabled?: boolean,
+    isClearable?: boolean,
 }
 
-export const GenericDatePicker: FC<Props> = ({ id, label, labelPlacement, onDateChange, min, max, disabled }) => {
+export const GenericDatePicker: FC<Props> = ({
+                                                 id,
+                                                 value,
+                                                 label,
+                                                 labelPlacement,
+                                                 onDateChange,
+                                                 min,
+                                                 max,
+                                                 disabled,
+                                                 isClearable
+                                             }) => {
     return (
         <div className={clsx("flex gap-6", labelPlacement === "above" && "flex-col")}>
             {label &&
@@ -23,7 +35,8 @@ export const GenericDatePicker: FC<Props> = ({ id, label, labelPlacement, onDate
                 disabled={disabled}
                 id={id}
                 type="date"
-                isClearable
+                isClearable={isClearable}
+                value={value ? formatDate(value, "-") : undefined}
                 onValueChange={value => {
                     if (onDateChange)
                         onDateChange(value ? new Date(value) : undefined);

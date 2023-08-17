@@ -11,6 +11,7 @@ import { Spacer } from "@nextui-org/react";
 import { InvoiceReportsControlBar } from "./control-bar/InvoiceReportsControlBar";
 import { InvoiceReportsTable } from "./InvoiceReportsTable";
 import { Invoice, InvoiceItem } from "@prisma/client";
+import { invoiceIsOverdue } from "../../../components/invoice-utils";
 
 type Props = {
     id: string
@@ -19,7 +20,7 @@ type Props = {
 export type ReportParamsState = {
     dateFrom?: Date | null,
     dateTo?: Date | null,
-    status?: "paid" | "unpaid" | null
+    status?: "paid" | "unpaid" | "overdue" | null
 }
 
 export enum ReportParamsActionType {
@@ -87,6 +88,9 @@ export default function InvoiceReportsContext({ id }: Props) {
                                 }
                                 case "unpaid": {
                                     return invoice.paid !== true;
+                                }
+                                case "overdue": {
+                                    return invoiceIsOverdue(invoice);
                                 }
                             }
                         };

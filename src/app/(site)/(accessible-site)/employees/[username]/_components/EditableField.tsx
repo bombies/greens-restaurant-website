@@ -177,7 +177,7 @@ export function DataContainer({
             <Skeleton
                 isLoaded={fieldIsLoaded || fieldIsLoaded === undefined}
                 className={clsx(
-                    "rounded-2xl",
+                    "rounded-2xl p-4",
                     (fieldIsLoaded || fieldIsLoaded === undefined) ? "!bg-transparent" : "w-1/2 h-5"
                 )}
             >
