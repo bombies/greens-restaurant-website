@@ -39,7 +39,7 @@ type Params = {
     customerIsLoading: boolean,
 }
 
-export const useReport = ({customer, customerIsLoading}: Params) => {
+export const useInvoiceReport = ({customer, customerIsLoading}: Params) => {
     const [visibleInvoices, setVisibleInvoices] = useState<(Invoice & { invoiceItems: InvoiceItem[] })[]>();
     const [reportParams, dispatchReportParams] = useReducer(reducer, {
         dateFrom: undefined,

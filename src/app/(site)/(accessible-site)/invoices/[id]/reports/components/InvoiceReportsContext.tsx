@@ -12,7 +12,7 @@ import { InvoiceReportsControlBar } from "./control-bar/InvoiceReportsControlBar
 import { InvoiceReportsTable } from "./InvoiceReportsTable";
 import { Invoice, InvoiceItem } from "@prisma/client";
 import { invoiceIsOverdue } from "../../../components/invoice-utils";
-import { useReport } from "./hooks/useReport";
+import { useInvoiceReport } from "./hooks/useInvoiceReport";
 
 type Props = {
     id: string
@@ -23,7 +23,7 @@ export default function InvoiceReportsContext({ id }: Props) {
     const {
         data: userData,
     } = useUserData([Permission.VIEW_INVOICES, Permission.CREATE_INVOICE]);
-    const { reportParams, dispatchReportParams, visibleInvoices } = useReport({ customer, customerIsLoading });
+    const { reportParams, dispatchReportParams, visibleInvoices } = useInvoiceReport({ customer, customerIsLoading });
 
     return (
         <div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { Dispatch, useEffect, useState } from "react";
-import { ReportParamsActionType, ReportParamsState } from "./useReport";
+import { ReportParamsActionType, ReportParamsState } from "./useInvoiceReport";
 
 export const useReportDateRange = (dispatchReportParams: Dispatch<{
     type: ReportParamsActionType,

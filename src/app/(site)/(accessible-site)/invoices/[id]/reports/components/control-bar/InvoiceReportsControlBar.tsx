@@ -16,7 +16,7 @@ import { downloadFileFromBlob } from "../../../../../../../../utils/client-utils
 import { formatDateDDMMYYYY, generateInvoiceTotal, invoiceIsOverdue } from "../../../../components/invoice-utils";
 import Exceljs from "exceljs";
 import { useReportDateRange } from "../hooks/useReportDateRange";
-import { ReportParamsActionType, ReportParamsState } from "../hooks/useReport";
+import { ReportParamsActionType, ReportParamsState } from "../hooks/useInvoiceReport";
 
 interface Props {
     id: string,

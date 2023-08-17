@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, useEffect, useState } from "react";
 import { PaidStatus } from "../../../[invoiceId]/components/InvoicePaidStatus";
 import DropdownInput from "../../../../../../../_components/inputs/DropdownInput";
-import { ReportParamsActionType, ReportParamsState } from "../hooks/useReport";
+import { ReportParamsActionType, ReportParamsState } from "../hooks/useInvoiceReport";
 
 interface Props {
     disabled?: boolean,
