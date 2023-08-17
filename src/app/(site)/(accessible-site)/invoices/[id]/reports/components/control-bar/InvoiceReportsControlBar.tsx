@@ -55,6 +55,7 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                     labelPlacement="above"
                     onDateChange={setStartDate}
                     max={endDate}
+                    isClearable
                 />
                 <GenericDatePicker
                     disabled={spreadsheetIsExporting}
@@ -63,6 +64,7 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                     labelPlacement="above"
                     onDateChange={setEndDate}
                     min={startDate}
+                    isClearable
                 />
                 <ChangeInvoiceReportStatusButton
                     disabled={spreadsheetIsExporting}

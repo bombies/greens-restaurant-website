@@ -39,11 +39,9 @@ export const GenericDatePicker: FC<Props> = ({
                 value={value ? formatDate(value, "-") : undefined}
                 onValueChange={value => {
                     const [year, month, day] = value.split("-");
-                    if (!year)
-                        return undefined;
-                    const parsedDate = new Date();
-                    parsedDate.setFullYear(Number(year), Number(month) - 1, Number(day));
-
+                    const parsedDate: Date | undefined = year ? new Date() : undefined;
+                    parsedDate?.setFullYear(Number(year), Number(month) - 1, Number(day));
+                    
                     if (onDateChange)
                         onDateChange(parsedDate);
                 }}
