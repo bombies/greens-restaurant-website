@@ -44,7 +44,7 @@ export default function InvoiceCustomerLayout({ id }: Props) {
 
     return (
         <div>
-            <div className="flex gap-12">e
+            <div className="flex tablet:flex-col gap-12 tablet:gap-6">
                 <Title className="self-center">Invoices - <span
                     className="text-primary capitalize">{customerIsLoading ? "Unknown" : customer?.customerName}</span>
                 </Title>

@@ -60,7 +60,7 @@ export default function DropdownInput({
     return (
         <div className={clsx("flex gap-6", labelPlacement === "above" && "flex-col")}>
             {label &&
-                <p className="default-container px-8 py-2 w-fit mx-auto uppercase text-[.75rem] tracking-tight font-semibold">{label}</p>}
+                <label className="default-container px-8 py-2 w-fit mx-auto uppercase text-[.75rem] tracking-tight font-semibold">{label}</label>}
             <Dropdown
                 classNames={{
                     base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6"

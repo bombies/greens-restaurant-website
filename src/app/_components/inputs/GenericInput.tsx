@@ -77,7 +77,5 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
             classNames={className}
         />;
 
-    return (
-        <>{input}</>
-    );
+    return input
 }

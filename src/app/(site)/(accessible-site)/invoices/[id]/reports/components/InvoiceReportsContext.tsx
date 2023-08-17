@@ -78,27 +78,41 @@ export default function InvoiceReportsContext({ id }: Props) {
             setVisibleInvoices(
                 customer.invoices
                     .filter(invoice => {
-                        const statusPredicate = (status: boolean | null) => {
+                        const statusPredicate = () => {
                             if (!reportParams.status)
-                                return true
+                                return true;
                             switch (reportParams.status) {
                                 case "paid": {
-                                    return status === true
+                                    return invoice.paid === true;
                                 }
                                 case "unpaid": {
-                                    return status !== true
+                                    return invoice.paid !== true;
                                 }
                             }
-                        }
+                        };
 
-                        return statusPredicate(invoice.paid)
+                        const dateFromPredicate = () => {
+                            if (!reportParams.dateFrom)
+                                return true;
+
+                            return new Date(invoice.createdAt) >= reportParams.dateFrom;
+                        };
+
+                        const dateToPredicate = () => {
+                            if (!reportParams.dateTo)
+                                return true;
+
+                            return new Date(invoice.createdAt) <= reportParams.dateTo;
+                        };
+
+                        return dateFromPredicate() && dateToPredicate() && statusPredicate();
                     })
             );
     }, [customer, reportParams]);
 
     return (
         <div>
-            <div className="flex gap-12">
+            <div className="flex tablet:flex-col gap-12 tablet:gap-6">
                 <Title className="self-center">Invoices - <span
                     className="text-primary capitalize">{customerIsLoading ? "Unknown" : customer?.customerName}</span>
                 </Title>
