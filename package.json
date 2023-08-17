@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@redux-devtools/core": "^3.13.1",
-    "@svgr/webpack": "^8.0.1",
+    "@svgr/webpack": "^8.1.0",
     "@types/bcrypt": "^5.0.0",
     "@types/cookie": "^0.5.1",
     "@types/jsonwebtoken": "^9.0.2",
