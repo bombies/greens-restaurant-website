@@ -37,22 +37,25 @@ export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
             <View>
                 <View style={{ display: "flex", flexDirection: "row", gap: 16 }}>
                     <Text style={styles.header}>INVOICE</Text>
-                    <View style={{
-                        backgroundColor: "#007d0d",
-                        borderWidth: 1,
-                        paddingVertical: 16,
-                        paddingHorizontal: 8,
-                        borderRadius: 16,
-                        borderColor: "#007d0d"
-                    }}>
-                        <Text style={{
-                            fontFamily: "Inter",
-                            fontWeight: 900,
-                            fontSize: 18,
-                            alignSelf: "center",
-                            color: "#ffffff"
-                        }}>{invoice?.paid && "[PAID]"}</Text>
-                    </View>
+                    {
+                        invoice?.paid &&
+                        <View style={{
+                            backgroundColor: "#007d0d",
+                            borderWidth: 1,
+                            paddingVertical: 16,
+                            paddingHorizontal: 8,
+                            borderRadius: 16,
+                            borderColor: "#007d0d"
+                        }}>
+                            <Text style={{
+                                fontFamily: "Inter",
+                                fontWeight: 900,
+                                fontSize: 18,
+                                alignSelf: "center",
+                                color: "#ffffff"
+                            }}>PAID</Text>
+                        </View>
+                    }
                 </View>
                 <Text style={{
                     fontFamily: "Inter",
