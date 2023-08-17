@@ -139,13 +139,13 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                         >
                             Export to Spreadsheet
                         </GenericButton>
-                        <GenericButton
-                            disabled={spreadsheetIsExporting}
-                            variant="flat"
-                            startContent={<PDFIcon width={20} fill="#00D615" />}
-                        >
-                            Export to PDF
-                        </GenericButton>
+                        {/*<GenericButton*/}
+                        {/*    disabled={spreadsheetIsExporting}*/}
+                        {/*    variant="flat"*/}
+                        {/*    startContent={<PDFIcon width={20} fill="#00D615" />}*/}
+                        {/*>*/}
+                        {/*    Export to PDF*/}
+                        {/*</GenericButton>*/}
                     </div>
                 </AccordionItem>
             </Accordion>
