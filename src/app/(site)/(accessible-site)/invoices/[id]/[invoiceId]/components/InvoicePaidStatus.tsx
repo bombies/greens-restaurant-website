@@ -6,37 +6,26 @@ import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../../../utils/Hooks";
 
-enum PaidStatus {
+export enum PaidStatus {
     PAID = "PAID",
-    UNPAID = "UNPAID"
+    UNPAID = "UNPAID",
+    ALL = "ALL",
+    OVERDUE = "OVERDUE"
 }
 
 type Props = {
-    initialStatus?: boolean | null,
-    customerId?: string,
-    invoiceId?: string,
+    selectedStatus: PaidStatus,
+    statusIsChanging?: boolean,
+    onStatusChange?: (status: PaidStatus) => void
 }
 
-type ChangePaidStatusArgs = {
-    arg: {
-        status: boolean
-    }
-}
+export default function InvoicePaidStatus({ selectedStatus, statusIsChanging, onStatusChange }: Props) {
 
-const ChangePaidStatus = (customerId?: string, invoiceId?: string) => {
-    const mutator = (url: string, { arg }: ChangePaidStatusArgs) => axios.patch(url, {
-        paid: arg.status
-    });
-    return useSWRMutation(`/api/invoices/customer/${customerId}/invoice/${invoiceId}`, mutator);
-};
-
-export default function InvoicePaidStatus({ initialStatus, customerId, invoiceId }: Props) {
-    const [selectedStatus, setSelectedStatus] = useState<PaidStatus>(initialStatus ? PaidStatus.PAID : PaidStatus.UNPAID);
-    const { trigger: triggerStatusChange, isMutating: statusIsChanging } = ChangePaidStatus(customerId, invoiceId);
 
     return (
         <DropdownInput
             variant="flat"
+            buttonClassName="font-semibold"
             color={selectedStatus === PaidStatus.PAID ? "success" : "danger"}
             isLoading={statusIsChanging}
             selectedValueLabel
@@ -44,19 +33,8 @@ export default function InvoicePaidStatus({ initialStatus, customerId, invoiceId
             selectedKeys={[selectedStatus]}
             setSelectedKeys={(keys) => {
                 const status = (Array.from(keys) as PaidStatus[])[0].toUpperCase();
-                triggerStatusChange({
-                    status: status === PaidStatus.PAID
-                })
-                    .then((res) => {
-                        setSelectedStatus(status as PaidStatus);
-                    })
-                    .catch(e => {
-                        console.error(e);
-                        sendToast({
-                            error: e,
-                            description: "There was an error updating the paid status!"
-                        });
-                    });
+                if (onStatusChange)
+                    onStatusChange(status as PaidStatus);
             }}
         />
     );

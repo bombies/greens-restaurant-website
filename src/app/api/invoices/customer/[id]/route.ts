@@ -121,7 +121,8 @@ export function PATCH(req: Request, { params }: Context) {
                 data: {
                     customerName: newName,
                     customerAddress: body.customerAddress,
-                    customerEmail: newEmail
+                    customerEmail: newEmail,
+                    customerDescription: body.customerDescription
                 }
             })
         );

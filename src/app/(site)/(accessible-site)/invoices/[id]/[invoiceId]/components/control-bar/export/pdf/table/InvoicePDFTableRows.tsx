@@ -5,50 +5,46 @@ import { Fragment } from "react";
 import { View, Text, StyleSheet } from "@react-pdf/renderer";
 import { dollarFormat } from "../../../../../../../../../../../utils/GeneralUtils";
 
-const borderColor = "#232323";
+const borderColor = "#000000";
 const styles = StyleSheet.create({
     row: {
         flexDirection: "row",
         borderBottomColor: borderColor,
         borderBottomWidth: 1,
         alignItems: "center",
-        height: 24,
-        fontStyle: "bold"
+        minHeight: 24,
     },
     item: {
+        fontFamily: "Inter",
         width: "20%",
         textAlign: "left",
         fontSize: "10",
-        borderRightColor: borderColor,
-        borderRightWidth: 1,
         paddingRight: 8
     },
     description: {
+        fontFamily: "Inter",
         width: "30%",
         fontSize: "10",
-        borderRightColor: borderColor,
         textAlign: "left",
-        borderRightWidth: 1,
         paddingHorizontal: 8,
         paddingVertical: 4
     },
     qty: {
+        fontFamily: "Inter",
         width: "10%",
         fontSize: "10",
-        borderRightColor: borderColor,
-        borderRightWidth: 1,
         paddingHorizontal: 8,
         textAlign: "right"
     },
     price: {
+        fontFamily: "Inter",
         width: "20%",
         fontSize: "10",
-        borderRightColor: borderColor,
-        borderRightWidth: 1,
         paddingHorizontal: 8,
         textAlign: "right"
     },
     total: {
+        fontFamily: "Inter",
         fontSize: "10",
         textAlign: "right",
         width: "20%",

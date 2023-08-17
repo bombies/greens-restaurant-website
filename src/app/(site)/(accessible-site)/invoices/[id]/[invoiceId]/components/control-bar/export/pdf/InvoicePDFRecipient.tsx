@@ -2,64 +2,79 @@
 
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import { InvoiceCustomer, InvoiceInformation } from "@prisma/client";
+import { formatDateDDMMYYYY } from "../../../../../../components/invoice-utils";
 
 type Props = {
     customerInfo?: InvoiceCustomer
     companyInfo?: InvoiceInformation
+    invoiceCreationDate?: Date
 }
 
 const styles = StyleSheet.create({
     headerView: {
         display: "flex",
+        flexDirection: "row",
         gap: "16",
         justifyContent: "space-between"
     },
     companyInfo: {
-        padding: 12,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: "rgb(0,0,0)"
+        padding: 12
     }
 });
 
-export default function InvoicePDFRecipient({ customerInfo, companyInfo }: Props) {
+export default function InvoicePDFRecipient({ customerInfo, companyInfo, invoiceCreationDate }: Props) {
     return (
         <View style={styles.headerView}>
-            <View style={styles.companyInfo}>
+            <View>
                 <Text style={{
+                    fontFamily: "Inter",
                     fontSize: 14,
                     fontWeight: "bold",
-                    marginBottom: 12
+                    marginBottom: 6,
+                    marginTop: 12,
+                    color: "#007d0d"
                 }}>BILLED TO</Text>
                 <Text style={{
-                    fontSize: 16,
+                    fontFamily: "Inter",
+                    fontSize: 12,
                     textTransform: "capitalize",
                     maxWidth: "200",
                     justifyContent: "flex-start"
                 }}>{customerInfo?.customerName}</Text>
+                {
+                    customerInfo?.customerDescription &&
+                    <Text style={{
+                        fontFamily: "Inter",
+                        fontSize: 12,
+                        textTransform: "capitalize",
+                        maxWidth: "75%",
+                        justifyContent: "flex-start"
+                    }}>
+                        {customerInfo?.customerDescription}
+                    </Text>
+                }
                 <Text style={{
+                    fontFamily: "Inter",
                     justifyContent: "flex-end",
                     fontSize: 12,
-                    maxWidth: "500"
+                    maxWidth: "75%"
                 }}>{customerInfo?.customerAddress}</Text>
             </View>
-            <View style={styles.companyInfo}>
+            <View>
                 <Text style={{
+                    fontFamily: "Inter",
                     fontSize: 14,
                     fontWeight: "bold",
-                    marginBottom: 12
-                }}>PAY TO</Text>
+                    marginBottom: 6,
+                    color: "#007d0d"
+                }}>INVOICE DATE</Text>
                 <Text style={{
-                    fontSize: 16,
+                    fontFamily: "Inter",
+                    fontSize: 12,
                     textTransform: "capitalize",
                     maxWidth: "200",
-                    justifyContent: "flex-end"
-                }}>{companyInfo?.companyName}</Text>
-                <Text style={{
-                    justifyContent: "flex-end",
-                    fontSize: 12,
-                    maxWidth: "500"
-                }}>{companyInfo?.companyAddress}</Text>
+                    justifyContent: "flex-start"
+                }}>{invoiceCreationDate ? formatDateDDMMYYYY(invoiceCreationDate) : "Unknown"}</Text>
             </View>
         </View>
     );
