@@ -19,6 +19,7 @@ import { useInvoice } from "./InvoiceProvider";
 import { useInvoiceItems } from "./InvoiceItemsProvider";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
+import { useInvoicePaymentStatus } from "./hooks/useInvoicePaymentStatus";
 
 type Props = {
     customerId: string
@@ -42,20 +43,12 @@ export default function InvoiceLayout({ customerId }: Props) {
     const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(customerId);
     const { data: invoice, isLoading: invoiceIsLoading } = useInvoice();
     const { state: invoiceItems } = useInvoiceItems();
-    const { data: userData, isLoading: userDataIsLoading } = useUserData();
+    const { data: userData, isLoading: userDataIsLoading } = useUserData([
+        Permission.VIEW_INVOICES,
+        Permission.CREATE_INVOICE
+    ]);
     const { trigger: triggerStatusChange, isMutating: statusIsChanging } = ChangePaidStatus(customerId);
-    const router = useRouter();
-    const [selectedStatus, setSelectedStatus] = useState<PaidStatus>(invoice?.paid ? PaidStatus.PAID : PaidStatus.UNPAID);
-
-    useEffect(() => {
-        if (!userDataIsLoading &&
-            (!userData || !hasAnyPermission(userData.permissions, [
-                Permission.VIEW_INVOICES,
-                Permission.CREATE_INVOICE
-            ]))
-        )
-            router.replace("/home");
-    }, [router, userData, userDataIsLoading]);
+    const { selectedStatus, setSelectedStatus } = useInvoicePaymentStatus({ invoice, invoiceIsLoading });
 
     return (
         <div>

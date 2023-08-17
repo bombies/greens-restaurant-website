@@ -18,10 +18,11 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         alignItems: "center",
         height: 24,
-        fontSize: 12,
-        fontStyle: "bold"
+        fontSize: 12
     },
     description: {
+        fontFamily: "Inter",
+        fontWeight: 600,
         width: "80%",
         textAlign: "right",
         borderRightColor: borderColor,
@@ -29,6 +30,9 @@ const styles = StyleSheet.create({
         paddingRight: 8
     },
     total: {
+        fontFamily: "Inter",
+        fontWeight: 700,
+        color: "#007d0d",
         width: "20%",
         textAlign: "right",
         paddingRight: 8
@@ -51,19 +55,21 @@ export default function InvoicePDFTableFooter({ items, termsAndConditions }: Pro
                 <Text style={styles.total}>{totalCost}</Text>
             </View>
             <View style={{
-                display: 'flex',
-                marginTop: 24,
+                display: "flex",
+                marginTop: 24
             }}>
                 {
                     termsAndConditions &&
                     <Fragment>
                         <Text style={{
+                            fontFamily: "Inter",
                             fontSize: 14,
                             fontWeight: "bold",
                             marginBottom: 6,
                             color: "#007d0d"
                         }}>TERMS &amp; CONDITIONS</Text>
                         <Text style={{
+                            fontFamily: "Inter",
                             fontSize: 12
                         }}>
                             {termsAndConditions}

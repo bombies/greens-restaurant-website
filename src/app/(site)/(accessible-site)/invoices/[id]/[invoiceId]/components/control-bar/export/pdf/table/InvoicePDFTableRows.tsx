@@ -13,15 +13,16 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         alignItems: "center",
         minHeight: 24,
-        fontStyle: "bold"
     },
     item: {
+        fontFamily: "Inter",
         width: "20%",
         textAlign: "left",
         fontSize: "10",
         paddingRight: 8
     },
     description: {
+        fontFamily: "Inter",
         width: "30%",
         fontSize: "10",
         textAlign: "left",
@@ -29,18 +30,21 @@ const styles = StyleSheet.create({
         paddingVertical: 4
     },
     qty: {
+        fontFamily: "Inter",
         width: "10%",
         fontSize: "10",
         paddingHorizontal: 8,
         textAlign: "right"
     },
     price: {
+        fontFamily: "Inter",
         width: "20%",
         fontSize: "10",
         paddingHorizontal: 8,
         textAlign: "right"
     },
     total: {
+        fontFamily: "Inter",
         fontSize: "10",
         textAlign: "right",
         width: "20%",
