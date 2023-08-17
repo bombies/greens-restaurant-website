@@ -38,8 +38,14 @@ export const GenericDatePicker: FC<Props> = ({
                 isClearable={isClearable}
                 value={value ? formatDate(value, "-") : undefined}
                 onValueChange={value => {
+                    const [year, month, day] = value.split("-");
+                    if (!year)
+                        return undefined;
+                    const parsedDate = new Date();
+                    parsedDate.setFullYear(Number(year), Number(month) - 1, Number(day));
+
                     if (onDateChange)
-                        onDateChange(value ? new Date(value) : undefined);
+                        onDateChange(parsedDate);
                 }}
                 min={min ? formatDate(min, "-") : undefined}
                 max={max ? formatDate(max, "-") : undefined}
