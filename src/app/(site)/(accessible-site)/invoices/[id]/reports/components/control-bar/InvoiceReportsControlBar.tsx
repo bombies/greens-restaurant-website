@@ -3,7 +3,6 @@
 import React, { Dispatch, FC, useEffect, useState } from "react";
 import { Accordion, AccordionItem, Spacer } from "@nextui-org/react";
 import { GoBackButton } from "../../../components/control-bar/InvoiceCustomerControlBar";
-import { ReportParamsActionType, ReportParamsState } from "../InvoiceReportsContext";
 import { ChangeInvoiceReportStatusButton } from "./ChangeInvoiceReportStatusButton";
 import { GenericDatePicker } from "../../../../../../../_components/GenericDatePicker";
 import { Divider } from "@nextui-org/divider";
@@ -16,6 +15,8 @@ import { sendToast } from "../../../../../../../../utils/Hooks";
 import { downloadFileFromBlob } from "../../../../../../../../utils/client-utils";
 import { formatDateDDMMYYYY, generateInvoiceTotal, invoiceIsOverdue } from "../../../../components/invoice-utils";
 import Exceljs from "exceljs";
+import { useReportDateRange } from "../hooks/useReportDateRange";
+import { ReportParamsActionType, ReportParamsState } from "../hooks/useReport";
 
 interface Props {
     id: string,
@@ -32,19 +33,13 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                                                         reportParams,
                                                         dispatchReportParams
                                                     }) => {
-    const [startDate, setStartDate] = useState<Date>();
-    const [endDate, setEndDate] = useState<Date>();
+    const {
+        startDate,
+        endDate,
+        setEndDate,
+        setStartDate
+    } = useReportDateRange(dispatchReportParams);
     const [spreadsheetIsExporting, setSpreadsheetIsExporting] = useState(false);
-
-    useEffect(() => {
-        dispatchReportParams({
-            type: ReportParamsActionType.SET,
-            payload: {
-                dateFrom: startDate ?? null,
-                dateTo: endDate ?? null
-            }
-        });
-    }, [dispatchReportParams, endDate, startDate]);
 
     return (
         <div className="default-container p-12">
