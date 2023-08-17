@@ -9,6 +9,7 @@ import { Spinner } from "@nextui-org/spinner";
 import { formatDateDDMMYYYY, generateInvoiceTotal, invoiceIsOverdue } from "../../../components/invoice-utils";
 import { Chip } from "@nextui-org/chip";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
+import SubTitle from "../../../../../../_components/text/SubTitle";
 
 interface Props {
     invoices?: (Invoice & { invoiceItems: InvoiceItem[] })[]
@@ -26,7 +27,7 @@ const columns: Column[] = [
     },
     {
         key: "invoice_date",
-        value: "Date"
+        value: "Date Created"
     },
     {
         key: "invoice_total",
@@ -115,6 +116,12 @@ export const InvoiceReportsTable: FC<Props> = ({ invoices, customerIsLoading }) 
                 onSortChange={setSortDescriptor}
                 loadingContent={
                     <Spinner size="lg" />
+                }
+                bottomContent={
+                    <div className="flex default-container p-6 gap-6 phone:justify-center phone:gap-1 justify-end">
+                        <SubTitle className="self-center text-lg phone:text-sm" thick>TOTAL</SubTitle>
+                        <p className="self-center px-6 phone:px-1 py-4 text-primary font-semibold text-xl phone:text-lg">{dollarFormat.format(sortedItems ? sortedItems.reduce((prev, invoice) => prev + generateInvoiceTotal(invoice), 0) : 0)}</p>
+                    </div>
                 }
             >
                 {(invoice) => (
