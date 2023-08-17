@@ -4,10 +4,11 @@ import DropdownInput from "../../../../../../../_components/inputs/DropdownInput
 import { ReportParamsActionType, ReportParamsState } from "../InvoiceReportsContext";
 
 interface Props {
+    disabled?: boolean,
     dispatchReportParams: Dispatch<{ type: ReportParamsActionType, payload: Partial<ReportParamsState> }>
 }
 
-export const ChangeInvoiceReportStatusButton: FC<Props> = ({dispatchReportParams}) => {
+export const ChangeInvoiceReportStatusButton: FC<Props> = ({disabled, dispatchReportParams}) => {
     const [selectedStatus, setSelectedStatus] = useState<PaidStatus>(PaidStatus.ALL);
 
     useEffect(() => {
@@ -44,6 +45,7 @@ export const ChangeInvoiceReportStatusButton: FC<Props> = ({dispatchReportParams
 
     return (
         <DropdownInput
+            disabled={disabled}
             label="Status"
             labelPlacement="above"
             variant="flat"

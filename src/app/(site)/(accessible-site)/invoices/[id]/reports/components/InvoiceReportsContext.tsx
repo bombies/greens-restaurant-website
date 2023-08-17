@@ -128,6 +128,8 @@ export default function InvoiceReportsContext({ id }: Props) {
                 <Fragment>
                     <InvoiceReportsControlBar
                         id={id}
+                        customerName={customer?.customerName ?? "Unknown"}
+                        currentItems={visibleInvoices ?? []}
                         reportParams={reportParams}
                         dispatchReportParams={dispatchReportParams}
                     />

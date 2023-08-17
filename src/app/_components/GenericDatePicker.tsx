@@ -10,15 +10,17 @@ interface Props {
     onDateChange?: (date?: Date) => void,
     min?: Date,
     max?: Date,
+    disabled?: boolean
 }
 
-export const GenericDatePicker: FC<Props> = ({ id, label, labelPlacement, onDateChange, min, max }) => {
+export const GenericDatePicker: FC<Props> = ({ id, label, labelPlacement, onDateChange, min, max, disabled }) => {
     return (
         <div className={clsx("flex gap-6", labelPlacement === "above" && "flex-col")}>
             {label &&
                 <label
                     className="default-container px-8 py-2 w-fit mx-auto uppercase text-[.75rem] tracking-tight font-semibold">{label}</label>}
             <GenericInput
+                disabled={disabled}
                 id={id}
                 type="date"
                 isClearable
