@@ -22,14 +22,14 @@ const styles = StyleSheet.create({
         fontStyle: "bold"
     },
     description: {
-        width: "85%",
+        width: "80%",
         textAlign: "right",
         borderRightColor: borderColor,
         borderRightWidth: 1,
         paddingRight: 8
     },
     total: {
-        width: "15%",
+        width: "20%",
         textAlign: "right",
         paddingRight: 8
     }

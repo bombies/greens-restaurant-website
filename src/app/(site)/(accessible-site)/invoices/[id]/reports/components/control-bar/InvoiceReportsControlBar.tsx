@@ -109,7 +109,8 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                                         { key: "status", header: "Status", width: 10 }
                                     ];
 
-                                    currentItems.forEach(item => {
+                                    let lastRow = 1;
+                                    currentItems.forEach((item, i) => {
                                         const row = workSheet.addRow({
                                             title: item.title,
                                             description: item.description,
@@ -117,6 +118,12 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                                             total: generateInvoiceTotal(item),
                                             status: item.paid ? "PAID" : "UNPAID"
                                         });
+                                        lastRow++;
+                                    });
+
+                                    workSheet.addRow({
+                                        date: "GRAND TOTAL",
+                                        total: { formula: `SUM(D2:D${lastRow})`, date1904: false }
                                     });
 
                                     const sheetBuffer = await workBook.xlsx.writeBuffer();
