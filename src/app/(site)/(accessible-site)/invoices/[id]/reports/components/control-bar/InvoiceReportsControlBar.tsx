@@ -15,8 +15,7 @@ import { Invoice, InvoiceItem } from "@prisma/client";
 import { sendToast } from "../../../../../../../../utils/Hooks";
 import { downloadFileFromBlob } from "../../../../../../../../utils/client-utils";
 import { formatDateDDMMYYYY, generateInvoiceTotal } from "../../../../components/invoice-utils";
-// @ts-ignore
-import Exceljs from "exceljs/dist/exceljs.min";
+import Exceljs from "exceljs";
 
 interface Props {
     id: string,
