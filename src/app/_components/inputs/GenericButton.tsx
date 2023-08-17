@@ -32,7 +32,7 @@ export default function GenericButton({ icon, cooldown, children, ...props }: Pr
                 color={props.color || "primary"}
                 variant={props.variant || "shadow"}
                 size={props.size || "lg"}
-                startContent={icon && <GenericImage src={icon} width={1.35} />}
+                startContent={icon ? <GenericImage src={icon} width={1.35} /> : props.startContent}
                 className={clsx(
                     "z-0 rounded-xl self-center cursor-pointer transition-fast hover:-translate-y-[.25rem] disabled:opacity-50 disabled:cursor-not-allowed p-6"
                 )}

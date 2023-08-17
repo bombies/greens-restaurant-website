@@ -9,6 +9,8 @@ import { AxiosError } from "axios";
 import { User } from "@prisma/client";
 import useSWR from "swr";
 import { fetcher } from "../app/(site)/(accessible-site)/employees/_components/EmployeeGrid";
+import Permission, { hasAnyPermission } from "../libs/types/permission";
+import { useRouter } from "next/navigation";
 
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<AppState> = useSelector;
@@ -42,8 +44,17 @@ const FetchUserData = () => {
     return useSWR("/api/users/me", fetcher<User>);
 };
 
-export function useUserData(): UserData {
+export function useUserData(permissions?: Permission[]): UserData {
     const { data, isLoading, error } = FetchUserData();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isLoading && permissions &&
+            (!data || !hasAnyPermission(data.permissions, permissions))
+        )
+            router.replace("/home");
+    }, [data, isLoading, permissions, router]);
+
     return { data, isLoading, error };
 }
 

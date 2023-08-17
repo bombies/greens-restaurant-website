@@ -11,6 +11,7 @@ import { CreateInvoiceCustomerDto } from "../../../../api/invoices/customer/rout
 import GenericInput from "../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
 import { sendToast } from "../../../../../utils/Hooks";
+import GenericTextArea from "../../../../_components/inputs/GenericTextArea";
 
 type Props = {
     disabled?: boolean
@@ -37,7 +38,8 @@ export default function CreateCustomerButton({ disabled }: Props) {
             dto: {
                 customerName: data.customerName,
                 customerAddress: data.customerAddress || null,
-                customerEmail: data.customerEmail
+                customerEmail: data.customerEmail,
+                customerDescription: data.customerDescription
             }
         }).then(() => {
             sendToast({
@@ -94,6 +96,15 @@ export default function CreateCustomerButton({ disabled }: Props) {
                         isDisabled={customerIsCreating || disabled}
                         isClearable
                         placeholder="Enter the address of the customer"
+                    />
+                    <Spacer y={6} />
+                    <GenericTextArea
+                        id="customerDesription"
+                        register={register}
+                        label="Description"
+                        isDisabled={customerIsCreating || disabled}
+                        isClearable
+                        placeholder="Enter a description of the customer"
                     />
                     <Spacer y={6} />
                     <GenericButton

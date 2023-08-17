@@ -11,6 +11,7 @@ import { CreateInvoiceItemsDto } from "../../../../../../../api/invoices/custome
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { sendToast } from "../../../../../../../../utils/Hooks";
+import GenericTextArea from "../../../../../../../_components/inputs/GenericTextArea";
 
 type AddInvoiceItemArgs = {
     arg: {
@@ -85,7 +86,7 @@ export default function AddInvoiceItemButton({ customerId, invoiceId, disabled }
                         isRequired
                         labelPlacement="outside"
                     />
-                    <GenericInput
+                    <GenericTextArea
                         disabled={itemIsAdding || disabled}
                         register={register}
                         errors={errors}

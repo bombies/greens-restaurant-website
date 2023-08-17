@@ -12,7 +12,7 @@ type Context = {
 
 export function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const customer = await fetchCustomerInfo(params.id, true);
+        const customer = await fetchCustomerInfo(params.id, true, true);
         if (customer.error)
             return customer.error;
         return NextResponse.json(customer.success);

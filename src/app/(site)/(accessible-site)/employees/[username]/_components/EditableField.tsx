@@ -12,6 +12,7 @@ import { sendToast } from "../../../../../../utils/Hooks";
 import closeIcon from "/public/icons/close.svg";
 import checkIcon from "/public/icons/check-green-circled.svg";
 import GenericModal from "../../../../../_components/GenericModal";
+import GenericTextArea from "../../../../../_components/inputs/GenericTextArea";
 
 interface Props {
     label: string,
@@ -23,7 +24,8 @@ interface Props {
         test: (value: string) => boolean,
         message?: string
     }
-    successMessage?: string
+    successMessage?: string,
+    textArea?: boolean,
     editAllowed: boolean
 }
 
@@ -35,7 +37,8 @@ export default function EditableField({
                                           onValueChange,
                                           validate,
                                           successMessage,
-                                          editAllowed
+                                          editAllowed,
+                                          textArea
                                       }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const {
@@ -83,13 +86,24 @@ export default function EditableField({
                 onClose={() => setModalOpen(false)}
             >
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <GenericInput
-                        register={register}
-                        errors={errors}
-                        id="value"
-                        label={`New ${label}`}
-                        required
-                    />
+                    {
+                        textArea ?
+                            <GenericTextArea
+                                register={register}
+                                errors={errors}
+                                id="value"
+                                label={`New ${label}`}
+                                required
+                            />
+                            :
+                            <GenericInput
+                                register={register}
+                                errors={errors}
+                                id="value"
+                                label={`New ${label}`}
+                                required
+                            />
+                    }
                     <Spacer y={6} />
                     <GenericButton type="submit">
                         Update
@@ -106,7 +120,7 @@ type DataContainerProps = {
     fieldIsLoaded?: boolean,
     onEdit?: MouseEventHandler<HTMLDivElement>
     capitalizeField?: boolean
-    editAllowed: boolean
+    editAllowed: boolean,
 } & React.PropsWithChildren
 
 export function DataContainer({
@@ -163,13 +177,13 @@ export function DataContainer({
             <Skeleton
                 isLoaded={fieldIsLoaded || fieldIsLoaded === undefined}
                 className={clsx(
-                    "rounded-2xl",
+                    "rounded-2xl p-4",
                     (fieldIsLoaded || fieldIsLoaded === undefined) ? "!bg-transparent" : "w-1/2 h-5"
                 )}
             >
                 {
                     children || <p className={clsx(
-                        "max-w-fit break-all !bg-red",
+                        "max-w-fit break-all whitespace-pre-wrap !bg-red",
                         capitalizeField && "capitalize"
                     )}>{field}</p>
                 }

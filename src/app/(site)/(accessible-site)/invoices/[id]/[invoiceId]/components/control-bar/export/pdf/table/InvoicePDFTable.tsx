@@ -7,7 +7,8 @@ import InvoicePDFTableRows from "./InvoicePDFTableRows";
 import InvoicePDFTableFooter from "./InvoicePDFTableFooter";
 
 type Props = {
-    invoiceItems?: InvoiceItem[]
+    invoiceItems?: InvoiceItem[],
+    termsAndConditions?: String,
 }
 
 const styles = StyleSheet.create({
@@ -20,12 +21,12 @@ const styles = StyleSheet.create({
     }
 });
 
-export default function InvoicePDFTable({ invoiceItems }: Props) {
+export default function InvoicePDFTable({ invoiceItems, termsAndConditions }: Props) {
     return (
         <View style={styles.tableContainer}>
             <InvoicePDFTableHeader />
             <InvoicePDFTableRows items={invoiceItems} />
-            <InvoicePDFTableFooter items={invoiceItems} />
+            <InvoicePDFTableFooter items={invoiceItems} termsAndConditions={termsAndConditions} />
         </View>
     );
 }

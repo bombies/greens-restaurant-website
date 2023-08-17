@@ -4,9 +4,11 @@ import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Selectio
 import { useMemo } from "react";
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
+import clsx from "clsx";
 
 export type DropdownInputProps = {
     label?: string,
+    labelPlacement?: "beside" | "above",
     color?: "primary" | "secondary" | "success" | "danger" | "warning"
     isLoading?: boolean,
     variant?: "light" | "shadow" | "flat" | "solid" | "bordered" | "faded" & Partial<"ghost">
@@ -18,11 +20,13 @@ export type DropdownInputProps = {
     icon?: string | StaticImageData
     disabled?: boolean,
     selectedValueLabel?: boolean
-    labelIsIcon?: boolean
+    labelIsIcon?: boolean,
+    buttonClassName?: string
 }
 
 export default function DropdownInput({
                                           label,
+                                          labelPlacement,
                                           variant,
                                           multiSelect,
                                           selectionRequired,
@@ -34,7 +38,8 @@ export default function DropdownInput({
                                           selectedValueLabel,
                                           color,
                                           labelIsIcon,
-                                          isLoading
+                                          isLoading,
+                                          buttonClassName
                                       }: DropdownInputProps) {
     const keyElements = keys.map(key => (
         <DropdownItem
@@ -55,8 +60,10 @@ export default function DropdownInput({
     );
 
     return (
-        <>
-            {label && <p>{label}</p>}
+        <div className={clsx("flex gap-6", labelPlacement === "above" && "flex-col")}>
+            {label &&
+                <label
+                    className="default-container px-8 py-2 w-fit mx-auto uppercase text-[.75rem] tracking-tight font-semibold">{label}</label>}
             <Dropdown
                 classNames={{
                     base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6"
@@ -64,12 +71,13 @@ export default function DropdownInput({
             >
                 <DropdownTrigger>
                     <Button
+                        fullWidth
                         isIconOnly={labelIsIcon}
                         variant={variant}
                         disabled={disabled || isLoading}
                         isLoading={isLoading}
                         color={color || "primary"}
-                        className="capitalize"
+                        className={clsx("capitalize", buttonClassName)}
                         endContent={icon && <GenericImage src={icon} width={1.5} />}
                     >
                         {selectedValueLabel && selectedValue}
@@ -87,6 +95,6 @@ export default function DropdownInput({
                     {keyElements}
                 </DropdownMenu>
             </Dropdown>
-        </>
+        </div>
     );
 }
