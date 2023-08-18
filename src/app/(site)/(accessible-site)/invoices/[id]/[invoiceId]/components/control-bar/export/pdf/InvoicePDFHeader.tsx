@@ -2,6 +2,7 @@
 
 import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Invoice, InvoiceInformation } from "@prisma/client";
+import { formatInvoiceNumber } from "../../../../../../components/invoice-utils";
 
 const styles = StyleSheet.create({
     companyImage: {
@@ -62,7 +63,7 @@ export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
                     fontSize: 24,
                     textTransform: "capitalize",
                     maxWidth: "200"
-                }}>{invoice?.title}</Text>
+                }}>Invoice #{formatInvoiceNumber(invoice?.number ?? 0)}</Text>
                 <Text style={{
                     fontFamily: "Inter",
                     fontSize: 14,

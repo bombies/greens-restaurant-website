@@ -114,6 +114,7 @@ export default function EditCustomerButton({ customer, disabled, iconOnly, onSuc
                     </div>
                     <EditableField
                         label="Customer Address"
+                        textArea
                         field={proposedChanges?.customerAddress || customer?.customerAddress}
                         editAllowed={!disabled}
                         onValueChange={value => setProposedChanges(prev => ({

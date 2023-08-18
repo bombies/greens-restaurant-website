@@ -33,7 +33,7 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
         label: "text-neutral-100",
     };
 
-    const input = register ?
+    return register ?
         <Input
             {...register(id, { required: props.required })}
             {...props}
@@ -75,7 +75,5 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
                     iconRight && <GenericImage src={iconRight} width={1.25} />)
             }
             classNames={className}
-        />;
-
-    return input
+        />
 }

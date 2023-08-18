@@ -90,7 +90,7 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
             <GenericTable
                 columns={columns}
                 items={customers ?? []}
-                emptyContent={customersAreLoading ? "Loading items..." : "There are no items."}
+                emptyContent={!customersAreLoading ? "There are no items." : undefined}
                 isLoading={customersAreLoading}
                 loadingContent={<Spinner size="lg" />}
                 bottomContent={

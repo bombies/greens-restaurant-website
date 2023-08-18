@@ -94,7 +94,7 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                                     const workSheet = workBook.addWorksheet(`Invoice Report - ${formatDateDDMMYYYY(new Date(), "-")}`);
 
                                     workSheet.columns = [
-                                        { key: "title", header: "Title", width: 16 },
+                                        { key: "number", header: "Number", width: 16 },
                                         { key: "description", header: "Description", width: 32 },
                                         { key: "date", header: "Date", width: 10 },
                                         {
@@ -109,7 +109,7 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                                     let lastRow = 1;
                                     currentItems.forEach((item, i) => {
                                         const row = workSheet.addRow({
-                                            title: item.title,
+                                            number: item.number,
                                             description: item.description,
                                             date: new Date(item.createdAt.toString()),
                                             total: generateInvoiceTotal(item),

@@ -25,11 +25,10 @@ export function POST(req: Request, { params }: Context) {
         if (error)
             return error;
 
+        const invoiceNumber = (await prisma.invoice.count()) + 1;
         const createdInvoice = await prisma.invoice.create({
             data: {
-                title: `Invoice #${
-                    customerInfo!.invoices?.length ? customerInfo!.invoices?.length + 1 : 1
-                }`,
+                number: invoiceNumber,
                 customerId: customerInfo!.id
             }
         });

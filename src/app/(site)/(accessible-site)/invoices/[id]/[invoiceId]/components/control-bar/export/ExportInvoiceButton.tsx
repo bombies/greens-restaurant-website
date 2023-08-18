@@ -7,6 +7,7 @@ import InvoicePDF from "./pdf/InvoicePDF";
 import exportIcon from "/public/icons/export-gold.svg";
 import { usePDF } from "@react-pdf/renderer";
 import { useEffect } from "react";
+import { formatInvoiceNumber } from "../../../../../components/invoice-utils";
 
 type Props = {
     customer?: InvoiceCustomer
@@ -47,7 +48,7 @@ export default function ExportInvoiceButton({ customer, invoice, invoiceItems, d
                     const aTag = document.createElement("a");
                     if (pdfInstance.url) {
                         aTag.href = pdfInstance.url;
-                        aTag.setAttribute("download", `${invoice?.title}-${customer?.customerName}.pdf`);
+                        aTag.setAttribute("download", `Invoice #${formatInvoiceNumber(invoice?.number ?? 0)}-${customer?.customerName}.pdf`);
                         document.body.appendChild(aTag);
                         aTag.click();
                     }

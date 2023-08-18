@@ -1,6 +1,6 @@
 "use client";
 
-import React, { MouseEventHandler, useState } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import { Skeleton, Spacer, Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
 import GenericImage from "../../../../../_components/GenericImage";
@@ -41,6 +41,7 @@ export default function EditableField({
                                           textArea
                                       }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
+    const [value, setValue] = useState<string>();
     const {
         register,
         handleSubmit,
@@ -48,6 +49,11 @@ export default function EditableField({
             errors
         }
     } = useForm<FieldValues>();
+    
+    useEffect(() => {
+        if (fieldIsLoaded && field)
+            setValue(field)
+    }, [field, fieldIsLoaded])
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         if (validate && !validate.test(data.value.trim())) {
@@ -92,6 +98,8 @@ export default function EditableField({
                                 register={register}
                                 errors={errors}
                                 id="value"
+                                value={value}
+                                onValueChange={setValue}
                                 label={`New ${label}`}
                                 required
                             />
@@ -100,6 +108,8 @@ export default function EditableField({
                                 register={register}
                                 errors={errors}
                                 id="value"
+                                value={value}
+                                onValueChange={setValue}
                                 label={`New ${label}`}
                                 required
                             />
