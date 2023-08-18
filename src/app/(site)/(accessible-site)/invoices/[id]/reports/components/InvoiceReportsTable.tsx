@@ -114,7 +114,7 @@ export const InvoiceReportsTable: FC<Props> = ({ invoices, customerIsLoading }) 
             <GenericTable
                 columns={columns}
                 items={sortedItems ?? []}
-                sortableColumns={["invoice_title", "invoice_date", "invoice_total"]}
+                sortableColumns={["invoice_number", "invoice_date", "invoice_total"]}
                 emptyContent={!customerIsLoading ? "There are no invoices." : undefined}
                 isLoading={customerIsLoading}
                 sortDescriptor={sortDescriptor}
