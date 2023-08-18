@@ -7,5 +7,5 @@ type Context = {
 }
 
 export default function InvoiceCustomerPage({ params }: Context) {
-    return (<InvoiceCustomerLayout id={params.id} />);
+    return <InvoiceCustomerLayout id={params.id} />;
 }

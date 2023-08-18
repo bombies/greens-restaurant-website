@@ -7,14 +7,9 @@ import Title from "../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
 import InvoiceCustomerControlBar from "./control-bar/InvoiceCustomerControlBar";
 import { useUserData } from "../../../../../../utils/Hooks";
-import { useRouter } from "next/navigation";
-import { Fragment, useEffect, useMemo } from "react";
+import { Fragment } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import InvoiceGrid from "./InvoiceGrid";
-import { Spinner } from "@nextui-org/spinner";
-import SubTitle from "../../../../../_components/text/SubTitle";
-import { Divider } from "@nextui-org/divider";
-import { dollarFormat } from "../../../../../../utils/GeneralUtils";
 import { InvoiceCustomerInformation } from "./InvoiceCustomerInformation";
 
 type Props = {
@@ -29,18 +24,10 @@ export const FetchInvoiceCustomer = (id: string) => {
 
 export default function InvoiceCustomerLayout({ id }: Props) {
     const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(id);
-    const { data: userData, isLoading: userDataIsLoading } = useUserData();
-    const router = useRouter();
-
-    useEffect(() => {
-        if (!userDataIsLoading &&
-            (!userData || !hasAnyPermission(userData.permissions, [
-                Permission.VIEW_INVOICES,
-                Permission.CREATE_INVOICE
-            ]))
-        )
-            router.replace("/home");
-    }, [router, userData, userDataIsLoading]);
+    const { data: userData, isLoading: userDataIsLoading } = useUserData([
+        Permission.VIEW_INVOICES,
+        Permission.CREATE_INVOICE
+    ]);
 
     return (
         <div>

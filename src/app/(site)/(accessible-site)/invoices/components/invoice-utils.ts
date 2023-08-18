@@ -6,6 +6,11 @@ export const generateInvoiceTotal = (invoice?: Invoice & { invoiceItems: Invoice
         .reduce((prev, acc) => prev + acc, 0) ?? 0;
 };
 
+export const generateInvoicesTotal = (invoices?: (Invoice & { invoiceItems: InvoiceItem[] })[]): number => {
+    return invoices?.reduce((prev, invoice) =>
+        prev + generateInvoiceTotal(invoice), 0) ?? 0;
+};
+
 export const fetchDueAt = (invoice?: Invoice): Date => {
     if (!invoice)
         return new Date();
