@@ -12,6 +12,7 @@ import GenericInput from "../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
 import { sendToast } from "../../../../../utils/Hooks";
 import GenericTextArea from "../../../../_components/inputs/GenericTextArea";
+import PlusIcon from "../../../../_components/icons/PlusIcon";
 
 type Props = {
     disabled?: boolean
@@ -117,9 +118,10 @@ export default function CreateCustomerButton({ disabled }: Props) {
                 </form>
             </GenericModal>
             <GenericButton
+                variant="flat"
                 disabled={disabled || customerIsCreating}
                 isLoading={customerIsCreating}
-                icon={addIcon}
+                startContent={<PlusIcon fill="#00D615" />}
                 onPress={() => setModalOpen(true)}
             >
                 Add Customer

@@ -8,22 +8,13 @@ import CompanyInvoiceCard from "./components/CompanyInvoiceCard";
 import InvoiceCustomerGrid from "./components/InvoiceCustomerGrid";
 import { hasAnyPermission, Permission } from "../../../../libs/types/permission";
 import { useUserData } from "../../../../utils/Hooks";
-import { Fragment, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Fragment } from "react";
 
 export default function InvoicesPage() {
-    const { data: userData, isLoading: userDataIsLoading } = useUserData();
-    const router = useRouter();
-
-    useEffect(() => {
-        if (!userDataIsLoading &&
-            (!userData || !hasAnyPermission(userData.permissions, [
-                Permission.VIEW_INVOICES,
-                Permission.CREATE_INVOICE
-            ]))
-        )
-            router.replace("/home");
-    }, [router, userData, userDataIsLoading]);
+    const { data: userData } = useUserData([
+        Permission.VIEW_INVOICES,
+        Permission.CREATE_INVOICE
+    ]);
 
     return (
         <div>
