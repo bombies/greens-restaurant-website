@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - dev
+      - feature/**
+      - features/**
+      - fix/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - name: Install Dependencies
+        run: |
+          echo "Installing node dependencies..."
+          npm i
+      - name: Building Project
+        run: |
+          echo "Building project..."
+          npm run lint
