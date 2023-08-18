@@ -9,6 +9,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
       - name: Deploy using SSH
         uses: appleboy/ssh-action@master
         with:
@@ -17,9 +22,10 @@ jobs:
           key: ${{ secrets.HOST_KEY }}
           passphrase: ${{ secrets.HOST_KEY_PASSPHRASE }}
           port: ${{ secrets.HOST_PORT }}
+          script_stop: true
           script: |
             cd ~/bombies/greens-restaurant-website
             git pull
             npm i
-            turbo build
+            npm run build
             pm2 restart 13
