@@ -7,6 +7,10 @@ on:
       - feature/**
       - features/**
       - fix/**
+  pull_request:
+    branches:
+      - main
+      - dev
 
 jobs:
   build:
