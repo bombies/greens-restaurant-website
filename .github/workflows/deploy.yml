@@ -23,7 +23,7 @@ jobs:
       - name: Building Project
         run: |
           echo "Building project..."
-          npm run lint
+          npm run build
   deploy:
     runs-on: ubuntu-latest
     needs:
