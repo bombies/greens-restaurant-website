@@ -1,0 +1,49 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - name: Install Dependencies
+        run: |
+          echo "Installing node dependencies..."
+          npm i
+      - name: Building Project
+        run: |
+          echo "Building project..."
+          npm run build
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Deploy using SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.HOST_USERNAME }}
+          key: ${{ secrets.HOST_KEY }}
+          passphrase: ${{ secrets.HOST_KEY_PASSPHRASE }}
+          port: ${{ secrets.HOST_PORT }}
+          script_stop: true
+          script: |
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            cd ~/bombies/greens-restaurant-website
+            git stash
+            git pull
+            npm i
+            npm run build
+            pm2 restart 14
