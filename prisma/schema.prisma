@@ -107,7 +107,7 @@ model InvoiceCustomer {
 
 model Invoice {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
+  number      Int      @unique
   description String?
   paid        Boolean?
 

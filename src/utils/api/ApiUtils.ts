@@ -7,6 +7,7 @@ import Mail from "nodemailer/lib/mailer";
 import { AuthenticatedServerAxiosClient } from "./AuthenticatedServerAxiosClient";
 import { getToken } from "next-auth/jwt";
 import prisma from "../../libs/prisma";
+import { z } from "zod";
 
 export const authenticated = async (
     request: Request,
@@ -83,11 +84,12 @@ export const respond = (options: {
     }, options.init);
 };
 
-export const respondWithInit = ({ data, message, ...init }: {
+export const respondWithInit = ({ data, message, validationErrors, ...init }: {
     data?: any,
-    message?: string
+    message?: string,
+    validationErrors?: z.SafeParseReturnType<any, any>
 } & ResponseInit) => {
-    return NextResponse.json(data || {
+    return NextResponse.json((!validationErrors?.success ? validationErrors?.error.errors : data) || {
         message
     }, init);
 };

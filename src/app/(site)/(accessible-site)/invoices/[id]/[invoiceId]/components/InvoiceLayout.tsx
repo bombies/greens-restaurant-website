@@ -20,6 +20,7 @@ import { useInvoiceItems } from "./InvoiceItemsProvider";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { useInvoicePaymentStatus } from "./hooks/useInvoicePaymentStatus";
+import { formatInvoiceNumber } from "../../../components/invoice-utils";
 
 type Props = {
     customerId: string
@@ -68,7 +69,7 @@ export default function InvoiceLayout({ customerId }: Props) {
                             <>
                                 <div className="flex gap-4">
                                     <SubTitle className="self-center capitalize break-words">
-                                        {invoice?.title}
+                                        Invoice #{formatInvoiceNumber(invoice?.number || 0)}
                                     </SubTitle>
                                     <InvoicePaidStatus
                                         selectedStatus={selectedStatus}

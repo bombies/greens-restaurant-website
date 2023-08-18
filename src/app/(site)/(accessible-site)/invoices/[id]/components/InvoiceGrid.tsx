@@ -17,7 +17,12 @@ import { Chip } from "@nextui-org/chip";
 import GenericImage from "../../../../../_components/GenericImage";
 import GenericCard from "../../../../../_components/GenericCard";
 import { dollarFormat } from "../../../../../../utils/GeneralUtils";
-import { fetchDueAt, generateInvoiceTotal, invoiceIsOverdue } from "../../components/invoice-utils";
+import {
+    fetchDueAt,
+    formatInvoiceNumber,
+    generateInvoiceTotal,
+    invoiceIsOverdue
+} from "../../components/invoice-utils";
 
 type Props = {
     customerIsLoading: boolean,
@@ -25,8 +30,6 @@ type Props = {
 }
 
 enum SortMode {
-    ASCENDING_TITLE = "A-Z",
-    DESCENDING_TITLE = "Z-A",
     ASCENDING_DATE = "Oldest - Newest",
     DESCENDING_DATE = "Newest - Oldest",
     ASCENDING_TOTAL = "Lowest Total - Highest Total",
@@ -48,12 +51,6 @@ const getSortPredicate = (a: (Invoice & { invoiceItems: InvoiceItem[] }), b: (In
         }
         case SortMode.DESCENDING_DATE: {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        }
-        case SortMode.ASCENDING_TITLE: {
-            return a.title.localeCompare(b.title);
-        }
-        case SortMode.DESCENDING_TITLE: {
-            return b.title.localeCompare(a.title);
         }
         case SortMode.ASCENDING_TOTAL: {
             return generateInvoiceTotal(a) - generateInvoiceTotal(b);
@@ -91,7 +88,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
             .filter(invoice => {
                 if (!search)
                     return true;
-                return invoice.title.toLowerCase().includes(search.toLowerCase().trim());
+                return invoice.number === Number(search.trim());
             })
             .sort((a, b) => getSortPredicate(a, b, sortMode[0]))
             .map(invoice => {
@@ -107,7 +104,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                             <div className="p-6">
                                 <div className="flex gap-4">
                                     <p className="text-primary text-xl break-words font-bold drop-shadow self-center">
-                                        {invoice.title}
+                                        Invoice #{formatInvoiceNumber(invoice.number)}
                                     </p>
                                     <Chip
                                         variant="flat"
@@ -135,7 +132,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                         <div className="flex flex-col gap-2 w-full">
                             <div className="flex gap-4">
                                 <p className="h-full overflow-hidden whitespace-nowrap overflow-ellipsis self-center max-w-1/2">
-                                    {invoice.title}
+                                    Invoice #{formatInvoiceNumber(invoice.number)}
                                 </p>
                                 <Chip
                                     variant="flat"
@@ -171,7 +168,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                     icon={sortIcon}
                     variant="flat"
                     selectionRequired
-                    keys={[SortMode.ASCENDING_TITLE, SortMode.DESCENDING_TITLE, SortMode.DESCENDING_DATE, SortMode.ASCENDING_DATE, SortMode.DESCENDING_TOTAL, SortMode.ASCENDING_TOTAL]}
+                    keys={[SortMode.DESCENDING_DATE, SortMode.ASCENDING_DATE, SortMode.DESCENDING_TOTAL, SortMode.ASCENDING_TOTAL]}
                     selectedKeys={sortMode}
                     setSelectedKeys={(keys) => setSortMode((Array.from(keys) as SortMode[]))}
                 />
@@ -203,12 +200,14 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
             <Divider className="my-6" />
             <div className="w-1/4 tablet:w-1/2 phone:w-full">
                 <GenericInput
-                    iconLeft={searchIcon}
+                    type="number"
+                    min="0"
                     id="invoiceSearch"
                     value={search}
                     onValueChange={(value: string | undefined) => setSearch(value)}
                     label="Search"
                     placeholder="Search for an invoice..."
+                    startContent="#"
                     width={24}
                 />
             </div>

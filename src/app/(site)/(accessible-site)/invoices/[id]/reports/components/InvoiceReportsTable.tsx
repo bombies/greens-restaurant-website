@@ -6,7 +6,12 @@ import GenericTable from "../../../../../../_components/table/GenericTable";
 import { Column } from "../../[invoiceId]/components/table/InvoiceTable";
 import { SortDescriptor, TableCell, TableRow } from "@nextui-org/react";
 import { Spinner } from "@nextui-org/spinner";
-import { formatDateDDMMYYYY, generateInvoiceTotal, invoiceIsOverdue } from "../../../components/invoice-utils";
+import {
+    formatDateDDMMYYYY,
+    formatInvoiceNumber,
+    generateInvoiceTotal,
+    invoiceIsOverdue
+} from "../../../components/invoice-utils";
 import { Chip } from "@nextui-org/chip";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 import SubTitle from "../../../../../../_components/text/SubTitle";
@@ -18,8 +23,8 @@ interface Props {
 
 const columns: Column[] = [
     {
-        key: "invoice_title",
-        value: "Title"
+        key: "invoice_number",
+        value: "Number"
     },
     {
         key: "invoice_desc",
@@ -44,8 +49,8 @@ export const InvoiceReportsTable: FC<Props> = ({ invoices, customerIsLoading }) 
 
     const getKeyValue = useCallback((invoice: (Invoice & { invoiceItems: InvoiceItem[] }), key: Key) => {
         switch (key) {
-            case "invoice_title": {
-                return invoice.title;
+            case "invoice_number": {
+                return formatInvoiceNumber(invoice.number);
             }
             case "invoice_desc": {
                 return invoice.description;
@@ -78,8 +83,8 @@ export const InvoiceReportsTable: FC<Props> = ({ invoices, customerIsLoading }) 
 
             let cmp: number;
             switch (sortDescriptor.column) {
-                case "invoice_title": {
-                    cmp = a.title.localeCompare(b.title);
+                case "invoice_number": {
+                    cmp = a.number - b.number;
                     break;
                 }
                 case "invoice_date": {
