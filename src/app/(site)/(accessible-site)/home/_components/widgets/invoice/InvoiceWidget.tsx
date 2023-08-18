@@ -15,6 +15,7 @@ import eyeIcon from "/public/icons/green-eye.svg";
 import trashIcon from "/public/icons/red-trash.svg";
 import EditCustomerButton from "../../../../invoices/[id]/components/control-bar/EditCustomerButton";
 import DeleteCustomerButton from "../../../../invoices/[id]/components/control-bar/DeleteCustomerButton";
+import { formatInvoiceNumber } from "../../../../invoices/components/invoice-utils";
 
 const FetchInvoiceCustomers = () => {
     return useSWR(
@@ -137,7 +138,7 @@ export default function InvoiceWidget() {
                             >
                                 <div>
                                     <div className="flex gap-2">
-                                        <p className="text-medium max-w-[70%] overflow-hidden whitespace-nowrap overflow-ellipsis">{invoice.title}</p>
+                                        <p className="text-medium max-w-[70%] overflow-hidden whitespace-nowrap overflow-ellipsis">Invoice #{formatInvoiceNumber(invoice.number)}</p>
                                         <Chip
                                             variant="flat"
                                             color={invoice.paid ? "success" : "danger"}

@@ -56,3 +56,7 @@ export function formatDateDDMMYYYY(date: Date, join: string = "/") {
         date.getFullYear()
     ].join(join);
 }
+
+export function formatInvoiceNumber(invoiceNumber: number): string {
+    return invoiceNumber.toString().padStart(5, "0");
+}

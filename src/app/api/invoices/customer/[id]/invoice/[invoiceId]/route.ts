@@ -6,6 +6,7 @@ import { Invoice, InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../libs/prisma";
 import { Either } from "../../../../../inventory/[name]/utils";
 import { INVOICE_ITEM_NAME_REGEX } from "../../../../../../../utils/regex";
+import { z } from "zod";
 
 type Context = {
     params: {
@@ -40,7 +41,13 @@ export const fetchInvoice = async (customerId: string, invoiceId: string, withIt
     return new Either<Invoice & { invoiceItems?: InvoiceItem[] }, NextResponse>(thisInvoice);
 };
 
-export type CreateInvoiceItemsDto = Omit<InvoiceItem, "id" | "createdAt" | "updatedAt">[]
+export type CreateInvoiceItemsDto = Omit<InvoiceItem, "id" | "createdAt" | "updatedAt" | "invoiceId">[]
+const createInvoiceDtoSchema = z.array(z.object({
+    name: z.string(),
+    description: z.string().optional(),
+    price: z.number(),
+    quantity: z.number()
+}).strict());
 
 export function POST(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
@@ -49,9 +56,11 @@ export function POST(req: Request, { params }: Context) {
             return invoice.error;
 
         const body = (await req.json()) as CreateInvoiceItemsDto;
-        if (!body)
+        const bodyValidated = createInvoiceDtoSchema.safeParse(body);
+        if (!body || !bodyValidated.success)
             return respondWithInit({
-                message: "You are missing the body for this request!",
+                message: "Invalid payload!",
+                validationErrors: bodyValidated,
                 status: 401
             });
 
@@ -82,7 +91,12 @@ export function POST(req: Request, { params }: Context) {
     }, [Permission.CREATE_INVOICE]);
 }
 
-export type UpdateInvoiceDto = Partial<Omit<Invoice, "createdAt" | "updatedAt" | "customerId" | "id">>;
+export type UpdateInvoiceDto = Partial<Omit<Invoice, "createdAt" | "updatedAt" | "customerId" | "id" | "number">>;
+const updateInvoiceDtoSchema = z.object({
+    description: z.string(),
+    paid: z.boolean(),
+    dueAt: z.date()
+}).partial().strict();
 
 export function PATCH(req: Request, { params }: Context) {
     return authenticated(req, async () => {
@@ -91,9 +105,12 @@ export function PATCH(req: Request, { params }: Context) {
             return invoice.error;
 
         const body = (await req.json()) as UpdateInvoiceDto;
-        if (!body)
+        const bodyValidated = updateInvoiceDtoSchema.safeParse(body);
+
+        if (!body || !bodyValidated.success)
             return respondWithInit({
                 message: "You must provide a body for this request!",
+                validationErrors: bodyValidated,
                 status: 401
             });
 

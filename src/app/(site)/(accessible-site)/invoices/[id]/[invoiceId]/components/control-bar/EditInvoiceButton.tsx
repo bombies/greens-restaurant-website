@@ -79,15 +79,6 @@ export default function EditInvoiceButton({ customerId, invoice, disabled }: Pro
                 />
                 <div className="space-y-6">
                     <EditableField
-                        label="Invoice Title"
-                        field={proposedChanges?.title || invoice?.title}
-                        editAllowed={!disabled}
-                        onValueChange={value => setProposedChanges(prev => ({
-                            ...prev,
-                            title: value
-                        }))}
-                    />
-                    <EditableField
                         textArea
                         label="Invoice Description"
                         field={(proposedChanges?.description || invoice?.description) || undefined}

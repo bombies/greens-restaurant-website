@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../../libs/prisma";
 import { INVOICE_ITEM_NAME_REGEX } from "../../../../../../../../utils/regex";
+import { z } from "zod";
 
 type Context = {
     params: {
@@ -33,6 +34,12 @@ const fetchInvoiceItem = async (customerId: string, invoiceId: string, itemId: s
 };
 
 export type UpdateInvoiceItemDto = Omit<Partial<InvoiceItem>, "invoiceId" | "id" | "createdAt" | "updatedAt">
+const updateInvoiceItemDtoSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+    price: z.number(),
+    quantity: z.number()
+}).strict().partial();
 
 export function PATCH(req: Request, { params }: Context) {
     return authenticated(req, async () => {
@@ -41,11 +48,14 @@ export function PATCH(req: Request, { params }: Context) {
             return item.error;
 
         const body = (await req.json()) as UpdateInvoiceItemDto;
-        if (!body)
+        const bodyValidated = updateInvoiceItemDtoSchema.safeParse(body);
+        if (!body || !bodyValidated.success)
             return respondWithInit({
-                message: "You must provide a body for this request!",
+                message: "Invalid payload!",
+                validationErrors: bodyValidated,
                 status: 401
             });
+
 
         if (body.name && !INVOICE_ITEM_NAME_REGEX.test(body.name))
             return respondWithInit({
