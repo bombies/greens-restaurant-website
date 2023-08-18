@@ -11,16 +11,36 @@ import clsx from "clsx";
 import { Card, CardBody } from "@nextui-org/card";
 import GenericCard from "../../../../_components/GenericCard";
 import { InvoiceCustomerWithInvoiceItems } from "../reports/components/hooks/useCustomerReports";
+import { useInvoiceCustomers } from "./hooks/useInvoiceCustomers";
+import { Divider } from "@nextui-org/divider";
+import GenericInput from "../../../../_components/inputs/GenericInput";
+import SearchIcon from "../../../../_components/icons/SearchIcon";
+import React, { Fragment } from "react";
 
 export const FetchCustomers = () => {
     return useSWR(`/api/invoices/customer`, fetcher<InvoiceCustomerWithInvoiceItems[]>);
 };
 
 export default function InvoiceCustomerGrid() {
-    const { data: customers, isLoading } = FetchCustomers();
+    const {
+        visibleCustomers: customers,
+        isLoading,
+        search,
+        setSearch
+    } = useInvoiceCustomers();
+
     const customerElements = customers?.map(customer => (
         <LinkCard key={customer.id} href={`/invoices/${customer.id}`}>
-            <p className="capitalize overflow-hidden whitespace-nowrap overflow-ellipsis">{customer.customerName}</p>
+            <div className="whitespace-nowrap overflow-hidden">
+                <p className="capitalize overflow-hidden overflow-ellipsis font-semibold">{customer.customerName}</p>
+                {
+                    customer.customerDescription &&
+                    <Fragment>
+                        <Divider className="my-4" />
+                        <p className="text-sm text-neutral-500 overflow-hidden overflow-ellipsis">{customer.customerDescription}</p>
+                    </Fragment>
+                }
+            </div>
         </LinkCard>
     ));
 
@@ -28,8 +48,18 @@ export default function InvoiceCustomerGrid() {
         <div className="default-container p-12 w-[50%] tablet:w-full">
             <SubTitle>Select a customer</SubTitle>
             <Spacer y={6} />
+            <div className="w-1/2 phone:w-full">
+                <GenericInput
+                    id="search"
+                    startContent={<SearchIcon fill="rgb(115 115 115)" width={16} />}
+                    value={search}
+                    onValueChange={setSearch}
+                    placeholder="Search for a customer..."
+                />
+            </div>
+            <Divider className="my-6" />
             <div className={clsx(
-                "grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-4",
+                "grid-cols-1 gap-4",
                 (customerElements?.length || isLoading) && "grid"
             )}>
                 {

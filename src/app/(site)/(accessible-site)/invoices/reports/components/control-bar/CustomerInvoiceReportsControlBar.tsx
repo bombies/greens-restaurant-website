@@ -4,7 +4,6 @@ import { FC } from "react";
 import { FilterCustomerInvoiceReportButton } from "./FilterCustomerInvoiceReportButton";
 import { InvoiceCustomerWithInvoiceItems } from "../hooks/useCustomerReports";
 import { GoBackButton } from "../../../[id]/components/control-bar/InvoiceCustomerControlBar";
-import { Spacer } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 
 interface Props {

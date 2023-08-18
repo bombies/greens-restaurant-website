@@ -111,6 +111,7 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                             {
                                 controlsEnabled ?
                                     <CldUploadButton
+                                        className="phone:mx-auto"
                                         options={{
                                             maxFiles: 1,
                                             maxFileSize: 3000000,
@@ -148,6 +149,7 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                         <Spacer y={6} />
                         <EditableField
                             label="Company Address"
+                            textArea
                             editAllowed={controlsEnabled}
                             field={proposedCompanyInfo?.companyAddress || data?.companyAddress}
                             fieldIsLoaded={!isLoading}
