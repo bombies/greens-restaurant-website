@@ -9,6 +9,7 @@ import clsx from "clsx";
 export type DropdownInputProps = {
     label?: string,
     labelPlacement?: "beside" | "above",
+    fallbackTriggerLabel?: string,
     color?: "primary" | "secondary" | "success" | "danger" | "warning"
     isLoading?: boolean,
     variant?: "light" | "shadow" | "flat" | "solid" | "bordered" | "faded" & Partial<"ghost">
@@ -27,6 +28,7 @@ export type DropdownInputProps = {
 export default function DropdownInput({
                                           label,
                                           labelPlacement,
+                                          fallbackTriggerLabel,
                                           variant,
                                           multiSelect,
                                           selectionRequired,
@@ -80,7 +82,7 @@ export default function DropdownInput({
                         className={clsx("capitalize", buttonClassName)}
                         endContent={icon && <GenericImage src={icon} width={1.5} />}
                     >
-                        {selectedValueLabel && selectedValue}
+                        {(selectedValueLabel && selectedValue) || fallbackTriggerLabel}
                     </Button>
                 </DropdownTrigger>
                 <DropdownMenu
@@ -88,6 +90,7 @@ export default function DropdownInput({
                     variant={variant}
                     disallowEmptySelection={selectionRequired}
                     selectedKeys={selectedKeys}
+                    closeOnSelect={!multiSelect}
                     onSelectionChange={setSelectedKeys}
                     selectionMode={multiSelect ? "multiple" : "single"}
                     disabledKeys={(disabled || isLoading) ? keys : undefined}
