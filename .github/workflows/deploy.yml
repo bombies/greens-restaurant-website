@@ -19,6 +19,8 @@ jobs:
           port: ${{ secrets.HOST_PORT }}
           script_stop: true
           script: |
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
             cd ~/bombies/greens-restaurant-website
             git stash
             git pull
