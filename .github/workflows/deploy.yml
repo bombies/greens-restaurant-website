@@ -15,6 +15,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.HOST_USERNAME }}
           key: ${{ secrets.HOST_KEY }}
+          passphrase: ${{ secrets.HOST_KEY_PASSPHRASE }}
           port: ${{ secrets.HOST_PORT }}
           script: |
             cd ~/bombies/greens-restaurant-website
