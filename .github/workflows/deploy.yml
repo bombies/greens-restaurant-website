@@ -19,7 +19,6 @@ jobs:
           port: ${{ secrets.HOST_PORT }}
           script_stop: true
           script: |
-            nvm use node
             cd ~/bombies/greens-restaurant-website
             git stash
             git pull
