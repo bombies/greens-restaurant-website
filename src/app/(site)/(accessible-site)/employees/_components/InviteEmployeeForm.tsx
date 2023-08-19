@@ -11,9 +11,9 @@ import { Permission, Permissions } from "../../../../../libs/types/permission";
 import { InviteDto } from "../../../../api/users/invite/route";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { sendToast } from "../../../../../utils/Hooks";
-import checkIcon from "/public/icons/check-green-circled.svg";
+import { errorToast } from "../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 
 const SendInvitationMail = (dto?: InviteDto) => {
@@ -45,24 +45,13 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
 
         triggerInvitation()
             .then(() => {
-                sendToast({
-                    description: "Invitation sent!",
-                    icon: checkIcon
-                }, {
-                    position: "top-center"
-                });
-
+                toast.success("Invitation sent!");
                 router.refresh();
                 setModalVisible(false);
             })
             .catch((err) => {
                 console.error(err);
-                sendToast({
-                    error: err,
-                    description: "Could not send invitation!"
-                }, {
-                    position: "top-center"
-                });
+                errorToast(err, "Could not send invitation!");
             });
     }, [inviteInfo, router, setModalVisible, triggerInvitation, userHasPermission]);
 

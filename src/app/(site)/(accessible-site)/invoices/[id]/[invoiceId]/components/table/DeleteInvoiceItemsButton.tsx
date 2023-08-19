@@ -8,10 +8,11 @@ import {
     DeleteManyInvoiceItemsDto
 } from "../../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/items/route";
 import ConfirmationModal from "../../../../../../../_components/ConfirmationModal";
-import { sendToast } from "../../../../../../../../utils/Hooks";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import axios from "axios";
 import trashIcon from "/public/icons/red-trash.svg";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../../../../utils/Hooks";
 
 type Props = {
     disabled: boolean,
@@ -73,17 +74,12 @@ export default function DeleteInvoiceItemsButton({
                                 payload: items.map(item => item.id)
                             });
                             setSelectedKeys([]);
-                            sendToast({
-                                description: `Successfully deleted those items!`
-                            });
+                            toast.success(`Successfully deleted those items!`);
                             setModalOpen(false);
                         })
                         .catch(e => {
                             console.error(e);
-                            sendToast({
-                                error: e,
-                                description: "There was an error deleting these items!"
-                            });
+                            errorToast(e, "There was an error deleting these items!");
                         });
                 }}
             />

@@ -12,7 +12,7 @@ import { Divider } from "@nextui-org/divider";
 import Permission, { permissionCheck } from "../../../../../../libs/types/permission";
 import { compare } from "../../../../../../utils/GeneralUtils";
 import ChangesMadeBar from "./ChangesMadeBar";
-import { sendToast } from "../../../../../../utils/Hooks";
+import { errorToast } from "../../../../../../utils/Hooks";
 import EditableField from "./EditableField";
 import { EMAIL_REGEX, NAME_REGEX, USERNAME_REGEX } from "../../../../../../utils/regex";
 import ChangePasswordButton from "./ChangePasswordButton";
@@ -23,6 +23,7 @@ import useSWRMutation from "swr/mutation";
 import useSWRImmutable from "swr/immutable";
 import ContainerSkeleton from "../../../../../_components/skeletons/ContainerSkeleton";
 import { DataGroupContainer } from "../../../../../_components/DataGroupContainer";
+import { toast } from "react-hot-toast";
 
 type Props = {
     username: string
@@ -77,10 +78,10 @@ export default function Employee({ username }: Props) {
     }, [employeeDataError, isLoading, router, session.data?.user?.username, user]);
 
     useEffect(() => {
-        if (!user)
+        if (isLoading || !user)
             return;
         setChangesMade(!compare(currentData, user));
-    }, [currentData, user]);
+    }, [currentData, isLoading, user]);
 
     useEffect(() => {
         if (!user)
@@ -101,11 +102,7 @@ export default function Employee({ username }: Props) {
 
                 // The gods have blessed us with an impossible error
                 if (!newUser) {
-                    sendToast({
-                        description: "Something went wrong! An undefined user was returned."
-                    }, {
-                        position: "top-center"
-                    });
+                    toast.error("Something went wrong! An undefined user was returned.");
                     return;
                 }
 
@@ -115,17 +112,10 @@ export default function Employee({ username }: Props) {
                     router.refresh();
                 }
 
-                sendToast({
-                    description: "Successfully updated user!"
-                });
+                toast.success("Successfully updated user!");
             })
             .catch((e) => {
-                sendToast({
-                    error: e,
-                    description: "Could not update user!"
-                }, {
-                    position: "top-center"
-                });
+                errorToast(e, "Could not update user!");
             });
     };
 
@@ -145,7 +135,7 @@ export default function Employee({ username }: Props) {
                         .map(value => value.toString());
 
                     setSelectedPermissions(permissions);
-                    sendToast({ description: "Discarded all changes." });
+                    toast("Discarded all changes.");
                 }} />
             <div className="default-container p-12">
                 <GoBackButton />

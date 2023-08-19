@@ -3,8 +3,8 @@ import { StaticImageData } from "next/image";
 import clsx from "clsx";
 import GenericImage from "../GenericImage";
 import { Button, ButtonProps } from "@nextui-org/react";
-import { sendToast } from "../../../utils/Hooks";
 import { PressEvent } from "@react-types/shared";
+import { toast } from "react-hot-toast";
 
 type Props =
     ButtonProps
@@ -42,12 +42,9 @@ export default function GenericButton({ icon, cooldown, children, ...props }: Pr
                             props.onPress(e);
                         setLastClick(new Date().getTime());
                     } else {
-                        sendToast({
-                            title: "Slow down!",
-                            description: `Woah there! This button is on cooldown. You may use it again in 
+                        toast(`Woah there! This button is on cooldown. You may use it again in 
                             ${(Math.abs(new Date().getTime() - (lastClick! + (cooldown! * 1000))) / 1000).toFixed(Math.abs(new Date().getTime() - (lastClick! + (cooldown! * 1000))) / 1000 < 1 ? 2 : 0)}
-                            seconds!`
-                        }, {
+                            seconds!`, {
                             position: "top-right"
                         });
                     }

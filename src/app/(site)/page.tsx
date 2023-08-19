@@ -4,14 +4,12 @@ import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import close from "/public/icons/close-circled.svg";
-import check from "/public/icons/check-green-circled.svg";
 import signInIcon from "/public/icons/sign-in.svg";
-import { sendToast } from "../../utils/Hooks";
 import GenericImage from "../_components/GenericImage";
 import GenericInput from "../_components/inputs/GenericInput";
 import GenericButton from "../_components/inputs/GenericButton";
 import { Spacer } from "@nextui-org/react";
+import { toast } from "react-hot-toast";
 
 export default function HomePage() {
     const userInfo = useSession();
@@ -41,15 +39,9 @@ export default function HomePage() {
         )
             .then((cb) => {
                 if (cb?.error) {
-                    sendToast({
-                        description: "Invalid credentials! Please check your details and try again.",
-                        icon: close
-                    });
+                    toast.error("Invalid credentials! Please check your details and try again.");
                 } else if (cb?.ok) {
-                    sendToast({
-                        description: "Logged in!",
-                        icon: check
-                    });
+                    toast.success("Logged in!");
                 }
             })
             .finally(() => {

@@ -2,9 +2,8 @@
 
 import Title from "../../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
-import { sendToast, useUserData } from "../../../../../../../utils/Hooks";
-import { useRouter } from "next/navigation";
-import { Fragment, useEffect, useState } from "react";
+import { errorToast, useUserData } from "../../../../../../../utils/Hooks";
+import { Fragment } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { FetchInvoiceCustomer } from "../../components/InvoiceCustomerLayout";
 import InvoiceControlBar from "./control-bar/InvoiceControlBar";
@@ -84,10 +83,7 @@ export default function InvoiceLayout({ customerId }: Props) {
                                                 })
                                                 .catch(e => {
                                                     console.error(e);
-                                                    sendToast({
-                                                        error: e,
-                                                        description: "There was an error updating the paid status!"
-                                                    });
+                                                    errorToast(e, "There was an error updating the paid status!");
                                                 });
                                         }}
                                     />

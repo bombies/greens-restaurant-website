@@ -7,13 +7,14 @@ const nextConfig = {
             "res.cloudinary.com"
         ]
     },
-    webpack: (config, { buildId }) => {
-        // only apply it if dev: false, isServer: false, nextRuntime: undefined
-        if (config.output.filename === 'static/chunks/[name]-[chunkhash].js') {
-            config.output.filename = `static/chunks/[name]-[chunkhash]-${buildId}.js`
-        }
-        return config
-    },
+    webpack: (config, { isServer, nextRuntime, webpack }) => {
+        // Avoid AWS SDK Node.js require issue
+        if (isServer && nextRuntime === "nodejs")
+            config.plugins.push(
+                new webpack.IgnorePlugin({ resourceRegExp: /^aws-crt$/ })
+            );
+        return config;
+    }
 };
 
 module.exports = nextConfig;

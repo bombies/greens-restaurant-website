@@ -4,11 +4,12 @@ import prisma from "../../../../libs/prisma";
 import { InvoiceInformation } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { COMPANY_NAME_REGEX } from "../../../../utils/regex";
+import { z } from "zod";
 
-const defaultInfo: Omit<InvoiceInformation, "createdAt" | "updatedAt" | "id"> = {
+const defaultInfo: Omit<InvoiceInformation, "createdAt" | "updatedAt" | "id" | "companyLogo"> = {
     companyName: "green's restaurant & pub",
     companyAddress: "41 Lyndhurst Road, Kingston",
-    companyLogo: "",
+    companyAvatar: "",
     termsAndConditions: ""
 };
 
@@ -18,12 +19,26 @@ export function GET(req: Request) {
     }, [Permission.CREATE_INVOICE, Permission.VIEW_INVOICES]);
 }
 
-export type UpdateCompanyInformationDto = Omit<Partial<InvoiceInformation>, "createdAt" | "updatedAt" | "id">
+export type UpdateCompanyInformationDto = Omit<Partial<InvoiceInformation>, "createdAt" | "updatedAt" | "id" | "companyLogo">
+const updateCompanyInformationDtoSchema = z.object({
+    companyName: z.string(),
+    companyAddress: z.string(),
+    companyAvatar: z.string(),
+    termsAndConditions: z.string()
+}).partial();
 
 export function PATCH(req: Request) {
     return authenticatedAny(req, async () => {
         const info = await fetchCompanyInfo();
+
         const body = (await req.json()) as UpdateCompanyInformationDto;
+        const bodyValidated = updateCompanyInformationDtoSchema.safeParse(body);
+        if (!bodyValidated.success)
+            return respondWithInit({
+                message: "Invalid payload!",
+                status: 401,
+                validationErrors: bodyValidated
+            });
 
         let newName: string | undefined = undefined;
         if (body.companyName) {
@@ -47,7 +62,7 @@ export function PATCH(req: Request) {
             },
             data: {
                 companyName: newName || info.companyName,
-                companyLogo: body.companyLogo || info.companyLogo,
+                companyAvatar: body.companyAvatar || info.companyAvatar,
                 companyAddress: body.companyAddress || info.companyAddress,
                 termsAndConditions: body.termsAndConditions || info.termsAndConditions
             }

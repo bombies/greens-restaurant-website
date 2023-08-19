@@ -1,9 +1,11 @@
-import { authenticated, Mailer, respond } from "../../../../utils/api/ApiUtils";
+import { authenticated, Mailer, respond, respondWithInit } from "../../../../utils/api/ApiUtils";
 import Permission, { permissionCheck } from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import { EMAIL_REGEX, NAME_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "../../../../utils/regex";
 import bcrypt from "bcrypt";
+import { User } from "@prisma/client";
+import { z } from "zod";
 
 type RouteContext = {
     params: {
@@ -58,16 +60,16 @@ export async function DELETE(req: Request, { params }: RouteContext) {
     }, Permission.ADMINISTRATOR);
 }
 
-type UpdateUserDto = Partial<{
-    username: string
-    firstName: string
-    lastName: string
-    email: string
-    password: string,
-    image: string | null
-    permissions: number
-    createdInventoryIds: string[]
-}>
+type UpdateUserDto = Partial<Omit<User, "id" | "createdInventoryIds" | "createdAt" | "updatedAt" | "image">>
+const updateUserDtoSchema = z.object({
+    username: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string(),
+    password: z.string(),
+    avatar: z.string(),
+    permissions: z.number()
+}).partial();
 
 export async function PATCH(req: Request, { params }: RouteContext) {
     return await authenticated(req, async (session) => {
@@ -94,8 +96,13 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             });
 
         const body: UpdateUserDto = await req.json();
-        if (!body)
-            return respond({ message: "You must provide some information to update!" });
+        const bodyValidated = updateUserDtoSchema.safeParse(body);
+        if (!body || !bodyValidated.success)
+            return respondWithInit({
+                message: "You must provide some information to update!",
+                status: 401,
+                validationErrors: bodyValidated
+            });
 
         // Validation
         if (body.username && body.username !== user.username) {
@@ -198,7 +205,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 subject: "Email Updated",
                 html: `
                 <!DOCTYPE HTML>
-                <html>
+                <html lang="en">
                   <head>
                     <link rel="preconnect" href="https://fonts.googleapis.com">
                     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -254,14 +261,11 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             });
         }
 
-        // Just a fail-safe in case the body contains an id field.
-        // @ts-ignore
-        const { id, ...updatableBody } = body;
         const updatedUser = await prisma.user.update({
             where: {
                 username: user.username
             },
-            data: updatableBody
+            data: body
         });
 
         return NextResponse.json(updatedUser);

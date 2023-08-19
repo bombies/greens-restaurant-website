@@ -9,8 +9,9 @@ import GenericInput from "../../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { sendToast } from "../../../../../../utils/Hooks";
+import { errorToast } from "../../../../../../utils/Hooks";
 import { useCurrentStock } from "./CurrentStockContext";
+import { toast } from "react-hot-toast";
 
 type AddItemProps = {
     arg: {
@@ -46,11 +47,7 @@ export default function AddStockItemButton({ inventoryName, disabled }: Props) {
         const { name } = data;
         triggerStockAdd({ name })
             .then(stock => {
-                sendToast({
-                    description: "Successfully created that item"
-                }, {
-                    position: "top-center"
-                });
+                toast.success("Successfully created that item");
                 setCurrentData(prev => [
                     ...prev,
                     {
@@ -62,13 +59,7 @@ export default function AddStockItemButton({ inventoryName, disabled }: Props) {
             })
             .catch(e => {
                 console.error(e);
-                sendToast({
-                    error: e,
-                    description: "Could not create that item!" // Fallback
-                }, {
-                    position: "top-center"
-
-                });
+                errorToast(e, "Could not create that item!");
             });
     };
 

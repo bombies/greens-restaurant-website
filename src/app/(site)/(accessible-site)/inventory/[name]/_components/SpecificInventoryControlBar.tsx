@@ -2,9 +2,8 @@
 
 import AddStockItemButton from "./AddStockItemButton";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
-import { sendToast, useUserData } from "../../../../../../utils/Hooks";
+import { errorToast, useUserData } from "../../../../../../utils/Hooks";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
-import { useCurrentStock } from "./CurrentStockContext";
 import { usePathname, useRouter } from "next/navigation";
 import sparklesIcon from "/public/icons/sparkles-green.svg";
 import eyeIcon from "/public/icons/green-eye.svg";
@@ -15,7 +14,7 @@ import ConfirmationModal from "../../../../../_components/ConfirmationModal";
 import { useState } from "react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import checkIcon from "/public/icons/check-green-circled.svg";
+import { toast } from "react-hot-toast";
 
 type Props = {
     inventoryName: string,
@@ -49,20 +48,10 @@ export default function SpecificInventoryControlBar({ inventoryName }: Props) {
                 onAccept={() => {
                     deleteInventory()
                         .then(() => {
-                            sendToast({
-                                icon: checkIcon,
-                                description: "You have successfully deleted that inventory!"
-                            }, {
-                                position: "top-center"
-                            });
+                            toast.success("You have successfully deleted that inventory!");
                         })
                         .catch(e => {
-                            sendToast({
-                                error: e,
-                                description: "There was an error deleting this inventory!"
-                            }, {
-                                position: "top-center"
-                            });
+                            errorToast(e, "There was an error deleting this inventory!");
                         });
                 }}
             />

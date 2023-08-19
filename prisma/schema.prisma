@@ -19,7 +19,8 @@ model User {
   password    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  image       String?
+  image       String? // Legacy images
+  avatar      String?
   permissions Int
 
   createdInventoryIds String[]    @db.ObjectId
@@ -85,7 +86,8 @@ model InvoiceInformation {
   id                 String  @id @default(auto()) @map("_id") @db.ObjectId
   companyName        String  @unique
   companyAddress     String
-  companyLogo        String?
+  companyLogo        String? // Legacy
+  companyAvatar      String?
   termsAndConditions String?
 
   createdAt DateTime @default(now())

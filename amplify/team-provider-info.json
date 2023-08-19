@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-greensrestaurantwebs-dev-121618-authRole",
+      "UnauthRoleArn": "arn:aws:iam::598735407977:role/amplify-greensrestaurantwebs-dev-121618-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::598735407977:role/amplify-greensrestaurantwebs-dev-121618-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-greensrestaurantwebs-dev-121618-deployment",
+      "UnauthRoleName": "amplify-greensrestaurantwebs-dev-121618-unauthRole",
+      "StackName": "amplify-greensrestaurantwebs-dev-121618",
+      "StackId": "arn:aws:cloudformation:us-east-1:598735407977:stack/amplify-greensrestaurantwebs-dev-121618/bbcc6b50-3eab-11ee-8220-0a748a371cc5",
+      "AmplifyAppId": "d3ogv7wwy7hkk5"
+    },
+    "categories": {
+      "auth": {
+        "greensrestaurantwebsaf37f0ae": {}
+      },
+      "storage": {
+        "s36f6942a7": {}
+      }
+    }
+  }
+}

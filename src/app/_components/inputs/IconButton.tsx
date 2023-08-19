@@ -4,8 +4,8 @@ import GenericImage from "../GenericImage";
 import React, { ReactElement, useCallback, useMemo, useState } from "react";
 import { UseDropdownProps } from "@nextui-org/dropdown/dist/use-dropdown";
 import { DropdownInputProps } from "./DropdownInput";
-import { sendToast } from "../../../utils/Hooks";
 import { PressEvent } from "@react-types/shared";
+import { toast } from "react-hot-toast";
 
 type Props = {
     toolTip?: string,
@@ -50,12 +50,9 @@ export default function IconButton({
                         buttonProps.onPress(e);
                     setLastClick(new Date().getTime());
                 } else {
-                    sendToast({
-                        title: "Slow down!",
-                        description: `Woah there! This button is on cooldown. You may use it again in 
-                        ${(Math.abs(new Date().getTime() - (lastClick! + (cooldown! * 1000))) / 1000).toFixed(Math.abs(new Date().getTime() - (lastClick! + (cooldown! * 1000))) / 1000 < 1 ? 2 : 0)}
-                         seconds!`
-                    }, {
+                    toast(`Woah there! This button is on cooldown. You may use it again in 
+                            ${(Math.abs(new Date().getTime() - (lastClick! + (cooldown! * 1000))) / 1000).toFixed(Math.abs(new Date().getTime() - (lastClick! + (cooldown! * 1000))) / 1000 < 1 ? 2 : 0)}
+                            seconds!`, {
                         position: "top-right"
                     });
                 }

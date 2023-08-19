@@ -8,9 +8,10 @@ import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { useRouter } from "next/navigation";
-import { sendToast } from "../../../../../../../utils/Hooks";
 import trashIcon from "/public/icons/red-trash.svg";
 import IconButton from "../../../../../../_components/inputs/IconButton";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../../../utils/Hooks";
 
 type Props = {
     customer?: InvoiceCustomer,
@@ -41,9 +42,7 @@ export default function DeleteCustomerButton({ customer, disabled, iconOnly, onS
                 onAccept={() => {
                     triggerCustomerDeletion()
                         .then((data) => {
-                            sendToast({
-                                description: `You have successfully deleted ${customer?.customerName.capitalize()}!`
-                            });
+                            toast.success(`You have successfully deleted ${customer?.customerName.capitalize()}!`);
 
                             if (!noReroute)
                                 router.push(`/invoices`);
@@ -53,10 +52,7 @@ export default function DeleteCustomerButton({ customer, disabled, iconOnly, onS
                         })
                         .catch(e => {
                             console.error(e);
-                            sendToast({
-                                error: e,
-                                description: "There was an error deleting this customer!"
-                            });
+                            errorToast(e, "There was an error deleting this customer!");
                         });
                 }}
             />

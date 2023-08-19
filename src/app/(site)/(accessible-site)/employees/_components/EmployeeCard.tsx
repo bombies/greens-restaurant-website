@@ -4,12 +4,14 @@ import { User } from "@prisma/client";
 import Link from "next/link";
 import { Avatar } from "@nextui-org/avatar";
 import { useState } from "react";
+import { useS3Url } from "../../../../_components/hooks/useS3Url";
 
 type Props = {
     user: User
 }
 
 export default function EmployeeCard({ user }: Props) {
+    const { avatar } = useS3Url(user.avatar);
     const [avatarColor, setAvatarColor] = useState<"default" | "primary" | "secondary" | "success" | "warning" | "danger">("default");
 
     return (
@@ -17,17 +19,17 @@ export default function EmployeeCard({ user }: Props) {
             <div
                 className="default-container p-6 transition-fast hover:-translate-y-1 hover:border-primary flex gap-4"
                 onMouseEnter={() => {
-                    setAvatarColor("success")
+                    setAvatarColor("success");
                 }}
                 onMouseLeave={() => {
-                    setAvatarColor("default")
+                    setAvatarColor("default");
                 }}
             >
                 <div className="w-fit">
                     <Avatar
                         isBordered
                         className="transition-fast"
-                        src={user.image || undefined}
+                        src={avatar || (user.image || undefined)}
                         color={avatarColor}
                     />
                 </div>

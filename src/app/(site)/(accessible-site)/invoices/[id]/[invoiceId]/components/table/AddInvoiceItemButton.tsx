@@ -10,8 +10,9 @@ import GenericButton from "../../../../../../../_components/inputs/GenericButton
 import { CreateInvoiceItemsDto } from "../../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/route";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { sendToast } from "../../../../../../../../utils/Hooks";
 import GenericTextArea from "../../../../../../../_components/inputs/GenericTextArea";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../../../../utils/Hooks";
 
 type AddInvoiceItemArgs = {
     arg: {
@@ -52,16 +53,11 @@ export default function AddInvoiceItemButton({ customerId, invoiceId, disabled }
         })
             .then(() => {
                 setModalOpen(false);
-                sendToast({
-                    description: "Successfully added that item!"
-                });
+                toast.success("Successfully added that item!");
             })
             .catch(e => {
                 console.error(e);
-                sendToast({
-                    error: e,
-                    description: "There was an error adding that item!"
-                });
+                errorToast(e, "There was an error adding that item!");
             });
     };
 
