@@ -12,7 +12,7 @@ AWSCLOUDFORMATIONCONFIG="{\
 }"
 AMPLIFY="{\
 \"projectName\":\"greensrestaurantwebs\",\
-\"envName\":\"ci\",\
+\"envName\":\"${AWS_ENV_NAME}\",\
 \"defaultEditor\":\"code\"\
 }"
 FRONTEND="{\

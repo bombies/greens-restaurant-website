@@ -29,6 +29,8 @@ jobs:
           node-version: 18
           cache: npm
       - name: Install Amplify CLI & InitProject
+        env:
+          AWS_ENV_NAME: "ci"
         run: |
           npm install -g @aws-amplify/cli --unsafe-perm=true
           bash init-amplify.sh

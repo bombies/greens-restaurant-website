@@ -12,7 +12,7 @@ AWSCLOUDFORMATIONCONFIG="{\
 }"
 AMPLIFY="{\
 \"projectName\":\"greensrestaurantwebs\",\
-\"envName\":\"ci\",\
+\"envName\":\"${AWS_ENV_NAME}\",\
 \"defaultEditor\":\"code\"\
 }"
 FRONTEND="{\
@@ -27,3 +27,5 @@ amplify init \
 --frontend $FRONTEND \
 --providers $PROVIDERS \
 --yes
+
+amplify add storage
