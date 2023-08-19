@@ -2,6 +2,12 @@
 set -e
 IFS='|'
 
+REACTCONFIG="{\
+\"SourceDir\":\"src\",\
+\"DistributionDir\":\"build\",\
+\"BuildCommand\":\"npm run-script build\",\
+\"StartCommand\":\"npm run-script start\"\
+}"
 AWSCLOUDFORMATIONCONFIG="{\
 \"configLevel\":\"project\",\
 \"useProfile\":true,\
@@ -16,18 +22,12 @@ AMPLIFY="{\
 \"defaultEditor\":\"code\"\
 }"
 FRONTEND="{\
-\"frontend\":\"react\"
+\"frontend\":\"javascript\",\
+\"framework\":\"react\",\
+\"config\":$REACTCONFIG\
 }"
 PROVIDERS="{\
 \"awscloudformation\":$AWSCLOUDFORMATIONCONFIG\
-}"
-CODEGEN="{\
-\"generateCode\":true,\
-\"codeLanguage\":\"swift\",\
-\"fileNamePattern\":\"graphql/**/*.graphql\",\
-\"generatedFileName\":\"API.swift\",\
-\"generateDocs\":true,\
-\"maxDepth\":2\
 }"
 
 amplify configure project \
