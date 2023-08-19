@@ -82,15 +82,17 @@ export async function POST(req: Request) {
                   <body>
                     <div>
                       <div class="banner">
+                      <a href="https://greensres.ajani.me">                      
                         <img src="https://i.imgur.com/HLTQ78m.png" alt="" width="128" height="128" />
+                      </a>
                       </div>
                       <main>
                         <h1>Hello <span class="primary-text">${firstName}</span>,</h1>
-                        <p>Please see the login details below to access your account.</p>
-                        <div class="details-container">
-                          <p><span class="bold">Username:</span> ${username}</p>
-                          <p><span class="bold">Password:</span> ${password}</p>
-                        </div>
+                        <p>Please see the login details below to access your account. Click <a href="https://greensres.ajani.me">here</a> to access the website.</p>
+                        <br />
+                        <br />
+                        <p><span class="bold primary-text">Username:</span> ${username}</p>
+                        <p><span class="bold primary-text">Password:</span> ${password}</p>
                       </main>
                     </div>
                   </body>
