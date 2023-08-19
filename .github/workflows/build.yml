@@ -39,7 +39,7 @@ jobs:
         env:
           AWS_ENV_NAME: "ci"
         run: |
-          npm install -g @aws-amplify/cli --unsafe-perm=true
+          npm install -g @aws-amplify/cli@10.0.0 --unsafe-perm=true
           bash init-amplify.sh
       - name: Install Dependencies
         run: |
