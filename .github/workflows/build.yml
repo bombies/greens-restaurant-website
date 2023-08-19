@@ -35,10 +35,10 @@ jobs:
         with:
           node-version: 18
           cache: npm
-      - name: Install Amplify CLI & Deploying Project
+      - name: Install Amplify CLI & Init Project
         run: |
           npm install -g @aws-amplify/cli --unsafe-perm=true
-          bash configure-amplify.sh
+          bash init-amplify.sh
       - name: Install Dependencies
         run: |
           echo "Installing node dependencies..."
