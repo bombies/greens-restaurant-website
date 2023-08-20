@@ -4,15 +4,15 @@ import GenericModal from "../../../../_components/GenericModal";
 import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericButton from "../../../../_components/inputs/GenericButton";
-import addIcon from "/public/icons/add.svg";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { CreateInvoiceCustomerDto } from "../../../../api/invoices/customer/route";
 import GenericInput from "../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
-import { sendToast } from "../../../../../utils/Hooks";
 import GenericTextArea from "../../../../_components/inputs/GenericTextArea";
 import PlusIcon from "../../../../_components/icons/PlusIcon";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../utils/Hooks";
 
 type Props = {
     disabled?: boolean
@@ -43,20 +43,11 @@ export default function CreateCustomerButton({ disabled }: Props) {
                 customerDescription: data.customerDescription
             }
         }).then(() => {
-            sendToast({
-                description: "Successfully created that customer!"
-            }, {
-                position: "top-center"
-            });
+            toast.success("Successfully created that customer!");
             setModalOpen(false);
         })
             .catch(e => {
-                sendToast({
-                    error: e,
-                    description: "Could not create that customer!" // Fallback
-                }, {
-                    position: "top-center"
-                });
+                errorToast(e, "Could not create that customer!");
             });
     };
 

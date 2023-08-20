@@ -12,9 +12,10 @@ import { SWRArgs } from "../../../../../employees/_components/EmployeeGrid";
 import useSWRMutation from "swr/mutation";
 import axios from "axios";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
-import { sendToast } from "../../../../../../../../utils/Hooks";
 import { InvoiceItemChangeAction } from "../InvoiceItemsProvider";
 import editIcon from "/public/icons/edit-green.svg";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../../../../utils/Hooks";
 
 type Props = {
     disabled: boolean,
@@ -84,17 +85,12 @@ export default function EditInvoiceItemButton({ customerId, item, dispatchItems,
                     }
                 });
                 setSelectedKeys([]);
-                sendToast({
-                    description: "Successfully updated that item!"
-                });
+                toast.success("Successfully updated that item!");
                 setModalOpen(false);
             })
             .catch(e => {
                 console.error(e);
-                sendToast({
-                    error: e,
-                    description: "There was an error updating this item!"
-                });
+                errorToast(e, "There was an error updating this item!");
             });
     };
 

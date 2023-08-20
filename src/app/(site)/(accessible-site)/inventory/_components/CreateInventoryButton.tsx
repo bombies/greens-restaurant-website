@@ -11,7 +11,8 @@ import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { CreateInventoryDto } from "../../../../api/inventory/route";
 import { useSession } from "next-auth/react";
-import { sendToast } from "../../../../../utils/Hooks";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../utils/Hooks";
 
 type Props = {
     disabled?: boolean
@@ -49,20 +50,11 @@ export default function CreateInventoryButton({ disabled }: Props) {
             }
         })
             .then(() => {
-                sendToast({
-                    description: "Successfully created that category!"
-                }, {
-                    position: "top-center"
-                });
+                toast.success("Successfully created that inventory");
                 setModalOpen(false);
             })
             .catch(e => {
-                sendToast({
-                    error: e,
-                    description: "Could not create that category!" // Fallback
-                }, {
-                    position: "top-center"
-                });
+                errorToast(e, "Could not create that inventory!");
             });
     };
 

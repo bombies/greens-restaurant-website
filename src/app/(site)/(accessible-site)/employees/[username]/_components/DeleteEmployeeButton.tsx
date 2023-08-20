@@ -5,10 +5,11 @@ import GenericButton from "../../../../../_components/inputs/GenericButton";
 import React, { useState } from "react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { sendToast } from "../../../../../../utils/Hooks";
+import { errorToast } from "../../../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import ConfirmationModal from "../../../../../_components/ConfirmationModal";
+import { toast } from "react-hot-toast";
 
 const DeleteUser = (username: string) => {
     const mutator = async (url: string) => await axios.delete(url);
@@ -49,38 +50,21 @@ export default function DeleteEmployeeButton({ username, allowed }: Props) {
                         return;
 
                     if (session.data?.user?.username === username) {
-                        sendToast({
-                            description: "You cannot delete yourself!"
-                        }, {
-                            position: "top-center"
-                        });
+                        toast.error("You cannot delete yourself!");
                         return;
                     } else if (username === "root") {
-                        sendToast({
-                            description: "You cannot delete the root user!"
-                        }, {
-                            position: "top-center"
-                        });
+                        toast.error("You cannot delete the root user!");
                         return;
                     }
 
                     triggerUserDelete()
                         .then(() => {
-                            sendToast({
-                                description: `Successfully deleted ${username}!`
-                            }, {
-                                position: "top-center"
-                            });
-
+                            toast.success(`Successfully deleted ${username}!`);
                             router.push("/employees");
                         })
                         .catch((e) => {
                             console.error(e);
-                            sendToast({
-                                description: "There was an error deleting this user!"
-                            }, {
-                                position: "top-center"
-                            });
+                            errorToast(e, "There was an error deleting this user!");
                         });
                 }}
                 accepting={userIsDeleting}

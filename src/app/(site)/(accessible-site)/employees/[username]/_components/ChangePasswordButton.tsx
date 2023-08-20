@@ -6,13 +6,13 @@ import React, { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
-import { sendToast } from "../../../../../../utils/Hooks";
 import { PASSWORD_REGEX } from "../../../../../../utils/regex";
 import axios from "axios";
 import { User } from "@prisma/client";
 import useSWRMutation from "swr/mutation";
 import { useSWRConfig } from "swr";
 import GenericModal from "../../../../../_components/GenericModal";
+import { toast } from "react-hot-toast";
 
 const ChangePassword = (username: string, password: string, nonAdmin?: boolean) => {
     const dto: Partial<User> = {
@@ -46,20 +46,12 @@ export default function ChangePasswordButton({ username, allowed, checkPrevious,
             return;
         triggerPasswordChange()
             .then(() => {
-                sendToast({
-                    description: "Successfully updated this user's password!"
-                }, {
-                    position: "top-center"
-                });
+                toast.success("Successfully updated this user's password!");
                 setModalOpen(false);
             })
             .catch((e) => {
                 console.error(e);
-                sendToast({
-                    description: "There was an error updating this user's password!"
-                }, {
-                    position: "top-center"
-                });
+                toast.error("There was an error updating this user's password!");
             });
     }, [password, triggerPasswordChange]);
 
@@ -81,21 +73,13 @@ export default function ChangePasswordButton({ username, allowed, checkPrevious,
             }));
 
             if (samePassword === undefined) {
-                sendToast({
-                    description: "There was an error comparing your old password!"
-                }, {
-                    position: "top-center"
-                });
+                toast.error("There was an error comparing your old password!");
                 setOldPasswordChecking(false);
                 return;
             }
 
             if (!samePassword.result) {
-                sendToast({
-                    description: "The old password provided doesn't natch your current password!"
-                }, {
-                    position: "top-center"
-                });
+                toast.error("The old password provided doesn't natch your current password!");
                 setOldPasswordChecking(false);
                 return;
             }
@@ -104,20 +88,12 @@ export default function ChangePasswordButton({ username, allowed, checkPrevious,
         }
 
         if (password !== confirmedPassword) {
-            sendToast({
-                description: "The passwords do not match!"
-            }, {
-                position: "top-center"
-            });
+            toast.error("The passwords do not match!");
             return;
         }
 
         if (!PASSWORD_REGEX.test(password)) {
-            sendToast({
-                description: "Invalid password! Ensure your password has at least 1 uppercase and lowercase character and that it's at least 8 characters long."
-            }, {
-                position: "top-center"
-            });
+            toast.error("Invalid password! Ensure your password has at least 1 uppercase and lowercase character and that it's at least 8 characters long.");
             return;
         }
         setPassword(password);

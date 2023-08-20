@@ -1,6 +1,6 @@
 "use client";
 
-import { Prisma, Stock, StockSnapshot } from "@prisma/client";
+import { Stock, StockSnapshot } from "@prisma/client";
 import {
     SortDescriptor,
     Spacer,
@@ -23,11 +23,12 @@ import RemoveStockModal from "./RemoveStockModal";
 import StockQuantityField from "./StockQuantityField";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { sendToast } from "../../../../../../../utils/Hooks";
 import SubTitle from "../../../../../../_components/text/SubTitle";
 import GenericInput from "../../../../../../_components/inputs/GenericInput";
 import searchIcon from "/public/icons/search.svg";
 import "../../../../../../../utils/GeneralUtils";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../../../utils/Hooks";
 
 type Props = {
     inventoryName: string,
@@ -214,19 +215,14 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                     quantity: res.data.quantity
                                 }
                             });
-                            sendToast({
-                                description: `Successfully updated ${item.name}!`
-                            }, {
+                            toast.success(`Successfully updated ${item.name}!`, {
                                 position: "top-right"
                             });
                             setEditMode(false);
                         })
                         .catch(e => {
                             console.error(e);
-                            sendToast({
-                                error: e,
-                                description: `Failed to update ${item.name}!`
-                            }, {
+                            errorToast(e, `Failed to update ${item.name}!`, {
                                 position: "top-right"
                             });
                         });
@@ -253,18 +249,13 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                                 quantity: item.quantity + 1
                                             }
                                         });
-                                        sendToast({
-                                            description: `Successfully incremented ${item.name}!`
-                                        }, {
+                                        toast.success(`Successfully incremented ${item.name}!`, {
                                             position: "top-right"
                                         });
                                     })
                                     .catch(e => {
                                         console.error(e);
-                                        sendToast({
-                                            error: e,
-                                            description: `Failed to increment ${item.name}!`
-                                        }, {
+                                        errorToast(e, `Failed to increment ${item.name}!`, {
                                             position: "top-right"
                                         });
                                     });
@@ -286,18 +277,13 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                                 quantity: item.quantity - 1
                                             }
                                         });
-                                        sendToast({
-                                            description: `Successfully decremented ${item.name}!`
-                                        }, {
+                                        toast.success(`Successfully decremented ${item.name}!`, {
                                             position: "top-right"
                                         });
                                     })
                                     .catch(e => {
                                         console.error(e);
-                                        sendToast({
-                                            error: e,
-                                            description: `Failed to decrement ${item.name}!`
-                                        }, {
+                                        errorToast(e, `Failed to decrement ${item.name}!`, {
                                             position: "top-right"
                                         });
                                     });
@@ -351,17 +337,12 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                     quantity: res.data.quantity
                                 }
                             });
-                            sendToast({
-                                description: `Successfully updated ${selectedItem!.name}!`
-                            });
+                            toast.success(`Successfully updated ${selectedItem!.name}!`);
                             setAddStockModalOpen(false);
                         })
                         .catch(e => {
                             console.error(e);
-                            sendToast({
-                                error: e,
-                                description: `Failed to update ${selectedItem!.name}!`
-                            });
+                            errorToast(e, `Failed to update ${selectedItem!.name}!`);
                         });
                 }}
                 isUpdating={isUpdating}
@@ -390,17 +371,12 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                                     quantity: res.data.quantity
                                 }
                             });
-                            sendToast({
-                                description: `Successfully updated ${selectedItem!.name}!`
-                            });
+                            toast.success(`Successfully updated ${selectedItem!.name}!`);
                             setRemoveStockModalOpen(false);
                         })
                         .catch(e => {
                             console.error(e);
-                            sendToast({
-                                error: e,
-                                description: `Failed to update ${selectedItem!.name}!`
-                            });
+                            errorToast(e, `Failed to update ${selectedItem!.name}!`);
                         });
                 }}
                 isOpen={removeStockModalOpen}
@@ -435,9 +411,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                             });
 
                             const data = item.data as Stock;
-                            sendToast({
-                                description: `Successfully removed ${data.name.capitalize()}`
-                            }, {
+                            toast.success(`Successfully removed ${data.name.capitalize()}`, {
                                 position: "top-right"
                             });
 
@@ -445,10 +419,7 @@ export default function StockTable({ inventoryName, stock, mutationAllowed }: Pr
                         })
                         .catch(e => {
                             console.error(e);
-                            sendToast({
-                                error: e,
-                                description: "Couldn't remove that item!"
-                            }, {
+                            errorToast(e, "Couldn't remove that item!", {
                                 position: "top-right"
                             });
                         });

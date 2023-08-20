@@ -11,10 +11,11 @@ import ChangesMadeBar from "../../../../employees/[username]/_components/Changes
 import EditableField from "../../../../employees/[username]/_components/EditableField";
 import { Spacer } from "@nextui-org/react";
 import { CUSTOMER_NAME_REGEX, EMAIL_REGEX } from "../../../../../../../utils/regex";
-import { sendToast } from "../../../../../../../utils/Hooks";
 import editIconGreen from "/public/icons/edit-green.svg";
 import editIcon from "/public/icons/edit.svg";
 import IconButton from "../../../../../../_components/inputs/IconButton";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../../../utils/Hooks";
 
 type Props = {
     customer?: InvoiceCustomer,
@@ -62,19 +63,14 @@ export default function EditCustomerButton({ customer, disabled, iconOnly, onSuc
                             .then((data) => {
                                 setProposedChanges(undefined);
                                 setModalOpen(false);
-                                sendToast({
-                                    description: "Successfully updated this customer!"
-                                });
+                                toast.success("Successfully updated this customer!");
 
                                 if (onSuccess)
                                     onSuccess(data.data);
                             })
                             .catch(e => {
                                 console.error(e);
-                                sendToast({
-                                    error: e,
-                                    description: "There was an error updating this customer!"
-                                });
+                                errorToast(e, "There was an error updating this customer!");
                             });
                     }}
                     onReject={() => setProposedChanges(undefined)}

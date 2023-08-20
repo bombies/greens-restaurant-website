@@ -4,7 +4,14 @@ import { AppDispatch, AppState } from "./redux/GlobalStore";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { toast, ToastOptions } from "react-hot-toast";
 import ToastComponent, { ToastDataProps } from "../app/_components/ToastComponent";
-import React, { MutableRefObject, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+    MutableRefObject,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useRef,
+    useState
+} from "react";
 import { AxiosError } from "axios";
 import { User } from "@prisma/client";
 import useSWR from "swr";
@@ -58,13 +65,9 @@ export function useUserData(permissions?: Permission[]): UserData {
     return { data, isLoading, error };
 }
 
-export function sendToast(props: ToastDataProps & { error?: AxiosError }, options?: ToastOptions) {
-    if (props.error) {
-        // @ts-ignore
-        props.description = props.error.response?.data?.message || (props.description || "An error occurred!");
-    }
-
-    toast.custom(t => (<ToastComponent toastObj={t} data={props} />), options);
+export function errorToast(error: AxiosError, fallback?: string, options?: ToastOptions) {
+    // @ts-ignore
+    toast.error(error.response?.data?.message || (fallback ?? "An error occurred!"), options);
 }
 
 type Callback<T> = (value?: T) => void;

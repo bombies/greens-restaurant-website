@@ -3,8 +3,9 @@
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { sendToast } from "../../../../../../../utils/Hooks";
 import invoiceIcon from "/public/icons/invoice.svg";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../../../utils/Hooks";
 
 type Props = {
     customerId?: string,
@@ -27,16 +28,11 @@ export default function CreateInvoiceButton({ customerId, disabled }: Props) {
                 icon={invoiceIcon}
                 onPress={() => triggerInvoiceCreation()
                     .then(() => {
-                        sendToast({
-                            description: "You have successfully created a new invoice!"
-                        });
+                        toast.success("You have successfully created a new invoice!");
                     })
                     .catch(e => {
                         console.error(e);
-                        sendToast({
-                            error: e,
-                            description: "There was an error creating a new invoice!"
-                        });
+                        errorToast(e, "There was an error creating a new invoice!");
                     })
                 }
             >

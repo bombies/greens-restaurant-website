@@ -3,7 +3,6 @@
 import useSWR from "swr";
 import { fetcher } from "../../employees/_components/EmployeeGrid";
 import { InvoiceInformation } from "@prisma/client";
-import { Spinner } from "@nextui-org/spinner";
 import { Skeleton, Spacer } from "@nextui-org/react";
 import { Avatar } from "@nextui-org/avatar";
 import EditableField from "../../employees/[username]/_components/EditableField";
@@ -14,10 +13,14 @@ import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { useEffect, useState } from "react";
 import ChangesMadeBar from "../../employees/[username]/_components/ChangesMadeBar";
-import { sendToast } from "../../../../../utils/Hooks";
 import SubTitle from "../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 import clsx from "clsx";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../utils/Hooks";
+import { useAvatar, useCompanyAvatar } from "../../account/components/hooks/useAvatar";
+import { useS3Base64String } from "../../../../_components/hooks/useS3Base64String";
+import { compare } from "../../../../../utils/GeneralUtils";
 
 type Props = {
     controlsEnabled: boolean
@@ -43,18 +46,19 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
     const { trigger: triggerCompanyInfoUpdate, isMutating: infoIsUpdating } = UpdateCompanyInfo();
     const [proposedCompanyInfo, setProposedCompanyInfo] = useState<UpdateCompanyInformationDto>();
     const [changesMade, setChangesMade] = useState(false);
+    const { component: avatarComponent } = useCompanyAvatar(proposedCompanyInfo, setProposedCompanyInfo);
+    const { avatar: companyAvatar, isLoading: companyAvatarIsLoading } = useS3Base64String(data?.companyAvatar);
 
     useEffect(() => {
-        setChangesMade(!!proposedCompanyInfo);
-    }, [proposedCompanyInfo]);
+        if (!isLoading && data)
+            setProposedCompanyInfo(data);
+    }, [data, isLoading]);
 
-    const handleImageUpload = (result: any) => {
-        const url = result?.info?.secure_url;
-        setProposedCompanyInfo(prev => ({
-            ...prev,
-            companyLogo: url
-        }));
-    };
+    useEffect(() => {
+        if (isLoading || !data)
+            return;
+        setChangesMade(!compare(proposedCompanyInfo, data));
+    }, [data, isLoading, proposedCompanyInfo]);
 
     return (
         <>
@@ -65,21 +69,17 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                     triggerCompanyInfoUpdate({
                         dto: proposedCompanyInfo
                     })
-                        .then(() => {
-                            setProposedCompanyInfo(undefined);
-                            sendToast({
-                                description: "You have successfully updated the company's invoice information!"
-                            });
+                        .then((res) => {
+                            console.log(res.data);
+                            setProposedCompanyInfo(res.data);
+                            toast.success("You have successfully updated the company's invoice information!");
                         })
                         .catch(e => {
                             console.error(e);
-                            sendToast({
-                                error: e,
-                                description: "There was an error updating the company's invoice information!"
-                            });
+                            errorToast(e, "There was an error updating the company's invoice information!");
                         });
                 }}
-                onReject={() => setProposedCompanyInfo(undefined)}
+                onReject={() => setProposedCompanyInfo(data)}
             />
             <div className="default-container p-12 phone:px-3 w-[50%] tablet:w-full h-fit">
                 {
@@ -110,38 +110,21 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                             </div>
                             {
                                 controlsEnabled ?
-                                    <CldUploadButton
-                                        className="phone:mx-auto"
-                                        options={{
-                                            maxFiles: 1,
-                                            maxFileSize: 3000000,
-                                            resourceType: "image"
-                                        }}
-                                        onUpload={handleImageUpload}
-                                        uploadPreset="kyyplgrx"
-                                    >
-                                        <Skeleton
-                                            isLoaded={!isLoading}
-                                            className={clsx(
-                                                "rounded-full w-36 h-36 flex items-center justify-center",
-                                                !isLoading && "!bg-transparent"
-                                            )}>
-                                            <Avatar
-                                                isBordered
-                                                className="self-center mx-auto transition-fast hover:brightness-150 cursor-pointer w-32 h-32"
-                                                src={(proposedCompanyInfo?.companyLogo || data?.companyLogo) || undefined}
-                                            />
-                                        </Skeleton>
-                                    </CldUploadButton>
+                                    <Skeleton isLoaded={!companyAvatarIsLoading} className={clsx(
+                                        "rounded-full p-1",
+                                        !companyAvatarIsLoading && "!bg-transparent"
+                                    )}>
+                                        {avatarComponent}
+                                    </Skeleton>
                                     :
-                                    <Skeleton isLoaded={!isLoading} className={clsx(
-                                        "rounded-full w-36 h-36 flex items-center justify-center",
+                                    <Skeleton isLoaded={!isLoading && !companyAvatarIsLoading} className={clsx(
+                                        "rounded-full p-1 flex items-center justify-center",
                                         !isLoading && "!bg-transparent"
                                     )}>
                                         <Avatar
                                             isBordered
                                             className="self-center mx-auto w-32 h-32"
-                                            src={(proposedCompanyInfo?.companyLogo || data?.companyLogo) || undefined}
+                                            src={companyAvatar || (data?.companyLogo || undefined)}
                                         />
                                     </Skeleton>
                             }

@@ -8,12 +8,13 @@ import { UpdateInvoiceDto } from "../../../../../../../api/invoices/customer/[id
 import GenericModal from "../../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import ChangesMadeBar from "../../../../../employees/[username]/_components/ChangesMadeBar";
-import { sendToast } from "../../../../../../../../utils/Hooks";
+import { errorToast } from "../../../../../../../../utils/Hooks";
 import EditableField, { DataContainer } from "../../../../../employees/[username]/_components/EditableField";
 import { Spacer } from "@nextui-org/react";
 import editIcon from "/public/icons/edit-green.svg";
 import { GenericDatePicker } from "../../../../../../../_components/GenericDatePicker";
 import { fetchDueAt } from "../../../../components/invoice-utils";
+import { toast } from "react-hot-toast";
 
 type Props = {
     customerId?: string
@@ -63,16 +64,11 @@ export default function EditInvoiceButton({ customerId, invoice, disabled }: Pro
                             .then(() => {
                                 setProposedChanges(undefined);
                                 setModalOpen(false);
-                                sendToast({
-                                    description: "Successfully updated this invoice!"
-                                });
+                                toast.success("Successfully updated this invoice!");
                             })
                             .catch(e => {
                                 console.error(e);
-                                sendToast({
-                                    error: e,
-                                    description: "There was an error updating this invoice!"
-                                });
+                                errorToast(e, "There was an error updating this invoice!");
                             });
                     }}
                     onReject={() => setProposedChanges(undefined)}

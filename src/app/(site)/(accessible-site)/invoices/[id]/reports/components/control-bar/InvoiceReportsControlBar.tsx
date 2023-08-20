@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Dispatch, FC, useEffect, useState } from "react";
+import React, { Dispatch, FC, useState } from "react";
 import { Accordion, AccordionItem, Spacer } from "@nextui-org/react";
 import { GoBackButton } from "../../../components/control-bar/InvoiceCustomerControlBar";
 import { ChangeInvoiceReportStatusButton } from "./ChangeInvoiceReportStatusButton";
@@ -9,14 +9,13 @@ import { Divider } from "@nextui-org/divider";
 import SubTitle from "../../../../../../../_components/text/SubTitle";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import SpreadsheetIcon from "../../../../../../../_components/icons/SpreadsheetIcon";
-import PDFIcon from "../../../../../../../_components/icons/PDFIcon";
 import { Invoice, InvoiceItem } from "@prisma/client";
-import { sendToast } from "../../../../../../../../utils/Hooks";
 import { downloadFileFromBlob } from "../../../../../../../../utils/client-utils";
 import { formatDateDDMMYYYY, generateInvoiceTotal, invoiceIsOverdue } from "../../../../components/invoice-utils";
 import Exceljs from "exceljs";
 import { useReportDateRange } from "../hooks/useReportDateRange";
 import { ReportParamsActionType, ReportParamsState } from "../hooks/useInvoiceReport";
+import { toast } from "react-hot-toast";
 
 interface Props {
     id: string,
@@ -126,14 +125,10 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                                     const sheetBuffer = await workBook.xlsx.writeBuffer();
                                     const sheetBlob = new Blob([sheetBuffer]);
                                     downloadFileFromBlob(sheetBlob, `${customerName} Invoice Report - ${formatDateDDMMYYYY(new Date(), "-")}.xlsx`)
-                                        .then(() => sendToast({
-                                            description: "Successfully exported your report!"
-                                        }));
+                                        .then(() => toast.success("Successfully exported your report!"));
                                 } catch (e: any) {
                                     console.error(e);
-                                    sendToast({
-                                        description: e.message ?? "There was an error exporting your report!"
-                                    });
+                                    toast.error(e.message ?? "There was an error exporting your report!");
                                 } finally {
                                     setSpreadsheetIsExporting(false);
                                 }

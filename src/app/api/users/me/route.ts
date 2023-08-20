@@ -1,8 +1,9 @@
-import { authenticated, Mailer, respond } from "../../../../utils/api/ApiUtils";
+import { authenticated, Mailer, respond, respondWithInit } from "../../../../utils/api/ApiUtils";
 import { NextResponse } from "next/server";
 import prisma from "../../../../libs/prisma";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "../../../../utils/regex";
 import bcrypt from "bcrypt";
+import { z } from "zod";
 
 export async function GET(req: Request) {
     return await authenticated(req, async (session) => {
@@ -23,8 +24,13 @@ export async function GET(req: Request) {
 type UpdateUserDto = Partial<{
     email: string
     password: string,
-    image: string | null
+    avatar: string | null
 }>
+const updateUserDtoSchema = z.object({
+    email: z.string(),
+    password: z.string(),
+    avatar: z.string()
+}).partial();
 
 export async function PATCH(req: Request) {
     return await authenticated(req, async (session) => {
@@ -40,8 +46,13 @@ export async function PATCH(req: Request) {
 
 
         const body: UpdateUserDto = await req.json();
+        const bodyValidated = updateUserDtoSchema.safeParse(body);
         if (!body)
-            return respond({ message: "You must provide some information to update!" });
+            return respondWithInit({
+                message: "You must provide some information to update!",
+                status: 401,
+                validationErrors: bodyValidated
+            });
 
         // Validation
         if (body.password) {
@@ -142,7 +153,7 @@ export async function PATCH(req: Request) {
             },
             data: {
                 email: body.email,
-                image: body.image,
+                avatar: body.avatar,
                 password: body.password
             }
         });

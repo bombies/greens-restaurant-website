@@ -8,11 +8,9 @@ import editIcon from "/public/icons/edit.svg";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
-import { sendToast } from "../../../../../../utils/Hooks";
-import closeIcon from "/public/icons/close.svg";
-import checkIcon from "/public/icons/check-green-circled.svg";
 import GenericModal from "../../../../../_components/GenericModal";
 import GenericTextArea from "../../../../../_components/inputs/GenericTextArea";
+import { toast } from "react-hot-toast";
 
 interface Props {
     label: string,
@@ -49,27 +47,19 @@ export default function EditableField({
             errors
         }
     } = useForm<FieldValues>();
-    
+
     useEffect(() => {
         if (fieldIsLoaded && field)
-            setValue(field)
-    }, [field, fieldIsLoaded])
+            setValue(field);
+    }, [field, fieldIsLoaded]);
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         if (validate && !validate.test(data.value.trim())) {
-            sendToast({
-                description: validate.message || "Invalid input!",
-                icon: closeIcon
-            });
-
+            toast.error(validate.message || "Invalid input!");
             return;
         }
 
-        sendToast({
-            description: successMessage || `Field updated! Make sure you save your changes.`,
-            icon: checkIcon
-        });
-
+        toast.success(successMessage || `Field updated! Make sure you save your changes.`);
         setModalOpen(false);
         if (onValueChange) {
             onValueChange(data.value.trim());

@@ -6,9 +6,10 @@ import ConfirmationModal from "../../../../../../../_components/ConfirmationModa
 import { Dispatch, Key, SetStateAction, useState } from "react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { sendToast } from "../../../../../../../../utils/Hooks";
 import { InvoiceItemChangeAction } from "../InvoiceItemsProvider";
 import trashIcon from "/public/icons/red-trash.svg";
+import { toast } from "react-hot-toast";
+import { errorToast } from "../../../../../../../../utils/Hooks";
 
 type Props = {
     disabled: boolean,
@@ -52,17 +53,12 @@ export default function DeleteInvoiceItemButton({ customerId, item, setSelectedK
                                 payload: { id: data.data.id }
                             });
                             setSelectedKeys([]);
-                            sendToast({
-                                description: `Successfully deleted ${data.data.name}!`
-                            });
+                            toast.success(`Successfully deleted ${data.data.name}!`);
                             setModalOpen(false);
                         })
                         .catch(e => {
                             console.error(e);
-                            sendToast({
-                                error: e,
-                                description: "There was an error deleting this item!"
-                            });
+                            errorToast(e, "There was an error deleting this item!");
                         });
                 }}
             />

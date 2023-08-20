@@ -7,8 +7,9 @@ import useSWRMutation from "swr/mutation";
 import ConfirmationModal from "../../../../../../../_components/ConfirmationModal";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { sendToast } from "../../../../../../../../utils/Hooks";
+import { errorToast } from "../../../../../../../../utils/Hooks";
 import trashIcon from "/public/icons/red-trash.svg";
+import { toast } from "react-hot-toast";
 
 type Props = {
     customerId?: string
@@ -37,17 +38,12 @@ export default function DeleteInvoiceButton({ customerId, invoice, disabled }: P
                 onAccept={() => {
                     triggerDeletion()
                         .then(() => {
-                            sendToast({
-                                description: "You have successfully deleted that invoice!"
-                            });
+                            toast.success("You have successfully deleted that invoice!");
                             router.push(`/invoices/${customerId}`);
                         })
                         .catch(e => {
                             console.error(e);
-                            sendToast({
-                                error: e,
-                                description: "There was an error deleting this invoice!"
-                            });
+                            errorToast(e, "There was an error deleting this invoice!");
                         });
                 }}
             />

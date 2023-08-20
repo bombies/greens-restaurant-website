@@ -3,6 +3,7 @@
 import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Invoice, InvoiceInformation } from "@prisma/client";
 import { formatInvoiceNumber } from "../../../../../../components/invoice-utils";
+import { useS3Base64String } from "../../../../../../../../../_components/hooks/useS3Base64String";
 
 const styles = StyleSheet.create({
     companyImage: {
@@ -29,6 +30,8 @@ type Props = {
 }
 
 export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
+    const { avatar } = useS3Base64String(companyInfo?.companyAvatar);
+
     return (
         <View style={{
             display: "flex",
@@ -88,7 +91,7 @@ export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
             {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image
                 style={styles.companyImage}
-                src={companyInfo?.companyLogo || ""}
+                src={avatar || (companyInfo?.companyLogo || "")}
             />
         </View>
     );

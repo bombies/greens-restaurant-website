@@ -3,15 +3,13 @@
 import Title from "../../../_components/text/Title";
 import { Skeleton, Spacer } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
-import { Avatar } from "@nextui-org/avatar";
-import { CldUploadButton } from "next-cloudinary";
 import React, { useEffect, useState } from "react";
 import { User } from "@prisma/client";
 import useSWRImmutable from "swr/immutable";
 import { fetcher } from "../employees/_components/EmployeeGrid";
 import { compare } from "../../../../utils/GeneralUtils";
 import { UpdateUser } from "../employees/[username]/_components/Employee";
-import { sendToast } from "../../../../utils/Hooks";
+import { errorToast } from "../../../../utils/Hooks";
 import ChangesMadeBar from "../employees/[username]/_components/ChangesMadeBar";
 import EditableField, { DataContainer } from "../employees/[username]/_components/EditableField";
 import { EMAIL_REGEX, NAME_REGEX, USERNAME_REGEX } from "../../../../utils/regex";
@@ -19,6 +17,8 @@ import { Divider } from "@nextui-org/divider";
 import ChangePasswordButton from "../employees/[username]/_components/ChangePasswordButton";
 import ContainerSkeleton from "../../../_components/skeletons/ContainerSkeleton";
 import { DataGroupContainer } from "../../../_components/DataGroupContainer";
+import { useUserAvatar } from "./components/hooks/useAvatar";
+import { toast } from "react-hot-toast";
 
 const useSelfData = () => {
     return useSWRImmutable(`/api/users/me`, fetcher<User>);
@@ -29,6 +29,7 @@ export default function AccountPage() {
     const { data: user, isLoading: userIsLoading } = useSelfData();
     const [currentData, setCurrentData] = useState<Partial<User>>();
     const [changesMade, setChangesMade] = useState(false);
+    const { component: avatarComponent } = useUserAvatar(currentData, setCurrentData);
     const {
         trigger: triggerUserUpdate,
         isMutating: userIsUpdating
@@ -45,13 +46,6 @@ export default function AccountPage() {
         setChangesMade(!compare(currentData, user));
     }, [currentData, user]);
 
-    const handleImageUpload = (result: any) => {
-        setCurrentData(prev => ({
-            ...prev,
-            image: result?.info?.secure_url
-        }));
-    };
-
     const doUpdate = () => {
         triggerUserUpdate()
             .then((value) => {
@@ -59,25 +53,14 @@ export default function AccountPage() {
 
                 // The gods have blessed us with an impossible error
                 if (!newUser) {
-                    sendToast({
-                        description: "Something went wrong! An undefined user was returned."
-                    }, {
-                        position: "top-center"
-                    });
+                    toast.error("Something went wrong! An undefined user was returned.");
                     return;
                 }
 
-                sendToast({
-                    description: "Successfully updated your account!"
-                });
+                toast.success("Successfully updated your account!");
             })
             .catch((e) => {
-                sendToast({
-                    error: e,
-                    description: "Could not update your account!"
-                }, {
-                    position: "top-center"
-                });
+                errorToast(e);
             });
     };
 
@@ -89,7 +72,7 @@ export default function AccountPage() {
                 onAccept={doUpdate}
                 onReject={() => {
                     setCurrentData(user);
-                    sendToast({ description: "Discarded all changes." });
+                    toast.error("Discarded all changes.");
                 }} />
             <Title>My Account</Title>
             <Spacer y={12} />
@@ -117,24 +100,10 @@ export default function AccountPage() {
                         </>
                         :
                         <>
-                            <div className="flex gap-4 phone:gap-2">
-                                <CldUploadButton
-                                    options={{
-                                        maxFiles: 1,
-                                        maxFileSize: 3000000,
-                                        resourceType: "image"
-                                    }}
-                                    onUpload={handleImageUpload}
-                                    uploadPreset="kyyplgrx"
-                                >
-                                    <Avatar
-                                        src={currentData?.image || undefined}
-                                        isBordered={true}
-                                        className="transition-fast hover:brightness-150 cursor-pointer w-36 phone:w-16 h-36 phone:h-16"
-                                    />
-                                </CldUploadButton>
+                            <div className="flex gap-4 phone:gap-2 phone:flex-col">
+                                {avatarComponent}
                                 <Spacer x={6} />
-                                <div className="self-center">
+                                <div className="self-center phone:text-center">
                                     <p className="text-3xl text-primary font-semibold">{currentData?.username}</p>
                                     <p className="text-secondary-text phone:text-sm">{`Created on ${new Date(currentData?.createdAt || 0).toLocaleDateString()} at ${new Date(currentData?.createdAt || 0).toLocaleTimeString()}`}</p>
                                 </div>

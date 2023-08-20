@@ -7,19 +7,19 @@ import { CSSTransition } from "react-transition-group";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import InventoryIcon from "../../../_components/icons/InventoryIcon";
-import waving from "/public/icons/waving-hand.svg";
 import signOutIcon from "/public/icons/sign-out.svg";
 import GenericImage from "../../../_components/GenericImage";
 import GenericButton from "../../../_components/inputs/GenericButton";
 import UsersIcon from "../../../_components/icons/UsersIcon";
 import GearsIcon from "../../../_components/icons/GearsIcon";
-import { sendToast } from "../../../../utils/Hooks";
 import InvoiceIcon from "../../../_components/icons/InvoiceIcon";
 import AccountIcon from "../../../_components/icons/AccountIcon";
 import { hasAnyPermission, hasPermission, Permission } from "../../../../libs/types/permission";
+import { toast } from "react-hot-toast";
+import { useUserData } from "../../../../utils/Hooks";
 
 export default function Sidebar() {
-    const session = useSession();
+    const { data: user } = useUserData();
     const [opened, setOpened] = useState(false);
 
     const sidebar = (
@@ -33,7 +33,7 @@ export default function Sidebar() {
             <div>
                 <div className="w-full max-h-[50vh] overflow-y-auto flex flex-col mb-6">
                     {
-                        hasAnyPermission(session.data?.user?.permissions, [
+                        hasAnyPermission(user?.permissions, [
                             Permission.CREATE_INVENTORY,
                             Permission.VIEW_INVENTORY,
                             Permission.MUTATE_STOCK
@@ -42,21 +42,21 @@ export default function Sidebar() {
                         <InventorySidebarItem />
                     }
                     {
-                        hasPermission(session.data?.user?.permissions, Permission.ADMINISTRATOR)
+                        hasPermission(user?.permissions, Permission.ADMINISTRATOR)
                         &&
                         <EmployeesSidebarItem />
                     }
                     {
-                        hasAnyPermission(session.data?.user?.permissions, [
+                        hasAnyPermission(user?.permissions, [
                             Permission.VIEW_INVOICES,
-                            Permission.CREATE_INVOICE,
+                            Permission.CREATE_INVOICE
                         ])
                         &&
                         <InvoicesSidebarItem />
                     }
                     <AccountSidebarItem />
                     {
-                        hasPermission(session.data?.user?.permissions, Permission.ADMINISTRATOR)
+                        hasPermission(user?.permissions, Permission.ADMINISTRATOR)
                         &&
                         <ManagementSidebarItem />
                     }
@@ -64,11 +64,8 @@ export default function Sidebar() {
                 <GenericButton
                     icon={signOutIcon}
                     onPress={() => signOut().then(() => {
-                        sendToast({
-                            description: "See you later!",
-                            icon: waving
-                        }, {
-                            position: "top-center"
+                        toast("See you later!", {
+                            icon: "👋"
                         });
                     })}>Sign Out</GenericButton>
             </div>
