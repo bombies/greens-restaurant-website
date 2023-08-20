@@ -100,10 +100,10 @@ export default function AccountPage() {
                         </>
                         :
                         <>
-                            <div className="flex gap-4 phone:gap-2">
+                            <div className="flex gap-4 phone:gap-2 phone:flex-col">
                                 {avatarComponent}
                                 <Spacer x={6} />
-                                <div className="self-center">
+                                <div className="self-center phone:text-center">
                                     <p className="text-3xl text-primary font-semibold">{currentData?.username}</p>
                                     <p className="text-secondary-text phone:text-sm">{`Created on ${new Date(currentData?.createdAt || 0).toLocaleDateString()} at ${new Date(currentData?.createdAt || 0).toLocaleTimeString()}`}</p>
                                 </div>

@@ -7,14 +7,7 @@ import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 import { NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider } from "next-themes";
-import { Amplify } from "aws-amplify";
-import awsConfig from "../../aws-exports";
 import { AppProgressBar } from "next-nprogress-bar";
-
-Amplify.configure({
-    ...awsConfig,
-    ssr: true
-});
 
 interface Props extends React.PropsWithChildren {
     session: any;

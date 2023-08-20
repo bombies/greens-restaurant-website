@@ -19,7 +19,7 @@ import clsx from "clsx";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../utils/Hooks";
 import { useAvatar, useCompanyAvatar } from "../../account/components/hooks/useAvatar";
-import { useS3Url } from "../../../../_components/hooks/useS3Url";
+import { useS3Base64String } from "../../../../_components/hooks/useS3Base64String";
 import { compare } from "../../../../../utils/GeneralUtils";
 
 type Props = {
@@ -47,7 +47,7 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
     const [proposedCompanyInfo, setProposedCompanyInfo] = useState<UpdateCompanyInformationDto>();
     const [changesMade, setChangesMade] = useState(false);
     const { component: avatarComponent } = useCompanyAvatar(proposedCompanyInfo, setProposedCompanyInfo);
-    const { avatar: companyAvatar } = useS3Url(data?.companyAvatar);
+    const { avatar: companyAvatar, isLoading: companyAvatarIsLoading } = useS3Base64String(data?.companyAvatar);
 
     useEffect(() => {
         if (!isLoading && data)
@@ -69,8 +69,9 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                     triggerCompanyInfoUpdate({
                         dto: proposedCompanyInfo
                     })
-                        .then(() => {
-                            setProposedCompanyInfo(undefined);
+                        .then((res) => {
+                            console.log(res.data);
+                            setProposedCompanyInfo(res.data);
                             toast.success("You have successfully updated the company's invoice information!");
                         })
                         .catch(e => {
@@ -78,7 +79,7 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                             errorToast(e, "There was an error updating the company's invoice information!");
                         });
                 }}
-                onReject={() => setProposedCompanyInfo(undefined)}
+                onReject={() => setProposedCompanyInfo(data)}
             />
             <div className="default-container p-12 phone:px-3 w-[50%] tablet:w-full h-fit">
                 {
@@ -109,10 +110,15 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                             </div>
                             {
                                 controlsEnabled ?
-                                    avatarComponent
+                                    <Skeleton isLoaded={!companyAvatarIsLoading} className={clsx(
+                                        "rounded-full p-1",
+                                        !companyAvatarIsLoading && "!bg-transparent"
+                                    )}>
+                                        {avatarComponent}
+                                    </Skeleton>
                                     :
-                                    <Skeleton isLoaded={!isLoading} className={clsx(
-                                        "rounded-full w-36 h-36 flex items-center justify-center",
+                                    <Skeleton isLoaded={!isLoading && !companyAvatarIsLoading} className={clsx(
+                                        "rounded-full p-1 flex items-center justify-center",
                                         !isLoading && "!bg-transparent"
                                     )}>
                                         <Avatar
