@@ -54,5 +54,6 @@ jobs:
             git stash
             git pull
             npm i
+            npx prisma generate
             npm run build
             pm2 restart 14
