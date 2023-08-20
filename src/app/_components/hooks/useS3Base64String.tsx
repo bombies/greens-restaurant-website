@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { FetchS3ObjectBuffer } from "../../../utils/client-utils";
 
+export const useS3Base64AvatarString = (userId: string, avatar?: string | null) => {
+    return useS3Base64String(avatar && `images/users/${userId}/${avatar}`);
+};
+
 export const useS3Base64String = (key?: string | null) => {
     const [avatar, setAvatar] = useState<string>();
     const { trigger: triggerFetch, isMutating: isLoading } = FetchS3ObjectBuffer();

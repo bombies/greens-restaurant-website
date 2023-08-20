@@ -30,7 +30,7 @@ type Props = {
 }
 
 export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
-    const { avatar } = useS3Base64String(companyInfo?.companyAvatar);
+    const { avatar } = useS3Base64String(companyInfo?.companyAvatar && `images/company/${companyInfo.companyAvatar}`);
 
     return (
         <View style={{

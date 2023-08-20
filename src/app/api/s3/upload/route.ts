@@ -10,9 +10,10 @@ export async function POST(req: Request) {
         const { searchParams } = new URL(req.url);
         const fileName = searchParams.get("fileName");
         const fileType = searchParams.get("fileType");
+        const key = searchParams.get("key");
         const command = new PutObjectCommand({
             Bucket: process.env.BUCKET_NAME,
-            Key: fileName ?? undefined,
+            Key: key ?? (fileName ?? undefined),
             ContentType: fileType ?? undefined
         });
         const url = await getSignedUrl(s3Client, command, { expiresIn: 60 });

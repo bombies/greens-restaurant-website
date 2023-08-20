@@ -28,7 +28,8 @@ export const FetchS3ObjectBuffer = () => {
 
 type S3FileUploadArgs = {
     arg: {
-        file: File
+        file: File,
+        key?: string,
     }
 }
 
@@ -41,6 +42,7 @@ export const UploadFileToS3 = () => {
         } = (await axios.post(
             url.replaceAll("{file_name}", file.name)
                 .replaceAll("{file_type}", file.type)
+                .replaceAll("{key}", arg.key ?? "")
         )).data;
 
         const formData = new FormData();
@@ -54,5 +56,5 @@ export const UploadFileToS3 = () => {
             }
         });
     };
-    return useSWRMutation(`/api/s3/upload?fileName={file_name}&fileType=$file_type}`, mutator);
+    return useSWRMutation(`/api/s3/upload?fileName={file_name}&fileType=$file_type}&key={key}`, mutator);
 };

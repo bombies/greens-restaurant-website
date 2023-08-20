@@ -9,10 +9,11 @@ import clsx from "clsx";
 import { Skeleton } from "@nextui-org/react";
 import { UploadFileToS3 } from "../../../../../utils/client-utils";
 
-interface Props {
+export interface UploadAvatarComponentProps {
     data?: {
         identifier?: string,
         fallbackSrc?: string | null,
+        path?: string,
         key?: string | null,
     };
     onUploadStart?: () => void,
@@ -22,16 +23,16 @@ interface Props {
     disabled?: boolean
 }
 
-export const UploadAvatarComponent: FC<Props> = ({
-                                                     data,
-                                                     onUploadSuccess,
-                                                     onFileRemove,
-                                                     onUploadError,
-                                                     onUploadStart,
-                                                     disabled
-                                                 }) => {
+export const UploadAvatarComponent: FC<UploadAvatarComponentProps> = ({
+                                                                          data,
+                                                                          onUploadSuccess,
+                                                                          onFileRemove,
+                                                                          onUploadError,
+                                                                          onUploadStart,
+                                                                          disabled
+                                                                      }) => {
     const inputRef = useRef<HTMLInputElement>(null);
-    const { avatar } = useS3Base64String(data?.key);
+    const { avatar } = useS3Base64String(data?.path && data.key ? `${data.path}/${data.key}` : data?.key);
     const { trigger: triggerUpload, isMutating: isUploading } = UploadFileToS3();
 
     return (
@@ -54,7 +55,8 @@ export const UploadAvatarComponent: FC<Props> = ({
                         }
                         const file = allFiles[0];
                         return triggerUpload({
-                            file: file
+                            file: file,
+                            key: data?.path && `${data.path}/${file.name}`
                         }).then(() => {
                                 if (onUploadSuccess)
                                     onUploadSuccess(`${file.name}`);

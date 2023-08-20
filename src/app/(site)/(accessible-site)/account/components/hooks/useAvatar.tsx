@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
-import { UploadAvatarComponent } from "../UploadAvatarComponent";
+import { UploadAvatarComponent, UploadAvatarComponentProps } from "../UploadAvatarComponent";
 import { InvoiceInformation, User } from "@prisma/client";
 
 export const useCompanyAvatar = (
@@ -10,6 +10,7 @@ export const useCompanyAvatar = (
 ) => {
     return useAvatar({
         data: {
+            path: "images/company",
             identifier: data?.id,
             fallbackSrc: data?.companyLogo,
             key: data?.companyAvatar
@@ -31,6 +32,7 @@ export const useUserAvatar = (
 ) => {
     return useAvatar({
         data: {
+            path: data?.id && `images/users/${data.id}`,
             identifier: data?.id,
             fallbackSrc: data?.image,
             key: data?.avatar
@@ -46,16 +48,7 @@ export const useUserAvatar = (
     });
 };
 
-type Params = {
-    data?: {
-        identifier?: string,
-        fallbackSrc?: string | null,
-        key?: string | null,
-    },
-    onUploadStart?: () => void,
-    onUploadSuccess?: (key: string) => void,
-    onUploadError?: (error: string) => void,
-}
+type Params = Omit<UploadAvatarComponentProps, "onFileRemove" | "disabled">
 
 export const useAvatar = ({
                               data,

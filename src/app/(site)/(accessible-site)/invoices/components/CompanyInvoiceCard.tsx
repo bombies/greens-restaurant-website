@@ -47,7 +47,10 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
     const [proposedCompanyInfo, setProposedCompanyInfo] = useState<UpdateCompanyInformationDto>();
     const [changesMade, setChangesMade] = useState(false);
     const { component: avatarComponent } = useCompanyAvatar(proposedCompanyInfo, setProposedCompanyInfo);
-    const { avatar: companyAvatar, isLoading: companyAvatarIsLoading } = useS3Base64String(data?.companyAvatar);
+    const {
+        avatar: companyAvatar,
+        isLoading: companyAvatarIsLoading
+    } = useS3Base64String(data?.companyAvatar && `images/company/${data.companyAvatar}`);
 
     useEffect(() => {
         if (!isLoading && data)
