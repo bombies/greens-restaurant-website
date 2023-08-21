@@ -22,11 +22,15 @@ import {
     formatInvoiceNumber,
     generateInvoiceTotal,
     invoiceIsOverdue
-} from "../../components/invoice-utils";
+} from "../../utils/invoice-utils";
+import {
+    InvoiceCustomerWithOptionalItems,
+    InvoiceWithOptionalItems
+} from "../../../home/_components/widgets/invoice/InvoiceWidget";
 
 type Props = {
     customerIsLoading: boolean,
-    customer?: InvoiceCustomer & { invoices: (Invoice & { invoiceItems: InvoiceItem[] })[] }
+    customer?: InvoiceCustomerWithOptionalItems
 }
 
 enum SortMode {
@@ -42,9 +46,7 @@ enum FilterMode {
     OVERDUE = "overdue",
 }
 
-const getSortPredicate = (a: (Invoice & { invoiceItems: InvoiceItem[] }), b: (Invoice & {
-    invoiceItems: InvoiceItem[]
-}), sortMode: SortMode): number => {
+const getSortPredicate = (a: InvoiceWithOptionalItems, b: InvoiceWithOptionalItems, sortMode: SortMode): number => {
     switch (sortMode.capitalize()) {
         case SortMode.ASCENDING_DATE: {
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
@@ -84,7 +86,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
 
     const invoiceCards = useMemo(() => {
         return customer?.invoices
-            .filter(invoice => getFilterPredicate(invoice, filterModes))
+            ?.filter(invoice => getFilterPredicate(invoice, filterModes))
             .filter(invoice => {
                 if (!search)
                     return true;
@@ -93,7 +95,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
             .sort((a, b) => getSortPredicate(a, b, sortMode[0]))
             .map(invoice => {
                 const invoiceTotal = dollarFormat.format(Number(invoice.invoiceItems
-                    .map(item => item.quantity * item.price)
+                    ?.map(item => item.quantity * item.price)
                     .reduce((prev, acc) => prev + acc, 0)));
 
                 return (

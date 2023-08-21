@@ -61,7 +61,7 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
         if (isLoading || !data)
             return;
         setChangesMade(!compare(proposedCompanyInfo, data));
-    }, [data, isLoading, proposedCompanyInfo]);
+    }, [companyAvatarIsLoading, data, isLoading, proposedCompanyInfo]);
 
     return (
         <>

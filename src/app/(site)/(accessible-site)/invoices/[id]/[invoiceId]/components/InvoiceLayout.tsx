@@ -5,7 +5,6 @@ import { Spacer } from "@nextui-org/react";
 import { errorToast, useUserData } from "../../../../../../../utils/Hooks";
 import { Fragment } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
-import { FetchInvoiceCustomer } from "../../components/InvoiceCustomerLayout";
 import InvoiceControlBar from "./control-bar/InvoiceControlBar";
 import SubTitle from "../../../../../../_components/text/SubTitle";
 import InvoiceTable, { invoiceColumns } from "./table/InvoiceTable";
@@ -19,7 +18,8 @@ import { useInvoiceItems } from "./InvoiceItemsProvider";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { useInvoicePaymentStatus } from "./hooks/useInvoicePaymentStatus";
-import { formatInvoiceNumber } from "../../../components/invoice-utils";
+import { formatInvoiceNumber } from "../../../utils/invoice-utils";
+import { FetchInvoiceCustomer } from "../../../utils/invoice-client-utils";
 
 type Props = {
     customerId: string

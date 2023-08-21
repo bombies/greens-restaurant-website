@@ -1,7 +1,7 @@
 import { FC } from "react";
 import clsx from "clsx";
 import GenericInput from "./inputs/GenericInput";
-import { formatDate } from "../(site)/(accessible-site)/invoices/components/invoice-utils";
+import { formatDate } from "../(site)/(accessible-site)/invoices/utils/invoice-utils";
 
 interface Props {
     id: string,

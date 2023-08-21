@@ -17,7 +17,9 @@ type Context = {
 
 export function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const invoice = await fetchInvoice(params.id, params.invoiceId, true);
+        const { searchParams } = new URL(req.url);
+        const withItems = searchParams.get("with_items")?.toLowerCase() === "true";
+        const invoice = await fetchInvoice(params.id, params.invoiceId, withItems);
         if (invoice.error)
             return invoice.error;
         return NextResponse.json(invoice.success);

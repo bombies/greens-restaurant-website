@@ -1,4 +1,4 @@
-import { authenticated, authenticatedAny, respondWithInit } from "../../../../../../utils/api/ApiUtils";
+import { authenticated, authenticatedAny } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
 import { fetchCustomerInfo } from "../route";
 import { NextResponse } from "next/server";
@@ -12,7 +12,10 @@ type Context = {
 
 export function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const customer = await fetchCustomerInfo(params.id, true, true);
+        const { searchParams } = new URL(req.url);
+        const withInvoices = searchParams.get("with_invoices")?.toLowerCase() === "true";
+        const withItems = searchParams.get("with_items")?.toLowerCase() === "true";
+        const customer = await fetchCustomerInfo(params.id, withInvoices, withItems);
         if (customer.error)
             return customer.error;
         return NextResponse.json(customer.success);

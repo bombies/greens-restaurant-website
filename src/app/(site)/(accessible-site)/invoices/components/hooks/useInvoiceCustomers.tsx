@@ -1,12 +1,12 @@
 "use client";
 
-import { FetchCustomers } from "../InvoiceCustomerGrid";
 import { useEffect, useState } from "react";
-import { InvoiceCustomerWithInvoiceItems } from "../../reports/components/hooks/useCustomerReports";
+import { FetchInvoiceCustomers } from "../../utils/invoice-client-utils";
+import { InvoiceCustomerWithOptionalItems } from "../../../home/_components/widgets/invoice/InvoiceWidget";
 
-export const useInvoiceCustomers = () => {
-    const { data: customers, isLoading } = FetchCustomers();
-    const [visibleCustomers, setVisibleCustomers] = useState<InvoiceCustomerWithInvoiceItems[]>();
+export const useInvoiceCustomers = (withInvoices?: boolean, withItems?: boolean) => {
+    const { data: customers, isLoading } = FetchInvoiceCustomers({ withInvoices, withItems });
+    const [visibleCustomers, setVisibleCustomers] = useState<InvoiceCustomerWithOptionalItems[]>();
     const [search, setSearch] = useState<string>();
 
     useEffect(() => {

@@ -1,8 +1,6 @@
 "use client";
 
-import useSWR from "swr";
-import { fetcher } from "../../../../employees/_components/EmployeeGrid";
-import { Invoice, InvoiceCustomer } from "@prisma/client";
+import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import { Spinner } from "@nextui-org/spinner";
 import { Fragment, useEffect, useMemo, useReducer } from "react";
 import { Divider } from "@nextui-org/divider";
@@ -12,18 +10,10 @@ import SubTitle from "../../../../../../_components/text/SubTitle";
 import { Accordion, AccordionItem, Link } from "@nextui-org/react";
 import IconButton from "../../../../../../_components/inputs/IconButton";
 import eyeIcon from "/public/icons/green-eye.svg";
-import trashIcon from "/public/icons/red-trash.svg";
 import EditCustomerButton from "../../../../invoices/[id]/components/control-bar/EditCustomerButton";
 import DeleteCustomerButton from "../../../../invoices/[id]/components/control-bar/DeleteCustomerButton";
-import { formatInvoiceNumber } from "../../../../invoices/components/invoice-utils";
-
-const FetchInvoiceCustomers = () => {
-    return useSWR(
-        "/api/invoices/customer",
-        fetcher<(InvoiceCustomer & { invoices: Invoice[] })[]>, {
-            revalidateOnMount: true
-        });
-};
+import { formatInvoiceNumber } from "../../../../invoices/utils/invoice-utils";
+import { FetchInvoiceCustomers } from "../../../../invoices/utils/invoice-client-utils";
 
 enum CustomerAction {
     UPDATE,
@@ -31,11 +21,14 @@ enum CustomerAction {
     SET
 }
 
-type InvoiceCustomerWithInvoices = InvoiceCustomer & { invoices: Invoice[] };
+export type InvoiceCustomerWithInvoices = InvoiceCustomer & { invoices: Invoice[] };
+export type InvoiceCustomerWithOptionalInvoices = InvoiceCustomer & { invoices?: Invoice[] };
+export type InvoiceCustomerWithOptionalItems = InvoiceCustomer & { invoices?: InvoiceWithOptionalItems[] };
+export type InvoiceWithOptionalItems = Invoice & { invoiceItems?: InvoiceItem[] }
 
-const reducer = (state: InvoiceCustomerWithInvoices[], { type, payload }: {
+const reducer = (state: InvoiceCustomerWithOptionalInvoices[], { type, payload }: {
     type: CustomerAction,
-    payload?: InvoiceCustomerWithInvoices[] | {
+    payload?: InvoiceCustomerWithOptionalInvoices[] | {
         id: string,
         data?: InvoiceCustomer
     }
@@ -79,7 +72,10 @@ const reducer = (state: InvoiceCustomerWithInvoices[], { type, payload }: {
 };
 
 export default function InvoiceWidget() {
-    const { data: invoiceCustomerAPIData, isLoading: invoiceCustomersLoading } = FetchInvoiceCustomers();
+    const {
+        data: invoiceCustomerAPIData,
+        isLoading: invoiceCustomersLoading
+    } = FetchInvoiceCustomers({ withInvoices: true });
     const [invoiceCustomers, dispatchInvoiceCustomers] = useReducer(reducer, invoiceCustomerAPIData ?? []);
 
     useEffect(() => {
@@ -131,14 +127,15 @@ export default function InvoiceWidget() {
             <Divider className="my-4" />
             <div className="flex flex-col gap-4">
                 {
-                    customer.invoices.length ? customer.invoices.map(invoice => (
+                    customer.invoices?.length ? customer.invoices.map(invoice => (
                             <LinkCard
                                 key={invoice.id}
                                 href={`/invoices/${customer.id}/${invoice.id}`}
                             >
                                 <div>
                                     <div className="flex gap-2">
-                                        <p className="text-medium max-w-[70%] overflow-hidden whitespace-nowrap overflow-ellipsis">Invoice #{formatInvoiceNumber(invoice.number)}</p>
+                                        <p className="text-medium max-w-[70%] overflow-hidden whitespace-nowrap overflow-ellipsis">Invoice
+                                            #{formatInvoiceNumber(invoice.number)}</p>
                                         <Chip
                                             variant="flat"
                                             color={invoice.paid ? "success" : "danger"}

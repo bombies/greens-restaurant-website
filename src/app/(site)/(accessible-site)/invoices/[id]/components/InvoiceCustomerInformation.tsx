@@ -1,30 +1,30 @@
 "use client";
 
 import React, { Fragment, useMemo } from "react";
-import { FetchInvoiceCustomer } from "./InvoiceCustomerLayout";
 import { Spinner } from "@nextui-org/spinner";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 import { dollarFormat } from "../../../../../../utils/GeneralUtils";
-import { generateInvoiceTotal } from "../../components/invoice-utils";
+import { generateInvoiceTotal } from "../../utils/invoice-utils";
+import { FetchInvoiceCustomer } from "../../utils/invoice-client-utils";
 
 interface Props {
     id: string;
 }
 
 export const InvoiceCustomerInformation: React.FC<Props> = ({ id }) => {
-    const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(id);
+    const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(id, true, true);
 
     const invoiceTotal = useMemo(() => (
         Number(customer?.invoices
-            .map(invoice => generateInvoiceTotal(invoice))
+            ?.map(invoice => generateInvoiceTotal(invoice))
             .reduce((prev, acc) => prev + acc, 0)
         )
     ), [customer?.invoices]);
 
     const invoicePaidTotal = useMemo(() => (
         Number(customer?.invoices
-            .filter(invoice => invoice.paid)
+            ?.filter(invoice => invoice.paid)
             .map(invoice => generateInvoiceTotal(invoice))
             .reduce((prev, acc) => prev + acc, 0)
         )
@@ -32,7 +32,7 @@ export const InvoiceCustomerInformation: React.FC<Props> = ({ id }) => {
 
     const invoiceUnpaidTotal = useMemo(() => (
         Number(customer?.invoices
-            .filter(invoice => !invoice.paid)
+            ?.filter(invoice => !invoice.paid)
             .map(invoice => generateInvoiceTotal(invoice))
             .reduce((prev, acc) => prev + acc, 0)
         )

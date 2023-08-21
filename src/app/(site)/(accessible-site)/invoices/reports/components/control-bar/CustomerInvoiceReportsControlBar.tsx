@@ -2,13 +2,15 @@
 
 import { FC } from "react";
 import { FilterCustomerInvoiceReportButton } from "./FilterCustomerInvoiceReportButton";
-import { InvoiceCustomerWithInvoiceItems } from "../hooks/useCustomerReports";
 import { GoBackButton } from "../../../[id]/components/control-bar/InvoiceCustomerControlBar";
 import { Divider } from "@nextui-org/divider";
+import {
+    InvoiceCustomerWithOptionalItems
+} from "../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 interface Props {
-    customers?: InvoiceCustomerWithInvoiceItems[],
-    allCustomers?: InvoiceCustomerWithInvoiceItems[],
+    customers?: InvoiceCustomerWithOptionalItems[],
+    allCustomers?: InvoiceCustomerWithOptionalItems[],
     setCustomers: (ids: string[]) => void,
     customersAreLoading: boolean
 }

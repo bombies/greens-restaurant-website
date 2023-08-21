@@ -1,16 +1,15 @@
 "use client";
 
-import { FetchCustomers } from "../../../components/InvoiceCustomerGrid";
 import { useCallback, useEffect, useState } from "react";
-import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
-
-export type InvoiceCustomerWithInvoiceItems = InvoiceCustomer & {
-    invoices: (Invoice & { invoiceItems: InvoiceItem[] })[]
-}
+import { FetchInvoiceCustomers } from "../../../utils/invoice-client-utils";
+import { InvoiceCustomerWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 export const useCustomerReports = () => {
-    const { data: allCustomers, isLoading } = FetchCustomers();
-    const [visibleCustomers, setVisibleCustomers] = useState<InvoiceCustomerWithInvoiceItems[]>();
+    const { data: allCustomers, isLoading } = FetchInvoiceCustomers({
+        withInvoices: true,
+        withItems: true
+    });
+    const [visibleCustomers, setVisibleCustomers] = useState<InvoiceCustomerWithOptionalItems[]>();
 
     const setCustomers = useCallback((names: string[]) => {
         if (!allCustomers)
@@ -21,7 +20,7 @@ export const useCustomerReports = () => {
             return;
         }
 
-        console.log('names', names)
+        console.log("names", names);
         setVisibleCustomers(allCustomers.filter(customer => names.includes(customer.customerName.toLowerCase().replaceAll(" ", "_"))));
     }, [allCustomers]);
 

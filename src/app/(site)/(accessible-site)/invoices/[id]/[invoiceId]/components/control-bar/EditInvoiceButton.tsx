@@ -13,7 +13,7 @@ import EditableField, { DataContainer } from "../../../../../employees/[username
 import { Spacer } from "@nextui-org/react";
 import editIcon from "/public/icons/edit-green.svg";
 import { GenericDatePicker } from "../../../../../../../_components/GenericDatePicker";
-import { fetchDueAt } from "../../../../components/invoice-utils";
+import { fetchDueAt } from "../../../../utils/invoice-utils";
 import { toast } from "react-hot-toast";
 
 type Props = {

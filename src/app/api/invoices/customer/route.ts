@@ -8,11 +8,15 @@ import "../../../../utils/GeneralUtils";
 
 export function GET(req: Request) {
     return authenticatedAny(req, async () => {
+        const { searchParams } = new URL(req.url);
+        const withInvoices = searchParams.get("with_invoices")?.toLowerCase() === "true";
+        const withItems = searchParams.get("with_items")?.toLowerCase() === "true";
+
         return NextResponse.json(await prisma.invoiceCustomer.findMany({
             include: {
-                invoices: {
+                invoices: withInvoices && {
                     include: {
-                        invoiceItems: true
+                        invoiceItems: withItems
                     }
                 }
             }

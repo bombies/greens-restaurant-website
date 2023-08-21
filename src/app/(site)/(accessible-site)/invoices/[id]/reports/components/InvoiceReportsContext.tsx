@@ -1,27 +1,24 @@
 "use client";
 
 import { useUserData } from "../../../../../../../utils/Hooks";
-import { FetchInvoiceCustomer } from "../../components/InvoiceCustomerLayout";
-import { useRouter } from "next/navigation";
-import { Fragment, useEffect, useReducer, useState } from "react";
+import { Fragment } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import Title from "../../../../../../_components/text/Title";
 import { InvoiceCustomerInformation } from "../../components/InvoiceCustomerInformation";
 import { Spacer } from "@nextui-org/react";
 import { InvoiceReportsControlBar } from "./control-bar/InvoiceReportsControlBar";
 import { InvoiceReportsTable } from "./InvoiceReportsTable";
-import { Invoice, InvoiceItem } from "@prisma/client";
-import { invoiceIsOverdue } from "../../../components/invoice-utils";
 import { useInvoiceReport } from "./hooks/useInvoiceReport";
+import { FetchInvoiceCustomer } from "../../../utils/invoice-client-utils";
 
 type Props = {
     id: string
 }
 
 export default function InvoiceReportsContext({ id }: Props) {
-    const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(id);
+    const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(id, true, true);
     const {
-        data: userData,
+        data: userData
     } = useUserData([Permission.VIEW_INVOICES, Permission.CREATE_INVOICE]);
     const { reportParams, dispatchReportParams, visibleInvoices } = useInvoiceReport({ customer, customerIsLoading });
 

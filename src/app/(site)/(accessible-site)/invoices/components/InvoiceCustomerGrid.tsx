@@ -2,24 +2,15 @@
 
 import CardSkeleton from "../../../../_components/skeletons/CardSkeleton";
 import LinkCard from "../../../../_components/LinkCard";
-import useSWR from "swr";
-import { fetcher } from "../../employees/_components/EmployeeGrid";
-import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import SubTitle from "../../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
 import clsx from "clsx";
-import { Card, CardBody } from "@nextui-org/card";
 import GenericCard from "../../../../_components/GenericCard";
-import { InvoiceCustomerWithInvoiceItems } from "../reports/components/hooks/useCustomerReports";
 import { useInvoiceCustomers } from "./hooks/useInvoiceCustomers";
 import { Divider } from "@nextui-org/divider";
 import GenericInput from "../../../../_components/inputs/GenericInput";
 import SearchIcon from "../../../../_components/icons/SearchIcon";
 import React, { Fragment } from "react";
-
-export const FetchCustomers = () => {
-    return useSWR(`/api/invoices/customer`, fetcher<InvoiceCustomerWithInvoiceItems[]>);
-};
 
 export default function InvoiceCustomerGrid() {
     const {

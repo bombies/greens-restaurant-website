@@ -11,13 +11,14 @@ import {
     formatInvoiceNumber,
     generateInvoiceTotal,
     invoiceIsOverdue
-} from "../../../components/invoice-utils";
+} from "../../../utils/invoice-utils";
 import { Chip } from "@nextui-org/chip";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 import SubTitle from "../../../../../../_components/text/SubTitle";
+import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 interface Props {
-    invoices?: (Invoice & { invoiceItems: InvoiceItem[] })[]
+    invoices?: InvoiceWithOptionalItems[]
     customerIsLoading: boolean,
 }
 
@@ -47,7 +48,7 @@ const columns: Column[] = [
 export const InvoiceReportsTable: FC<Props> = ({ invoices, customerIsLoading }) => {
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
 
-    const getKeyValue = useCallback((invoice: (Invoice & { invoiceItems: InvoiceItem[] }), key: Key) => {
+    const getKeyValue = useCallback((invoice: InvoiceWithOptionalItems, key: Key) => {
         switch (key) {
             case "invoice_number": {
                 return formatInvoiceNumber(invoice.number);

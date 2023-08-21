@@ -1,8 +1,12 @@
-"use client"
+"use client";
 
 import { useEffect, useReducer, useState } from "react";
-import { invoiceIsOverdue } from "../../../../components/invoice-utils";
+import { invoiceIsOverdue } from "../../../../utils/invoice-utils";
 import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
+import {
+    InvoiceCustomerWithOptionalItems,
+    InvoiceWithOptionalItems
+} from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 export type ReportParamsState = {
     dateFrom?: Date | null,
@@ -35,12 +39,12 @@ const reducer = (state: ReportParamsState, action: {
 };
 
 type Params = {
-    customer?: InvoiceCustomer & { invoices: (Invoice & { invoiceItems: InvoiceItem[] })[] },
+    customer?: InvoiceCustomerWithOptionalItems,
     customerIsLoading: boolean,
 }
 
-export const useInvoiceReport = ({customer, customerIsLoading}: Params) => {
-    const [visibleInvoices, setVisibleInvoices] = useState<(Invoice & { invoiceItems: InvoiceItem[] })[]>();
+export const useInvoiceReport = ({ customer, customerIsLoading }: Params) => {
+    const [visibleInvoices, setVisibleInvoices] = useState<InvoiceWithOptionalItems[]>();
     const [reportParams, dispatchReportParams] = useReducer(reducer, {
         dateFrom: undefined,
         dateTo: undefined,
@@ -56,7 +60,7 @@ export const useInvoiceReport = ({customer, customerIsLoading}: Params) => {
         if (customer)
             setVisibleInvoices(
                 customer.invoices
-                    .filter(invoice => {
+                    ?.filter(invoice => {
                         const statusPredicate = () => {
                             if (!reportParams.status)
                                 return true;
@@ -92,5 +96,5 @@ export const useInvoiceReport = ({customer, customerIsLoading}: Params) => {
             );
     }, [customer, reportParams]);
 
-    return { reportParams, visibleInvoices, dispatchReportParams }
-}
+    return { reportParams, visibleInvoices, dispatchReportParams };
+};

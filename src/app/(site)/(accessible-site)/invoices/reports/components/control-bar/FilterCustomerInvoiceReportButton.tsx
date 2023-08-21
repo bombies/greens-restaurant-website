@@ -2,12 +2,11 @@
 
 import { FC, useEffect, useState } from "react";
 import DropdownInput from "../../../../../../_components/inputs/DropdownInput";
-import { InvoiceCustomerWithInvoiceItems } from "../hooks/useCustomerReports";
-import { PaidStatus } from "../../../[id]/[invoiceId]/components/InvoicePaidStatus";
+import { InvoiceCustomerWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 interface Props {
-    customers?: InvoiceCustomerWithInvoiceItems[],
-    visibleCustomers?: InvoiceCustomerWithInvoiceItems[],
+    customers?: InvoiceCustomerWithOptionalItems[],
+    visibleCustomers?: InvoiceCustomerWithOptionalItems[],
     setCustomers: (names: string[]) => void,
     customersAreLoading: boolean
 }

@@ -1,8 +1,5 @@
 "use client";
 
-import useSWR from "swr";
-import { fetcher } from "../../../employees/_components/EmployeeGrid";
-import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import Title from "../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
 import InvoiceCustomerControlBar from "./control-bar/InvoiceCustomerControlBar";
@@ -11,19 +8,14 @@ import { Fragment } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import InvoiceGrid from "./InvoiceGrid";
 import { InvoiceCustomerInformation } from "./InvoiceCustomerInformation";
+import { FetchInvoiceCustomer } from "../../utils/invoice-client-utils";
 
 type Props = {
     id: string,
 }
 
-export const FetchInvoiceCustomer = (id: string) => {
-    return useSWR(`/api/invoices/customer/${id}/invoices`, fetcher<InvoiceCustomer & {
-        invoices: (Invoice & { invoiceItems: InvoiceItem[] })[]
-    }>);
-};
-
 export default function InvoiceCustomerLayout({ id }: Props) {
-    const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(id);
+    const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(id, true, true);
     const { data: userData, isLoading: userDataIsLoading } = useUserData([
         Permission.VIEW_INVOICES,
         Permission.CREATE_INVOICE

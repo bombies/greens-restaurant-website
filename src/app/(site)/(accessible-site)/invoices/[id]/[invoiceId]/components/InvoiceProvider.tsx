@@ -1,28 +1,20 @@
 "use client";
 
-import React, { useContext } from "react";
-import useSWR, { SWRResponse } from "swr";
-import { Invoice, InvoiceItem } from "@prisma/client";
-import { fetcher } from "../../../../employees/_components/EmployeeGrid";
+import React from "react";
+import { SWRResponse } from "swr";
+import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { FetchInvoice } from "../../../utils/invoice-client-utils";
 
-const InvoiceContext = React.createContext<SWRResponse<(Invoice & {
-    invoiceItems: InvoiceItem[]
-}) | undefined> | undefined>(undefined);
+const InvoiceContext = React.createContext<SWRResponse<InvoiceWithOptionalItems | undefined> | undefined>(undefined);
 
 type Props = {
     customerId: string,
     invoiceId: string,
 } & React.PropsWithChildren
 
-const FetchInvoice = (customerId: string, invoiceId: string) => {
-    return useSWR(`/api/invoices/customer/${customerId}/invoice/${invoiceId}`, fetcher<Invoice & {
-        invoiceItems: InvoiceItem[]
-    }>);
-};
-
 export function InvoiceProvider({ customerId, invoiceId, children }: Props) {
     return (
-        <InvoiceContext.Provider value={FetchInvoice(customerId, invoiceId)}>
+        <InvoiceContext.Provider value={FetchInvoice(customerId, invoiceId, true)}>
             {children}
         </InvoiceContext.Provider>
     );

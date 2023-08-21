@@ -9,18 +9,18 @@ import { Divider } from "@nextui-org/divider";
 import SubTitle from "../../../../../../../_components/text/SubTitle";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import SpreadsheetIcon from "../../../../../../../_components/icons/SpreadsheetIcon";
-import { Invoice, InvoiceItem } from "@prisma/client";
 import { downloadFileFromBlob } from "../../../../../../../../utils/client-utils";
-import { formatDateDDMMYYYY, generateInvoiceTotal, invoiceIsOverdue } from "../../../../components/invoice-utils";
+import { formatDateDDMMYYYY, generateInvoiceTotal, invoiceIsOverdue } from "../../../../utils/invoice-utils";
 import Exceljs from "exceljs";
 import { useReportDateRange } from "../hooks/useReportDateRange";
 import { ReportParamsActionType, ReportParamsState } from "../hooks/useInvoiceReport";
 import { toast } from "react-hot-toast";
+import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 interface Props {
     id: string,
     customerName: string,
-    currentItems: (Invoice & { invoiceItems: InvoiceItem[] })[],
+    currentItems: InvoiceWithOptionalItems[],
     reportParams: ReportParamsState,
     dispatchReportParams: Dispatch<{ type: ReportParamsActionType, payload: Partial<ReportParamsState> }>
 }

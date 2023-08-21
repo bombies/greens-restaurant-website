@@ -1,12 +1,16 @@
 import { Invoice, InvoiceItem } from "@prisma/client";
+import {
+    InvoiceCustomerWithOptionalItems,
+    InvoiceWithOptionalItems
+} from "../../home/_components/widgets/invoice/InvoiceWidget";
 
-export const generateInvoiceTotal = (invoice?: Invoice & { invoiceItems: InvoiceItem[] }): number => {
+export const generateInvoiceTotal = (invoice?: InvoiceWithOptionalItems): number => {
     return invoice?.invoiceItems
-        .map(item => item.quantity * item.price)
+        ?.map(item => item.quantity * item.price)
         .reduce((prev, acc) => prev + acc, 0) ?? 0;
 };
 
-export const generateInvoicesTotal = (invoices?: (Invoice & { invoiceItems: InvoiceItem[] })[]): number => {
+export const generateInvoicesTotal = (invoices?: InvoiceWithOptionalItems[]): number => {
     return invoices?.reduce((prev, invoice) =>
         prev + generateInvoiceTotal(invoice), 0) ?? 0;
 };

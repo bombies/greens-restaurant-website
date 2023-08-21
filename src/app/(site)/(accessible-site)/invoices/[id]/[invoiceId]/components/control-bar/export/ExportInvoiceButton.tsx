@@ -7,7 +7,7 @@ import InvoicePDF from "./pdf/InvoicePDF";
 import exportIcon from "/public/icons/export-gold.svg";
 import { usePDF } from "@react-pdf/renderer";
 import { useEffect } from "react";
-import { formatInvoiceNumber } from "../../../../../components/invoice-utils";
+import { formatInvoiceNumber } from "../../../../../utils/invoice-utils";
 
 type Props = {
     customer?: InvoiceCustomer

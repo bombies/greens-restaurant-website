@@ -2,12 +2,12 @@ import React, { FC, Key, useCallback } from "react";
 import GenericTable from "../../../../../_components/table/GenericTable";
 import { Column } from "../../[id]/[invoiceId]/components/table/InvoiceTable";
 import { Button, Link, TableCell, TableRow, Tooltip } from "@nextui-org/react";
-import { InvoiceCustomerWithInvoiceItems } from "./hooks/useCustomerReports";
 import { Spinner } from "@nextui-org/spinner";
-import { generateInvoicesTotal, generateInvoiceTotal, invoiceIsOverdue } from "../../components/invoice-utils";
+import { generateInvoicesTotal, generateInvoiceTotal, invoiceIsOverdue } from "../../utils/invoice-utils";
 import { dollarFormat } from "../../../../../../utils/GeneralUtils";
 import EyeIcon from "../../../../../_components/icons/EyeIcon";
 import SubTitle from "../../../../../_components/text/SubTitle";
+import { InvoiceCustomerWithOptionalItems } from "../../../home/_components/widgets/invoice/InvoiceWidget";
 
 const columns: Column[] = [
     { key: "customer_name", value: "Customer Name" },
@@ -22,12 +22,12 @@ const columns: Column[] = [
 ];
 
 interface Props {
-    customers?: InvoiceCustomerWithInvoiceItems[],
+    customers?: InvoiceCustomerWithOptionalItems[],
     customersAreLoading: boolean
 }
 
 export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreLoading }) => {
-    const getKeyValue = useCallback((customer: InvoiceCustomerWithInvoiceItems, key: Key) => {
+    const getKeyValue = useCallback((customer: InvoiceCustomerWithOptionalItems, key: Key) => {
         switch (key) {
             case "customer_name": {
                 return customer.customerName;
@@ -35,37 +35,37 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
             case "total_invoiced": {
                 return dollarFormat.format(
                     customer.invoices
-                        .reduce((prev, invoice) =>
-                            prev + generateInvoiceTotal(invoice), 0)
+                        ?.reduce((prev, invoice) =>
+                            prev + generateInvoiceTotal(invoice), 0) ?? 0
                 );
             }
             case "total_paid": {
                 return dollarFormat.format(
                     customer.invoices
-                        .filter(invoice => invoice.paid)
+                        ?.filter(invoice => invoice.paid)
                         .reduce((prev, invoice) =>
-                            prev + generateInvoiceTotal(invoice), 0)
+                            prev + generateInvoiceTotal(invoice), 0) ?? 0
                 );
             }
             case "total_outstanding": {
                 return dollarFormat.format(
                     customer.invoices
-                        .filter(invoice => !invoice.paid)
+                        ?.filter(invoice => !invoice.paid)
                         .reduce((prev, invoice) =>
-                            prev + generateInvoiceTotal(invoice), 0)
+                            prev + generateInvoiceTotal(invoice), 0) ?? 0
                 );
             }
             case "invoice_count": {
-                return customer.invoices.length;
+                return customer.invoices?.length;
             }
             case "paid_invoice_count": {
-                return customer.invoices.filter(invoice => invoice.paid).length;
+                return customer.invoices?.filter(invoice => invoice.paid).length;
             }
             case "unpaid_invoice_count": {
-                return customer.invoices.filter(invoice => !invoice.paid).length;
+                return customer.invoices?.filter(invoice => !invoice.paid).length;
             }
             case "overdue_invoice_count": {
-                return customer.invoices.filter(invoice => invoiceIsOverdue(invoice)).length;
+                return customer.invoices?.filter(invoice => invoiceIsOverdue(invoice)).length;
             }
             case "actions": {
                 return (
@@ -109,7 +109,7 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
                             <p className="self-center text-right px-6 phone:px-1 py-4 text-primary font-semibold text-xl phone:text-lg">
                                 {dollarFormat.format(
                                     customers ?
-                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices.filter(invoice => invoice.paid)), 0)
+                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices?.filter(invoice => invoice.paid)), 0)
                                         : 0
                                 )}
                             </p>
@@ -117,7 +117,7 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
                             <p className="self-center text-right px-6 phone:px-1 py-4 text-primary font-semibold text-xl phone:text-lg">
                                 {dollarFormat.format(
                                     customers ?
-                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices.filter(invoice => !invoice.paid)), 0)
+                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices?.filter(invoice => !invoice.paid)), 0)
                                         : 0
                                 )}
                             </p>

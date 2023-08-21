@@ -2,7 +2,7 @@
 
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import { InvoiceCustomer, InvoiceInformation } from "@prisma/client";
-import { formatDateDDMMYYYY } from "../../../../../../components/invoice-utils";
+import { formatDateDDMMYYYY } from "../../../../../../utils/invoice-utils";
 
 type Props = {
     customerInfo?: InvoiceCustomer

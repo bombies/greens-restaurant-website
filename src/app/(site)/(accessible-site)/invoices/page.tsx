@@ -3,7 +3,7 @@
 import Title from "../../../_components/text/Title";
 import SubTitle from "../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
-import InvoiceControlBar from "./components/InvoiceControlBar";
+import InvoiceControlBar from "./components/control-bar/InvoiceControlBar";
 import CompanyInvoiceCard from "./components/CompanyInvoiceCard";
 import InvoiceCustomerGrid from "./components/InvoiceCustomerGrid";
 import { hasAnyPermission, Permission } from "../../../../libs/types/permission";
@@ -23,16 +23,20 @@ export default function InvoicesPage() {
             {
                 hasAnyPermission(
                     userData?.permissions,
-                    [Permission.CREATE_INVOICE]
+                    [Permission.CREATE_INVOICE, Permission.VIEW_INVOICES]
                 ) &&
                 <Fragment>
                     <Spacer y={6} />
                     <InvoiceControlBar
-                        controlsEnabled={
+                        mutationAllowed={
                             hasAnyPermission(
                                 userData?.permissions,
                                 [Permission.CREATE_INVOICE]
                             )}
+                        fetchingAllowed={hasAnyPermission(
+                            userData?.permissions,
+                            [Permission.CREATE_INVOICE, Permission.VIEW_INVOICES]
+                        )}
                     />
                 </Fragment>
             }

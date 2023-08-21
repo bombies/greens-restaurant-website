@@ -2,7 +2,7 @@
 
 import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Invoice, InvoiceInformation } from "@prisma/client";
-import { formatInvoiceNumber } from "../../../../../../components/invoice-utils";
+import { formatInvoiceNumber } from "../../../../../../utils/invoice-utils";
 import { useS3Base64String } from "../../../../../../../../../_components/hooks/useS3Base64String";
 
 const styles = StyleSheet.create({
