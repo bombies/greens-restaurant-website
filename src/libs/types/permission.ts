@@ -1,13 +1,62 @@
 export enum Permission {
+    /**
+     * Permission to do everything
+     */
     ADMINISTRATOR = 1 << 8,
 
     // INVENTORY
+    /**
+     * This grants the user to create inventories.
+     * It also automatically allows viewing inventories and mutating
+     * stock as well as stock requests.
+     */
     CREATE_INVENTORY = 1 << 1,
+
+    /**
+     * This grants read-only permission to a user for inventories.
+     */
     VIEW_INVENTORY = 1 << 2,
+
+    /**
+     * This grants read and write permissions to a user for inventories.
+     * This does not allow a user to create an inventory.
+     */
     MUTATE_STOCK = 1 << 3,
 
+    /**
+     * This grants the user the permission to create a stock request.
+     * This will also allow the user to see their own stock requests.
+     */
+    CREATE_STOCK_REQUEST = 1 << 6,
+
+    /**
+     * This grants the user to view all open stock requests.
+     * This is read-only access, meaning the user will not be
+     * able to accept or reject stock requests. This permission
+     * will automatically grant the permission to create a stock
+     * request.
+     */
+    VIEW_STOCK_REQUESTS = 1 << 7,
+
+    /**
+     * This allows the user to accept or reject stock requests
+     * made by other users. It will also allow the user stock
+     * requests to be assigned to them.
+     */
+    MANAGE_STOCK_REQUESTS = 1 << 9,
+
     // INVOICES
+    /**
+     * This allows the user to create invoice customers and
+     * create invoices. The permission to view customers and
+     * invoices is inherited.
+     */
     CREATE_INVOICE = 1 << 4,
+
+    /**
+     * This allows the user to view all invoices for all customers
+     * as well as reports for the company and customer.
+     */
     VIEW_INVOICES = 1 << 5,
 }
 
@@ -76,7 +125,14 @@ export const PermissionGroups: PermissionGroup[] = [
     },
     {
         label: "Manage Inventory",
-        value: [Permission.CREATE_INVENTORY, Permission.VIEW_INVENTORY, Permission.MUTATE_STOCK]
+        value: [
+            Permission.CREATE_INVENTORY,
+            Permission.VIEW_INVENTORY,
+            Permission.MUTATE_STOCK,
+            Permission.CREATE_STOCK_REQUEST,
+            Permission.VIEW_STOCK_REQUESTS,
+            Permission.MANAGE_STOCK_REQUESTS
+        ]
     },
     {
         label: "Manage Invoices",

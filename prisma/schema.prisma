@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -25,6 +22,18 @@ model User {
 
   createdInventoryIds String[]    @db.ObjectId
   createdInventories  Inventory[]
+
+  stockRequests StockRequest[]
+}
+
+model StockRequest {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  requestedByUserId String @db.ObjectId
+  requestedByUser   User   @relation(fields: [requestedByUserId], references: [id])
+
+  stock    Stock[]  @relation(fields: [stockIds], references: [id])
+  stockIds String[] @db.ObjectId
 }
 
 model Inventory {
@@ -66,6 +75,9 @@ model Stock {
 
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   inventoryId String    @db.ObjectId
+
+  requestIds String[]       @db.ObjectId
+  requests   StockRequest[] @relation(fields: [requestIds], references: [id])
 }
 
 model StockSnapshot {
