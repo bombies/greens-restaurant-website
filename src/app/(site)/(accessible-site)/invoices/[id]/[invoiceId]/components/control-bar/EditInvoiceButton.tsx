@@ -90,7 +90,7 @@ export default function EditInvoiceButton({ customerId, invoice, disabled }: Pro
                             value={proposedChanges?.dueAt ?? fetchDueAt(invoice)}
                             onDateChange={(date) => setProposedChanges(prev => ({
                                 ...prev,
-                                dueAt: date
+                                dueAt: date && new Date(date.toString())
                             }))}
                             min={invoice && new Date(invoice?.createdAt.toString())}
                         />

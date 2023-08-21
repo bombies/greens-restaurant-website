@@ -97,7 +97,7 @@ export type UpdateInvoiceDto = Partial<Omit<Invoice, "createdAt" | "updatedAt" |
 const updateInvoiceDtoSchema = z.object({
     description: z.string(),
     paid: z.boolean(),
-    dueAt: z.date()
+    dueAt: z.date().or(z.string())
 }).partial().strict();
 
 export function PATCH(req: Request, { params }: Context) {
@@ -111,10 +111,13 @@ export function PATCH(req: Request, { params }: Context) {
 
         if (!body || !bodyValidated.success)
             return respondWithInit({
-                message: "You must provide a body for this request!",
+                message: "Invalid payload",
                 validationErrors: bodyValidated,
                 status: 401
             });
+
+        if (body.dueAt)
+            body.dueAt = new Date(body.dueAt.toString());
 
         const updatedInvoice = await prisma.invoice.update({
             where: {
