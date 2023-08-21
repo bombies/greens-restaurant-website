@@ -118,12 +118,12 @@ export const Permissions: PermissionObject[] = [
     }
 ];
 
-export const PermissionGroups: PermissionGroup[] = [
-    {
+export const permissionGroups = {
+    administrator: {
         label: "Administrator",
         value: [Permission.ADMINISTRATOR]
     },
-    {
+    manageInventory: {
         label: "Manage Inventory",
         value: [
             Permission.CREATE_INVENTORY,
@@ -134,10 +134,10 @@ export const PermissionGroups: PermissionGroup[] = [
             Permission.MANAGE_STOCK_REQUESTS
         ]
     },
-    {
+    manageInvoices: {
         label: "Manage Invoices",
         value: [Permission.CREATE_INVOICE, Permission.VIEW_INVOICES]
     }
-];
+};
 
 export default Permission;

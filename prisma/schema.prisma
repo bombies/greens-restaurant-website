@@ -23,17 +23,27 @@ model User {
   createdInventoryIds String[]    @db.ObjectId
   createdInventories  Inventory[]
 
-  stockRequests StockRequest[]
+  openStockRequests     StockRequest[] @relation(name: "openStocks")
+  assignedStockRequests StockRequest[] @relation(name: "assignedStocks")
 }
 
 model StockRequest {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  reviewed      Boolean
+  rejected      Boolean
+  reviewedNotes String
+
+  assignedToUserId String @db.ObjectId
+  assignedToUser   User   @relation(name: "openStocks", fields: [assignedToUserId], references: [id])
 
   requestedByUserId String @db.ObjectId
-  requestedByUser   User   @relation(fields: [requestedByUserId], references: [id])
+  requestedByUser   User   @relation(name: "assignedStocks", fields: [requestedByUserId], references: [id])
 
   stock    Stock[]  @relation(fields: [stockIds], references: [id])
   stockIds String[] @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Inventory {
