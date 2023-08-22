@@ -69,6 +69,9 @@ const fetchPermissionsFromUserSession = async (session: Session): Promise<number
     const user = await prisma.user.findUnique({
         where: {
             username: session.user?.username
+        },
+        select: {
+            permissions: true
         }
     });
     return user?.permissions || 0;
