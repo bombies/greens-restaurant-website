@@ -2,7 +2,7 @@ import { authenticatedAny } from "../../../../utils/api/ApiUtils";
 import Permission from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { getFetchStockRequestsSearchParams } from "./@me/route";
+import { getFetchStockRequestsSearchParams } from "./me/route";
 
 export async function GET(req: Request) {
     return authenticatedAny(req, async () => {
