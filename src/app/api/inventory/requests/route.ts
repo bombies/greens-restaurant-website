@@ -2,13 +2,11 @@ import { authenticatedAny } from "../../../../utils/api/ApiUtils";
 import Permission from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { NextResponse } from "next/server";
+import { getFetchStockRequestsSearchParams } from "./@me/route";
 
 export async function GET(req: Request) {
     return authenticatedAny(req, async () => {
-        const { searchParams } = new URL(req.url);
-        const reviewed = searchParams.get("reviewed")?.toLowerCase() === "true" ? (searchParams.get("reviewed")?.toLowerCase() === "false" ? false : undefined) : true;
-        const rejected = searchParams.get("rejected")?.toLowerCase() === "true" ? (searchParams.get("rejected")?.toLowerCase() === "false" ? false : undefined) : true;
-
+        const {rejected, reviewed} = getFetchStockRequestsSearchParams(req.url)
         const requests = await prisma.stockRequest.findMany({
             where: {
                 reviewed,

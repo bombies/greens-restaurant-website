@@ -2,7 +2,8 @@ import { authenticatedAny, respondWithInit } from "../../../../../../utils/api/A
 import Permission from "../../../../../../libs/types/permission";
 import prisma from "../../../../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { CreateStockRequestDto } from "../route";
+import { getFetchStockRequestsSearchParams } from "../route";
+import { StockRequest } from "@prisma/client";
 import { z } from "zod";
 
 type Context = {
@@ -13,6 +14,7 @@ type Context = {
 
 export async function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async (session) => {
+        const { withItems } = getFetchStockRequestsSearchParams(req.url);
         const request = await prisma.stockRequest.findFirst({
             where: {
                 AND: [
@@ -23,6 +25,9 @@ export async function GET(req: Request, { params }: Context) {
                         id: params.id
                     }
                 ]
+            },
+            include: {
+                requestedItems: withItems
             }
         });
         return NextResponse.json(request);
@@ -34,10 +39,10 @@ export async function GET(req: Request, { params }: Context) {
     ]);
 }
 
-export type UpdateStockRequestDto = Partial<CreateStockRequestDto>
+export type UpdateStockRequestDto = Partial<Pick<StockRequest, "assignedToUsersId">>
 const updateStockRequestDtoSchema = z.object({
-    stockIds: z.string()
-}).strict().partial();
+    assignedToUsersId: z.array(z.string()).optional()
+}).partial();
 
 export async function PATCH(req: Request, { params }: Context) {
     return authenticatedAny(req, async (session) => {
@@ -56,22 +61,21 @@ export async function PATCH(req: Request, { params }: Context) {
                 status: 401
             });
 
-        const updatedRequest = await prisma.stockRequest.update({
+        let updatedRequest = await prisma.stockRequest.update({
             where: {
                 id: params.id,
                 requestedByUserId: session.user.id
             },
             data: {
-                ...body
+                assignedToUsersId: body.assignedToUsersId
             }
         });
-
         return NextResponse.json(updatedRequest);
     }, [
         Permission.CREATE_INVENTORY,
         Permission.CREATE_STOCK_REQUEST,
         Permission.MANAGE_STOCK_REQUESTS,
-        Permission.VIEW_STOCK_REQUESTS
+        Permission.VIEW_STOCK_REQUESTS,
     ]);
 }
 
@@ -112,6 +116,6 @@ export async function DELETE(req: Request, { params }: Context) {
         Permission.CREATE_INVENTORY,
         Permission.CREATE_STOCK_REQUEST,
         Permission.MANAGE_STOCK_REQUESTS,
-        Permission.VIEW_STOCK_REQUESTS
+        Permission.VIEW_STOCK_REQUESTS,
     ]);
 }

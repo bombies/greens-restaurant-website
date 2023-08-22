@@ -11,7 +11,7 @@ type Context = {
     }
 }
 
-export type AdminUpdateStockRequestDto = Partial<Omit<StockRequest, "id" | "assignedToUserId" | "requestedByUserId" | "stockIds" | "createdAt" | "updatedAt">>
+export type AdminUpdateStockRequestDto = Partial<Pick<StockRequest, "reviewed" | "rejected" | "reviewedNotes">>
 const adminUpdateStockRequestDtoSchema = z.object({
     reviewed: z.boolean(),
     rejected: z.boolean(),

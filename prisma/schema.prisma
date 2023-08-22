@@ -23,24 +23,38 @@ model User {
   createdInventoryIds String[]    @db.ObjectId
   createdInventories  Inventory[]
 
-  openStockRequests     StockRequest[] @relation(name: "openStocks")
-  assignedStockRequests StockRequest[] @relation(name: "assignedStocks")
+  openStockRequests StockRequest[] @relation(name: "openStocks")
+
+  assignedStockRequestsIds String[]       @db.ObjectId
+  assignedStockRequests    StockRequest[] @relation(name: "assignedStocks", fields: [assignedStockRequestsIds], references: [id])
 }
 
 model StockRequest {
   id            String  @id @default(auto()) @map("_id") @db.ObjectId
   reviewed      Boolean
   rejected      Boolean
-  reviewedNotes String
+  reviewedNotes String?
 
-  assignedToUserId String @db.ObjectId
-  assignedToUser   User   @relation(name: "openStocks", fields: [assignedToUserId], references: [id])
+  assignedToUsersId String[] @db.ObjectId
+  assignedToUsers   User[]   @relation(name: "assignedStocks", fields: [assignedToUsersId], references: [id])
 
-  requestedByUserId String @db.ObjectId
-  requestedByUser   User   @relation(name: "assignedStocks", fields: [requestedByUserId], references: [id])
+  requestedByUserId String               @db.ObjectId
+  requestedByUser   User                 @relation(name: "openStocks", fields: [requestedByUserId], references: [id], onDelete: Cascade)
+  requestedItems    RequestedStockItem[] @relation()
 
-  stock    Stock[]  @relation(fields: [stockIds], references: [id])
-  stockIds String[] @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RequestedStockItem {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  amountRequested Int
+
+  stockRequest   StockRequest? @relation(fields: [stockRequestId], references: [id], onDelete: Cascade)
+  stockRequestId String?       @db.ObjectId
+
+  stockSnapshot   StockSnapshot @relation(fields: [stockSnapshotId], references: [id], onDelete: Cascade)
+  stockSnapshotId String        @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -85,9 +99,6 @@ model Stock {
 
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   inventoryId String    @db.ObjectId
-
-  requestIds String[]       @db.ObjectId
-  requests   StockRequest[] @relation(fields: [requestIds], references: [id])
 }
 
 model StockSnapshot {
@@ -102,6 +113,8 @@ model StockSnapshot {
   inventorySnapshot   InventorySnapshot @relation(fields: [inventorySnapshotId], references: [id], onDelete: Cascade)
 
   inventoryId String @db.ObjectId
+
+  requestedStockItems RequestedStockItem[] @relation()
 }
 
 model InvoiceInformation {
