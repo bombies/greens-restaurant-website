@@ -7,10 +7,11 @@ import clsx from "clsx";
 
 type Props = {
     title: string
-    footerContent?: JSX.Element
+    footerContent?: JSX.Element,
+    bodyClassName?: string,
 } & React.PropsWithChildren & ModalProps
 
-export default function GenericModal({ title, children, footerContent, ...modalProps }: Props) {
+export default function GenericModal({ title, children, footerContent, bodyClassName, ...modalProps }: Props) {
     return (
         <Modal
             {...modalProps}
@@ -27,7 +28,7 @@ export default function GenericModal({ title, children, footerContent, ...modalP
                     <SubTitle className="capitalize" thick>{title}</SubTitle>
                 </ModalHeader>
                 <ModalBody>
-                    <div className=" p-6">
+                    <div className={clsx("p-6", bodyClassName)}>
                         {children}
                     </div>
                 </ModalBody>

@@ -29,9 +29,9 @@ export const authHandler: AuthOptions = {
                 if (!fetchedUser) throw new Error("Invalid credentials!");
 
                 const result = await compare(credentials.password, fetchedUser.password);
-                const { username, firstName, lastName, ...user } = fetchedUser;
+                const { username, firstName, lastName, id, ...user } = fetchedUser;
                 if (result)
-                    return { username, firstName, lastName };
+                    return { username, firstName, lastName, id };
                 else throw new Error("Invalid credentials!");
             }
         })

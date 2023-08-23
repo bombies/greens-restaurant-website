@@ -115,7 +115,6 @@ const reducer = (state: StockSnapshot[], action: {
         }
         case StockAction.SET: {
             newState = action.payload as StockSnapshot[];
-            console.log("new state", newState);
             break;
         }
         default: {

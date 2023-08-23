@@ -2,30 +2,44 @@ import { authenticatedAny, respondWithInit } from "../../../../../utils/api/ApiU
 import Permission from "../../../../../libs/types/permission";
 import prisma from "../../../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { RequestedStockItem, StockRequest } from "@prisma/client";
+import { Prisma, RequestedStockItem, StockRequest } from "@prisma/client";
 import { z } from "zod";
+import StockRequestWhereInput = Prisma.StockRequestWhereInput;
 
 export const getFetchStockRequestsSearchParams = (url: string) => {
     const { searchParams } = new URL(url);
-    const reviewed = searchParams.get("reviewed")?.toLowerCase() === "true" ? (searchParams.get("reviewed")?.toLowerCase() === "false" ? false : undefined) : true;
-    const rejected = searchParams.get("rejected")?.toLowerCase() === "true" ? (searchParams.get("rejected")?.toLowerCase() === "false" ? false : undefined) : true;
+    const reviewed = searchParams.get("reviewed")?.toLowerCase() !== "true" ? (searchParams.get("reviewed")?.toLowerCase() === "false" ? false : undefined) : true;
+    const rejected = searchParams.get("rejected")?.toLowerCase() !== "true" ? (searchParams.get("rejected")?.toLowerCase() === "false" ? false : undefined) : true;
     const withItems = searchParams.get("with_items")?.toLowerCase() === "true" || false;
-    return { reviewed, rejected, withItems };
+    const withUsers = searchParams.get("with_users")?.toLowerCase() === "true" || false;
+    return { reviewed, rejected, withItems, withUsers };
 };
 
 export async function GET(req: Request) {
     return authenticatedAny(req, async (session) => {
-        const { rejected, reviewed, withItems } = getFetchStockRequestsSearchParams(req.url);
+        const { rejected, reviewed, withItems, withUsers } = getFetchStockRequestsSearchParams(req.url);
+
+        let whereQuery: StockRequestWhereInput = {
+            requestedByUserId: session.user!.id
+        };
+
+        if (rejected !== undefined)
+            whereQuery = {
+                ...whereQuery,
+                rejected
+            };
+
+        if (reviewed !== undefined)
+            whereQuery = {
+                ...whereQuery,
+                reviewed
+            };
+
         const requests = await prisma.stockRequest.findMany({
-            where: {
-                AND: [
-                    { requestedByUserId: session.user?.id },
-                    { reviewed },
-                    { rejected }
-                ]
-            },
+            where: whereQuery,
             include: {
-                requestedItems: withItems
+                requestedItems: withItems,
+                requestedByUser: withUsers
             }
         });
         return NextResponse.json(requests);

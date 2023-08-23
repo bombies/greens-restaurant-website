@@ -55,10 +55,16 @@ export const fetchStockItem = async (inventoryName: string, itemId: string): Pro
     return new Either<Stock, NextResponse>(item);
 };
 
-export const fetchCurrentSnapshot = async (name: string): Promise<Either<InventorySnapshot & {
+export type InventorySnapshotWithInventoryAndStockSnapshots = InventorySnapshot & {
     inventory: Inventory & { stock: Stock[] },
     stockSnapshots: StockSnapshot[]
-}, NextResponse>> => {
+}
+export type InventorySnapshotWithStockSnapshots = InventorySnapshot & {
+    stockSnapshots: StockSnapshot[]
+}
+
+
+export const fetchCurrentSnapshot = async (name: string): Promise<Either<InventorySnapshotWithInventoryAndStockSnapshots, NextResponse>> => {
     const inventory = await prisma.inventory.findUnique({
         where: {
             name: name.toLowerCase()
@@ -125,6 +131,159 @@ export const fetchCurrentSnapshot = async (name: string): Promise<Either<Invento
         });
         return await generateWholesomeCurrentSnapshot(inventory, newSnapshot);
     } else return await generateWholesomeCurrentSnapshot(inventory, snapshot);
+};
+
+export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<InventorySnapshotWithInventoryAndStockSnapshots[], NextResponse>> => {
+    const inventories = await prisma.inventory.findMany({
+        where: {
+            id: {
+                in: ids
+            }
+        },
+        include: {
+            stock: true
+        }
+    });
+
+    if (!inventories || !inventories.length)
+        return new Either<InventorySnapshotWithInventoryAndStockSnapshots[], NextResponse>(
+            undefined,
+            respond({
+                message: `There were no inventories found with ids: ${ids.toString()}`,
+                init: {
+                    status: 404
+                }
+            })
+        );
+
+    const todaysDate = new Date();
+    todaysDate.setHours(0, 0, 0, 0);
+    const tommorowsDate = new Date();
+    tommorowsDate.setHours(24, 0, 0, 0);
+
+    const inventoryUids = inventories.map(inv => inv.uid);
+    const snapshots = await prisma.inventorySnapshot.findMany({
+        where: {
+            AND: [
+                {
+                    uid: {
+                        in: inventoryUids
+                    }
+                },
+                {
+                    createdAt: {
+                        lte: tommorowsDate,
+                        gte: todaysDate
+                    }
+                }
+            ]
+        },
+        include: {
+            stockSnapshots: true,
+            inventory: {
+                include: {
+                    stock: true
+                }
+            }
+        }
+    });
+
+    const allSnapshots: InventorySnapshotWithInventoryAndStockSnapshots[] = snapshots;
+    if (ids.length !== snapshots.length) {
+        const foundSnapshotUids = snapshots.map(snapshot => snapshot.uid);
+        const missingInventories = inventories.filter(inventory => !foundSnapshotUids.includes(inventory.uid));
+        const dataToInsert = missingInventories.map(inv => ({
+            uid: inv.uid,
+            inventoryId: inv.id
+        }));
+
+        await prisma.inventorySnapshot.createMany({
+            data: dataToInsert
+        });
+
+        allSnapshots.push(...dataToInsert.map(data => {
+            const correspondingInventory = inventories.find(inv => inv.uid === data.uid)!;
+            return ({
+                ...data,
+                id: "",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                inventory: correspondingInventory,
+                stockSnapshots: []
+            });
+        }));
+    }
+
+    return await generateWholesomeCurrentSnapshots(allSnapshots);
+};
+
+const generateWholesomeCurrentSnapshots = async (snapshots: InventorySnapshotWithInventoryAndStockSnapshots[]): Promise<Either<InventorySnapshotWithInventoryAndStockSnapshots[], NextResponse>> => {
+    const todaysDate = new Date();
+    todaysDate.setHours(0, 0, 0, 0);
+
+    let emptyStockSnapshots = snapshots.filter(snapshot => !snapshot.stockSnapshots.length);
+    const nonEmptyStockSnapshots = snapshots.filter(snapshot => snapshot.stockSnapshots.length);
+
+    // Handle  all inventory snapshots with empty stock snapshots
+    const previousSnapshots = await prisma.inventorySnapshot.findMany({
+        where: {
+            uid: {
+                in: emptyStockSnapshots.map(snapshot => snapshot.inventory.uid)
+            },
+            createdAt: {
+                lt: todaysDate
+            }
+        },
+        include: {
+            stockSnapshots: true
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
+    });
+
+    const latestPreviousSnapshots: InventorySnapshotWithStockSnapshots[] = [];
+    emptyStockSnapshots.forEach(emptySnapshot => {
+        const snap = previousSnapshots.find(snap => snap.uid === emptySnapshot.uid && snap.stockSnapshots.length);
+        if (snap)
+            latestPreviousSnapshots.push(snap);
+    });
+
+    const newStockSnapshots: Omit<StockSnapshot, "id">[] = [];
+    latestPreviousSnapshots.forEach(snapshot => {
+        newStockSnapshots.push(
+            ...snapshot.stockSnapshots.map(stockSnapshot => {
+                const { id, createdAt, updatedAt, inventorySnapshotId, ...validSnapshot } = stockSnapshot;
+                return ({
+                    ...validSnapshot,
+                    createdAt: todaysDate,
+                    updatedAt: todaysDate,
+                    inventorySnapshotId: snapshots.find(snap => snap.uid === snapshot.uid)!.id
+                });
+            })
+        );
+
+    });
+
+    if (newStockSnapshots.length) {
+        await prisma.stockSnapshot.createMany({
+            data: newStockSnapshots
+        });
+    }
+
+    emptyStockSnapshots = emptyStockSnapshots.map(snapshot => ({
+        ...snapshot,
+        stockSnapshots: newStockSnapshots
+            .filter(newSnapshot => newSnapshot.inventorySnapshotId === snapshot.id)
+            .map(snapshot => ({ ...snapshot, id: "" }))
+    }));
+
+    return new Either<InventorySnapshotWithInventoryAndStockSnapshots[], NextResponse>(
+        [
+            ...nonEmptyStockSnapshots,
+            ...emptyStockSnapshots
+        ]
+    );
 };
 
 const generateWholesomeCurrentSnapshot = async (inventory: Inventory, snapshot: InventorySnapshot & {

@@ -25,7 +25,6 @@ import DeleteInvoiceItemButton from "./DeleteInvoiceItemButton";
 import DeleteInvoiceItemsButton from "./DeleteInvoiceItemsButton";
 import closeIcon from "/public/icons/close-gold-circled.svg";
 import GenericTable from "../../../../../../../_components/table/GenericTable";
-import { columns } from "../../../../../inventory/[name]/_components/table/StockTable";
 
 
 export type Column = {

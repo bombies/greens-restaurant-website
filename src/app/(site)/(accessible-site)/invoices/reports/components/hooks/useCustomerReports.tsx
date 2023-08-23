@@ -20,7 +20,6 @@ export const useCustomerReports = () => {
             return;
         }
 
-        console.log("names", names);
         setVisibleCustomers(allCustomers.filter(customer => names.includes(customer.customerName.toLowerCase().replaceAll(" ", "_"))));
     }, [allCustomers]);
 

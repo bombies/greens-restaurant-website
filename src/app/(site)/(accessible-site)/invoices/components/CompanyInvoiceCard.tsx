@@ -73,7 +73,6 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                         dto: proposedCompanyInfo
                     })
                         .then((res) => {
-                            console.log(res.data);
                             setProposedCompanyInfo(res.data);
                             toast.success("You have successfully updated the company's invoice information!");
                         })
