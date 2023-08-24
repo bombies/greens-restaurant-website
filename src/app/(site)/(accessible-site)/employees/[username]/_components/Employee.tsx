@@ -24,6 +24,7 @@ import useSWRImmutable from "swr/immutable";
 import ContainerSkeleton from "../../../../../_components/skeletons/ContainerSkeleton";
 import { DataGroupContainer } from "../../../../../_components/DataGroupContainer";
 import { toast } from "react-hot-toast";
+import { UpdateUserDto } from "../../../../../api/users/[username]/route";
 
 type Props = {
     username: string
@@ -33,11 +34,18 @@ const useEmployeeData = (username: string) => {
     return useSWRImmutable(`/api/users/${username}`, fetcher<User>);
 };
 
-export const UpdateUser = (username?: string, newData?: Partial<User>, nonAdmin?: boolean) => {
-    const mutator = (url: string) => axios.patch(url, newData ? {
-        ...newData,
-        password: undefined
-    } : undefined);
+export type UpdateUserArgs = {
+    arg: {
+        dto?: UpdateUserDto
+    }
+}
+
+export const UpdateUser = (username?: string, nonAdmin?: boolean) => {
+    const mutator = (url: string, { arg }: UpdateUserArgs) => {
+        // @ts-ignore
+        const { id, createdAt, updatedAt, image, createdInventoryIds, assignedStockRequestsIds, ...validDto } = arg.dto;
+        return axios.patch(url, validDto);
+    };
     return useSWRMutation(nonAdmin ? `/api/users/me` : `/api/users/${username}`, mutator);
 };
 
@@ -45,7 +53,7 @@ export default function Employee({ username }: Props) {
     const session = useSession();
     const { data: user, isLoading, error: employeeDataError } = useEmployeeData(username);
     const router = useRouter();
-    const [currentData, setCurrentData] = useState<Partial<User>>();
+    const [currentData, setCurrentData] = useState<UpdateUserDto>();
     const [changesMade, setChangesMade] = useState(false);
     const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
     const [editAllowed, setEditAllowed] = useState(false);
@@ -53,7 +61,7 @@ export default function Employee({ username }: Props) {
     const {
         trigger: triggerUserUpdate,
         isMutating: userIsUpdating
-    } = UpdateUser(username, currentData);
+    } = UpdateUser(username);
 
     useEffect(() => {
         if (session.status !== "loading" && session.data?.user?.username !== "root" && username === "root")
@@ -96,7 +104,9 @@ export default function Employee({ username }: Props) {
     }, [user]);
 
     const doUpdate = () => {
-        triggerUserUpdate()
+        triggerUserUpdate({
+            dto: currentData
+        })
             .then((value) => {
                 const newUser: User | undefined = value?.data;
 

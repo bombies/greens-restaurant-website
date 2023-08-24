@@ -33,7 +33,7 @@ export default function AccountPage() {
     const {
         trigger: triggerUserUpdate,
         isMutating: userIsUpdating
-    } = UpdateUser(session.data?.user?.username, currentData, true);
+    } = UpdateUser(session.data?.user?.username, true);
 
     useEffect(() => {
         if (!userIsLoading && user)
@@ -47,7 +47,9 @@ export default function AccountPage() {
     }, [currentData, user]);
 
     const doUpdate = () => {
-        triggerUserUpdate()
+        triggerUserUpdate({
+            dto: currentData
+        })
             .then((value) => {
                 const newUser: User | undefined = value?.data;
 

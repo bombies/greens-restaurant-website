@@ -60,16 +60,16 @@ export async function DELETE(req: Request, { params }: RouteContext) {
     }, Permission.ADMINISTRATOR);
 }
 
-type UpdateUserDto = Partial<Omit<User, "id" | "createdInventoryIds" | "createdAt" | "updatedAt" | "image">>
+export type UpdateUserDto = Partial<Omit<User, "id" | "createdInventoryIds" | "createdAt" | "updatedAt" | "image" | "assignedStockRequestsIds">>
 const updateUserDtoSchema = z.object({
     username: z.string(),
     firstName: z.string(),
     lastName: z.string(),
     email: z.string(),
     password: z.string(),
-    avatar: z.string(),
+    avatar: z.string().nullable(),
     permissions: z.number()
-}).partial();
+}).partial().strict();
 
 export async function PATCH(req: Request, { params }: RouteContext) {
     return await authenticated(req, async (session) => {
