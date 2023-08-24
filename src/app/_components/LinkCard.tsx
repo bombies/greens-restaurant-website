@@ -5,18 +5,21 @@ import React from "react";
 import { Badge } from "@nextui-org/badge";
 import infoIcon from "/public/icons/info.svg";
 import GenericImage from "./GenericImage";
+import clsx from "clsx";
 
 type Props = {
     href: string,
     toolTip?: string | React.ReactNode,
+    className?: string,
 } & React.PropsWithChildren
 
-export default function LinkCard({ href, children, toolTip }: Props) {
+export default function LinkCard({ href, children, toolTip, className }: Props) {
     const button = (
         <Button
             href={href}
             as={Link}
-            className={"h-fit w-full !default-container !p-6 transition-fast hover:-translate-y-1 hover:!border-primary !flex justify-start"}>
+            className={clsx("h-fit w-full !default-container !p-6 transition-fast hover:-translate-y-1 hover:!border-primary !flex justify-start", className)}
+        >
             {children}
         </Button>
     );

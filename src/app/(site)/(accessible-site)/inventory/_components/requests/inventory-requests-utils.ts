@@ -5,11 +5,15 @@ export type StockSnapshotWithOptionalInventory = StockSnapshot & {
 }
 
 export type StockRequestWithOptionalCreator = StockRequest & {
-    requesterByUser?: User
+    requestedByUser?: User
 }
 
 export type StockRequestWithOptionalItems = StockRequest & {
     requestedItems?: RequestedStockItem[]
+}
+
+export type StockRequestWithOptionalAssignees = StockRequest & {
+    assignedToUsers?: User[]
 }
 
 export type StockRequestWithOptionalCreatorAndItems =

@@ -2,9 +2,7 @@
 
 import Title from "../../../_components/text/Title";
 import SubTitle from "../../../_components/text/SubTitle";
-import { useEffect } from "react";
 import { hasAnyPermission, Permission } from "../../../../libs/types/permission";
-import { useRouter } from "next/navigation";
 import { Spacer, Tab } from "@nextui-org/react";
 import InventoryControlBar from "./_components/InventoryControlBar";
 import InventoryGrid from "./_components/InventoryGrid";
@@ -16,23 +14,15 @@ import InventoryIcon from "../../../_components/icons/InventoryIcon";
 import RequestIcon from "../../../_components/icons/RequestIcon";
 
 export default function InventoryPage() {
-    const { isLoading: userDataIsLoading, data: userData } = useUserData();
+    const { isLoading: userDataIsLoading, data: userData } = useUserData([
+        Permission.VIEW_INVENTORY,
+        Permission.CREATE_INVENTORY,
+        Permission.MUTATE_STOCK,
+        Permission.VIEW_STOCK_REQUESTS,
+        Permission.CREATE_STOCK_REQUEST,
+        Permission.MANAGE_STOCK_REQUESTS
+    ]);
     const { selectedTabKey, setSelectedTabKey } = useSelectedInventoryTab(userDataIsLoading, userData);
-    const router = useRouter();
-
-    useEffect(() => {
-        if (!userDataIsLoading &&
-            (!userData || !hasAnyPermission(userData.permissions, [
-                Permission.VIEW_INVENTORY,
-                Permission.CREATE_INVENTORY,
-                Permission.MUTATE_STOCK,
-                Permission.VIEW_STOCK_REQUESTS,
-                Permission.CREATE_STOCK_REQUEST,
-                Permission.MANAGE_STOCK_REQUESTS
-            ]))
-        )
-            router.replace("/home");
-    }, [router, userData, userDataIsLoading]);
 
     return (
         <div>
