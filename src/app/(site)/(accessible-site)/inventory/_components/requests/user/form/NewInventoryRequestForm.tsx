@@ -1,7 +1,6 @@
 "use client";
 
 import { Dispatch, FC, SetStateAction, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { FetchAllInventories } from "../../../InventoryGrid";
 import { SelectItem } from "@nextui-org/react";
 import GenericSelectMenu from "../../../../../../../_components/GenericSelectMenu";
@@ -10,7 +9,7 @@ import InventoryRequestedItemsContainer from "./InventoryRequestedItemsContainer
 import { Avatar } from "@nextui-org/avatar";
 import { FetchUsersWithPermissions } from "../../../../../../../../utils/client-utils";
 import Permission from "../../../../../../../../libs/types/permission";
-import { useS3AvatarUrls, useS3Base64AvatarStrings } from "../../../../../../../_components/hooks/useS3Base64String";
+import { useS3AvatarUrls } from "../../../../../../../_components/hooks/useS3Base64String";
 
 type Props = {
     setModalOpen: Dispatch<SetStateAction<boolean>>
@@ -30,6 +29,7 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen }) => {
         <div className="space-y-6">
             <div className="flex gap-4 phone:flex-col">
                 <GenericSelectMenu
+                    isRequired
                     selectionMode="multiple"
                     id="selected_inventories"
                     placeholder="Select inventories..."
