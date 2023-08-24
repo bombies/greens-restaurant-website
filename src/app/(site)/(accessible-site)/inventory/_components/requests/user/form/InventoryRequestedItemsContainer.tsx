@@ -1,14 +1,20 @@
 "use client";
 
-import { Dispatch, FC, Fragment, SetStateAction, useEffect, useMemo, useReducer, useState } from "react";
-import useSWR from "swr";
+import { Dispatch, FC, Fragment, SetStateAction, useEffect, useMemo, useReducer } from "react";
+import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
-import { InventorySnapshotWithInventoryAndStockSnapshots } from "../../../../../../../api/inventory/[name]/utils";
+import {
+    InventorySnapshotWithInventoryAndStockSnapshots,
+    InventoryWithOptionalStock
+} from "../../../../../../../api/inventory/[name]/utils";
 import InventoryRequestedItemsTable from "./InventoryRequestedItemsTable";
 import AddRequestedItemsButton from "./AddRequestedItemsButton";
 import { CreateStockRequestDto } from "../../../../../../../api/inventory/requests/me/route";
 import { RequestedStockItem } from "@prisma/client";
-import { RequestedStockItemWithOptionalSnapshot } from "../../inventory-requests-utils";
+import {
+    RequestedStockItemWithOptionalStock,
+    StockRequestWithOptionalCreatorAndAssignees
+} from "../../inventory-requests-utils";
 import { v4 } from "uuid";
 import { Divider } from "@nextui-org/divider";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
@@ -18,17 +24,25 @@ import { errorToast } from "../../../../../../../../utils/Hooks";
 
 interface Props {
     selectedIds: string[];
+    selectedAssigneeIds: string[];
     setSnapshotsLoading: Dispatch<SetStateAction<boolean>>;
     setModalOpen: Dispatch<SetStateAction<boolean>>;
+    mutator: KeyedMutator<StockRequestWithOptionalCreatorAndAssignees[] | undefined>;
+    visibleData?: StockRequestWithOptionalCreatorAndAssignees[];
 }
 
 const FetchCurrentSnapshots = (ids: string[]) => {
     return useSWR(`/api/inventory/currentsnapshots?ids=${ids.toString()}`, fetcher<InventorySnapshotWithInventoryAndStockSnapshots[]>);
 };
 
+const FetchInventories = (ids: string[], withStock?: boolean) => {
+    return useSWR(`/api/inventory?${ids.length ? `ids=${ids.toString()}&` : ""}with_stock=${withStock ?? false}`, fetcher<InventoryWithOptionalStock[]>);
+};
+
 export enum ProposedStockRequestsAction {
     ADD_ASSIGNEE,
     REMOVE_ASSIGNEE,
+    SET_ASSIGNEES,
     ADD_ITEM,
     REMOVE_ITEM,
     UPDATE_ITEM,
@@ -37,8 +51,9 @@ export enum ProposedStockRequestsAction {
 const reducer = (state: CreateStockRequestDto, { type, payload }: {
     type: ProposedStockRequestsAction,
     payload: { id: string }
-        | Pick<RequestedStockItem, "amountRequested" | "stockSnapshotId">
-        | { id: string } & Pick<RequestedStockItem, "amountRequested" | "stockSnapshotId">
+        | { ids: string[] }
+        | Pick<RequestedStockItem, "amountRequested" | "stockId">
+        | { id: string } & Pick<RequestedStockItem, "amountRequested" | "stockId">
 }) => {
     let newState = { ...state };
 
@@ -70,15 +85,24 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
             );
             break;
         }
+        case ProposedStockRequestsAction.SET_ASSIGNEES: {
+            const ids = (payload as { ids: string[] }).ids;
+            if (!ids) {
+                console.warn("Tried setting request assignees with an invalid payload!");
+                break;
+            }
+            newState.assignedToUsersId = ids;
+            break;
+        }
         case ProposedStockRequestsAction.ADD_ITEM: {
-            newState.items.push(payload as Pick<RequestedStockItem, "amountRequested" | "stockSnapshotId">);
+            newState.items.push(payload as Pick<RequestedStockItem, "amountRequested" | "stockId">);
             break;
         }
         case ProposedStockRequestsAction.REMOVE_ITEM: {
             newState.items.splice(
                 newState.items
                     .findIndex(item =>
-                            item.stockSnapshotId === (payload as {
+                            item.stockId === (payload as {
                                 id: string
                             }).id
                     )
@@ -94,43 +118,59 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
     return newState;
 };
 
-const InventoryRequestedItemsContainer: FC<Props> = ({ selectedIds, setSnapshotsLoading, setModalOpen }) => {
+const InventoryRequestedItemsContainer: FC<Props> = ({
+                                                         selectedIds,
+                                                         selectedAssigneeIds,
+                                                         setSnapshotsLoading,
+                                                         setModalOpen,
+                                                         mutator,
+                                                         visibleData
+                                                     }) => {
     const { trigger: triggerRequestionCreation, isMutating: isCreatingRequest } = useRequestCreationTrigger();
-    const { isLoading, data } = FetchCurrentSnapshots(selectedIds);
+    const { isLoading, data } = FetchInventories(selectedIds, true);
     const [proposedRequestedItems, dispatchProposedRequestedItems] = useReducer(reducer, {
-        assignedToUsersId: [],
+        assignedToUsersId: selectedAssigneeIds,
         items: []
     });
-    const stockSnapshots = useMemo(() => {
+    const stock = useMemo(() => {
         if (!data)
             return [];
-        return data.map(i => i.stockSnapshots).flat();
+        return data.map(i => i.stock ?? []).flat();
     }, [data]);
+
+    useEffect(() => {
+        dispatchProposedRequestedItems({
+            type: ProposedStockRequestsAction.SET_ASSIGNEES,
+            payload: {
+                ids: selectedAssigneeIds
+            }
+        });
+    }, [selectedAssigneeIds]);
 
     useEffect(() => {
         setSnapshotsLoading(isLoading);
     }, [isLoading, setSnapshotsLoading]);
 
-    const optimisticRequestedItems = useMemo<RequestedStockItemWithOptionalSnapshot[]>(() => {
+    const optimisticRequestedItems = useMemo<RequestedStockItemWithOptionalStock[]>(() => {
         return proposedRequestedItems.items.map(item => ({
             ...item,
-            stockSnapshot: stockSnapshots.find(snapshot => snapshot.id === item.stockSnapshotId)!,
+            stock: stock.find(snapshot => snapshot.id === item.stockId)!,
             createdAt: new Date(),
             updatedAt: new Date(),
             id: v4(),
             stockRequestId: ""
         }));
-    }, [proposedRequestedItems, stockSnapshots]);
+    }, [proposedRequestedItems, stock]);
 
     return (
         <Fragment>
             <InventoryRequestedItemsTable items={optimisticRequestedItems} />
             <AddRequestedItemsButton
                 disabled={isCreatingRequest}
-                proposedSnapshotIds={proposedRequestedItems.items.map(item => item.stockSnapshotId)}
+                proposedSnapshotIds={proposedRequestedItems.items.map(item => item.stockId)}
                 dispatchProposedRequests={dispatchProposedRequestedItems}
                 snapshotsLoading={isLoading}
-                stockSnapshots={stockSnapshots ?? []}
+                stock={stock ?? []}
             />
             <Divider className="my-6" />
             <GenericButton
@@ -142,7 +182,12 @@ const InventoryRequestedItemsContainer: FC<Props> = ({ selectedIds, setSnapshots
                     triggerRequestionCreation({
                         dto: proposedRequestedItems
                     })
-                        .then(() => {
+                        .then((res) => {
+                            const data: StockRequestWithOptionalCreatorAndAssignees = res.data;
+
+                            // Set optimistic data
+                            mutator(visibleData ? [...visibleData, data] : [data]);
+
                             toast.success("Successfully made a new inventory request!");
                             setModalOpen(false);
                         })

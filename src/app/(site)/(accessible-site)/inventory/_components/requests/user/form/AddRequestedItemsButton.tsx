@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, FC, Fragment, useState } from "react";
-import { RequestedStockItem, StockSnapshot } from "@prisma/client";
+import { RequestedStockItem, Stock, StockSnapshot } from "@prisma/client";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
@@ -20,17 +20,17 @@ interface Props {
     dispatchProposedRequests: Dispatch<{
         type: ProposedStockRequestsAction,
         payload: { id: string }
-            | Pick<RequestedStockItem, "amountRequested" | "stockSnapshotId">
-            | { id: string } & Pick<RequestedStockItem, "amountRequested" | "stockSnapshotId">
+            | Pick<RequestedStockItem, "amountRequested" | "stockId">
+            | { id: string } & Pick<RequestedStockItem, "amountRequested" | "stockId">
     }>;
-    stockSnapshots: StockSnapshot[];
+    stock: Stock[];
 }
 
 const AddRequestedItemsButton: FC<Props> = ({
                                                 disabled,
                                                 snapshotsLoading,
                                                 proposedSnapshotIds,
-                                                stockSnapshots,
+                                                stock,
                                                 dispatchProposedRequests
                                             }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -42,7 +42,7 @@ const AddRequestedItemsButton: FC<Props> = ({
             type: ProposedStockRequestsAction.ADD_ITEM,
             payload: {
                 amountRequested: Number(data.amount_requested),
-                stockSnapshotId: selectedItemIds[0]
+                stockId: selectedItemIds[0]
             }
         });
 
@@ -63,7 +63,7 @@ const AddRequestedItemsButton: FC<Props> = ({
                             id="selected_item"
                             placeholder="Select an item..."
                             variant="flat"
-                            items={stockSnapshots.sort((a, b) => a.name.localeCompare(b.name))}
+                            items={stock.sort((a, b) => a.name.localeCompare(b.name))}
                             disabled={snapshotsLoading}
                             selectedKeys={selectedItemIds}
                             disabledKeys={proposedSnapshotIds}
@@ -100,7 +100,7 @@ const AddRequestedItemsButton: FC<Props> = ({
                 </form>
             </GenericModal>
             <Button
-                isDisabled={!stockSnapshots.length || snapshotsLoading || disabled}
+                isDisabled={!stock.length || snapshotsLoading || disabled}
                 color="primary"
                 variant="flat"
                 isIconOnly

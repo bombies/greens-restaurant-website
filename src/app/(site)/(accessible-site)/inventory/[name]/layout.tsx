@@ -19,7 +19,7 @@ export default function Layout({ children, params }: Context) {
                 Inventory - <span
                 className="text-primary capitalize">{params.name.replaceAll("-", " ") || "Unknown"}</span>
             </Title>
-            <SubTitle>It is currently <Clock />, {new Date().toLocaleDateString()}</SubTitle>
+            <SubTitle>It is currently <Clock />, {new Date().toLocaleDateString("en-JM")}</SubTitle>
             <Spacer y={6} />
             <CurrentStockProvider>
                 <SpecificInventoryControlBar inventoryName={params.name} />

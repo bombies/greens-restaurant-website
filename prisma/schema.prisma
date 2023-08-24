@@ -49,12 +49,13 @@ model StockRequest {
 model RequestedStockItem {
   id              String @id @default(auto()) @map("_id") @db.ObjectId
   amountRequested Int
+  amountProvided  Int?
 
   stockRequest   StockRequest? @relation(fields: [stockRequestId], references: [id], onDelete: Cascade)
   stockRequestId String?       @db.ObjectId
 
-  stockSnapshot   StockSnapshot @relation(fields: [stockSnapshotId], references: [id], onDelete: Cascade)
-  stockSnapshotId String        @db.ObjectId
+  stock   Stock  @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  stockId String @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -99,6 +100,8 @@ model Stock {
 
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   inventoryId String    @db.ObjectId
+
+  requestedStockItems RequestedStockItem[] @relation()
 }
 
 model StockSnapshot {
@@ -113,8 +116,6 @@ model StockSnapshot {
   inventorySnapshot   InventorySnapshot @relation(fields: [inventorySnapshotId], references: [id], onDelete: Cascade)
 
   inventoryId String @db.ObjectId
-
-  requestedStockItems RequestedStockItem[] @relation()
 }
 
 model InvoiceInformation {

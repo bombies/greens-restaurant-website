@@ -12,12 +12,13 @@ export const getFetchStockRequestsSearchParams = (url: string) => {
     const rejected = searchParams.get("rejected")?.toLowerCase() !== "true" ? (searchParams.get("rejected")?.toLowerCase() === "false" ? false : undefined) : true;
     const withItems = searchParams.get("with_items")?.toLowerCase() === "true" || false;
     const withUsers = searchParams.get("with_users")?.toLowerCase() === "true" || false;
-    return { reviewed, rejected, withItems, withUsers };
+    const withAssignees = searchParams.get("with_assignees")?.toLowerCase() === "true" || false;
+    return { reviewed, rejected, withItems, withUsers, withAssignees };
 };
 
 export async function GET(req: Request) {
     return authenticatedAny(req, async (session) => {
-        const { rejected, reviewed, withItems, withUsers } = getFetchStockRequestsSearchParams(req.url);
+        const { rejected, reviewed, withItems, withUsers, withAssignees } = getFetchStockRequestsSearchParams(req.url);
 
         let whereQuery: StockRequestWhereInput = {
             requestedByUserId: session.user!.id
@@ -39,7 +40,8 @@ export async function GET(req: Request) {
             where: whereQuery,
             include: {
                 requestedItems: withItems,
-                requestedByUser: withUsers
+                requestedByUser: withUsers,
+                assignedToUsers: withAssignees
             }
         });
         return NextResponse.json(requests);
@@ -52,14 +54,14 @@ export async function GET(req: Request) {
 }
 
 export type CreateStockRequestDto = Pick<StockRequest, "assignedToUsersId"> & {
-    items: Pick<RequestedStockItem, "amountRequested" | "stockSnapshotId">[]
+    items: Pick<RequestedStockItem, "amountRequested" | "stockId">[]
 }
 
 export const createStockRequestSchemaDto = z.object({
     assignedToUsersId: z.array(z.string()).optional(),
     items: z.array(z.object({
         amountRequested: z.number(),
-        stockSnapshotId: z.string()
+        stockId: z.string()
     }))
 }).strict();
 
@@ -80,10 +82,10 @@ export async function POST(req: Request) {
                 status: 401
             });
 
-        const validStockSnapshotsIds = (await prisma.stockSnapshot.findMany({
+        const validStockIds = (await prisma.stock.findMany({
             where: {
                 id: {
-                    in: body.items.map(item => item.stockSnapshotId)
+                    in: body.items.map(item => item.stockId)
                 }
             },
             select: { id: true }
@@ -95,15 +97,30 @@ export async function POST(req: Request) {
                 reviewed: false,
                 requestedByUserId: session.user.id,
                 assignedToUsersId: body.assignedToUsersId
+            },
+            include: {
+                requestedByUser: true,
+                assignedToUsers: true,
             }
         });
 
         const itemsToBeCreated = body.items
-            .filter(item => validStockSnapshotsIds.includes(item.stockSnapshotId))
+            .filter(item => validStockIds.includes(item.stockId))
             .map(item => ({ ...item, stockRequestId: createdRequest.id }));
 
         const createdRequestedStockItems = await prisma.requestedStockItem.createMany({
             data: itemsToBeCreated
+        });
+
+        await prisma.user.updateMany({
+            where: {
+                id: { in: body.assignedToUsersId }
+            },
+            data: {
+                assignedStockRequestsIds: {
+                    push: createdRequest.id
+                }
+            }
         });
 
         // TODO: Email any assigned users about the newly created request

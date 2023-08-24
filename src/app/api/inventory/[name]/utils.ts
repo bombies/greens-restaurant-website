@@ -55,6 +55,10 @@ export const fetchStockItem = async (inventoryName: string, itemId: string): Pro
     return new Either<Stock, NextResponse>(item);
 };
 
+export type InventoryWithOptionalStock = Inventory & {
+    stock?: Stock[]
+}
+
 export type InventorySnapshotWithInventoryAndStockSnapshots = InventorySnapshot & {
     inventory: Inventory & { stock: Stock[] },
     stockSnapshots: StockSnapshot[]

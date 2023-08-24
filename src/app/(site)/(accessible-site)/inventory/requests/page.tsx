@@ -21,8 +21,6 @@ export default function InventoryRequestsPage() {
         Permission.CREATE_STOCK_REQUEST,
         Permission.MANAGE_STOCK_REQUESTS
     ]);
-    const { selectedTabKey, setSelectedTabKey } = useSelectedInventoryTab(userDataIsLoading, userData);
-
 
     return (
         <div>
@@ -44,7 +42,7 @@ export default function InventoryRequestsPage() {
                                 Permission.MANAGE_STOCK_REQUESTS
                             ]
                         ) &&
-                        <InventoryRequestsContainer />
+                        <InventoryRequestsContainer userPermissions={userData?.permissions} />
                     }
                 </Fragment>
             }

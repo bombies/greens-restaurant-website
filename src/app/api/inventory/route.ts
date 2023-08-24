@@ -4,10 +4,28 @@ import prisma from "../../../libs/prisma";
 import { NextResponse } from "next/server";
 import { INVENTORY_NAME_REGEX } from "../../../utils/regex";
 import { v4 } from "uuid";
+import { Prisma } from ".prisma/client";
+import InventoryWhereInput = Prisma.InventoryWhereInput;
 
 export function GET(req: Request) {
     return authenticatedAny(req, async () => {
-        const inventories = await prisma.inventory.findMany();
+        const { searchParams } = new URL(req.url);
+        const ids = searchParams.get("ids")?.replaceAll(/\s/g, "").split(",").filter(id => id.length > 0);
+        const withStock = searchParams.get("with_stock") === "true";
+        let whereQuery: InventoryWhereInput | undefined = undefined;
+        if (ids && ids.length)
+            whereQuery = {
+                id: {
+                    in: ids
+                }
+            };
+
+        const inventories = await prisma.inventory.findMany({
+            where: whereQuery,
+            include: {
+                stock: withStock
+            }
+        });
         return NextResponse.json(inventories);
     }, [
         Permission.CREATE_INVENTORY,

@@ -10,15 +10,20 @@ import { Avatar } from "@nextui-org/avatar";
 import { FetchUsersWithPermissions } from "../../../../../../../../utils/client-utils";
 import Permission from "../../../../../../../../libs/types/permission";
 import { useS3AvatarUrls } from "../../../../../../../_components/hooks/useS3Base64String";
+import { KeyedMutator } from "swr";
+import { StockRequestWithOptionalCreatorAndAssignees } from "../../inventory-requests-utils";
 
 type Props = {
     setModalOpen: Dispatch<SetStateAction<boolean>>
+    mutator: KeyedMutator<StockRequestWithOptionalCreatorAndAssignees[] | undefined>
+    visibleData?: StockRequestWithOptionalCreatorAndAssignees[],
 }
 
-const NewInventoryRequestForm: FC<Props> = ({ setModalOpen }) => {
+const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData }) => {
     const { data, isLoading } = FetchAllInventories();
     const [snapshotsLoading, setSnapshotsLoading] = useState(false);
     const [selectedInventoryIds, setSelectedInventoryIds] = useState<string[]>([]);
+    const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([]);
     const {
         data: availableAssignees,
         isLoading: isLoadingAvailableAssignees
@@ -64,11 +69,14 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen }) => {
                 {
                     (avatarsLoading || isLoadingAvailableAssignees) ||
                     <GenericSelectMenu
+                        selectionMode="multiple"
                         id="selected_assignees"
                         placeholder="Select assignees..."
                         variant="flat"
                         disabled={snapshotsLoading || isLoadingAvailableAssignees || avatarsLoading}
                         items={availableAssignees ?? []}
+                        selectedKeys={selectedAssigneeIds}
+                        onSelectionChange={selection => setSelectedAssigneeIds(Array.from(selection) as string[])}
                     >
                         {assignee => {
                             const avatarSrc = avatars?.find(userAvatar =>
@@ -92,8 +100,11 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen }) => {
                 }
             </div>
             <InventoryRequestedItemsContainer
+                mutator={mutator}
+                visibleData={visibleData}
                 setSnapshotsLoading={setSnapshotsLoading}
                 selectedIds={selectedInventoryIds}
+                selectedAssigneeIds={selectedAssigneeIds}
                 setModalOpen={setModalOpen}
             />
         </div>

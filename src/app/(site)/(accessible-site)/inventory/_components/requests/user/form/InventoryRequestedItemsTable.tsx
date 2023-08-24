@@ -3,8 +3,8 @@ import GenericTable from "../../../../../../../_components/table/GenericTable";
 import { TableCell, TableRow } from "@nextui-org/react";
 import { Column } from "../../../../../invoices/[id]/[invoiceId]/components/table/InvoiceTable";
 import {
-    RequestedStockItemWithOptionalSnapshot,
-    RequestedStockItemWithOptionalSnapshotAndRequest
+    RequestedStockItemWithOptionalStock,
+    RequestedStockItemWithOptionalStockAndRequest
 } from "../../inventory-requests-utils";
 
 const columns: Column[] = [
@@ -13,13 +13,13 @@ const columns: Column[] = [
 ];
 
 interface Props {
-    items: RequestedStockItemWithOptionalSnapshot[];
+    items: RequestedStockItemWithOptionalStock[];
 }
 
-const getValueForKey = (item: RequestedStockItemWithOptionalSnapshotAndRequest, key: Key) => {
+const getValueForKey = (item: RequestedStockItemWithOptionalStockAndRequest, key: Key) => {
     switch (key) {
         case "item_name": {
-            return <p className="capitalize">{item.stockSnapshot?.name.replaceAll("-", " ")}</p>;
+            return <p className="capitalize">{item.stock?.name.replaceAll("-", " ")}</p>;
         }
         case "amount_requested": {
             return item.amountRequested;

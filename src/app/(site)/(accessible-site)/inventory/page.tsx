@@ -95,7 +95,7 @@ export default function InventoryPage() {
                                 <span>Requests</span>
                             </div>
                         }>
-                            <InventoryRequestsContainer />
+                            <InventoryRequestsContainer userPermissions={userData?.permissions} />
                         </Tab>
                     }
                 </GenericTabs>
