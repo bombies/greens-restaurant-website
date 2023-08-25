@@ -1,14 +1,45 @@
 import { authenticatedAny, respondWithInit } from "../../../../../utils/api/ApiUtils";
-import Permission from "../../../../../libs/types/permission";
+import Permission, { hasAnyPermission } from "../../../../../libs/types/permission";
 import prisma from "../../../../../libs/prisma";
 import { StockRequest } from "@prisma/client";
 import { z } from "zod";
 import { NextResponse } from "next/server";
+import { getFetchStockRequestsSearchParams } from "../me/route";
 
 type Context = {
     params: {
         id: string
     }
+}
+
+export async function GET(req: Request, { params }: Context) {
+    return authenticatedAny(req, async (session, _, userPermissions) => {
+        const { withItems, withUsers, withAssignees } = getFetchStockRequestsSearchParams(req.url);
+        const andArr: any[] = [{ id: params.id }];
+        if (!hasAnyPermission(userPermissions, [
+            Permission.CREATE_INVENTORY,
+            Permission.VIEW_STOCK_REQUESTS,
+            Permission.MANAGE_STOCK_REQUESTS
+        ]))
+            andArr.push({ requestedByUserId: session.user!.id });
+
+        const request = await prisma.stockRequest.findFirst({
+            where: {
+                AND: andArr
+            },
+            include: {
+                requestedItems: withItems,
+                requestedByUser: withUsers,
+                assignedToUsers: withAssignees
+            }
+        });
+        return NextResponse.json(request);
+    }, [
+        Permission.CREATE_INVENTORY,
+        Permission.CREATE_STOCK_REQUEST,
+        Permission.VIEW_STOCK_REQUESTS,
+        Permission.MANAGE_STOCK_REQUESTS
+    ]);
 }
 
 export type AdminUpdateStockRequestDto = Partial<Pick<StockRequest, "reviewed" | "rejected" | "reviewedNotes">>

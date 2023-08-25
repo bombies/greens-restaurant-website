@@ -11,7 +11,7 @@ import { z } from "zod";
 
 export const authenticated = async (
     request: Request,
-    logic: (session: Session, axios: AuthenticatedServerAxiosClient) => Promise<NextResponse>,
+    logic: (session: Session, axios: AuthenticatedServerAxiosClient, userPermissions: number) => Promise<NextResponse>,
     permissionRequired?: Permission
 ): Promise<NextResponse> => {
     return authenticatedAny(request, logic, permissionRequired ? [permissionRequired] : undefined);
@@ -19,7 +19,7 @@ export const authenticated = async (
 
 export const authenticatedAny = async (
     request: Request,
-    logic: (session: Session, axios: AuthenticatedServerAxiosClient) => Promise<NextResponse>,
+    logic: (session: Session, axios: AuthenticatedServerAxiosClient, userPermissions: number) => Promise<NextResponse>,
     permissionsRequired?: Permission[]
 ): Promise<NextResponse> => {
     const session = await getServerSession(authHandler);
@@ -34,7 +34,7 @@ export const authenticatedAny = async (
         // @ts-ignore
         const token = await getToken({ req: request, raw: true });
         const client = new AuthenticatedServerAxiosClient(token);
-        return await logic(session, client);
+        return await logic(session, client, userPermissions);
     } catch (ex: any) {
         console.error(ex);
         return respond({ message: "Internal Server Error", init: { status: 500 } });
@@ -43,7 +43,7 @@ export const authenticatedAny = async (
 
 export const authenticatedAll = async (
     request: Request,
-    logic: (session: Session, axios: AuthenticatedServerAxiosClient) => Promise<NextResponse>,
+    logic: (session: Session, axios: AuthenticatedServerAxiosClient, userPermissions: number) => Promise<NextResponse>,
     permissionsRequired?: Permission[]
 ): Promise<NextResponse> => {
     const session = await getServerSession(authHandler);
@@ -58,7 +58,7 @@ export const authenticatedAll = async (
         // @ts-ignore
         const token = await getToken({ req: request, raw: true });
         const client = new AuthenticatedServerAxiosClient(token);
-        return await logic(session, client);
+        return await logic(session, client, userPermissions);
     } catch (ex: any) {
         console.error(ex);
         return respond({ message: "Internal Server Error", init: { status: 500 } });

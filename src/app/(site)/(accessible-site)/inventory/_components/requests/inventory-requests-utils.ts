@@ -24,6 +24,10 @@ export type StockRequestWithOptionalCreatorAndItems =
     StockRequestWithOptionalCreator
     & Pick<StockRequestWithOptionalItems, "requestedItems">
 
+export type StockRequestWithOptionalExtras =
+    StockRequestWithOptionalCreatorAndItems
+    & Pick<StockRequestWithOptionalAssignees, "assignedToUsers">
+
 export type RequestedStockItemWithOptionalStock = RequestedStockItem & {
     stock?: Stock
 }
