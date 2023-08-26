@@ -62,12 +62,10 @@ export function PATCH(req: Request, { params }: Context) {
                 status: 401
             });
 
-        const updatedItem = await prisma.requestedStockItem.updateMany({
+        const updatedItem = await prisma.requestedStockItem.update({
             where: {
-                AND: [
-                    { id: params.itemId },
-                    { stockRequest: { requestedByUserId: session.user.id } }
-                ]
+                id: params.itemId,
+                stockRequest: { requestedByUserId: session.user.id }
             },
             data: body
         });
@@ -89,12 +87,10 @@ export function DELETE(req: Request, { params }: Context) {
                 status: 403
             });
 
-        const deletedItem = await prisma.requestedStockItem.deleteMany({
+        const deletedItem = await prisma.requestedStockItem.delete({
             where: {
-                AND: [
-                    { id: params.itemId },
-                    { stockRequest: { requestedByUserId: session.user.id } }
-                ]
+                id: params.itemId,
+                stockRequest: { requestedByUserId: session.user.id }
             }
         });
 

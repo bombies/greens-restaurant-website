@@ -40,7 +40,7 @@ const UserInventoryRequestsTab: FC = () => {
                     <Spinner size="lg" />
                     :
                     requestCards.length ?
-                        <div className="grid grid-cols-2 phone:grid-cols-1 gap-4">
+                        <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
                             {requestCards}
                         </div>
                         :

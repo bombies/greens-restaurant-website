@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useMemo, useReducer, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 import { StockRequestWithOptionalExtras } from "../../../_components/requests/inventory-requests-utils";
@@ -11,19 +11,20 @@ import { useRouter } from "next/navigation";
 import { useUserData } from "../../../../../../../utils/Hooks";
 import Permission, { hasAnyPermission } from "../../../../../../../libs/types/permission";
 import InventoryRequestedItemsTable from "../../../_components/requests/user/form/InventoryRequestedItemsTable";
-import {
-    ReviewInventoryRequestDto
-} from "../../../../../../api/inventory/requests/[id]/review/route";
 import { toast } from "react-hot-toast";
 import "../../../../../../../utils/GeneralUtils";
-import { compare } from "../../../../../../../utils/GeneralUtils";
 import ChangesMadeBar from "../../../../employees/[username]/_components/ChangesMadeBar";
 import CheckIcon from "../../../../../../_components/icons/CheckIcon";
-import GenericModal from "../../../../../../_components/GenericModal";
-import GenericTextArea from "../../../../../../_components/inputs/GenericTextArea";
-import { Divider } from "@nextui-org/divider";
-import GenericCard from "../../../../../../_components/GenericCard";
-import GenericButton from "../../../../../../_components/inputs/GenericButton";
+import { StockRequestStatus } from ".prisma/client";
+import SpecificInventoryRequestInformation from "./SpecificInventoryRequestInformation";
+import ConfirmInventoryRequestReviewModal from "./ConfirmInventoryRequestReviewModal";
+import useAdminInventoryRequestData, { OptimisticRequestDataActionType } from "./hooks/useAdminInventoryRequestData";
+import axios from "axios";
+import useSWRMutation from "swr/mutation";
+import { UpdateRequestedStockItemDto } from "../../../../../../api/inventory/requests/me/[id]/[itemId]/route";
+import { InventorySnapshotWithInventoryAndStockSnapshots } from "../../../../../../api/inventory/[name]/utils";
+import { RequestedStockItem } from "@prisma/client";
+import "../../../../../../../utils/GeneralUtils";
 
 type Props = {
     id: string,
@@ -33,94 +34,31 @@ const FetchRequest = (id: string) => {
     return useSWR(`/api/inventory/requests/${id}?with_items=true&with_users=true&with_assignees=true`, fetcher<StockRequestWithOptionalExtras>);
 };
 
-enum OptimisticRequestDataActionType {
-    SET,
-    SET_NOTES,
-    REJECT,
-    APPROVE,
-    PARTIALLY_APPROVE
-}
-
-type OptimisticRequestDataPayload = ReviewInventoryRequestDto | { id: string, amountApproved?: number } | {
-    notes: string
-}
-type OptimisticRequestDataAction = {
-    type: OptimisticRequestDataActionType,
-    payload: OptimisticRequestDataPayload
-}
-
-const reducer = (state: ReviewInventoryRequestDto, action: OptimisticRequestDataAction) => {
-    let newState = { ...state };
-    switch (action.type) {
-        case OptimisticRequestDataActionType.SET: {
-            newState = { ...action.payload as ReviewInventoryRequestDto };
-            break;
-        }
-        case OptimisticRequestDataActionType.SET_NOTES: {
-            const notes = (action.payload as { notes: string }).notes;
-            if (!notes) {
-                console.warn("Tried setting notes for inventory request with invalid payload!", action.payload);
-                break;
-            }
-            newState.reviewedNotes = notes;
-            break;
-        }
-        case OptimisticRequestDataActionType.APPROVE: {
-            const id = (action.payload as { id: string }).id;
-            if (!id) {
-                console.warn("Tried approving inventory request with invalid payload!", action.payload);
-                break;
-            }
-
-            const index = newState.items.findIndex(item => item.id === id);
-            if (index === -1)
-                break;
-
-            const item = newState.items[index];
-            newState.items[index] = {
-                ...item,
-                amountProvided: item.amountRequested
-            };
-            break;
-        }
-        case OptimisticRequestDataActionType.PARTIALLY_APPROVE: {
-            const { id, amountApproved } = (action.payload as { id: string, amountApproved: number });
-            if (!id || !amountApproved) {
-                console.warn("Tried approving inventory request with invalid payload!", action.payload);
-                break;
-            }
-
-            const index = newState.items.findIndex(item => item.id === id);
-            if (index === -1)
-                break;
-
-            const item = newState.items[index];
-            newState.items[index] = {
-                ...item,
-                amountProvided: amountApproved
-            };
-            break;
-        }
-        case OptimisticRequestDataActionType.REJECT: {
-            const id = (action.payload as { id: string }).id;
-            if (!id) {
-                console.warn("Tried rejecting inventory request with invalid payload!", action.payload);
-                break;
-            }
-
-            const index = newState.items.findIndex(item => item.id === id);
-            if (index === -1)
-                break;
-
-            const item = newState.items[index];
-            newState.items[index] = {
-                ...item,
-                amountProvided: 0
-            };
-            break;
-        }
+type UpdateItemArgs = {
+    arg: {
+        itemId: string,
+        dto: UpdateRequestedStockItemDto
     }
-    return newState;
+}
+
+const UpdateItem = (id: string) => {
+    const mutator = (url: string, { arg }: UpdateItemArgs) => axios.patch(url.replace("{item_id}", arg.itemId), arg.dto);
+    return useSWRMutation(`/api/inventory/requests/me/${id}/{item_id}`, mutator);
+};
+
+type DeleteItemArgs = {
+    arg: {
+        itemId: string
+    }
+}
+
+const DeleteItem = (id: string) => {
+    const mutator = (url: string, { arg }: DeleteItemArgs) => axios.delete(url.replace("{item_id}", arg.itemId));
+    return useSWRMutation(`/api/inventory/requests/me/${id}/{item_id}`, mutator);
+};
+
+const FetchCurrentSnapshots = (ids: string[]) => {
+    return useSWR(`/api/inventory/currentsnapshots?ids=${ids.toString()}`, fetcher<InventorySnapshotWithInventoryAndStockSnapshots[]>);
 };
 
 const SpecificRequestContainer: FC<Props> = ({ id }) => {
@@ -131,98 +69,40 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
         Permission.MANAGE_STOCK_REQUESTS
     ]);
     const { data: request, isLoading: requestIsLoading, mutate } = FetchRequest(id);
-    const [optimisticRequest, dispatchOptimisticRequest] = useReducer(reducer, {
-        reviewedNotes: undefined,
-        items: []
-    });
+    const { trigger: updateItem, isMutating: itemIsUpdating } = UpdateItem(id);
+    const { trigger: deleteItem, isMutating: itemIsDeleting } = DeleteItem(id);
     const [changesMade, setChangesMade] = useState(false);
+    const { optimisticRequest, dispatchOptimisticRequest, startingRequest } = useAdminInventoryRequestData({
+        isEnabled: hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MANAGE_STOCK_REQUESTS]),
+        request,
+        requestIsLoading,
+        changesMade,
+        setChangesMade
+    });
     const [confirmReviewModalOpen, setConfirmReviewModalOpen] = useState(false);
     const router = useRouter();
 
-    const startingRequest = useMemo(() => ({
-        items: request?.requestedItems?.map(item => ({
-            stock: item.stock,
-            id: item.id,
-            amountRequested: item.amountRequested,
-            amountProvided: -1
-        })) ?? []
-    }), [request?.requestedItems, optimisticRequest]);
 
     useEffect(() => {
-        if (!requestIsLoading && !request)
+        if ((!requestIsLoading && !request)
+            || (!requestIsLoading && request && userData && !hasAnyPermission(userData.permissions, [
+                Permission.CREATE_INVENTORY,
+                Permission.VIEW_STOCK_REQUESTS,
+                Permission.MANAGE_STOCK_REQUESTS
+            ]) && request.requestedByUser?.id !== userData.id)
+        )
             router.push("/inventory/requests");
-        else if (!requestIsLoading && request) {
-            dispatchOptimisticRequest({
-                type: OptimisticRequestDataActionType.SET,
-                payload: {
-                    items: request.requestedItems?.map(item => ({
-                        stock: item.stock,
-                        id: item.id,
-                        amountRequested: item.amountRequested,
-                        amountProvided: -1
-                    })) ?? []
-                }
-            });
-        }
-    }, [request, requestIsLoading, router]);
+    }, [request, requestIsLoading, router, userData]);
 
-    useEffect(() => {
-        if (requestIsLoading || !request || !optimisticRequest || !startingRequest)
-            return;
-        setChangesMade(!compare(startingRequest, optimisticRequest));
-    }, [startingRequest, optimisticRequest, request, requestIsLoading]);
-
-    console.log(changesMade, startingRequest.items, optimisticRequest.items);
     return (
         <div>
-            <GenericModal
-                title="Confirm Review"
+            <ConfirmInventoryRequestReviewModal
                 isOpen={confirmReviewModalOpen}
-                onClose={() => setConfirmReviewModalOpen(false)}
-                classNames={{
-                    wrapper: "z-[202]",
-                    backdrop: "z-[201]"
-                }}
-            >
-                <form>
-                    <div className="space-y-6">
-                        <GenericTextArea
-                            id="review_notes"
-                            label="Notes"
-                            placeholder="Enter some notes here..."
-                        />
-                        <Divider className="my-6" />
-                        <GenericCard>
-                            <p>
-                                <span className="font-semibold text-warning">⚠️ Are you sure you want to finish this review? ⚠️</span><br /><br />
-                                Once you select <span
-                                className="font-semibold text-primary">{"\"I'm sure\""}</span> you will no
-                                longer be able to edit this
-                                request!
-                            </p>
-
-                        </GenericCard>
-                        <div className="flex gap-4">
-                            <GenericButton
-                                type="submit"
-                                onPress={() => {
-                                    // TODO: Make the API call and mutate the request
-                                }}
-                            >
-                                {"I'm sure"}
-                            </GenericButton>
-                            <GenericButton
-                                color="danger"
-                                variant="flat"
-                                onPress={() => setConfirmReviewModalOpen(false)}
-                            >
-                                Nevermind
-                            </GenericButton>
-                        </div>
-                    </div>
-
-                </form>
-            </GenericModal>
+                setOpen={setConfirmReviewModalOpen}
+                id={id}
+                mutate={mutate}
+                optimisticRequest={optimisticRequest}
+            />
             <ChangesMadeBar
                 changesMade={changesMade}
                 isChanging={false}
@@ -245,20 +125,19 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                 }}
             />
             <Title>Inventory Request</Title>
-            <p
-                className="text-primary font-semibold text-2xl phone:text-medium default-container p-6 mt-6 w-fit">{requestIsLoading ? "Unknown" : `Request for ${new Date(request?.createdAt ?? "").toLocaleDateString("en-JM")} @ ${new Date(request?.createdAt ?? "").toLocaleTimeString("en-JM", {
-                timeZone: "EST",
-                timeStyle: "short"
-            })}`}</p>
+            <SpecificInventoryRequestInformation
+                request={request}
+                requestIsLoading={requestIsLoading}
+            />
             <Spacer y={12} />
             <div className="default-container max-w-[80%] tablet:w-full p-12 phone:px-4">
                 <GoBackButton label="View All Requests" href="/inventory/requests" />
                 <Spacer y={6} />
                 <InventoryRequestedItemsTable
-                    items={optimisticRequest.items ?? []}
+                    items={optimisticRequest.items.length ? optimisticRequest.items : (request?.requestedItems || [])}
                     showItemStatus
                     isLoading={requestIsLoading}
-                    adminActions={hasAnyPermission(userData?.permissions, [Permission.MANAGE_STOCK_REQUESTS, Permission.CREATE_INVENTORY])}
+                    adminActions={request?.status === StockRequestStatus.PENDING && hasAnyPermission(userData?.permissions, [Permission.MANAGE_STOCK_REQUESTS, Permission.CREATE_INVENTORY])}
                     onAdminAction={{
                         onApprove(item) {
                             if (!item.id)
@@ -299,6 +178,80 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                         }
 
                     }}
+                    onSelfAction={request?.status === StockRequestStatus.PENDING ? {
+                        onRemove: {
+                            removing: itemIsDeleting,
+                            async action(item) {
+                                const remove = async () => {
+                                    return deleteItem({
+                                        itemId: item.id!
+                                    })
+                                        .then(res => {
+                                            const deletedItem: RequestedStockItem = res.data;
+                                            const updatedInfo = { ...request };
+                                            const deletedIndex = request?.requestedItems?.findIndex(reqItem => reqItem.id === deletedItem.id);
+
+                                            if (deletedIndex === -1 || deletedIndex === undefined)
+                                                return;
+                                            updatedInfo?.requestedItems?.splice(deletedIndex);
+                                            mutate(updatedInfo);
+                                        })
+                                        .catch(e => {
+                                            console.error(e);
+                                            throw e;
+                                        });
+                                };
+
+                                await toast.promise(remove(), {
+                                    loading: `Removing ${item.stock?.name.replaceAll("-", " ").capitalize()}...`,
+                                    success: `Successfully removed ${item.stock?.name.replaceAll("-", " ").capitalize()}!`,
+                                    error(msg?: string) {
+                                        return msg ?? `There was an error removing ${item.stock?.name.replaceAll("-", " ").capitalize()}!`;
+                                    }
+                                });
+                            }
+                        },
+                        onAmountChange: {
+                            editing: itemIsUpdating,
+                            async action(item, newAmount) {
+                                const remove = async () => {
+                                    return updateItem({
+                                        itemId: item.id!,
+                                        dto: {
+                                            amountRequested: newAmount
+                                        }
+                                    })
+                                        .then(res => {
+                                            const updatedItem: RequestedStockItem = res.data;
+                                            const updatedInfo = { ...request };
+                                            const updatedIndex = request?.requestedItems?.findIndex(reqItem => reqItem.id === updatedItem.id);
+
+                                            if (updatedIndex === -1 || updatedIndex === undefined)
+                                                return;
+
+                                            const currentItem = updatedInfo.requestedItems![updatedIndex];
+                                            updatedInfo.requestedItems![updatedIndex] = {
+                                                ...currentItem,
+                                                amountRequested: updatedItem.amountRequested
+                                            };
+                                            mutate(updatedInfo);
+                                        })
+                                        .catch(e => {
+                                            console.error(e);
+                                            throw e;
+                                        });
+                                };
+
+                                await toast.promise(remove(), {
+                                    loading: `Updating ${item.stock?.name.replaceAll("-", " ").capitalize()}...`,
+                                    success: `Successfully updated ${item.stock?.name.replaceAll("-", " ").capitalize()}!`,
+                                    error(msg?: string) {
+                                        return msg ?? `There was an error updating ${item.stock?.name.replaceAll("-", " ").capitalize()}!`;
+                                    }
+                                });
+                            }
+                        }
+                    } : undefined}
                 />
             </div>
         </div>

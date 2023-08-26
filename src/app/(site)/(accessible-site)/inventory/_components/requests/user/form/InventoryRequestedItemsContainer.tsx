@@ -4,7 +4,6 @@ import { Dispatch, FC, Fragment, SetStateAction, useEffect, useMemo, useReducer 
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import {
-    InventorySnapshotWithInventoryAndStockSnapshots,
     InventoryWithOptionalStock
 } from "../../../../../../../api/inventory/[name]/utils";
 import InventoryRequestedItemsTable from "./InventoryRequestedItemsTable";
@@ -31,10 +30,6 @@ interface Props {
     visibleData?: StockRequestWithOptionalCreatorAndAssignees[];
 }
 
-const FetchCurrentSnapshots = (ids: string[]) => {
-    return useSWR(`/api/inventory/currentsnapshots?ids=${ids.toString()}`, fetcher<InventorySnapshotWithInventoryAndStockSnapshots[]>);
-};
-
 const FetchInventories = (ids: string[], withStock?: boolean) => {
     return useSWR(`/api/inventory?${ids.length ? `ids=${ids.toString()}&` : ""}with_stock=${withStock ?? false}`, fetcher<InventoryWithOptionalStock[]>);
 };
@@ -53,7 +48,7 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
     payload: { id: string }
         | { ids: string[] }
         | Pick<RequestedStockItem, "amountRequested" | "stockId">
-        | { id: string } & Pick<RequestedStockItem, "amountRequested" | "stockId">
+        | { id: string } & Pick<RequestedStockItem, "amountRequested">
 }) => {
     let newState = { ...state };
 
@@ -110,7 +105,26 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
             break;
         }
         case ProposedStockRequestsAction.UPDATE_ITEM: {
-            // TODO: When I actually need this. Too lazy to implement this 😂
+            const { id, amountRequested } = (payload as {
+                id: string
+            } & Pick<RequestedStockItem, "amountRequested">);
+            if (!id || !amountRequested) {
+                console.warn("Tried setting updating request item with an invalid payload!", payload);
+                break;
+            }
+
+            const index = newState.items
+                .findIndex(item =>
+                        item.stockId === (payload as {
+                            id: string
+                        }).id
+                );
+
+            const oldItem = newState.items[index];
+            newState.items[index] = {
+                ...oldItem,
+                amountRequested
+            };
             break;
         }
     }
@@ -165,7 +179,30 @@ const InventoryRequestedItemsContainer: FC<Props> = ({
 
     return (
         <Fragment>
-            <InventoryRequestedItemsTable items={optimisticRequestedItems} />
+            <InventoryRequestedItemsTable
+                items={optimisticRequestedItems}
+                onSelfAction={{
+                    onAmountChange: {
+                        async action(item, newAmount) {
+                            dispatchProposedRequestedItems({
+                                type: ProposedStockRequestsAction.UPDATE_ITEM,
+                                payload: {
+                                    id: item.stock!.id,
+                                    amountRequested: newAmount
+                                }
+                            });
+                        }
+                    },
+                    onRemove: {
+                        async action(item) {
+                            dispatchProposedRequestedItems({
+                                type: ProposedStockRequestsAction.REMOVE_ITEM,
+                                payload: { id: item.stock!.id }
+                            });
+                        }
+                    }
+                }}
+            />
             <AddRequestedItemsButton
                 disabled={isCreatingRequest}
                 proposedSnapshotIds={proposedRequestedItems.items.map(item => item.stockId)}

@@ -7,17 +7,21 @@ import GenericSelectMenu from "../../../../../../../_components/GenericSelectMen
 import { Chip } from "@nextui-org/chip";
 import InventoryRequestedItemsContainer from "./InventoryRequestedItemsContainer";
 import { Avatar } from "@nextui-org/avatar";
-import { FetchUsersWithPermissions } from "../../../../../../../../utils/client-utils";
-import Permission from "../../../../../../../../libs/types/permission";
 import { useS3AvatarUrls } from "../../../../../../../_components/hooks/useS3Base64String";
-import { KeyedMutator } from "swr";
+import useSWR, { KeyedMutator } from "swr";
 import { StockRequestWithOptionalCreatorAndAssignees } from "../../inventory-requests-utils";
+import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
+import { User } from "@prisma/client";
 
 type Props = {
     setModalOpen: Dispatch<SetStateAction<boolean>>
     mutator: KeyedMutator<StockRequestWithOptionalCreatorAndAssignees[] | undefined>
     visibleData?: StockRequestWithOptionalCreatorAndAssignees[],
 }
+
+const FetchValidAssignees = () => {
+    return useSWR("/api/inventory/requests/assignees", fetcher<Pick<User, "id" | "username" | "permissions" | "firstName" | "lastName" | "image" | "avatar">[]>);
+};
 
 const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData }) => {
     const { data, isLoading } = FetchAllInventories();
@@ -27,7 +31,7 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData
     const {
         data: availableAssignees,
         isLoading: isLoadingAvailableAssignees
-    } = FetchUsersWithPermissions([Permission.MANAGE_STOCK_REQUESTS, Permission.CREATE_INVENTORY]);
+    } = FetchValidAssignees();
     const { avatars, isLoading: avatarsLoading } = useS3AvatarUrls(availableAssignees ?? []);
 
     return (

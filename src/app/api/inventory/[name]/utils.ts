@@ -201,21 +201,28 @@ export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<Inven
             inventoryId: inv.id
         }));
 
-        await prisma.inventorySnapshot.createMany({
+        const fetchedMissingInventories = await prisma.inventorySnapshot.createMany({
             data: dataToInsert
-        });
-
-        allSnapshots.push(...dataToInsert.map(data => {
-            const correspondingInventory = inventories.find(inv => inv.uid === data.uid)!;
-            return ({
-                ...data,
-                id: "",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                inventory: correspondingInventory,
-                stockSnapshots: []
-            });
+        }).then(() => prisma.inventorySnapshot.findMany({
+            where: {
+                uid: {
+                    in: missingInventories.map(inv => inv.uid)
+                },
+                inventoryId: {
+                    in: missingInventories.map(inv => inv.id)
+                }
+            },
+            include: {
+                inventory: {
+                    include: {
+                        stock: true
+                    }
+                },
+                stockSnapshots: true
+            }
         }));
+
+        allSnapshots.push(...fetchedMissingInventories);
     }
 
     return await generateWholesomeCurrentSnapshots(allSnapshots);
@@ -243,7 +250,8 @@ const generateWholesomeCurrentSnapshots = async (snapshots: InventorySnapshotWit
         },
         orderBy: {
             createdAt: "desc"
-        }
+        },
+        distinct: "uid"
     });
 
     const latestPreviousSnapshots: InventorySnapshotWithStockSnapshots[] = [];

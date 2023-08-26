@@ -14,6 +14,8 @@ import CheckIcon from "../../../../../../../_components/icons/CheckIcon";
 import PartialApproveButton from "./admin-actions/PartialApproveButton";
 import { Chip } from "@nextui-org/chip";
 import PendingIcon from "../../../../../../../_components/icons/PendingIcon";
+import EditAmountRequestedButton from "./self-actions/EditAmountRequestedButton";
+import RemoveRequestedItemButton from "./self-actions/RemoveRequestedItemButton";
 
 interface Props {
     items: Partial<RequestedStockItemWithOptionalStock>[];
@@ -31,8 +33,14 @@ type OnAdminAction = {
 }
 
 type OnSelfAction = {
-    onRemove: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>) => void,
-    onAmountChange?: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>, newAmount: number) => void
+    onRemove: {
+        removing?: boolean,
+        action: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>) => Promise<void>
+    },
+    onAmountChange?: {
+        editing?: boolean,
+        action: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>, newAmount: number) => Promise<void>
+    }
 }
 
 const getValueForKey = (
@@ -81,7 +89,18 @@ const getValueForKey = (
                             </IconButton>
                         </Fragment>
                         :
-                        <Fragment></Fragment>
+                        <Fragment>
+                            <EditAmountRequestedButton
+                                item={item}
+                                onAmountChange={onSelfAction?.onAmountChange?.action}
+                                editing={onSelfAction?.onAmountChange?.editing}
+                            />
+                            <RemoveRequestedItemButton
+                                item={item}
+                                onRemove={onSelfAction?.onRemove.action}
+                                removing={onSelfAction?.onRemove.removing}
+                            />
+                        </Fragment>
                     }
                 </div>
             );
@@ -113,7 +132,7 @@ const getValueForKey = (
                         REJECTED
                     </Chip>
                 );
-            else if (item.amountProvided === -1)
+            else if (item.amountProvided === -1 || item.amountProvided === null || item.amountProvided === undefined)
                 return (
                     <Chip
                         variant="flat"
@@ -169,9 +188,10 @@ const InventoryRequestedItemsTable: FC<Props> = ({
 
         if (showItemStatus)
             ret.push({ key: "status", value: "Status" });
-        ret.push({ key: "actions", value: "Actions" });
+        if ((adminActions && onAdminAction) || onSelfAction)
+            ret.push({ key: "actions", value: "Actions" });
         return ret;
-    }, [showItemStatus]);
+    }, [adminActions, onAdminAction, onSelfAction, showItemStatus]);
 
     return (
         <GenericTable

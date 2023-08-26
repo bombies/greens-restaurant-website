@@ -3,7 +3,7 @@ import Permission from "../../../../../../libs/types/permission";
 import prisma from "../../../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import { getFetchStockRequestsSearchParams } from "../route";
-import { StockRequest } from "@prisma/client";
+import { RequestedStockItem, StockRequest } from "@prisma/client";
 import { z } from "zod";
 import { StockRequestStatus } from ".prisma/client";
 
@@ -32,6 +32,45 @@ export async function GET(req: Request, { params }: Context) {
             }
         });
         return NextResponse.json(request);
+    }, [
+        Permission.CREATE_INVENTORY,
+        Permission.CREATE_STOCK_REQUEST,
+        Permission.MANAGE_STOCK_REQUESTS,
+        Permission.VIEW_STOCK_REQUESTS
+    ]);
+}
+
+export type CreateRequestedStockItemsDto = Pick<RequestedStockItem, "amountRequested" | "stockId">[]
+const createRequestedStockItemsDto = z.array(z.object({
+    amountRequested: z.number(),
+    stockId: z.string()
+}));
+
+export async function POST(req: Request, { params }: Context) {
+    return authenticatedAny(req, async () => {
+        const body: CreateRequestedStockItemsDto = await req.json();
+        const bodyValidated = createRequestedStockItemsDto.safeParse(body);
+        if (!bodyValidated.success)
+            return respondWithInit({
+                message: "Invalid paylod!",
+                validationErrors: bodyValidated,
+                status: 401
+            });
+
+        const createdItems = await prisma.requestedStockItem.createMany({
+            data: body
+        }).then(() => prisma.requestedStockItem.findMany({
+            where: {
+                stockId: {
+                    in: body.map(item => item.stockId)
+                }
+            },
+            include: {
+                stock: true
+            }
+        }));
+
+        return NextResponse.json(createdItems);
     }, [
         Permission.CREATE_INVENTORY,
         Permission.CREATE_STOCK_REQUEST,

@@ -7,6 +7,7 @@ import prisma from "../../../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import { Inventory, RequestedStockItem, Stock } from "@prisma/client";
 import { fetchCurrentSnapshots } from "../../../[name]/utils";
+import { arrayCompare } from "../../../../../../utils/GeneralUtils";
 
 type Context = {
     params: {
@@ -30,7 +31,7 @@ const reviewInventoryRequestDtoSchema = z.object({
         id: z.string(),
         amountProvided: z.number()
     }))
-});
+}).passthrough();
 
 export async function POST(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
@@ -80,11 +81,8 @@ export async function POST(req: Request, { params }: Context) {
 
 
             const bodyItemIds = body.items.map(item => item.id);
-            for (let id in stockRequestIds)
-                if (!bodyItemIds.includes(id)) {
-                    status = StockRequestStatus.PARTIALLY_DELIVERED;
-                    break;
-                }
+            if (!arrayCompare(bodyItemIds, stockRequestIds))
+                status = StockRequestStatus.PARTIALLY_DELIVERED;
         }
 
         /**
@@ -109,7 +107,7 @@ export async function POST(req: Request, { params }: Context) {
          */
         const request = await prisma.stockRequest.update({
             where: { id: params.id },
-            data: { status }
+            data: { status, reviewedNotes: body.reviewedNotes }
         });
 
         /**
