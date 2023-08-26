@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { getFetchStockRequestsSearchParams } from "../route";
 import { StockRequest } from "@prisma/client";
 import { z } from "zod";
+import { StockRequestStatus } from ".prisma/client";
 
 type Context = {
     params: {
@@ -75,7 +76,7 @@ export async function PATCH(req: Request, { params }: Context) {
         Permission.CREATE_INVENTORY,
         Permission.CREATE_STOCK_REQUEST,
         Permission.MANAGE_STOCK_REQUESTS,
-        Permission.VIEW_STOCK_REQUESTS,
+        Permission.VIEW_STOCK_REQUESTS
     ]);
 }
 
@@ -99,9 +100,9 @@ export async function DELETE(req: Request, { params }: Context) {
                 status: 404
             });
 
-        if (request.reviewed)
+        if (request.status === StockRequestStatus.DELIVERED || request.status === StockRequestStatus.PARTIALLY_DELIVERED)
             return respondWithInit({
-                message: "You cannot delete a reviewed request!"
+                message: "You cannot delete a delivered request!"
             });
 
         const deletedRequest = await prisma.stockRequest.delete({
@@ -116,6 +117,6 @@ export async function DELETE(req: Request, { params }: Context) {
         Permission.CREATE_INVENTORY,
         Permission.CREATE_STOCK_REQUEST,
         Permission.MANAGE_STOCK_REQUESTS,
-        Permission.VIEW_STOCK_REQUESTS,
+        Permission.VIEW_STOCK_REQUESTS
     ]);
 }

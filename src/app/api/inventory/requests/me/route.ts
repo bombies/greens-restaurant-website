@@ -5,35 +5,29 @@ import { NextResponse } from "next/server";
 import { Prisma, RequestedStockItem, StockRequest } from "@prisma/client";
 import { z } from "zod";
 import StockRequestWhereInput = Prisma.StockRequestWhereInput;
+import { StockRequestStatus } from ".prisma/client";
 
 export const getFetchStockRequestsSearchParams = (url: string) => {
     const { searchParams } = new URL(url);
-    const reviewed = searchParams.get("reviewed")?.toLowerCase() !== "true" ? (searchParams.get("reviewed")?.toLowerCase() === "false" ? false : undefined) : true;
-    const rejected = searchParams.get("rejected")?.toLowerCase() !== "true" ? (searchParams.get("rejected")?.toLowerCase() === "false" ? false : undefined) : true;
+    const status = searchParams.get("status")?.toLowerCase() as StockRequestStatus;
     const withItems = searchParams.get("with_items")?.toLowerCase() === "true" || false;
     const withUsers = searchParams.get("with_users")?.toLowerCase() === "true" || false;
     const withAssignees = searchParams.get("with_assignees")?.toLowerCase() === "true" || false;
-    return { reviewed, rejected, withItems, withUsers, withAssignees };
+    return { status, withItems, withUsers, withAssignees };
 };
 
 export async function GET(req: Request) {
     return authenticatedAny(req, async (session) => {
-        const { rejected, reviewed, withItems, withUsers, withAssignees } = getFetchStockRequestsSearchParams(req.url);
+        const { status, withItems, withUsers, withAssignees } = getFetchStockRequestsSearchParams(req.url);
 
         let whereQuery: StockRequestWhereInput = {
             requestedByUserId: session.user!.id
         };
 
-        if (rejected !== undefined)
+        if (status !== undefined)
             whereQuery = {
                 ...whereQuery,
-                rejected
-            };
-
-        if (reviewed !== undefined)
-            whereQuery = {
-                ...whereQuery,
-                reviewed
+                status
             };
 
         const requests = await prisma.stockRequest.findMany({
@@ -93,14 +87,13 @@ export async function POST(req: Request) {
 
         const createdRequest = await prisma.stockRequest.create({
             data: {
-                rejected: false,
-                reviewed: false,
+                status: StockRequestStatus.PENDING,
                 requestedByUserId: session.user.id,
                 assignedToUsersId: body.assignedToUsersId
             },
             include: {
                 requestedByUser: true,
-                assignedToUsers: true,
+                assignedToUsers: true
             }
         });
 

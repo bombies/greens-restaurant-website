@@ -158,7 +158,8 @@ const InventoryRequestedItemsContainer: FC<Props> = ({
             createdAt: new Date(),
             updatedAt: new Date(),
             id: v4(),
-            stockRequestId: ""
+            stockRequestId: "",
+            amountProvided: null
         }));
     }, [proposedRequestedItems, stock]);
 

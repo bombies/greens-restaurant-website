@@ -9,23 +9,16 @@ import StockRequestWhereInput = Prisma.StockRequestWhereInput;
 export async function GET(req: Request) {
     return authenticatedAny(req, async () => {
         const {
-            rejected,
-            reviewed,
+            status,
             withUsers,
             withItems,
             withAssignees
         } = getFetchStockRequestsSearchParams(req.url);
         let whereQuery: StockRequestWhereInput = {};
 
-        if (rejected)
+        if (status)
             whereQuery = {
-                rejected
-            };
-
-        if (reviewed)
-            whereQuery = {
-                ...whereQuery,
-                reviewed
+                status
             };
 
         const requests = await prisma.stockRequest.findMany({

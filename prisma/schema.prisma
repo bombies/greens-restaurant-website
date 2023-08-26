@@ -30,9 +30,8 @@ model User {
 }
 
 model StockRequest {
-  id            String  @id @default(auto()) @map("_id") @db.ObjectId
-  reviewed      Boolean
-  rejected      Boolean
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  status        StockRequestStatus
   reviewedNotes String?
 
   assignedToUsersId String[] @db.ObjectId
@@ -44,6 +43,13 @@ model StockRequest {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum StockRequestStatus {
+  DELIVERED
+  PARTIALLY_DELIVERED
+  REJECTED
+  PENDING
 }
 
 model RequestedStockItem {

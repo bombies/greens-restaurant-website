@@ -8,13 +8,11 @@ import { Chip } from "@nextui-org/chip";
 import PendingIcon from "../../../../../_components/icons/PendingIcon";
 import DeliveredIcon from "../../../../../_components/icons/DeliveredIcon";
 import DeniedIcon from "../../../../../_components/icons/DeniedIcon";
-import {
-    StockRequestWithOptionalAssignees,
-    StockRequestWithOptionalCreatorAndAssignees
-} from "./inventory-requests-utils";
+import { StockRequestWithOptionalCreatorAndAssignees } from "./inventory-requests-utils";
 import { Avatar } from "@nextui-org/avatar";
-import { useS3AvatarUrls, useS3Base64AvatarStrings } from "../../../../../_components/hooks/useS3Base64String";
-import { AvatarGroup, Spacer, Tooltip, User } from "@nextui-org/react";
+import { useS3AvatarUrls } from "../../../../../_components/hooks/useS3Base64String";
+import { AvatarGroup, Tooltip, User } from "@nextui-org/react";
+import { StockRequestStatus } from ".prisma/client";
 
 interface Props {
     request: StockRequestWithOptionalCreatorAndAssignees;
@@ -48,6 +46,66 @@ const InventoryRequestCard: FC<Props> = ({ request, showRequester }) => {
             });
     }, [avatars, request.assignedToUsers, request.assignedToUsersId]);
 
+    const requestStatusChip = useMemo(() => {
+        switch (request.status) {
+            case StockRequestStatus.DELIVERED: {
+                return (
+                    <Chip
+                        variant="flat"
+                        color="success"
+                        classNames={{
+                            content: "font-semibold"
+                        }}
+                        startContent={<DeliveredIcon width={16} />}
+                    >
+                        DELIVERED
+                    </Chip>
+                );
+            }
+            case StockRequestStatus.PARTIALLY_DELIVERED: {
+                return (
+                    <Chip
+                        variant="flat"
+                        color="warning"
+                        classNames={{
+                            content: "font-semibold"
+                        }}
+                        startContent={<DeliveredIcon width={16} />}
+                    >
+                        PARTIALLY DELIVERED
+                    </Chip>
+                );
+            }
+            case StockRequestStatus.REJECTED: {
+                return (
+                    <Chip
+                        variant="flat"
+                        color="danger"
+                        classNames={{
+                            content: "font-semibold"
+                        }}
+                        startContent={<DeniedIcon width={16} />}
+                    >
+                        REJECTED
+                    </Chip>
+                );
+            }
+            case StockRequestStatus.PENDING: {
+                return (
+                    <Chip
+                        variant="flat"
+                        classNames={{
+                            content: "font-semibold"
+                        }}
+                        startContent={<PendingIcon width={16} />}
+                    >
+                        PENDING
+                    </Chip>
+                );
+            }
+        }
+    }, [request.status]);
+
     return (
         <LinkCard
             href={`/inventory/requests/${request.id}`}
@@ -62,36 +120,7 @@ const InventoryRequestCard: FC<Props> = ({ request, showRequester }) => {
                 }
             </SubTitle>
             <Divider className="my-6" />
-            {
-                request.reviewed ?
-                    (request.rejected ?
-                            <Chip
-                                variant="flat"
-                                color="danger"
-                                classNames={{
-                                    content: "font-semibold"
-                                }}
-                                startContent={<DeniedIcon width={16} />}
-                            >REJECTED</Chip>
-                            :
-                            <Chip
-                                variant="flat"
-                                color="success"
-                                classNames={{
-                                    content: "font-semibold"
-                                }}
-                                startContent={<DeliveredIcon width={16} />}
-                            >DELIVERED</Chip>
-                    )
-                    :
-                    <Chip
-                        variant="flat"
-                        classNames={{
-                            content: "font-semibold"
-                        }}
-                        startContent={<PendingIcon width={16} />}
-                    >PENDING</Chip>
-            }
+            {requestStatusChip}
             {
                 showRequester &&
                 <div className="flex mt-4">

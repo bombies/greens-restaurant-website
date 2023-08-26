@@ -9,7 +9,7 @@ export type StockRequestWithOptionalCreator = StockRequest & {
 }
 
 export type StockRequestWithOptionalItems = StockRequest & {
-    requestedItems?: RequestedStockItem[]
+    requestedItems?: (RequestedStockItem & { stock?: Stock })[]
 }
 
 export type StockRequestWithOptionalAssignees = StockRequest & {

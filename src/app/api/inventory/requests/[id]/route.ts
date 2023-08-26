@@ -28,7 +28,11 @@ export async function GET(req: Request, { params }: Context) {
                 AND: andArr
             },
             include: {
-                requestedItems: withItems,
+                requestedItems: withItems && {
+                    include: {
+                        stock: true
+                    }
+                },
                 requestedByUser: withUsers,
                 assignedToUsers: withAssignees
             }
@@ -42,10 +46,9 @@ export async function GET(req: Request, { params }: Context) {
     ]);
 }
 
-export type AdminUpdateStockRequestDto = Partial<Pick<StockRequest, "reviewed" | "rejected" | "reviewedNotes">>
+export type AdminUpdateStockRequestDto = Partial<Pick<StockRequest, "status" | "reviewedNotes">>
 const adminUpdateStockRequestDtoSchema = z.object({
-    reviewed: z.boolean(),
-    rejected: z.boolean(),
+    status: z.string(),
     reviewedNotes: z.string()
 }).partial().strict();
 

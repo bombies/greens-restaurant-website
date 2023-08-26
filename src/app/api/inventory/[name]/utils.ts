@@ -269,17 +269,20 @@ const generateWholesomeCurrentSnapshots = async (snapshots: InventorySnapshotWit
 
     });
 
-    if (newStockSnapshots.length) {
+    const createdStockSnapshots = newStockSnapshots.length ?
         await prisma.stockSnapshot.createMany({
             data: newStockSnapshots
-        });
-    }
+        }).then(() => prisma.stockSnapshot.findMany({
+            where: {
+                createdAt: {
+                    gte: todaysDate
+                }
+            }
+        })) : [];
 
     emptyStockSnapshots = emptyStockSnapshots.map(snapshot => ({
         ...snapshot,
-        stockSnapshots: newStockSnapshots
-            .filter(newSnapshot => newSnapshot.inventorySnapshotId === snapshot.id)
-            .map(snapshot => ({ ...snapshot, id: "" }))
+        stockSnapshots: createdStockSnapshots.filter(stockSnapshot => stockSnapshot.inventorySnapshotId === snapshot.id)
     }));
 
     return new Either<InventorySnapshotWithInventoryAndStockSnapshots[], NextResponse>(
@@ -328,16 +331,23 @@ const generateWholesomeCurrentSnapshot = async (inventory: Inventory, snapshot: 
                 });
             });
 
-            await prisma.stockSnapshot.createMany({
+            const createdSnapshots = await prisma.stockSnapshot.createMany({
                 data: newStockSnapshots
-            });
+            }).then(() => prisma.stockSnapshot.findMany({
+                where: {
+                    inventorySnapshotId: snapshot.id,
+                    createdAt: {
+                        gte: todaysDate
+                    }
+                }
+            }));
 
             return new Either<InventorySnapshot & {
                 inventory: Inventory & { stock: Stock[] };
                 stockSnapshots: StockSnapshot[]
             }, NextResponse>({
                 ...snapshot,
-                stockSnapshots: newStockSnapshots.map(snapshot => ({ ...snapshot, id: "" }))
+                stockSnapshots: createdSnapshots
             });
         }
     }
