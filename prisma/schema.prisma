@@ -38,7 +38,7 @@ model StockRequest {
   assignedToUsers   User[]   @relation(name: "assignedStocks", fields: [assignedToUsersId], references: [id])
 
   requestedByUserId String               @db.ObjectId
-  requestedByUser   User                 @relation(name: "openStocks", fields: [requestedByUserId], references: [id], onDelete: Cascade)
+  requestedByUser   User                 @relation(name: "openStocks", fields: [requestedByUserId], references: [id])
   requestedItems    RequestedStockItem[] @relation()
 
   createdAt DateTime @default(now())
