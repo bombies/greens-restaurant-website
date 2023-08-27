@@ -16,14 +16,19 @@ import { Chip } from "@nextui-org/chip";
 import PendingIcon from "../../../../../../../_components/icons/PendingIcon";
 import EditAmountRequestedButton from "./self-actions/EditAmountRequestedButton";
 import RemoveRequestedItemButton from "./self-actions/RemoveRequestedItemButton";
+import { InventorySnapshotWithInventoryAndStockSnapshots } from "../../../../../../../api/inventory/[name]/utils";
+import { StockSnapshot } from "@prisma/client";
+import { StockRequestStatus } from ".prisma/client";
 
 interface Props {
     items: Partial<RequestedStockItemWithOptionalStock>[];
     isLoading?: boolean,
     adminActions?: boolean,
     showItemStatus?: boolean,
-    onAdminAction?: OnAdminAction
-    onSelfAction?: OnSelfAction
+    onAdminAction?: OnAdminAction,
+    onSelfAction?: OnSelfAction,
+    inventorySnapshots?: InventorySnapshotWithInventoryAndStockSnapshots[],
+    requestStatus?: StockRequestStatus
 }
 
 type OnAdminAction = {
@@ -47,8 +52,11 @@ const getValueForKey = (
     item: Partial<RequestedStockItemWithOptionalStockAndRequest>,
     key: Key, adminActions?: boolean,
     onAdminAction?: OnAdminAction,
-    onSelfAction?: OnSelfAction
+    onSelfAction?: OnSelfAction,
+    snapshots?: StockSnapshot[]
 ) => {
+    const findItemSnapshot = (): StockSnapshot | undefined => snapshots?.find(snapshot => snapshot.uid === item.stock?.uid);
+
     switch (key) {
         case "item_name": {
             return <p className="capitalize">{item.stock?.name.replaceAll("-", " ")}</p>;
@@ -57,11 +65,14 @@ const getValueForKey = (
             return item.amountRequested;
         }
         case "actions": {
+            const itemSnapshot = findItemSnapshot();
+
             return (
                 <div className="flex gap-4">
                     {adminActions ?
                         <Fragment>
                             <IconButton
+                                isDisabled={(itemSnapshot?.quantity ?? 0) < (item.amountRequested ?? 0)}
                                 variant="flat"
                                 color="success"
                                 toolTip="Approve"
@@ -74,6 +85,7 @@ const getValueForKey = (
                             </IconButton>
                             <PartialApproveButton
                                 item={item}
+                                max={(itemSnapshot?.quantity ?? 0) < (item.amountRequested ?? 0) ? itemSnapshot?.quantity : undefined}
                                 onPartialApprove={onAdminAction?.onPartialApprove}
                             />
                             <IconButton
@@ -169,6 +181,9 @@ const getValueForKey = (
                     </div>
                 );
         }
+        case "amount_available": {
+            return findItemSnapshot()?.quantity ?? "Unknown";
+        }
     }
 };
 
@@ -178,7 +193,9 @@ const InventoryRequestedItemsTable: FC<Props> = ({
                                                      adminActions,
                                                      onAdminAction,
                                                      onSelfAction,
-                                                     showItemStatus
+                                                     showItemStatus,
+                                                     inventorySnapshots,
+                                                     requestStatus
                                                  }) => {
     const columns: Column[] = useMemo(() => {
         const ret = [
@@ -186,12 +203,19 @@ const InventoryRequestedItemsTable: FC<Props> = ({
             { key: "amount_requested", value: "Amount Requested" }
         ];
 
+        if (requestStatus === StockRequestStatus.PENDING && adminActions && onAdminAction)
+            ret.push({ key: "amount_available", value: "Amount Available" });
         if (showItemStatus)
             ret.push({ key: "status", value: "Status" });
         if ((adminActions && onAdminAction) || onSelfAction)
             ret.push({ key: "actions", value: "Actions" });
+
         return ret;
-    }, [adminActions, onAdminAction, onSelfAction, showItemStatus]);
+    }, [adminActions, onAdminAction, onSelfAction, requestStatus, showItemStatus]);
+
+    const stockSnapshots = useMemo(() => {
+        return inventorySnapshots?.map(invSnapshot => invSnapshot.stockSnapshots).flat();
+    }, [inventorySnapshots]);
 
     return (
         <GenericTable
@@ -203,7 +227,7 @@ const InventoryRequestedItemsTable: FC<Props> = ({
             {(item) => (
                 <TableRow key={item.id}>
                     {(colKey) => (
-                        <TableCell>{getValueForKey(item, colKey, adminActions, onAdminAction, onSelfAction)}</TableCell>
+                        <TableCell>{getValueForKey(item, colKey, adminActions, onAdminAction, onSelfAction, stockSnapshots)}</TableCell>
                     )}
                 </TableRow>
             )}

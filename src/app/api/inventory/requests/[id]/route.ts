@@ -30,7 +30,11 @@ export async function GET(req: Request, { params }: Context) {
             include: {
                 requestedItems: withItems && {
                     include: {
-                        stock: true
+                        stock: {
+                            include: {
+                                inventory: true
+                            }
+                        }
                     }
                 },
                 requestedByUser: withUsers,

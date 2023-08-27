@@ -12,10 +12,12 @@ import GenericButton from "../../../../../../../../_components/inputs/GenericBut
 
 type Props = {
     item: Partial<RequestedStockItemWithOptionalStockAndRequest>,
+    disabled?: boolean,
+    max?: number,
     onPartialApprove?: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>, approvedAmount: number) => void
 }
 
-const PartialApproveButton: FC<Props> = ({ item, onPartialApprove }) => {
+const PartialApproveButton: FC<Props> = ({ item, onPartialApprove, disabled, max }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const { handleSubmit, register, formState: { errors } } = useForm();
 
@@ -40,7 +42,7 @@ const PartialApproveButton: FC<Props> = ({ item, onPartialApprove }) => {
                         label="How much stock would you like to approve?"
                         placeholder="Enter a number..."
                         type="number"
-                        max={item.amountRequested ? item.amountRequested - 1 : undefined}
+                        max={max ?? (item.amountRequested ? item.amountRequested - 1 : undefined)}
                         min={1}
                     />
                     <Divider className="my-6" />
@@ -53,6 +55,7 @@ const PartialApproveButton: FC<Props> = ({ item, onPartialApprove }) => {
                 </form>
             </GenericModal>
             <IconButton
+                disabled={disabled}
                 variant="flat"
                 color="warning"
                 onPress={() => setModalOpen(true)}

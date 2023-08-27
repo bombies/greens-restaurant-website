@@ -22,9 +22,10 @@ import useAdminInventoryRequestData, { OptimisticRequestDataActionType } from ".
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { UpdateRequestedStockItemDto } from "../../../../../../api/inventory/requests/me/[id]/[itemId]/route";
-import { InventorySnapshotWithInventoryAndStockSnapshots } from "../../../../../../api/inventory/[name]/utils";
 import { RequestedStockItem } from "@prisma/client";
 import "../../../../../../../utils/GeneralUtils";
+import useCurrentInventoryRequestSnapshots from "./hooks/useCurrentInventoryRequestSnapshots";
+import { Spinner } from "@nextui-org/spinner";
 
 type Props = {
     id: string,
@@ -57,10 +58,6 @@ const DeleteItem = (id: string) => {
     return useSWRMutation(`/api/inventory/requests/me/${id}/{item_id}`, mutator);
 };
 
-const FetchCurrentSnapshots = (ids: string[]) => {
-    return useSWR(`/api/inventory/currentsnapshots?ids=${ids.toString()}`, fetcher<InventorySnapshotWithInventoryAndStockSnapshots[]>);
-};
-
 const SpecificRequestContainer: FC<Props> = ({ id }) => {
     const { data: userData } = useUserData([
         Permission.CREATE_INVENTORY,
@@ -72,8 +69,9 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
     const { trigger: updateItem, isMutating: itemIsUpdating } = UpdateItem(id);
     const { trigger: deleteItem, isMutating: itemIsDeleting } = DeleteItem(id);
     const [changesMade, setChangesMade] = useState(false);
+    const isAdmin = hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MANAGE_STOCK_REQUESTS]);
     const { optimisticRequest, dispatchOptimisticRequest, startingRequest } = useAdminInventoryRequestData({
-        isEnabled: hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MANAGE_STOCK_REQUESTS]),
+        isEnabled: isAdmin,
         request,
         requestIsLoading,
         changesMade,
@@ -81,7 +79,12 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
     });
     const [confirmReviewModalOpen, setConfirmReviewModalOpen] = useState(false);
     const router = useRouter();
+    const { snapshots, isLoadingSnapshots } = useCurrentInventoryRequestSnapshots({
+        isAdmin: isAdmin,
+        request,
+        requestIsLoading
 
+    });
 
     useEffect(() => {
         if ((!requestIsLoading && !request)
@@ -133,126 +136,129 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
             <div className="default-container max-w-[80%] tablet:w-full p-12 phone:px-4">
                 <GoBackButton label="View All Requests" href="/inventory/requests" />
                 <Spacer y={6} />
-                <InventoryRequestedItemsTable
-                    items={optimisticRequest.items.length ? optimisticRequest.items : (request?.requestedItems || [])}
-                    showItemStatus
-                    isLoading={requestIsLoading}
-                    adminActions={request?.status === StockRequestStatus.PENDING && hasAnyPermission(userData?.permissions, [Permission.MANAGE_STOCK_REQUESTS, Permission.CREATE_INVENTORY])}
-                    onAdminAction={{
-                        onApprove(item) {
-                            if (!item.id)
-                                return;
+                {
+                    !isLoadingSnapshots ?
+                        <InventoryRequestedItemsTable
+                            items={optimisticRequest.items.length ? optimisticRequest.items : (request?.requestedItems || [])}
+                            inventorySnapshots={snapshots}
+                            showItemStatus
+                            requestStatus={request?.status}
+                            isLoading={requestIsLoading || isLoadingSnapshots}
+                            adminActions={request?.status === StockRequestStatus.PENDING && isAdmin}
+                            onAdminAction={{
+                                onApprove(item) {
+                                    if (!item.id)
+                                        return;
 
-                            // TODO: Make checks with the current snapshot to ensure item can be approved
+                                    dispatchOptimisticRequest({
+                                        type: OptimisticRequestDataActionType.APPROVE,
+                                        payload: { id: item.id }
+                                    });
 
-                            dispatchOptimisticRequest({
-                                type: OptimisticRequestDataActionType.APPROVE,
-                                payload: { id: item.id }
-                            });
+                                    toast.success(`Successfully approved ${item?.stock?.name.replaceAll("-", " ").capitalize()}`);
+                                },
+                                onPartialApprove(item, amountApproved) {
+                                    if (!item.id)
+                                        return;
 
-                            toast.success(`Successfully approved ${item?.stock?.name.replaceAll("-", " ").capitalize()}`);
-                        },
-                        onPartialApprove(item, amountApproved) {
-                            if (!item.id)
-                                return;
+                                    dispatchOptimisticRequest({
+                                        type: OptimisticRequestDataActionType.PARTIALLY_APPROVE,
+                                        payload: { id: item.id, amountApproved: amountApproved }
+                                    });
 
-                            // TODO: Make checks with the current snapshot to ensure item can be partially approved with the amount
+                                    toast.success(`Successfully partially approved ${item?.stock?.name.replaceAll("-", " ").capitalize()}`);
+                                },
+                                onReject(item) {
+                                    if (!item.id)
+                                        return;
 
-                            dispatchOptimisticRequest({
-                                type: OptimisticRequestDataActionType.PARTIALLY_APPROVE,
-                                payload: { id: item.id, amountApproved: amountApproved }
-                            });
+                                    dispatchOptimisticRequest({
+                                        type: OptimisticRequestDataActionType.REJECT,
+                                        payload: { id: item.id }
+                                    });
 
-                            toast.success(`Successfully partially approved ${item?.stock?.name.replaceAll("-", " ").capitalize()}`);
-                        },
-                        onReject(item) {
-                            if (!item.id)
-                                return;
+                                    toast.success(`Successfully rejected ${item?.stock?.name.replaceAll("-", " ").capitalize()}`);
+                                }
 
-                            dispatchOptimisticRequest({
-                                type: OptimisticRequestDataActionType.REJECT,
-                                payload: { id: item.id }
-                            });
+                            }}
+                            onSelfAction={request?.status === StockRequestStatus.PENDING ? {
+                                onRemove: {
+                                    removing: itemIsDeleting,
+                                    async action(item) {
+                                        const remove = async () => {
+                                            return deleteItem({
+                                                itemId: item.id!
+                                            })
+                                                .then(res => {
+                                                    const deletedItem: RequestedStockItem = res.data;
+                                                    const updatedInfo = { ...request };
+                                                    const deletedIndex = request?.requestedItems?.findIndex(reqItem => reqItem.id === deletedItem.id);
 
-                            toast.success(`Successfully rejected ${item?.stock?.name.replaceAll("-", " ").capitalize()}`);
-                        }
+                                                    if (deletedIndex === -1 || deletedIndex === undefined)
+                                                        return;
+                                                    updatedInfo?.requestedItems?.splice(deletedIndex);
+                                                    mutate(updatedInfo);
+                                                })
+                                                .catch(e => {
+                                                    console.error(e);
+                                                    throw e;
+                                                });
+                                        };
 
-                    }}
-                    onSelfAction={request?.status === StockRequestStatus.PENDING ? {
-                        onRemove: {
-                            removing: itemIsDeleting,
-                            async action(item) {
-                                const remove = async () => {
-                                    return deleteItem({
-                                        itemId: item.id!
-                                    })
-                                        .then(res => {
-                                            const deletedItem: RequestedStockItem = res.data;
-                                            const updatedInfo = { ...request };
-                                            const deletedIndex = request?.requestedItems?.findIndex(reqItem => reqItem.id === deletedItem.id);
-
-                                            if (deletedIndex === -1 || deletedIndex === undefined)
-                                                return;
-                                            updatedInfo?.requestedItems?.splice(deletedIndex);
-                                            mutate(updatedInfo);
-                                        })
-                                        .catch(e => {
-                                            console.error(e);
-                                            throw e;
+                                        await toast.promise(remove(), {
+                                            loading: `Removing ${item.stock?.name.replaceAll("-", " ").capitalize()}...`,
+                                            success: `Successfully removed ${item.stock?.name.replaceAll("-", " ").capitalize()}!`,
+                                            error(msg?: string) {
+                                                return msg ?? `There was an error removing ${item.stock?.name.replaceAll("-", " ").capitalize()}!`;
+                                            }
                                         });
-                                };
-
-                                await toast.promise(remove(), {
-                                    loading: `Removing ${item.stock?.name.replaceAll("-", " ").capitalize()}...`,
-                                    success: `Successfully removed ${item.stock?.name.replaceAll("-", " ").capitalize()}!`,
-                                    error(msg?: string) {
-                                        return msg ?? `There was an error removing ${item.stock?.name.replaceAll("-", " ").capitalize()}!`;
                                     }
-                                });
-                            }
-                        },
-                        onAmountChange: {
-                            editing: itemIsUpdating,
-                            async action(item, newAmount) {
-                                const remove = async () => {
-                                    return updateItem({
-                                        itemId: item.id!,
-                                        dto: {
-                                            amountRequested: newAmount
-                                        }
-                                    })
-                                        .then(res => {
-                                            const updatedItem: RequestedStockItem = res.data;
-                                            const updatedInfo = { ...request };
-                                            const updatedIndex = request?.requestedItems?.findIndex(reqItem => reqItem.id === updatedItem.id);
+                                },
+                                onAmountChange: {
+                                    editing: itemIsUpdating,
+                                    async action(item, newAmount) {
+                                        const remove = async () => {
+                                            return updateItem({
+                                                itemId: item.id!,
+                                                dto: {
+                                                    amountRequested: newAmount
+                                                }
+                                            })
+                                                .then(res => {
+                                                    const updatedItem: RequestedStockItem = res.data;
+                                                    const updatedInfo = { ...request };
+                                                    const updatedIndex = request?.requestedItems?.findIndex(reqItem => reqItem.id === updatedItem.id);
 
-                                            if (updatedIndex === -1 || updatedIndex === undefined)
-                                                return;
+                                                    if (updatedIndex === -1 || updatedIndex === undefined)
+                                                        return;
 
-                                            const currentItem = updatedInfo.requestedItems![updatedIndex];
-                                            updatedInfo.requestedItems![updatedIndex] = {
-                                                ...currentItem,
-                                                amountRequested: updatedItem.amountRequested
-                                            };
-                                            mutate(updatedInfo);
-                                        })
-                                        .catch(e => {
-                                            console.error(e);
-                                            throw e;
+                                                    const currentItem = updatedInfo.requestedItems![updatedIndex];
+                                                    updatedInfo.requestedItems![updatedIndex] = {
+                                                        ...currentItem,
+                                                        amountRequested: updatedItem.amountRequested
+                                                    };
+                                                    mutate(updatedInfo);
+                                                })
+                                                .catch(e => {
+                                                    console.error(e);
+                                                    throw e;
+                                                });
+                                        };
+
+                                        await toast.promise(remove(), {
+                                            loading: `Updating ${item.stock?.name.replaceAll("-", " ").capitalize()}...`,
+                                            success: `Successfully updated ${item.stock?.name.replaceAll("-", " ").capitalize()}!`,
+                                            error(msg?: string) {
+                                                return msg ?? `There was an error updating ${item.stock?.name.replaceAll("-", " ").capitalize()}!`;
+                                            }
                                         });
-                                };
-
-                                await toast.promise(remove(), {
-                                    loading: `Updating ${item.stock?.name.replaceAll("-", " ").capitalize()}...`,
-                                    success: `Successfully updated ${item.stock?.name.replaceAll("-", " ").capitalize()}!`,
-                                    error(msg?: string) {
-                                        return msg ?? `There was an error updating ${item.stock?.name.replaceAll("-", " ").capitalize()}!`;
                                     }
-                                });
-                            }
-                        }
-                    } : undefined}
-                />
+                                }
+                            } : undefined}
+                        />
+                        :
+                        <Spinner size="lg" />
+                }
             </div>
         </div>
     );
