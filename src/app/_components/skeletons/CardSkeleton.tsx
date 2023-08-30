@@ -14,7 +14,7 @@ export default function CardSkeleton({ width, contentRepeat }: Props) {
 
     return (
         <div
-            className="default-container p-6"
+            className="default-container p-6 space-y-3"
             style={{
                 width: width || "100%"
             }}

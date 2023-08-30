@@ -1,13 +1,11 @@
 "use client";
 
-import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
+import { Invoice } from "@prisma/client";
 import LinkCard from "../../../../../_components/LinkCard";
 import { Divider } from "@nextui-org/divider";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { Button, Checkbox, CheckboxGroup, Popover, PopoverContent, PopoverTrigger, Spacer } from "@nextui-org/react";
-import sortIcon from "/public/icons/green-filter.svg";
 import filterIcon from "/public/icons/filter-green.svg";
-import searchIcon from "/public/icons/search.svg";
 import DropdownInput from "../../../../../_components/inputs/DropdownInput";
 import React, { useMemo, useState } from "react";
 import "../../../../../../utils/GeneralUtils";
@@ -27,6 +25,9 @@ import {
     InvoiceCustomerWithOptionalItems,
     InvoiceWithOptionalItems
 } from "../../../home/_components/widgets/invoice/InvoiceWidget";
+import SortIcon from "../../../../../_components/icons/SortIcon";
+import CheckboxMenu from "../../../../../_components/CheckboxMenu";
+import FilterIcon from "../../../../../_components/icons/FilterIcon";
 
 type Props = {
     customerIsLoading: boolean,
@@ -47,17 +48,17 @@ enum FilterMode {
 }
 
 const getSortPredicate = (a: InvoiceWithOptionalItems, b: InvoiceWithOptionalItems, sortMode: SortMode): number => {
-    switch (sortMode.capitalize()) {
-        case SortMode.ASCENDING_DATE: {
+    switch (sortMode.toLowerCase().replaceAll("_", " ")) {
+        case SortMode.ASCENDING_DATE.toLowerCase(): {
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         }
-        case SortMode.DESCENDING_DATE: {
+        case SortMode.DESCENDING_DATE.toLowerCase(): {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         }
-        case SortMode.ASCENDING_TOTAL: {
+        case SortMode.ASCENDING_TOTAL.toLowerCase(): {
             return generateInvoiceTotal(a) - generateInvoiceTotal(b);
         }
-        case SortMode.DESCENDING_TOTAL: {
+        case SortMode.DESCENDING_TOTAL.toLowerCase(): {
             return generateInvoiceTotal(b) - generateInvoiceTotal(a);
         }
         default: {
@@ -167,37 +168,29 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                 <SubTitle className="self-center">All Invoices</SubTitle>
                 <DropdownInput
                     labelIsIcon
-                    icon={sortIcon}
+                    icon={<SortIcon />}
                     variant="flat"
                     selectionRequired
                     keys={[SortMode.DESCENDING_DATE, SortMode.ASCENDING_DATE, SortMode.DESCENDING_TOTAL, SortMode.ASCENDING_TOTAL]}
                     selectedKeys={sortMode}
                     setSelectedKeys={(keys) => setSortMode((Array.from(keys) as SortMode[]))}
                 />
-                <Popover
-                    classNames={{
-                        base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6"
+                <CheckboxMenu
+                    buttonProps={{
+                        children: <FilterIcon />
                     }}
-                    placement="bottom"
+                    checkboxGroupProps={{
+                        label: "Filter",
+                        value: filterModes,
+                        onValueChange(value) {
+                            setFilterModes(value as FilterMode[]);
+                        }
+                    }}
                 >
-                    <PopoverTrigger>
-                        <Button isIconOnly variant="flat" color="secondary">
-                            <GenericImage className="self-center" src={filterIcon} width={1.35} />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                        <CheckboxGroup
-                            label="Filter"
-                            color="secondary"
-                            value={filterModes}
-                            onValueChange={value => setFilterModes(value as FilterMode[])}
-                        >
-                            <Checkbox value={FilterMode.PAID}>Paid</Checkbox>
-                            <Checkbox value={FilterMode.UNPAID}>Unpaid</Checkbox>
-                            <Checkbox value={FilterMode.OVERDUE}>Overdue</Checkbox>
-                        </CheckboxGroup>
-                    </PopoverContent>
-                </Popover>
+                    <Checkbox value={FilterMode.PAID}>Paid</Checkbox>
+                    <Checkbox value={FilterMode.UNPAID}>Unpaid</Checkbox>
+                    <Checkbox value={FilterMode.OVERDUE}>Overdue</Checkbox>
+                </CheckboxMenu>
             </div>
             <Divider className="my-6" />
             <div className="w-1/4 tablet:w-1/2 phone:w-full">
