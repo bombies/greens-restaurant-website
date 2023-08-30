@@ -50,7 +50,7 @@ jobs:
           script: |
             export NVM_DIR=~/.nvm
             source ~/.nvm/nvm.sh
-            cd ~/bombies/greens-restaurant-website
+            cd ~/bombies/greens-restaurant-website-staging
             git stash
             git pull
             npm i
