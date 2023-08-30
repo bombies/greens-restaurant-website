@@ -52,7 +52,6 @@ export default function InvoiceLayout({ customerId }: Props) {
     ]);
     const { trigger: triggerStatusChange, isMutating: statusIsChanging } = ChangePaidStatus(customerId);
     const { selectedStatus, setSelectedStatus } = useInvoicePaymentStatus({ invoice, invoiceIsLoading });
-    const { pdf } = useInvoicePDF({ customer, invoice, invoiceItems });
 
     return (
         <div>
@@ -156,9 +155,6 @@ export default function InvoiceLayout({ customerId }: Props) {
                                 [Permission.CREATE_INVOICE]
                             ) : false}
                         />
-                        {<PDFViewer width="100%" height="1000px">
-                            {pdf}
-                        </PDFViewer>}
                     </Fragment>
 
             }
