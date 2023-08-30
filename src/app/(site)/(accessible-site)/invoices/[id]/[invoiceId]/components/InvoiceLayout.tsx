@@ -20,9 +20,6 @@ import useSWRMutation from "swr/mutation";
 import { useInvoicePaymentStatus } from "./hooks/useInvoicePaymentStatus";
 import { formatInvoiceNumber } from "../../../utils/invoice-utils";
 import { FetchInvoiceCustomer } from "../../../utils/invoice-client-utils";
-import ReactPDF, { PDFViewer } from "@react-pdf/renderer";
-import InvoicePDF from "./control-bar/export/pdf/InvoicePDF";
-import useInvoicePDF from "./control-bar/export/useInvoicePDF";
 
 type Props = {
     customerId: string
@@ -46,7 +43,7 @@ export default function InvoiceLayout({ customerId }: Props) {
     const { data: customer, isLoading: customerIsLoading, mutate } = FetchInvoiceCustomer(customerId);
     const { data: invoice, isLoading: invoiceIsLoading, mutate: mutateInvoice } = useInvoice();
     const { state: invoiceItems } = useInvoiceItems();
-    const { data: userData, isLoading: userDataIsLoading } = useUserData([
+    const { data: userData } = useUserData([
         Permission.VIEW_INVOICES,
         Permission.CREATE_INVOICE
     ]);
@@ -81,7 +78,7 @@ export default function InvoiceLayout({ customerId }: Props) {
                                                 invoiceId: invoice?.id ?? "",
                                                 status: status === PaidStatus.PAID
                                             })
-                                                .then((res) => {
+                                                .then(() => {
                                                     setSelectedStatus(status as PaidStatus);
                                                 })
                                                 .catch(e => {
