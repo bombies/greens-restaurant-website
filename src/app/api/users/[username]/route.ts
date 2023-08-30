@@ -1,4 +1,4 @@
-import { authenticated, Mailer, respond, respondWithInit } from "../../../../utils/api/ApiUtils";
+import { authenticated, respond, respondWithInit } from "../../../../utils/api/ApiUtils";
 import Permission, { permissionCheck } from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { NextResponse } from "next/server";
@@ -6,6 +6,7 @@ import { EMAIL_REGEX, NAME_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "../../.
 import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 import { z } from "zod";
+import { Mailer } from "../../../../utils/api/Mailer";
 
 type RouteContext = {
     params: {
@@ -199,65 +200,11 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                     init: { status: 401 }
                 });
 
-            await Mailer.sendMail({
-                from: "\"Green's Pub\" <no-reply@robertify.me>",
+            await Mailer.sendEmailUpdate({
                 to: body.email,
-                subject: "Email Updated",
-                html: `
-                <!DOCTYPE HTML>
-                <html lang="en">
-                  <head>
-                    <link rel="preconnect" href="https://fonts.googleapis.com">
-                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-                    <style>
-                      body {
-                        background-color: white;
-                        font-family: "Inter", sans-serif;
-                      }
-                      
-                      main {
-                        padding: 2rem;+
-                      }
-                
-                      .banner {
-                        background-image: linear-gradient(to right, #007d0d, #00D615);
-                        padding: 1rem;
-                      }
-                
-                      .primary-text {
-                        color: #00D615;
-                      }
-                
-                      .details-container {
-                        margin-top: 4rem;
-                        padding: 4rem 2rem;
-                        background: #00D615;
-                        border-radius: 16px;
-                        width: fit-content;
-                        box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-                      }
-                      
-                      .bold {
-                        font-weight: 700;
-                      }
-                
-                    </style>
-                  </head>
-                
-                  <body>
-                    <div>
-                      <div class="banner">
-                        <img src="https://i.imgur.com/HLTQ78m.png" alt="" width="128" height="128" />
-                      </div>
-                      <main>
-                        <h1>Hello <span class="primary-text">${user.firstName}</span>,</h1>
-                        <p>Your email for account with username <b>${body.username || user.username}</b> has been updated to this one. (${body.email})</p>
-                      </main>
-                    </div>
-                  </body>
-                </html>
-            `
+                username: body.username || user.username,
+                firstName: user.firstName,
+                email: body.email
             });
         }
 

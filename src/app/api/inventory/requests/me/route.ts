@@ -6,6 +6,7 @@ import { Prisma, RequestedStockItem, StockRequest } from "@prisma/client";
 import { z } from "zod";
 import StockRequestWhereInput = Prisma.StockRequestWhereInput;
 import { StockRequestStatus } from ".prisma/client";
+import { Mailer } from "../../../../../utils/api/Mailer";
 
 export const getFetchStockRequestsSearchParams = (url: string) => {
     const { searchParams } = new URL(url);
@@ -103,7 +104,14 @@ export async function POST(req: Request) {
 
         const createdRequestedStockItems = await prisma.requestedStockItem.createMany({
             data: itemsToBeCreated
-        });
+        }).then(() => prisma.requestedStockItem.findMany({
+            where: {
+                stockRequestId: createdRequest.id
+            },
+            include: {
+                stock: true
+            }
+        }));
 
         await prisma.user.updateMany({
             where: {
@@ -116,7 +124,10 @@ export async function POST(req: Request) {
             }
         });
 
-        // TODO: Email any assigned users about the newly created request
+        await Mailer.sendInventoryRequestAssignment({
+            assignees: createdRequest.assignedToUsers,
+            request: { ...createdRequest, requestedItems: createdRequestedStockItems }
+        });
 
         return NextResponse.json({ ...createdRequest, requestedItems: createdRequestedStockItems });
     }, [

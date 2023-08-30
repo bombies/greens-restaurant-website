@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import Permission, { hasAnyPermission, hasPermissions } from "../../libs/types/permission";
 import { getServerSession, Session } from "next-auth";
 import { authHandler } from "../../app/api/auth/[...nextauth]/route";
-import nodemailer from "nodemailer";
-import Mail from "nodemailer/lib/mailer";
 import { AuthenticatedServerAxiosClient } from "./AuthenticatedServerAxiosClient";
 import { getToken } from "next-auth/jwt";
 import prisma from "../../libs/prisma";
@@ -99,20 +97,3 @@ export const respondWithInit = ({ data, message, validationErrors, ...init }: {
         message
     }, init);
 };
-
-export class Mailer {
-    private static readonly transporter = nodemailer.createTransport({
-        host: process.env.MAILER_HOST,
-        port: Number(process.env.MAILER_PORT),
-        secure: false,
-        requireTLS: true,
-        auth: {
-            user: process.env.MAILER_USER,
-            pass: process.env.MAILER_PASSWORD
-        }
-    });
-
-    public static async sendMail(options: Mail.Options) {
-        return await Mailer.transporter.sendMail(options);
-    }
-}

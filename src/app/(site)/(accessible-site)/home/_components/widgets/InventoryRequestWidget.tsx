@@ -18,23 +18,22 @@ const InventoryRequestWidget: FC = () => {
         data, dataIsLoading: isLoading
     });
     const cards = useMemo(() => visibleRequests
-            ?.map(request => (
-                <LinkCard key={request.id} href={`/inventory/requests/${request.id}`}>
-                    <div className="block">
-                        <SubTitle className="!text-sm" thick>
-                            {
-                                `Request for ${new Date(request.createdAt).toLocaleDateString("en-JM")} @ ${new Date(request.createdAt).toLocaleTimeString("en-JM", {
-                                    timeZone: "EST",
-                                    timeStyle: "short"
-                                })}`
-                            }
-                        </SubTitle>
-                        <Divider className="my-2" />
-                        {getStatusChip(request)}
-                    </div>
-                </LinkCard>
-            ))
-        , [visibleRequests]);
+        ?.map(request => (
+            <LinkCard key={request.id} href={`/inventory/requests/${request.id}`}>
+                <div className="block">
+                    <SubTitle className="!text-sm" thick>
+                        {
+                            `Request for ${new Date(request.createdAt).toLocaleDateString("en-JM")} @ ${new Date(request.createdAt).toLocaleTimeString("en-JM", {
+                                timeZone: "EST",
+                                timeStyle: "short"
+                            })}`
+                        }
+                    </SubTitle>
+                    <Divider className="my-2" />
+                    {getStatusChip(request)}
+                </div>
+            </LinkCard>
+        )), [visibleRequests]);
 
     return (
         <div className="default-container backdrop-blur-md pt-6 px-6 pb-12 w-96 h-96 phone:w-full">
