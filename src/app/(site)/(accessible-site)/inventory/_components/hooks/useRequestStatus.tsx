@@ -7,15 +7,20 @@ import { Chip } from "@nextui-org/chip";
 import DeliveredIcon from "../../../../../_components/icons/DeliveredIcon";
 import DeniedIcon from "../../../../../_components/icons/DeniedIcon";
 import PendingIcon from "../../../../../_components/icons/PendingIcon";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import SubTitle from "../../../../../_components/text/SubTitle";
+import { Divider } from "@nextui-org/divider";
+import clsx from "clsx";
 
 const useRequestStatus = (request?: StockRequestWithOptionalCreatorAndAssignees) => {
-    return useMemo(() => {
+    const chip = useMemo(() => {
         switch (request?.status) {
             case StockRequestStatus.DELIVERED: {
                 return (
                     <Chip
                         variant="flat"
                         color="success"
+                        className={clsx(request.reviewedNotes && "cursor-pointer")}
                         classNames={{
                             content: "font-semibold"
                         }}
@@ -30,6 +35,7 @@ const useRequestStatus = (request?: StockRequestWithOptionalCreatorAndAssignees)
                     <Chip
                         variant="flat"
                         color="warning"
+                        className={clsx(request.reviewedNotes && "cursor-pointer")}
                         classNames={{
                             content: "font-semibold"
                         }}
@@ -44,6 +50,7 @@ const useRequestStatus = (request?: StockRequestWithOptionalCreatorAndAssignees)
                     <Chip
                         variant="flat"
                         color="danger"
+                        className={clsx(request.reviewedNotes && "cursor-pointer")}
                         classNames={{
                             content: "font-semibold"
                         }}
@@ -57,6 +64,7 @@ const useRequestStatus = (request?: StockRequestWithOptionalCreatorAndAssignees)
                 return (
                     <Chip
                         variant="flat"
+                        className={clsx(request.reviewedNotes && "cursor-pointer")}
                         classNames={{
                             content: "font-semibold"
                         }}
@@ -67,7 +75,26 @@ const useRequestStatus = (request?: StockRequestWithOptionalCreatorAndAssignees)
                 );
             }
         }
-    }, [request?.status]);
+    }, [request?.reviewedNotes, request?.status]);
+
+    return request?.reviewedNotes ? (
+        <Popover
+            showArrow
+            placement="right"
+            classNames={{
+                base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6"
+            }}
+        >
+            <PopoverTrigger>
+                {chip}
+            </PopoverTrigger>
+            <PopoverContent>
+                <SubTitle thick>Notes</SubTitle>
+                <Divider className="my-3" />
+                {request.reviewedNotes}
+            </PopoverContent>
+        </Popover>
+    ) : chip;
 };
 
 export default useRequestStatus;
