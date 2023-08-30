@@ -20,6 +20,9 @@ import useSWRMutation from "swr/mutation";
 import { useInvoicePaymentStatus } from "./hooks/useInvoicePaymentStatus";
 import { formatInvoiceNumber } from "../../../utils/invoice-utils";
 import { FetchInvoiceCustomer } from "../../../utils/invoice-client-utils";
+import ReactPDF, { PDFViewer } from "@react-pdf/renderer";
+import InvoicePDF from "./control-bar/export/pdf/InvoicePDF";
+import useInvoicePDF from "./control-bar/export/useInvoicePDF";
 
 type Props = {
     customerId: string
@@ -49,6 +52,7 @@ export default function InvoiceLayout({ customerId }: Props) {
     ]);
     const { trigger: triggerStatusChange, isMutating: statusIsChanging } = ChangePaidStatus(customerId);
     const { selectedStatus, setSelectedStatus } = useInvoicePaymentStatus({ invoice, invoiceIsLoading });
+    const { pdf } = useInvoicePDF({ customer, invoice, invoiceItems });
 
     return (
         <div>
@@ -143,14 +147,20 @@ export default function InvoiceLayout({ customerId }: Props) {
                         <TableSkeleton columns={invoiceColumns} />
                     </div>
                     :
-                    <InvoiceTable
-                        customer={customer}
-                        mutator={mutate}
-                        mutationAllowed={!invoice?.paid ? hasAnyPermission(
-                            userData?.permissions,
-                            [Permission.CREATE_INVOICE]
-                        ) : false}
-                    />
+                    <Fragment>
+                        <InvoiceTable
+                            customer={customer}
+                            mutator={mutate}
+                            mutationAllowed={!invoice?.paid ? hasAnyPermission(
+                                userData?.permissions,
+                                [Permission.CREATE_INVOICE]
+                            ) : false}
+                        />
+                        {<PDFViewer width="100%" height="1000px">
+                            {pdf}
+                        </PDFViewer>}
+                    </Fragment>
+
             }
 
         </div>
