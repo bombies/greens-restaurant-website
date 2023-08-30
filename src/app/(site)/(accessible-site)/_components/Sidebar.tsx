@@ -76,8 +76,7 @@ export default function Sidebar() {
         <div className={clsx(`
             h-full
             p-6
-            sticky
-            tablet:absolute
+            absolute
             top-0
             transition-fast
             z-40`,

@@ -6,25 +6,16 @@ import InventoryRequestCard from "../InventoryRequestCard";
 import { Divider } from "@nextui-org/divider";
 import GenericCard from "../../../../../../_components/GenericCard";
 import SubTitle from "../../../../../../_components/text/SubTitle";
-import useMutableRequests, { RequestSortMode } from "../hooks/useMutableRequests";
+import useMutableRequests from "../hooks/useMutableRequests";
 import CardSkeleton from "../../../../../../_components/skeletons/CardSkeleton";
-import DropdownInput from "../../../../../../_components/inputs/DropdownInput";
-import SortIcon from "../../../../../../_components/icons/SortIcon";
-import CheckboxMenu from "../../../../../../_components/CheckboxMenu";
-import FilterIcon from "../../../../../../_components/icons/FilterIcon";
-import { StockRequestStatus } from ".prisma/client";
-import { Checkbox } from "@nextui-org/react";
-import PendingIcon from "../../../../../../_components/icons/PendingIcon";
-import DeliveredIcon from "../../../../../../_components/icons/DeliveredIcon";
-import DeniedIcon from "../../../../../../_components/icons/DeniedIcon";
 
-const FetchAllRequests = (withAssignees?: boolean) => {
+export const FetchAllRequests = (withAssignees?: boolean) => {
     return useSWR(`/api/inventory/requests?with_users=true&with_assignees=${withAssignees ?? false}`, fetcher<StockRequestWithOptionalCreator[]>);
 };
 
 const AllInventoryRequestsTab: FC = () => {
     const { data, isLoading } = FetchAllRequests(true);
-    const { visibleRequests, sortMode, setSortMode, filters, setFilters } = useMutableRequests({
+    const { visibleRequests, sortButton, filterButton } = useMutableRequests({
         data, dataIsLoading: isLoading
     });
     const requestCards = useMemo(() => {
@@ -42,48 +33,8 @@ const AllInventoryRequestsTab: FC = () => {
     return (
         <Fragment>
             <div className="flex items-center gap-4">
-                <DropdownInput
-                    labelIsIcon
-                    icon={<SortIcon />}
-                    variant="flat"
-                    selectionRequired
-                    keys={[RequestSortMode.NEWEST_OLDEST, RequestSortMode.OLDEST_NEWEST]}
-                    selectedKeys={sortMode ? [sortMode] : []}
-                    setSelectedKeys={(keys) => setSortMode((Array.from(keys)[0] as RequestSortMode))}
-                />
-                <CheckboxMenu
-                    buttonProps={{
-                        children: <FilterIcon />
-                    }}
-                    checkboxGroupProps={{
-                        label: "Filter",
-                        value: filters,
-                        onValueChange(value) {
-                            setFilters(value as StockRequestStatus[]);
-                        }
-                    }}
-                >
-                    <Checkbox
-                        icon={<PendingIcon />}
-                        color="default"
-                        value={StockRequestStatus.PENDING}
-                    >Pending</Checkbox>
-                    <Checkbox
-                        color="warning"
-                        icon={<DeliveredIcon />}
-                        value={StockRequestStatus.PARTIALLY_DELIVERED}
-                    >Partially Delivered</Checkbox>
-                    <Checkbox
-                        color="success"
-                        icon={<DeliveredIcon />}
-                        value={StockRequestStatus.DELIVERED}
-                    >Delivered</Checkbox>
-                    <Checkbox
-                        color="danger"
-                        icon={<DeniedIcon />}
-                        value={StockRequestStatus.REJECTED}
-                    >Rejected</Checkbox>
-                </CheckboxMenu>
+                {sortButton}
+                {filterButton}
             </div>
             <Divider className="my-6" />
             {

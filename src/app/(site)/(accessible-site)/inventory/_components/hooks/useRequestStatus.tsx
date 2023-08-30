@@ -12,70 +12,74 @@ import SubTitle from "../../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 import clsx from "clsx";
 
+export const getStatusChip = (request?: StockRequestWithOptionalCreatorAndAssignees) => {
+    switch (request?.status) {
+        case StockRequestStatus.DELIVERED: {
+            return (
+                <Chip
+                    variant="flat"
+                    color="success"
+                    className={clsx(request.reviewedNotes && "cursor-pointer")}
+                    classNames={{
+                        content: "font-semibold"
+                    }}
+                    startContent={<DeliveredIcon width={16} />}
+                >
+                    DELIVERED
+                </Chip>
+            );
+        }
+        case StockRequestStatus.PARTIALLY_DELIVERED: {
+            return (
+                <Chip
+                    variant="flat"
+                    color="warning"
+                    className={clsx(request.reviewedNotes && "cursor-pointer")}
+                    classNames={{
+                        content: "font-semibold"
+                    }}
+                    startContent={<DeliveredIcon width={16} />}
+                >
+                    PARTIALLY DELIVERED
+                </Chip>
+            );
+        }
+        case StockRequestStatus.REJECTED: {
+            return (
+                <Chip
+                    variant="flat"
+                    color="danger"
+                    className={clsx(request.reviewedNotes && "cursor-pointer")}
+                    classNames={{
+                        content: "font-semibold"
+                    }}
+                    startContent={<DeniedIcon width={16} />}
+                >
+                    REJECTED
+                </Chip>
+            );
+        }
+        case StockRequestStatus.PENDING: {
+            return (
+                <Chip
+                    variant="flat"
+                    className={clsx(request.reviewedNotes && "cursor-pointer")}
+                    classNames={{
+                        content: "font-semibold"
+                    }}
+                    startContent={<PendingIcon width={16} />}
+                >
+                    PENDING
+                </Chip>
+            );
+        }
+    }
+};
+
 const useRequestStatus = (request?: StockRequestWithOptionalCreatorAndAssignees) => {
     const chip = useMemo(() => {
-        switch (request?.status) {
-            case StockRequestStatus.DELIVERED: {
-                return (
-                    <Chip
-                        variant="flat"
-                        color="success"
-                        className={clsx(request.reviewedNotes && "cursor-pointer")}
-                        classNames={{
-                            content: "font-semibold"
-                        }}
-                        startContent={<DeliveredIcon width={16} />}
-                    >
-                        DELIVERED
-                    </Chip>
-                );
-            }
-            case StockRequestStatus.PARTIALLY_DELIVERED: {
-                return (
-                    <Chip
-                        variant="flat"
-                        color="warning"
-                        className={clsx(request.reviewedNotes && "cursor-pointer")}
-                        classNames={{
-                            content: "font-semibold"
-                        }}
-                        startContent={<DeliveredIcon width={16} />}
-                    >
-                        PARTIALLY DELIVERED
-                    </Chip>
-                );
-            }
-            case StockRequestStatus.REJECTED: {
-                return (
-                    <Chip
-                        variant="flat"
-                        color="danger"
-                        className={clsx(request.reviewedNotes && "cursor-pointer")}
-                        classNames={{
-                            content: "font-semibold"
-                        }}
-                        startContent={<DeniedIcon width={16} />}
-                    >
-                        REJECTED
-                    </Chip>
-                );
-            }
-            case StockRequestStatus.PENDING: {
-                return (
-                    <Chip
-                        variant="flat"
-                        className={clsx(request.reviewedNotes && "cursor-pointer")}
-                        classNames={{
-                            content: "font-semibold"
-                        }}
-                        startContent={<PendingIcon width={16} />}
-                    >
-                        PENDING
-                    </Chip>
-                );
-            }
-        }
-    }, [request?.reviewedNotes, request?.status]);
+        return getStatusChip(request);
+    }, [request]);
 
     return request?.reviewedNotes ? (
         <Popover

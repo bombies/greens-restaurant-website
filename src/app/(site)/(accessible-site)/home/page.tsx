@@ -13,6 +13,7 @@ import StockGraphWidget from "./_components/widgets/StockGraphWidget";
 import { Spacer } from "@nextui-org/react";
 import InvoiceWidget from "./_components/widgets/invoice/InvoiceWidget";
 import CreateInventoryRequestQuickAction from "./_components/quick-actions/CreateInventoryRequestQuickAction";
+import InventoryRequestWidget from "./_components/widgets/InventoryRequestWidget";
 
 export default function HomePage() {
     const session = useSession();
@@ -84,7 +85,15 @@ export default function HomePage() {
                 )
             }
             <Spacer y={12} />
-            <div className="flex justify-center phone:flex-col gap-12">
+            <div className="grid grid-cols-3 place-items-center tablet:grid-cols-1 gap-20">
+                {
+                    hasAnyPermission(user?.permissions, [
+                        Permission.CREATE_INVENTORY,
+                        Permission.MANAGE_STOCK_REQUESTS,
+                        Permission.VIEW_STOCK_REQUESTS
+                    ]) &&
+                    <InventoryRequestWidget />
+                }
                 {
                     hasAnyPermission(user?.permissions, [
                         Permission.CREATE_INVENTORY,

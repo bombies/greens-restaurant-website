@@ -157,7 +157,7 @@ export default function InvoiceWidget() {
     )), [invoiceCustomers]);
 
     return (
-        <div className="default-container backdrop-blur-md pt-6 px-6 pb-12 w-[26rem] h-96 phone:w-full">
+        <div className="default-container backdrop-blur-md pt-6 px-6 pb-12 w-96 h-96 phone:w-full">
             {
                 invoiceCustomersLoading ?
                     <div className="flex justify-center items-center"><Spinner size="lg" /></div>
