@@ -16,12 +16,15 @@ import editIcon from "/public/icons/edit.svg";
 import IconButton from "../../../../../../_components/inputs/IconButton";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../../../utils/Hooks";
+import { KeyedMutator } from "swr";
+import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 type Props = {
     customer?: InvoiceCustomer,
     disabled?: boolean,
     iconOnly?: boolean,
     onSuccess?: (data: InvoiceCustomer) => void;
+    mutator?: KeyedMutator<InvoiceCustomer | undefined>,
 }
 
 type UpdateCustomerInfoArgs = {
@@ -35,7 +38,7 @@ const UpdateCustomerInfo = (customerId?: string) => {
     return useSWRMutation(`/api/invoices/customer/${customerId}`, mutator);
 };
 
-export default function EditCustomerButton({ customer, disabled, iconOnly, onSuccess }: Props) {
+export default function EditCustomerButton({ customer, disabled, iconOnly, onSuccess, mutator }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const [proposedChanges, setProposedChanges] = useState<UpdateCustomerDto>();
     const [changesMade, setChangesMade] = useState(false);
@@ -60,13 +63,21 @@ export default function EditCustomerButton({ customer, disabled, iconOnly, onSuc
                         triggerCustomerUpdate({
                             dto: proposedChanges
                         })
-                            .then((data) => {
+                            .then(async (res) => {
+                                const updatedCustomer: InvoiceCustomer = res.data;
                                 setProposedChanges(undefined);
+
+                                if (mutator)
+                                    await mutator({
+                                        ...customer,
+                                        ...updatedCustomer
+                                    });
+
                                 setModalOpen(false);
                                 toast.success("Successfully updated this customer!");
 
                                 if (onSuccess)
-                                    onSuccess(data.data);
+                                    onSuccess(updatedCustomer);
                             })
                             .catch(e => {
                                 console.error(e);

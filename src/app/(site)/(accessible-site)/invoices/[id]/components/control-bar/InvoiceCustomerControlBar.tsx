@@ -10,20 +10,31 @@ import Link from "next/link";
 import { Spacer } from "@nextui-org/react";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import ReportsIcon from "../../../../../../_components/icons/ReportsIcon";
+import { InvoiceCustomerWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { KeyedMutator } from "swr";
 
 type Props = {
-    customer?: InvoiceCustomer
+    customer?: InvoiceCustomer,
+    mutator: KeyedMutator<InvoiceCustomerWithOptionalItems | undefined>,
     controlsEnabled?: boolean
 }
 
-export default function InvoiceCustomerControlBar({ customer, controlsEnabled }: Props) {
+export default function InvoiceCustomerControlBar({ customer, controlsEnabled, mutator }: Props) {
     return (
         <div className="default-container p-12">
             <GoBackButton href="/invoices" label="View all customers" />
             <Spacer y={6} />
             <div className="grid grid-cols-4 tablet:grid-cols-1 gap-4">
-                <CreateInvoiceButton customerId={customer?.id} disabled={!controlsEnabled} />
-                <EditCustomerButton customer={customer} disabled={!controlsEnabled} />
+                <CreateInvoiceButton
+                    customer={customer}
+                    disabled={!controlsEnabled}
+                    mutator={mutator}
+                />
+                <EditCustomerButton
+                    customer={customer}
+                    disabled={!controlsEnabled}
+                    mutator={mutator}
+                />
                 <GenericButton
                     color="warning"
                     variant="flat"
@@ -42,7 +53,7 @@ type GoBackButtonProps = {
     href: string,
 }
 
-export function GoBackButton({label, href}: GoBackButtonProps) {
+export function GoBackButton({ label, href }: GoBackButtonProps) {
     const [iconColor, setIconColor] = useState("#ffffff");
     const setActiveColor = () => setIconColor("#00D615");
     const setDefaultColor = () => setIconColor("#ffffff");

@@ -6,20 +6,19 @@ import SubTitle from "../../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
 import clsx from "clsx";
 import GenericCard from "../../../../_components/GenericCard";
-import { useInvoiceCustomers } from "./hooks/useInvoiceCustomers";
+import { InvoiceCustomerHook, useInvoiceCustomers } from "./hooks/useInvoiceCustomers";
 import { Divider } from "@nextui-org/divider";
 import GenericInput from "../../../../_components/inputs/GenericInput";
 import SearchIcon from "../../../../_components/icons/SearchIcon";
-import React, { Fragment } from "react";
+import React, { FC, Fragment } from "react";
 
-export default function InvoiceCustomerGrid() {
-    const {
-        visibleCustomers: customers,
-        isLoading,
-        search,
-        setSearch
-    } = useInvoiceCustomers();
-
+const InvoiceCustomerGrid: FC<InvoiceCustomerHook> = ({
+                                                          customers,
+                                                          visibleCustomers,
+                                                          search,
+                                                          setSearch,
+                                                          isLoading
+                                                      }) => {
     const customerElements = customers?.map(customer => (
         <LinkCard key={customer.id} href={`/invoices/${customer.id}`}>
             <div className="whitespace-nowrap overflow-hidden">
@@ -70,4 +69,6 @@ export default function InvoiceCustomerGrid() {
             </div>
         </div>
     );
-}
+};
+
+export default InvoiceCustomerGrid;

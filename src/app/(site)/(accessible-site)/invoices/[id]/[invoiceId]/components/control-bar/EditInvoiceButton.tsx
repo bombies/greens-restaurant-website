@@ -15,9 +15,12 @@ import editIcon from "/public/icons/edit-green.svg";
 import { GenericDatePicker } from "../../../../../../../_components/GenericDatePicker";
 import { fetchDueAt } from "../../../../utils/invoice-utils";
 import { toast } from "react-hot-toast";
+import { KeyedMutator } from "swr";
+import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 type Props = {
-    customerId?: string
+    customerId?: string,
+    mutateInvoice: KeyedMutator<InvoiceWithOptionalItems | undefined>
     invoice?: Invoice
     disabled: boolean
 }
@@ -33,7 +36,7 @@ const UpdateInvoiceInfo = (customerId?: string, invoiceId?: string) => {
     return useSWRMutation(`/api/invoices/customer/${customerId}/invoice/${invoiceId}`, mutator);
 };
 
-export default function EditInvoiceButton({ customerId, invoice, disabled }: Props) {
+export default function EditInvoiceButton({ customerId, invoice, disabled, mutateInvoice }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const [proposedChanges, setProposedChanges] = useState<UpdateInvoiceDto>();
     const [changesMade, setChangesMade] = useState(false);
@@ -61,7 +64,14 @@ export default function EditInvoiceButton({ customerId, invoice, disabled }: Pro
                         triggerInvoiceInfoUpdate({
                             dto: proposedChanges
                         })
-                            .then(() => {
+                            .then(async (res) => {
+                                const updatedInvoice: InvoiceWithOptionalItems = res.data;
+
+                                await mutateInvoice({
+                                    ...invoice,
+                                    ...updatedInvoice
+                                });
+
                                 setProposedChanges(undefined);
                                 setModalOpen(false);
                                 toast.success("Successfully updated this invoice!");

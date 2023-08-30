@@ -6,15 +6,18 @@ import Link from "next/link";
 import EditInvoiceButton from "./EditInvoiceButton";
 import ExportInvoiceButton from "./export/ExportInvoiceButton";
 import DeleteInvoiceButton from "./DeleteInvoiceButton";
+import { KeyedMutator } from "swr";
+import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 type Props = {
     customer?: InvoiceCustomer,
     invoice?: Invoice,
-    invoiceItems?: InvoiceItem[]
+    invoiceItems?: InvoiceItem[],
+    mutateInvoice: KeyedMutator<InvoiceWithOptionalItems | undefined>
     controlsEnabled?: boolean
 }
 
-export default function InvoiceControlBar({ customer, invoice, invoiceItems, controlsEnabled }: Props) {
+export default function InvoiceControlBar({ customer, invoice, invoiceItems, controlsEnabled, mutateInvoice }: Props) {
     return (
         <div className="default-container p-12">
             <GoBackButton customerId={customer?.id} />
@@ -24,6 +27,7 @@ export default function InvoiceControlBar({ customer, invoice, invoiceItems, con
                     customerId={customer?.id}
                     invoice={invoice}
                     disabled={!controlsEnabled}
+                    mutateInvoice={mutateInvoice}
                 />
                 <ExportInvoiceButton
                     customer={customer}

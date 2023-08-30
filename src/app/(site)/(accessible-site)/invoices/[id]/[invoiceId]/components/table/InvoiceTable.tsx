@@ -7,11 +7,7 @@ import {
     Selection,
     SortDescriptor,
     Spacer,
-    Table,
-    TableBody,
     TableCell,
-    TableColumn,
-    TableHeader,
     TableRow
 } from "@nextui-org/react";
 import clsx from "clsx";
@@ -25,7 +21,8 @@ import DeleteInvoiceItemButton from "./DeleteInvoiceItemButton";
 import DeleteInvoiceItemsButton from "./DeleteInvoiceItemsButton";
 import closeIcon from "/public/icons/close-gold-circled.svg";
 import GenericTable from "../../../../../../../_components/table/GenericTable";
-import { columns } from "../../../../../inventory/[name]/_components/table/StockTable";
+import { InvoiceCustomerWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { KeyedMutator } from "swr";
 
 
 export type Column = {
@@ -57,13 +54,14 @@ export const invoiceColumns: Column[] = [
 ];
 
 type Props = {
-    customerId?: string,
+    customer?: InvoiceCustomerWithOptionalItems,
+    mutator: KeyedMutator<InvoiceCustomerWithOptionalItems | undefined>,
     mutationAllowed: boolean
 }
 
-export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
+export default function InvoiceTable({ customer, mutationAllowed, mutator }: Props) {
     const { data: invoice, isLoading } = useInvoice();
-    const { state: items, dispatch: dispatchItems } = useInvoiceItems();
+    const { state: items, dispatch: dispatchItems, mutate: mutateItems } = useInvoiceItems();
     const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
 
@@ -142,7 +140,7 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                             </GenericButton>
                             <DeleteInvoiceItemsButton
                                 disabled={!mutationAllowed}
-                                customerId={customerId}
+                                customerId={customer?.id}
                                 items={items.filter(item => selectedKeys
                                     .map(key => key.toString().split("/")[0])
                                     .includes(item.id)
@@ -162,7 +160,7 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                                         <div className="flex phone:flex-col gap-4 phone:gap-2">
                                             <EditInvoiceItemButton
                                                 disabled={!mutationAllowed}
-                                                customerId={customerId}
+                                                customerId={customer?.id}
                                                 item={items.find(item => item.id === selectedKeys[0].toString().split("/")[0])!}
                                                 dispatchItems={dispatchItems}
                                                 setSelectedKeys={setSelectedKeys}
@@ -178,7 +176,7 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                                             </GenericButton>
                                             <DeleteInvoiceItemButton
                                                 disabled={!mutationAllowed}
-                                                customerId={customerId}
+                                                customerId={customer?.id}
                                                 item={items.find(item => item.id === selectedKeys[0].toString().split("/")[0])!}
                                                 dispatchItems={dispatchItems}
                                                 setSelectedKeys={setSelectedKeys}
@@ -223,8 +221,10 @@ export default function InvoiceTable({ customerId, mutationAllowed }: Props) {
                         <div className="p-6">
                             <AddInvoiceItemButton
                                 disabled={!mutationAllowed}
-                                invoiceId={invoice?.id}
-                                customerId={customerId}
+                                invoice={invoice}
+                                customer={customer}
+                                items={items}
+                                mutator={mutateItems}
                             />
                         </div>
                     </Fragment>

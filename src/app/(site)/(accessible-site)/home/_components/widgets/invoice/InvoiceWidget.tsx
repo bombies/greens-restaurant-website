@@ -74,7 +74,8 @@ const reducer = (state: InvoiceCustomerWithOptionalInvoices[], { type, payload }
 export default function InvoiceWidget() {
     const {
         data: invoiceCustomerAPIData,
-        isLoading: invoiceCustomersLoading
+        isLoading: invoiceCustomersLoading,
+        mutate
     } = FetchInvoiceCustomers({ withInvoices: true });
     const [invoiceCustomers, dispatchInvoiceCustomers] = useReducer(reducer, invoiceCustomerAPIData ?? []);
 

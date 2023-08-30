@@ -15,8 +15,8 @@ type Props = {
 }
 
 export default function InvoiceCustomerLayout({ id }: Props) {
-    const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(id, true, true);
-    const { data: userData, isLoading: userDataIsLoading } = useUserData([
+    const { data: customer, isLoading: customerIsLoading, mutate } = FetchInvoiceCustomer(id, true, true);
+    const { data: userData } = useUserData([
         Permission.VIEW_INVOICES,
         Permission.CREATE_INVOICE
     ]);
@@ -39,6 +39,7 @@ export default function InvoiceCustomerLayout({ id }: Props) {
                 <Fragment>
                     <InvoiceCustomerControlBar
                         customer={customer}
+                        mutator={mutate}
                         controlsEnabled={
                             hasAnyPermission(
                                 userData?.permissions,

@@ -13,6 +13,12 @@ import useSWRMutation from "swr/mutation";
 import GenericTextArea from "../../../../../../../_components/inputs/GenericTextArea";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../../../../utils/Hooks";
+import {
+    InvoiceCustomerWithOptionalItems,
+    InvoiceWithOptionalItems
+} from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { KeyedMutator } from "swr";
+import { InvoiceItem } from "@prisma/client";
 
 type AddInvoiceItemArgs = {
     arg: {
@@ -26,21 +32,23 @@ const AddInvoiceItem = (customerId?: string, invoiceId?: string) => {
 };
 
 type Props = {
-    customerId?: string,
-    invoiceId?: string,
+    customer?: InvoiceCustomerWithOptionalItems,
+    items?: InvoiceItem[],
+    mutator: KeyedMutator<InvoiceWithOptionalItems | undefined>,
+    invoice?: InvoiceWithOptionalItems,
     disabled: boolean,
 }
 
-export default function AddInvoiceItemButton({ customerId, invoiceId, disabled }: Props) {
+export default function AddInvoiceItemButton({ customer, items, mutator, invoice, disabled }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm<FieldValues>();
-    const { trigger: triggerItemAdd, isMutating: itemIsAdding } = AddInvoiceItem(customerId, invoiceId);
+    const { trigger: triggerItemAdd, isMutating: itemIsAdding } = AddInvoiceItem(customer?.id, invoice?.id);
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         const validQuantity = Math.floor(Math.max(0, data.quantity));
         const validPrice = Math.max(0, data.price);
 
-        if (!invoiceId)
+        if (!invoice)
             return;
 
         triggerItemAdd({
@@ -51,7 +59,12 @@ export default function AddInvoiceItemButton({ customerId, invoiceId, disabled }
                 price: validPrice
             }]
         })
-            .then(() => {
+            .then(async (res) => {
+                const createdItem: InvoiceItem = res.data;
+                await mutator({
+                    ...invoice,
+                    invoiceItems: items ? [...items, createdItem] : [createdItem]
+                });
                 setModalOpen(false);
                 toast.success("Successfully added that item!");
             })

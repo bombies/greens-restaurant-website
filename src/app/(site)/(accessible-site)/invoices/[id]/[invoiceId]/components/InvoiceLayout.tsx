@@ -40,8 +40,8 @@ const ChangePaidStatus = (customerId?: string) => {
 };
 
 export default function InvoiceLayout({ customerId }: Props) {
-    const { data: customer, isLoading: customerIsLoading } = FetchInvoiceCustomer(customerId);
-    const { data: invoice, isLoading: invoiceIsLoading } = useInvoice();
+    const { data: customer, isLoading: customerIsLoading, mutate } = FetchInvoiceCustomer(customerId);
+    const { data: invoice, isLoading: invoiceIsLoading, mutate: mutateInvoice } = useInvoice();
     const { state: invoiceItems } = useInvoiceItems();
     const { data: userData, isLoading: userDataIsLoading } = useUserData([
         Permission.VIEW_INVOICES,
@@ -127,6 +127,7 @@ export default function InvoiceLayout({ customerId }: Props) {
                         customer={customer}
                         invoice={invoice}
                         invoiceItems={invoiceItems}
+                        mutateInvoice={mutateInvoice}
                         controlsEnabled={
                             hasAnyPermission(
                                 userData?.permissions,
@@ -143,7 +144,8 @@ export default function InvoiceLayout({ customerId }: Props) {
                     </div>
                     :
                     <InvoiceTable
-                        customerId={customer?.id}
+                        customer={customer}
+                        mutator={mutate}
                         mutationAllowed={!invoice?.paid ? hasAnyPermission(
                             userData?.permissions,
                             [Permission.CREATE_INVOICE]
