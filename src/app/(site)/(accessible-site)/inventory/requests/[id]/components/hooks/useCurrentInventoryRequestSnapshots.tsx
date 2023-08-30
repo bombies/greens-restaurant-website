@@ -8,7 +8,7 @@ import { StockRequestStatus } from ".prisma/client";
 
 const FetchCurrentSnapshots = (isAdmin: boolean, requestIsLoading: boolean, request?: StockRequestWithOptionalExtras) => {
     const allIds = request?.requestedItems?.map(requestedStock =>
-        requestedStock.stock?.inventory.id ?? ""
+        requestedStock.stock?.inventory?.id ?? ""
     ) ?? [];
     const ids = Array.from(new Set(allIds));
     return useSWR(isAdmin && !requestIsLoading && request && request.status === StockRequestStatus.PENDING ? `/api/inventory/currentsnapshots?ids=${ids.toString()}` : undefined, fetcher<InventorySnapshotWithInventoryAndStockSnapshots[]>);
