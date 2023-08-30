@@ -22,7 +22,7 @@
     "@types/uuid": "^9.0.2",
     "@vercel/og": "^0.5.8",
     "apexcharts": "^3.41.1",
-    "axios": "^1.4.0",
+    "axios": "^1.5.0",
     "bcrypt": "^5.1.1",
     "clsx": "^2.0.0",
     "exceljs": "^4.3.0",
