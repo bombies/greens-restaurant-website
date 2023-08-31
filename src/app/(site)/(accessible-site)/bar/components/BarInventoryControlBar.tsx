@@ -6,10 +6,10 @@ import GenericButton from "../../../../_components/inputs/GenericButton";
 import EyeIcon from "../../../../_components/icons/EyeIcon";
 import SparklesIcon from "../../../../_components/icons/SparklesIcon";
 
-const customSnapshotRegex = /\/bar\/[a-zA-Z0-9-]+\/snapshots\/.+/;
-const currentSnapshotRegex = /\/bar\/[a-zA-Z0-9-]+/;
-const snapshotPageRegex = /\/bar\/[a-zA-Z0-9-]+\/snapshots/;
-const insightPageRegex = /\/bar\/[a-zA-Z0-9-]+\/insights/;
+const customSnapshotRegex = /\/bar\/snapshots\/.+/;
+const currentSnapshotRegex = /\/bar/;
+const snapshotPageRegex = /\/bar\/snapshots/;
+const insightPageRegex = /\/bar\/insights/;
 
 const BarInventoryControlBar: FC = () => {
     const router = useRouter();
