@@ -91,7 +91,7 @@ export const respondWithInit = ({ data, message, validationErrors, ...init }: {
     validationErrors?: z.SafeParseReturnType<any, any>
 } & ResponseInit) => {
     return NextResponse.json((!validationErrors?.success ? {
-        message,
+        message: validationErrors?.error.errors.map(err => err.message).join(". ") || message,
         data: validationErrors?.error.errors
     } : data) || {
         message

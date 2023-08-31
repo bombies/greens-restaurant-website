@@ -11,6 +11,7 @@ import SubTitle from "../../../../../_components/text/SubTitle";
 import { useUserData } from "../../../../../../utils/Hooks";
 import TableSkeleton from "../../../../../_components/skeletons/TableSkeleton";
 import { useCurrentStock } from "./CurrentStockContext";
+import { InventoryType } from ".prisma/client";
 
 type Props = {
     name: string
@@ -58,6 +59,7 @@ export default function Inventory({ name }: Props) {
                     name: stock.name,
                     quantity: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.quantity || 0,
                     uid: stock.uid,
+                    type: InventoryType.DEFAULT,
                     inventorySnapshotId: currentSnapshotData.id,
                     inventoryId: currentSnapshotData.inventoryId,
                     createdAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.createdAt || new Date(),

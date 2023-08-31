@@ -4,7 +4,7 @@ import DoubleArrowIcon from "../../../_components/icons/DoubleArrowIcon";
 import { JSX, MouseEventHandler, useState } from "react";
 import clsx from "clsx";
 import { CSSTransition } from "react-transition-group";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import InventoryIcon from "../../../_components/icons/InventoryIcon";
 import signOutIcon from "/public/icons/sign-out.svg";
@@ -17,6 +17,7 @@ import AccountIcon from "../../../_components/icons/AccountIcon";
 import { hasAnyPermission, hasPermission, Permission } from "../../../../libs/types/permission";
 import { toast } from "react-hot-toast";
 import { useUserData } from "../../../../utils/Hooks";
+import BarIcon from "../../../_components/icons/BarIcon";
 
 export default function Sidebar() {
     const { data: user } = useUserData();
@@ -32,6 +33,15 @@ export default function Sidebar() {
             </div>
             <div>
                 <div className="w-full max-h-[50vh] overflow-y-auto flex flex-col mb-6">
+                    {
+                        hasAnyPermission(user?.permissions, [
+                            Permission.CREATE_INVENTORY,
+                            Permission.VIEW_BAR_INVENTORY,
+                            Permission.MUTATE_BAR_INVENTORY
+                        ])
+                        &&
+                        <TheBarSidebarItem />
+                    }
                     {
                         hasAnyPermission(user?.permissions, [
                             Permission.CREATE_INVENTORY,
@@ -128,7 +138,7 @@ function SidebarItem(props: SidebarItemProps) {
                 <div className="self-center">
                     {props.icon}
                 </div>
-                <p className="text-lg tracking-wide">{props.label}</p>
+                <p className="text-lg tracking-wide self-center">{props.label}</p>
             </div>
         </Link>
 
@@ -144,6 +154,21 @@ function InventorySidebarItem() {
     return (<SidebarItem
         label={"Inventory"}
         href={"/inventory"}
+        icon={icon}
+        onHoverEnter={setActiveColor}
+        onHoverLeave={setDefaultColor}
+    />);
+}
+
+function TheBarSidebarItem() {
+    const [iconColor, setIconColor] = useState("#ffffff");
+    const setActiveColor = () => setIconColor("#00D615");
+    const setDefaultColor = () => setIconColor("#ffffff");
+
+    const icon = <BarIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
+    return (<SidebarItem
+        label={"The Bar"}
+        href={"/bar"}
         icon={icon}
         onHoverEnter={setActiveColor}
         onHoverLeave={setDefaultColor}

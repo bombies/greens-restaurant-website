@@ -25,17 +25,17 @@ const DeleteInventory = (inventoryName: string) => {
     return useSWRMutation(`/api/inventory/${inventoryName}`, mutator);
 };
 
+const customSnapshotRegex = /\/inventory\/[a-zA-Z0-9-]+\/snapshots\/.+/;
+const currentSnapshotRegex = /\/inventory\/[a-zA-Z0-9-]+/;
+const snapshotPageRegex = /\/inventory\/[a-zA-Z0-9-]+\/snapshots/;
+const insightPageRegex = /\/inventory\/[a-zA-Z0-9-]+\/insights/;
+
 export default function SpecificInventoryControlBar({ inventoryName }: Props) {
     const { data, isLoading } = useUserData();
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const router = useRouter();
     const pathName = usePathname();
     const { trigger: deleteInventory, isMutating: inventoryIsDeleting } = DeleteInventory(inventoryName);
-
-    const customSnapshotRegex = /\/inventory\/[a-zA-Z0-9-]+\/snapshots\/.+/;
-    const currentSnapshotRegex = /\/inventory\/[a-zA-Z0-9-]+/;
-    const snapshotPageRegex = /\/inventory\/[a-zA-Z0-9-]+\/snapshots/;
-    const insightPageRegex = /\/inventory\/[a-zA-Z0-9-]+\/insights/;
 
     return (
         <>

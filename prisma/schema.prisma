@@ -67,11 +67,25 @@ model RequestedStockItem {
   updatedAt DateTime @updatedAt
 }
 
+enum InventoryType {
+  BAR
+  DEFAULT
+}
+
+enum StockType {
+  FLASK_DRINK
+  QUART_BOTTLE
+  IMPERIAL_BOTTLE
+  DEFAULT
+}
+
 model Inventory {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  uid       String   @unique
-  name      String   @unique
-  userId    String?  @db.ObjectId
+  id     String         @id @default(auto()) @map("_id") @db.ObjectId
+  uid    String         @unique
+  name   String         @unique
+  userId String?        @db.ObjectId
+  type   InventoryType?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -98,9 +112,11 @@ model InventorySnapshot {
 }
 
 model Stock {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  uid       String   @unique
-  name      String
+  id   String     @id @default(auto()) @map("_id") @db.ObjectId
+  uid  String     @unique
+  name String
+  type StockType?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -111,10 +127,12 @@ model Stock {
 }
 
 model StockSnapshot {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  uid       String
-  name      String
-  quantity  Int
+  id       String     @id @default(auto()) @map("_id") @db.ObjectId
+  uid      String
+  name     String
+  quantity Int
+  type     StockType?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

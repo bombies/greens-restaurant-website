@@ -9,6 +9,8 @@ export enum Permission {
      * This grants the user to create inventories.
      * It also automatically allows viewing inventories and mutating
      * stock as well as stock requests.
+     * This permission also  grants the ability to view and mutate the
+     * bar inventory.
      */
     CREATE_INVENTORY = 1 << 1,
 
@@ -44,6 +46,20 @@ export enum Permission {
      * requests to be assigned to them.
      */
     MANAGE_STOCK_REQUESTS = 1 << 9,
+
+    /**
+     * This allows the user to view all bar inventories.
+     * They will also be allowed to view all snapshots and
+     * insights.
+     */
+    VIEW_BAR_INVENTORY = 1 << 10,
+
+    /**
+     * This allows the user to mutate bar inventories.
+     * Meaning they will be allowed to update the inventory information
+     * and update stock information.
+     */
+    MUTATE_BAR_INVENTORY = 1 << 11,
 
     // INVOICES
     /**

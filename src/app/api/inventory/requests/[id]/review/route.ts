@@ -113,7 +113,7 @@ export async function POST(req: Request, { params }: Context) {
         /**
          * Update stock snapshots for the approved stock requests.
          */
-        await updateSnapshots(items);
+        await updateSnapshots(items.filter(item => item.amountProvided));
 
         return NextResponse.json({ ...request, requestedItems: items });
     }, [

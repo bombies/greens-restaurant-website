@@ -1,8 +1,7 @@
-import { authenticatedAny, respond } from "../../../../../../utils/api/ApiUtils";
+import { authenticatedAny } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
-import prisma from "../../../../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { fetchCurrentSnapshot, fetchStockItem, generateValidStockName } from "../../utils";
+import { deleteStockItem, fetchStockItem, updateStockItem } from "../../utils";
 
 type RouteContext = {
     params: {
@@ -14,74 +13,25 @@ type RouteContext = {
 export function GET(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
         const fetchedItem = await fetchStockItem(params.name, params.id);
-        if (fetchedItem.error)
-            return fetchedItem.error;
-        return NextResponse.json(fetchedItem.success);
+        return fetchedItem.error ?? NextResponse.json(fetchedItem.success);
     }, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK, Permission.VIEW_INVENTORY]);
 }
 
-type UpdateStockDto = Partial<{
+export type UpdateStockDto = {
     name: string,
-}>
+}
 
 export function PATCH(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
-        const fetchedItem = await fetchStockItem(params.name, params.id);
-        if (fetchedItem.error)
-            return fetchedItem.error;
-
-        const item = fetchedItem.success!;
-        const { name }: UpdateStockDto = await req.json();
-        if (!name)
-            return respond({
-                message: "You provided nothing to update!",
-                init: {
-                    status: 401
-                }
-            });
-
-        const validatedName = generateValidStockName(name);
-        if (validatedName.error)
-            return validatedName.error;
-
-        const updatedStock = await prisma.stock.update({
-            where: {
-                id: item.id
-            },
-            data: {
-                name: name
-            }
-        });
-
-        return NextResponse.json(updatedStock);
+        const dto: UpdateStockDto = await req.json();
+        const updatedItem = await updateStockItem(params.name, params.id, dto);
+        return updatedItem.error ?? NextResponse.json(updatedItem.success!);
     }, [Permission.MUTATE_STOCK, Permission.CREATE_INVENTORY]);
 }
 
 export function DELETE(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
-        const fetchedItem = await fetchStockItem(params.name, params.id);
-        if (fetchedItem.error)
-            return fetchedItem.error;
-
-        const item = fetchedItem.success!;
-        const deletedItem = await prisma.stock.delete({
-            where: {
-                uid: item.uid
-            }
-        });
-
-        // Delete item from current snapshot
-        const currentSnapshot = await fetchCurrentSnapshot(params.name);
-        if (currentSnapshot.error)
-            return currentSnapshot.error;
-
-        await prisma.stockSnapshot.deleteMany({
-            where: {
-                inventorySnapshotId: currentSnapshot.success!.id,
-                uid: item.uid
-            }
-        });
-
-        return NextResponse.json(deletedItem);
+        const deletedItem = await deleteStockItem(params.name, params.id);
+        return deletedItem.error ?? NextResponse.json(deletedItem.success);
     }, [Permission.MUTATE_STOCK, Permission.CREATE_INVENTORY]);
 }

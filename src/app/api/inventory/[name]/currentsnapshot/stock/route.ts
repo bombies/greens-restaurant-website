@@ -2,6 +2,7 @@ import { authenticatedAny } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
 import { NextResponse } from "next/server";
 import { createStockSnapshot } from "../../utils";
+import { StockType } from "@prisma/client";
 
 type RouteContext = {
     params: {
@@ -10,7 +11,8 @@ type RouteContext = {
 }
 
 export type StockSnapshotPostDto = {
-    name: string
+    name: string,
+    type?: StockType
 }
 
 export async function POST(req: Request, { params }: RouteContext) {
