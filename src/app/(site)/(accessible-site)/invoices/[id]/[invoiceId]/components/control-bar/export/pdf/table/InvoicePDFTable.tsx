@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         marginTop: 24,
         borderWidth: 0,
-        borderRadius: 8
+        borderRadius: 8,
     }
 });
 

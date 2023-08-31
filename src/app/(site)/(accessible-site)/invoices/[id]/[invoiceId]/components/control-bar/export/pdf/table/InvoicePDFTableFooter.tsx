@@ -54,30 +54,6 @@ export default function InvoicePDFTableFooter({ items, termsAndConditions }: Pro
                 <Text style={styles.description}>TOTAL</Text>
                 <Text style={styles.total}>{totalCost}</Text>
             </View>
-            <View style={{
-                display: "flex",
-                marginTop: 24
-            }}>
-                {
-                    termsAndConditions &&
-                    <Fragment>
-                        <Text style={{
-                            fontFamily: "Inter",
-                            fontSize: 14,
-                            fontWeight: "bold",
-                            marginBottom: 6,
-                            color: "#007d0d"
-                        }}>TERMS &amp; CONDITIONS</Text>
-                        <Text style={{
-                            fontFamily: "Inter",
-                            fontSize: 12
-                        }}>
-                            {termsAndConditions}
-                        </Text>
-                    </Fragment>
-                }
-            </View>
         </View>
-
     );
 }

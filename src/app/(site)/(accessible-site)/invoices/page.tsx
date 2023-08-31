@@ -9,12 +9,14 @@ import InvoiceCustomerGrid from "./components/InvoiceCustomerGrid";
 import { hasAnyPermission, Permission } from "../../../../libs/types/permission";
 import { useUserData } from "../../../../utils/Hooks";
 import { Fragment } from "react";
+import { useInvoiceCustomers } from "./components/hooks/useInvoiceCustomers";
 
 export default function InvoicesPage() {
     const { data: userData } = useUserData([
         Permission.VIEW_INVOICES,
         Permission.CREATE_INVOICE
     ]);
+    const invoiceCustomerHook = useInvoiceCustomers();
 
     return (
         <div>
@@ -28,6 +30,8 @@ export default function InvoicesPage() {
                 <Fragment>
                     <Spacer y={6} />
                     <InvoiceControlBar
+                        customers={invoiceCustomerHook.customers}
+                        mutateData={invoiceCustomerHook.mutate}
                         mutationAllowed={
                             hasAnyPermission(
                                 userData?.permissions,
@@ -42,7 +46,7 @@ export default function InvoicesPage() {
             }
             <Spacer y={6} />
             <div className="flex gap-6 tablet:flex-col">
-                <InvoiceCustomerGrid />
+                <InvoiceCustomerGrid {...invoiceCustomerHook} />
                 <CompanyInvoiceCard controlsEnabled={hasAnyPermission(
                     userData?.permissions,
                     [Permission.CREATE_INVOICE]

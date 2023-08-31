@@ -1,10 +1,11 @@
 "use client";
 import { Invoice, InvoiceCustomer, InvoiceInformation, InvoiceItem } from "@prisma/client";
-import ReactPDF, { Document, Page, StyleSheet } from "@react-pdf/renderer";
+import ReactPDF, { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import InvoicePDFHeader from "./InvoicePDFHeader";
 import InvoicePDFRecipient from "./InvoicePDFRecipient";
 import InvoicePDFTable from "./table/InvoicePDFTable";
 import Font = ReactPDF.Font;
+import { Fragment } from "react";
 
 type PDFProps = {
     companyInfo?: InvoiceInformation,
@@ -59,7 +60,7 @@ Font.register({
 const styles = StyleSheet.create({
     body: {
         paddingTop: 35,
-        paddingBottom: 65,
+        paddingBottom: 150,
         paddingHorizontal: 35
     }
 });
@@ -78,6 +79,31 @@ export default function InvoicePDF({ companyInfo, customerInfo, invoice, invoice
                     invoiceItems={invoiceItems}
                     termsAndConditions={companyInfo?.termsAndConditions ?? undefined}
                 />
+                {
+                    companyInfo?.termsAndConditions &&
+                    <View
+                        style={{
+                            position: "absolute",
+                            bottom: 40,
+                            left: 35
+                        }}
+                        fixed
+                    >
+                        <Text style={{
+                            fontFamily: "Inter",
+                            fontSize: 14,
+                            fontWeight: "bold",
+                            marginBottom: 6,
+                            color: "#007d0d"
+                        }}>TERMS &amp; CONDITIONS</Text>
+                        <Text style={{
+                            fontFamily: "Inter",
+                            fontSize: 12
+                        }}>
+                            {companyInfo.termsAndConditions}
+                        </Text>
+                    </View>
+                }
             </Page>
         </Document>
     );

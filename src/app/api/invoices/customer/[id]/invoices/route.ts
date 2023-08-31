@@ -33,6 +33,9 @@ export function POST(req: Request, { params }: Context) {
             data: {
                 number: invoiceNumber,
                 customerId: customerInfo!.id
+            },
+            include: {
+                invoiceItems: true
             }
         });
 

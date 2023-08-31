@@ -2,12 +2,11 @@
 
 import GenericButton from "../../../../../../../../_components/inputs/GenericButton";
 import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
-import { FetchCompanyInfo } from "../../../../../components/CompanyInvoiceCard";
-import InvoicePDF from "./pdf/InvoicePDF";
 import exportIcon from "/public/icons/export-gold.svg";
 import { usePDF } from "@react-pdf/renderer";
 import { useEffect } from "react";
 import { formatInvoiceNumber } from "../../../../../utils/invoice-utils";
+import useInvoicePDF from "./useInvoicePDF";
 
 type Props = {
     customer?: InvoiceCustomer
@@ -17,24 +16,14 @@ type Props = {
 }
 
 export default function ExportInvoiceButton({ customer, invoice, invoiceItems, disabled }: Props) {
-    const { data: companyInfo, isLoading: companyInfoIsLoading } = FetchCompanyInfo();
+    const { pdf: invoicePdf, companyInfoIsLoading } = useInvoicePDF({ customer, invoice, invoiceItems });
     const [pdfInstance, updatePdfInstance] = usePDF({
-        document: <InvoicePDF
-            companyInfo={companyInfo}
-            customerInfo={customer}
-            invoice={invoice}
-            invoiceItems={invoiceItems}
-        />
+        document: invoicePdf
     });
 
     useEffect(() => {
-        updatePdfInstance(<InvoicePDF
-            companyInfo={companyInfo}
-            customerInfo={customer}
-            invoice={invoice}
-            invoiceItems={invoiceItems}
-        />);
-    }, [companyInfo, customer, invoice, invoiceItems, updatePdfInstance]);
+        updatePdfInstance(invoicePdf);
+    }, [invoicePdf, updatePdfInstance]);
 
     return (
         <>

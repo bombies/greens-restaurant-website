@@ -4,6 +4,8 @@ import React, { useEffect, useReducer } from "react";
 import { useInvoice } from "./InvoiceProvider";
 import { InvoiceItem } from "@prisma/client";
 import { UpdateInvoiceItemDto } from "../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/[itemId]/route";
+import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { KeyedMutator } from "swr";
 
 export enum InvoiceItemChangeAction {
     UPDATE,
@@ -18,7 +20,8 @@ const InvoiceItemsContext = React.createContext<{
     dispatch: React.Dispatch<{
         type: InvoiceItemChangeAction,
         payload?: { id: string } & UpdateInvoiceItemDto | InvoiceItem[] | string[]
-    }>
+    }>,
+    mutate: KeyedMutator<InvoiceWithOptionalItems | undefined>
 } | undefined>(undefined);
 
 const reducer = (state: InvoiceItem[], action: {
@@ -78,7 +81,7 @@ const reducer = (state: InvoiceItem[], action: {
 };
 
 export function InvoiceItemsProvider({ children }: React.PropsWithChildren) {
-    const { data: invoice, isLoading: invoiceIsLoading } = useInvoice();
+    const { data: invoice, isLoading: invoiceIsLoading, mutate } = useInvoice();
     const [items, dispatchItems] = useReducer(reducer, invoice?.invoiceItems!);
 
     useEffect(() => {
@@ -93,7 +96,8 @@ export function InvoiceItemsProvider({ children }: React.PropsWithChildren) {
     return (
         <InvoiceItemsContext.Provider value={{
             state: items,
-            dispatch: dispatchItems
+            dispatch: dispatchItems,
+            mutate
         }}>
             {children}
         </InvoiceItemsContext.Provider>

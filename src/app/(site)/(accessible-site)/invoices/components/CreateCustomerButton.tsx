@@ -13,9 +13,14 @@ import GenericTextArea from "../../../../_components/inputs/GenericTextArea";
 import PlusIcon from "../../../../_components/icons/PlusIcon";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../utils/Hooks";
+import { InvoiceCustomerWithOptionalItems } from "../../home/_components/widgets/invoice/InvoiceWidget";
+import { KeyedMutator } from "swr";
+import { InvoiceCustomer } from "@prisma/client";
 
 type Props = {
-    disabled?: boolean
+    disabled?: boolean,
+    customers?: InvoiceCustomerWithOptionalItems[]
+    mutateData: KeyedMutator<InvoiceCustomerWithOptionalItems[] | undefined>
 }
 
 type CreateCustomerArgs = {
@@ -29,7 +34,7 @@ const CreateCustomer = () => {
     return useSWRMutation("/api/invoices/customer", mutator);
 };
 
-export default function CreateCustomerButton({ disabled }: Props) {
+export default function CreateCustomerButton({ disabled, mutateData, customers }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm<FieldValues>();
     const { trigger: triggerCustomerCreation, isMutating: customerIsCreating } = CreateCustomer();
@@ -42,7 +47,9 @@ export default function CreateCustomerButton({ disabled }: Props) {
                 customerEmail: data.customerEmail,
                 customerDescription: data.customerDescription
             }
-        }).then(() => {
+        }).then(async (res) => {
+            const createdCustomer: InvoiceCustomer = res.data;
+            await mutateData(customers ? [...customers, createdCustomer] : [createdCustomer]);
             toast.success("Successfully created that customer!");
             setModalOpen(false);
         })
@@ -81,7 +88,7 @@ export default function CreateCustomerButton({ disabled }: Props) {
                         />
                     </div>
                     <Spacer y={6} />
-                    <GenericInput
+                    <GenericTextArea
                         id="customerAddress"
                         register={register}
                         label="Address"
@@ -91,7 +98,7 @@ export default function CreateCustomerButton({ disabled }: Props) {
                     />
                     <Spacer y={6} />
                     <GenericTextArea
-                        id="customerDesription"
+                        id="customerDescription"
                         register={register}
                         label="Description"
                         isDisabled={customerIsCreating || disabled}

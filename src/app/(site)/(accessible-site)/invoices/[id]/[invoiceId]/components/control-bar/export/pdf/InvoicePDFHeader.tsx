@@ -44,19 +44,28 @@ export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
                     {
                         invoice?.paid &&
                         <View style={{
-                            backgroundColor: "#007d0d",
-                            borderWidth: 1,
-                            paddingVertical: 16,
-                            paddingHorizontal: 8,
+                            display: "flex",
+                            justifyContent: "center",
+                            position: "absolute",
+                            left: 150,
+                            top: 100,
+                            borderWidth: 5,
                             borderRadius: 16,
-                            borderColor: "#007d0d"
+                            paddingVertical: 16,
+                            paddingHorizontal: 32,
+                            transform: "rotate(-10deg)",
+                            width: 200,
+                            borderColor: "#a50000"
                         }}>
                             <Text style={{
                                 fontFamily: "Inter",
+                                margin: 0,
+                                padding: 0,
                                 fontWeight: 900,
-                                fontSize: 18,
+                                fontSize: 36,
+                                textAlign: "center",
                                 alignSelf: "center",
-                                color: "#ffffff"
+                                color: "#a50000"
                             }}>PAID</Text>
                         </View>
                     }
