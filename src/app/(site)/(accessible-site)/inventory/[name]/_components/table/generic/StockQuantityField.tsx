@@ -2,7 +2,7 @@
 
 import { StockSnapshot } from "@prisma/client";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import GenericInput from "../../../../../../_components/inputs/GenericInput";
+import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import clsx from "clsx";
 import { CSSTransition } from "react-transition-group";

@@ -1,10 +1,10 @@
 "use client";
 
-import GenericModal from "../../../../../../_components/GenericModal";
+import GenericModal from "../../../../../../../_components/GenericModal";
 import { StockSnapshot } from "@prisma/client";
-import GenericInput from "../../../../../../_components/inputs/GenericInput";
+import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import GenericButton from "../../../../../../_components/inputs/GenericButton";
+import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import { Spacer } from "@nextui-org/react";
 import { Dispatch, SetStateAction } from "react";
 import subtractIcon from "/public/icons/subtract.svg";

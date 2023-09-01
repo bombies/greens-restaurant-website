@@ -5,7 +5,7 @@ import { Key } from "react";
 import addIcon from "/public/icons/add.svg";
 import trashIcon from "/public/icons/red-trash.svg";
 import subtractIcon from "/public/icons/subtract.svg";
-import GenericImage from "../../../../../../_components/GenericImage";
+import GenericImage from "../../../../../../../_components/GenericImage";
 
 type Props = {
     onAdd: () => void,

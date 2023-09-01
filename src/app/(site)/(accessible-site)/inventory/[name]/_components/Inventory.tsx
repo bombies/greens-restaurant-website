@@ -6,7 +6,7 @@ import { fetcher } from "../../../employees/_components/EmployeeGrid";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
-import StockTable, { columns } from "./table/StockTable";
+import InventoryStockTable, { columns } from "./table/InventoryStockTable";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { useUserData } from "../../../../../../utils/Hooks";
 import TableSkeleton from "../../../../../_components/skeletons/TableSkeleton";
@@ -76,7 +76,7 @@ export default function Inventory({ name }: Props) {
                     :
                     !inventoryDataError ?
                         (currentStockSnapshot.length > 0 ?
-                                <StockTable
+                                <InventoryStockTable
                                     inventoryName={name}
                                     stock={currentStockSnapshot}
                                     mutationAllowed={hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}

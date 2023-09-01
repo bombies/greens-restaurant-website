@@ -15,12 +15,12 @@ import addIcon from "/public/icons/add-2.svg";
 import minusIcon from "/public/icons/minus.svg";
 import moreIcon from "/public/icons/more.svg";
 import IconButton from "../../../../../../_components/inputs/IconButton";
-import StockOptionsDropdown from "./StockOptionsDropdown";
-import AddStockModal from "./AddStockModal";
+import StockOptionsDropdown from "./generic/StockOptionsDropdown";
+import AddStockModal from "./generic/AddStockModal";
 import { Key, useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import ConfirmationModal from "../../../../../../_components/ConfirmationModal";
-import RemoveStockModal from "./RemoveStockModal";
-import StockQuantityField from "./StockQuantityField";
+import RemoveStockModal from "./generic/RemoveStockModal";
+import StockQuantityField from "./generic/StockQuantityField";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import SubTitle from "../../../../../../_components/text/SubTitle";
@@ -125,7 +125,7 @@ const reducer = (state: StockSnapshot[], action: {
     return newState;
 };
 
-export default function StockTable({ inventoryName, stock, mutationAllowed }: Props) {
+export default function InventoryStockTable({ inventoryName, stock, mutationAllowed }: Props) {
     const [stockState, dispatchStockState] = useReducer(reducer, stock ?? []);
     const [visibleStockState, setVisibleStockState] = useState<StockSnapshot[]>(stockState);
     const [stockSearch, setStockSearch] = useState<string>();

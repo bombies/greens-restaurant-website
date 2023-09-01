@@ -5,7 +5,7 @@ import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import { InventorySnapshot, StockSnapshot } from "@prisma/client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import StockTable, { columns } from "../../../_components/table/StockTable";
+import InventoryStockTable, { columns } from "../../../_components/table/InventoryStockTable";
 import TableSkeleton from "../../../../../../../_components/skeletons/TableSkeleton";
 import { Spacer } from "@nextui-org/react";
 import SubTitle from "../../../../../../../_components/text/SubTitle";
@@ -54,7 +54,7 @@ export default function SpecificSnapshotContainer({ inventoryName, snapshotId }:
                         <TableSkeleton columns={columns} contentRepeat={20} />
                         :
                         data &&
-                        <StockTable
+                        <InventoryStockTable
                             inventoryName={inventoryName}
                             stock={data!.stockSnapshots}
                             mutationAllowed={false}

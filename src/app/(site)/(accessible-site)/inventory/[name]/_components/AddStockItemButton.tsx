@@ -28,7 +28,7 @@ const AddItem = (inventoryName: string) => {
 
 type Props = {
     inventoryName: string,
-    disabled?: boolean
+    disabled?: boolean,
 }
 
 export default function AddStockItemButton({ inventoryName, disabled }: Props) {

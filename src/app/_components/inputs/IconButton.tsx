@@ -44,7 +44,7 @@ export default function IconButton({
             {...buttonProps}
             isIconOnly
             variant={buttonProps.variant || "light"}
-            color={color || "secondary"}
+            color={color || "primary"}
             onPress={(e: PressEvent) => {
                 if (!isOnCoolDown()) {
                     if (buttonProps.onPress)
