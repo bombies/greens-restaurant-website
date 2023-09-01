@@ -559,26 +559,28 @@ const generateWholesomeCurrentSnapshot = async (inventory: Inventory, snapshot: 
                 });
             });
 
-            const createdSnapshots = await prisma.stockSnapshot.createMany({
-                data: newStockSnapshots
-            }).then(() => prisma.stockSnapshot.findMany({
-                where: {
-                    inventorySnapshotId: snapshot.id,
-                    createdAt: {
-                        gte: todaysDate
+            if (newStockSnapshots.length) {
+                const createdSnapshots = await prisma.stockSnapshot.createMany({
+                    data: newStockSnapshots
+                }).then(() => prisma.stockSnapshot.findMany({
+                    where: {
+                        inventorySnapshotId: snapshot.id,
+                        createdAt: {
+                            gte: todaysDate
+                        }
                     }
-                }
-            }));
+                }));
 
-            return new Either<InventorySnapshot & {
-                inventory: Inventory & {
-                    stock: Stock[]
-                };
-                stockSnapshots: StockSnapshot[]
-            }, NextResponse>({
-                ...snapshot,
-                stockSnapshots: createdSnapshots
-            });
+                return new Either<InventorySnapshot & {
+                    inventory: Inventory & {
+                        stock: Stock[]
+                    };
+                    stockSnapshots: StockSnapshot[]
+                }, NextResponse>({
+                    ...snapshot,
+                    stockSnapshots: createdSnapshots
+                });
+            }
         }
     }
 
