@@ -1,21 +1,31 @@
 "use client";
 
-import { FC, Fragment, useCallback } from "react";
-import GenericStockTable, { StockTableColumnKey } from "../../inventory/[name]/_components/table/generic/GenericStockTable";
+import { FC, Fragment, useCallback, useState } from "react";
+import GenericStockTable, {
+    StockTableColumnKey
+} from "../../../inventory/[name]/_components/table/generic/GenericStockTable";
 import { KeyedMutator } from "swr";
 import {
     InventorySectionSnapshotWithExtras,
     StockSnapshotWithStock
-} from "../../../../api/inventory/[name]/utils";
+} from "../../../../../api/inventory/[name]/utils";
+import { InventorySection, Stock } from "@prisma/client";
+import AddBarSectionStockModal from "./AddBarSectionStockModal";
 
 type Props = {
+    barName?: string,
+    section?: InventorySection
     currentSnapshot?: InventorySectionSnapshotWithExtras
     mutateCurrentSnapshot: KeyedMutator<InventorySectionSnapshotWithExtras | undefined>
     stockIsLoading: boolean,
     mutationAllowed: boolean,
 }
 
-const BarStockTable: FC<Props> = ({ currentSnapshot, mutateCurrentSnapshot, stockIsLoading, mutationAllowed }) => {
+export type PartialStock = Partial<Omit<Stock, "id">>
+
+const BarStockTable: FC<Props> = ({ barName, section, currentSnapshot, mutateCurrentSnapshot, stockIsLoading, mutationAllowed }) => {
+    const [addItemModelOpen, setAddItemModalOpen] = useState(false);
+
     const addOptimisticStockItem = useCallback(async (item: StockSnapshotWithStock) => {
         await mutateCurrentSnapshot({
             ...currentSnapshot,
@@ -23,8 +33,34 @@ const BarStockTable: FC<Props> = ({ currentSnapshot, mutateCurrentSnapshot, stoc
         });
     }, [currentSnapshot, mutateCurrentSnapshot]);
 
+    const removeOptimisticStockItem = useCallback(async (item: Stock) => {
+        if (!currentSnapshot)
+            return;
+
+        const stockSnapshots = currentSnapshot.stockSnapshots;
+        const itemIndex = stockSnapshots.findIndex(i => item.id === item.id);
+        if (itemIndex === -1)
+            return;
+        stockSnapshots.splice(itemIndex);
+
+        await mutateCurrentSnapshot({
+            ...currentSnapshot,
+            stockSnapshots
+        });
+    }, [currentSnapshot, mutateCurrentSnapshot]);
+
+    const updateOptimisticStockItem = useCallback(async (item: PartialStock) => {
+
+    }, []);
+
     return (
         <Fragment>
+            <AddBarSectionStockModal
+                barName={barName}
+                section={section}
+                isOpen={addItemModelOpen}
+                setOpen={setAddItemModalOpen}
+            />
             <GenericStockTable
                 stock={currentSnapshot?.stockSnapshots ?? []}
                 stockLoading={stockIsLoading}
@@ -50,7 +86,7 @@ const BarStockTable: FC<Props> = ({ currentSnapshot, mutateCurrentSnapshot, stoc
                     // TODO
                 }}
                 onItemAddButtonPress={() => {
-                    // TODO
+                    setAddItemModalOpen(true);
                 }}
             />
         </Fragment>

@@ -16,8 +16,8 @@ interface Props {
     stockLoading: boolean,
     mutationAllowed: boolean;
     getKeyValue: (item: StockSnapshotWithStock, key: StockTableColumnKey) => any;
-    onQuantityIncrement: (incrementedBy: number) => void;
-    onQuantityDecrement: (decrementedBy: number) => void;
+    onQuantityIncrement: (item: StockSnapshotWithStock, incrementedBy: number) => void;
+    onQuantityDecrement: (item: StockSnapshotWithStock, decrementedBy: number) => void;
     onStockDelete: (deletedIds: string[]) => void;
     onItemAddButtonPress: () => void,
 }
@@ -38,7 +38,9 @@ const GenericStockTable: FC<Props> = ({
                                           onStockDelete,
                                           onItemAddButtonPress
                                       }) => {
-    const fetchKeyValue = useStockTableValue(getKeyValue, mutationAllowed);
+    const fetchKeyValue = useStockTableValue({
+        getKeyValue, mutationAllowed, onQuantityDecrement, onQuantityIncrement
+    });
     const columns: Column[] = useMemo(() => {
         const cols: Column[] = [
             {

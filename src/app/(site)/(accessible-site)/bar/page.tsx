@@ -11,9 +11,9 @@ import { Spinner } from "@nextui-org/spinner";
 import SubTitle from "../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 import AddSectionButton from "./components/AddSectionButton";
-import { Spacer } from "@nextui-org/react";
-import { InventorySection } from "@prisma/client";
+import { Skeleton, Spacer } from "@nextui-org/react";
 import { InventorySectionWithOptionalExtras } from "../../../api/inventory/bar/[name]/types";
+import TableSkeleton from "../../../_components/skeletons/TableSkeleton";
 
 const useBarInfo = () => {
     return useSWR("/api/inventory/bar", fetcher<InventoryWithSections>);
@@ -55,7 +55,22 @@ export default function BarPage() {
         <div className="default-container p-12 phone:px-4">
             {
                 barInfoLoading ?
-                    <Spinner />
+                    <div className="default-container p-6">
+                        <Skeleton className="rounded-2xl w-1/4 h-6" />
+                        <Spacer y={6} />
+                        <Skeleton className="rounded-2xl w-1/4 h-12" />
+                        <Spacer y={6} />
+                        <TableSkeleton columns={[
+                            {
+                                key: "stock_name",
+                                value: "Name"
+                            },
+                            {
+                                key: "stock_quantity",
+                                value: "Quantity"
+                            }
+                        ]} contentRepeat={10} />
+                    </div>
                     :
                     <Fragment>
                         {

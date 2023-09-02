@@ -35,7 +35,7 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
 
     return register ?
         <Input
-            {...register(id, { required: props.required })}
+            {...register(id, { required: props.required || props.isRequired })}
             {...props}
             type={type === "password" ? (passwordVisible ? "text" : "password") : type}
             radius={radius || "lg"}

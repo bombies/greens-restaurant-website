@@ -8,7 +8,7 @@ import {
     InventorySectionSnapshotWithExtras, InventoryWithSections
 } from "../../../../../api/inventory/[name]/utils";
 import Permission, { hasAnyPermission } from "../../../../../../libs/types/permission";
-import BarStockTable from "../BarStockTable";
+import BarStockTable from "./BarStockTable";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
 import BarSectionControl from "./control/BarSectionControl";
@@ -81,6 +81,7 @@ const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData }) =>
             </div>
             <Spacer y={6} />
             <BarStockTable
+                barName={barInfo?.name}
                 currentSnapshot={currentSnapshot}
                 mutateCurrentSnapshot={mutateCurrentSnapshot}
                 stockIsLoading={currentSnapshotLoading}

@@ -6,7 +6,19 @@ import IconButton from "../../../../../../../../_components/inputs/IconButton";
 import StockOptionsDropdown from "../StockOptionsDropdown";
 import { StockSnapshotWithStock } from "../../../../../../../../api/inventory/[name]/utils";
 
-const useStockTableValue = (getKeyValue: (item: StockSnapshotWithStock, key: StockTableColumnKey) => any, mutationAllowed: boolean) => {
+type Props = {
+    getKeyValue: (item: StockSnapshotWithStock, key: StockTableColumnKey) => any,
+    mutationAllowed: boolean,
+    onQuantityIncrement: (item: StockSnapshotWithStock, incrementedBy: number) => void,
+    onQuantityDecrement: (item: StockSnapshotWithStock, decrementedBy: number) => void,
+}
+
+const useStockTableValue = ({
+                                getKeyValue,
+                                mutationAllowed,
+                                onQuantityDecrement,
+                                onQuantityIncrement
+                            }: Props) => {
     return useCallback((item: StockSnapshotWithStock, key: Key) => {
         switch (key) {
             case "stock_actions": {
@@ -18,7 +30,7 @@ const useStockTableValue = (getKeyValue: (item: StockSnapshotWithStock, key: Sto
                                 toolTip="Increment"
                                 cooldown={1}
                                 onPress={() => {
-                                    // TODO: Work on increment logic
+                                    onQuantityIncrement(item, 1);
                                 }}
                             />
                             <IconButton
@@ -26,16 +38,17 @@ const useStockTableValue = (getKeyValue: (item: StockSnapshotWithStock, key: Sto
                                 toolTip="Decrement"
                                 cooldown={1}
                                 onPress={() => {
-                                    // TODO: Work on decrement logic
+                                    onQuantityDecrement(item, 1);
                                 }}
                             />
                         </div>
                         <div className="flex  p-3 default-container !rounded-xl w-fit">
+                            // TODO: Replace with with a popover with a form
+
                             <IconButton
                                 disabled={!mutationAllowed}
                                 toolTip="More Options"
 
-                                // TODO: Replace with with a popover with a form
                                 // Doing so negates the need for a "selectedItem" state.
                                 withDropdown={
                                     <StockOptionsDropdown
