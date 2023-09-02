@@ -122,13 +122,13 @@ export async function POST(req: Request, { params }: Context) {
     ]);
 }
 
-type RequestStockItemWithStockAndInventory = RequestedStockItem & {
+type RequestStockItemWithStockAndOptionalInventory = RequestedStockItem & {
     stock: Stock & {
-        inventory: Inventory
+        inventory: Inventory | null
     }
 }
 
-const updateSnapshots = async (items: RequestStockItemWithStockAndInventory[]) => {
+const updateSnapshots = async (items: RequestStockItemWithStockAndOptionalInventory[]) => {
     const transformedItems = transformItems(items);
     const snapshots = await fetchCurrentSnapshots(transformedItems.map(item => item.inventory.id));
     const todaysDate = new Date();
@@ -160,7 +160,7 @@ type InventoryWithRequestedStockItems = {
     items: (RequestedStockItem & { stock: Stock })[]
 }
 
-const transformItems = (items: RequestStockItemWithStockAndInventory[]): InventoryWithRequestedStockItems[] => {
+const transformItems = (items: RequestStockItemWithStockAndOptionalInventory[]): InventoryWithRequestedStockItems[] => {
     const ret: InventoryWithRequestedStockItems[] = [];
     const hasInventory = (id: string) => {
         return !!ret.filter(obj => obj.inventory.id === id).length;
@@ -169,6 +169,8 @@ const transformItems = (items: RequestStockItemWithStockAndInventory[]): Invento
     items.forEach(item => {
         const { stock, ...soleItem } = item;
         const { inventory, ...stockWithoutInventory } = stock;
+        if (!inventory)
+            return;
         if (hasInventory(inventory.id)) {
             const index = ret.findIndex(inv => inv.inventory.id === inventory.id);
             ret[index] = {

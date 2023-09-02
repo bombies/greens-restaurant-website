@@ -34,14 +34,16 @@ export async function GET(req: Request, { params }: RouteContext) {
 
         const stockSnapshots = await prisma.stockSnapshot.findMany({
             where: {
-                inventoryId: inventory.success!.id
+                stock: {
+                    inventoryId: inventory.success!.id
+                }
             }
         });
 
         const data: StockTimeSeries[] = stock.map(item => {
             const itemSnapshots = stockSnapshots.filter(snapshotItem => snapshotItem.uid === item.uid);
             const timeData: TimeSeriesData[] = itemSnapshots.map(snapshot => ({
-                date: new Date(snapshot.createdAt.setHours(0,0,0,0)),
+                date: new Date(snapshot.createdAt.setHours(0, 0, 0, 0)),
                 value: snapshot.quantity
             }));
 

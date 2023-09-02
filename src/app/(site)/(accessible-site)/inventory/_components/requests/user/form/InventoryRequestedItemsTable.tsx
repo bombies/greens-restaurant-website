@@ -16,7 +16,9 @@ import { Chip } from "@nextui-org/chip";
 import PendingIcon from "../../../../../../../_components/icons/PendingIcon";
 import EditAmountRequestedButton from "./self-actions/EditAmountRequestedButton";
 import RemoveRequestedItemButton from "./self-actions/RemoveRequestedItemButton";
-import { InventorySnapshotWithOptionalExtras } from "../../../../../../../api/inventory/[name]/utils";
+import {
+    InventorySnapshotWithOptionalExtras, StockSnapshotWithOptionalStock
+} from "../../../../../../../api/inventory/[name]/utils";
 import { StockSnapshot } from "@prisma/client";
 import { StockRequestStatus } from ".prisma/client";
 
@@ -53,7 +55,7 @@ const getValueForKey = (
     key: Key, adminActions?: boolean,
     onAdminAction?: OnAdminAction,
     onSelfAction?: OnSelfAction,
-    snapshots?: StockSnapshot[]
+    snapshots?: StockSnapshotWithOptionalStock[]
 ) => {
     const findItemSnapshot = (): StockSnapshot | undefined => snapshots?.find(snapshot => snapshot.uid === item.stock?.uid);
 
@@ -214,7 +216,7 @@ const InventoryRequestedItemsTable: FC<Props> = ({
     }, [adminActions, onAdminAction, onSelfAction, requestStatus, showItemStatus]);
 
     const stockSnapshots = useMemo(() => {
-        return inventorySnapshots?.map(invSnapshot => invSnapshot.stockSnapshots).flat();
+        return inventorySnapshots?.map(invSnapshot => invSnapshot.stockSnapshots!).flat();
     }, [inventorySnapshots]);
 
     return (
@@ -227,7 +229,14 @@ const InventoryRequestedItemsTable: FC<Props> = ({
             {(item) => (
                 <TableRow key={item.id}>
                     {(colKey) => (
-                        <TableCell>{getValueForKey(item, colKey, adminActions, onAdminAction, onSelfAction, stockSnapshots)}</TableCell>
+                        <TableCell>{getValueForKey(
+                            item,
+                            colKey,
+                            adminActions,
+                            onAdminAction,
+                            onSelfAction,
+                            stockSnapshots
+                        )}</TableCell>
                     )}
                 </TableRow>
             )}
