@@ -8,13 +8,14 @@ import GenericButton from "../../../../../../../_components/inputs/GenericButton
 import { Spacer } from "@nextui-org/react";
 import { Dispatch, SetStateAction } from "react";
 import addIcon from "/public/icons/add.svg";
+import { StockSnapshotWithStock } from "../../../../../../../api/inventory/[name]/utils";
 
 type Props = {
     disabled?: boolean,
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>
     onClose: () => void
-    item?: StockSnapshot,
+    item?: StockSnapshotWithStock,
     onSubmit: SubmitHandler<FieldValues>,
     isUpdating: boolean
 }
@@ -35,7 +36,7 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item, onSubmit
                 onClose();
                 setOpen(false);
             }}
-            title={`Add ${item?.name
+            title={`Add ${item?.stock.name
                 ?.replace(
                     /(\w)(\w*)/g,
                     (g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
