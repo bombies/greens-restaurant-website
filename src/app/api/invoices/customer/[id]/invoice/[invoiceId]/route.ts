@@ -63,7 +63,7 @@ export function POST(req: Request, { params }: Context) {
             return respondWithInit({
                 message: "Invalid payload!",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
         // Check item names
@@ -77,7 +77,7 @@ export function POST(req: Request, { params }: Context) {
         if (invalidNames.length)
             return respondWithInit({
                 message: `Some item names are invalid! These include: ${invalidNames.toString()}. Item names must not include "/".`,
-                status: 401
+                status: 400
             });
 
         const items = body.map(info => ({
@@ -113,7 +113,7 @@ export function PATCH(req: Request, { params }: Context) {
             return respondWithInit({
                 message: "Invalid payload",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
         if (body.dueAt)

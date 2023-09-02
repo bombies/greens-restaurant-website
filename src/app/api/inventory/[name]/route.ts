@@ -34,7 +34,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             return respond({
                 message: "Malformed body!",
                 init: {
-                    status: 401
+                    status: 400
                 }
             });
 

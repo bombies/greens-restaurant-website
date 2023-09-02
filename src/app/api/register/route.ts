@@ -28,7 +28,7 @@ export async function POST(req: Request) {
         return respond({
             message: "Malformed body!",
             init: {
-                status: 401
+                status: 400
             }
         })
 

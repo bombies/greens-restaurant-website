@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         const { firstName, lastName, username, email, permissions }: InviteDto = await req.json();
 
         if (!username || !email || permissions === undefined)
-            return respond({ message: "Malformed payload!", init: { status: 401 } });
+            return respond({ message: "Malformed payload!", init: { status: 400 } });
 
         const existingUser = await prisma.user.findMany({
             where: {
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         });
 
         if (existingUser.length !== 0)
-            return respond({ message: "There is already a user with that email/username!", init: { status: 401 } });
+            return respond({ message: "There is already a user with that email/username!", init: { status: 400 } });
 
         const password = v4();
         const mailInfo = await Mailer.sendDashboardInvite(
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
                 }
             });
             return NextResponse.json(createdUser);
-        } else return respond({ message: "Could not send invitation email!", init: { status: 401 } });
+        } else return respond({ message: "Could not send invitation email!", init: { status: 400 } });
 
     }, Permission.ADMINISTRATOR);
 }

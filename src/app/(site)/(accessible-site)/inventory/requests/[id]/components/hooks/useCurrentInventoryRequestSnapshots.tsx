@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
-import { InventorySnapshotWithInventoryAndStockSnapshots } from "../../../../../../../api/inventory/[name]/utils";
+import { InventorySnapshotWithOptionalExtras } from "../../../../../../../api/inventory/[name]/utils";
 import { StockRequestWithOptionalExtras } from "../../../../_components/requests/inventory-requests-utils";
 import { StockRequestStatus } from ".prisma/client";
 
@@ -11,7 +11,7 @@ const FetchCurrentSnapshots = (isAdmin: boolean, requestIsLoading: boolean, requ
         requestedStock.stock?.inventory?.id ?? ""
     ) ?? [];
     const ids = Array.from(new Set(allIds));
-    return useSWR(isAdmin && !requestIsLoading && request && request.status === StockRequestStatus.PENDING ? `/api/inventory/currentsnapshots?ids=${ids.toString()}` : undefined, fetcher<InventorySnapshotWithInventoryAndStockSnapshots[]>);
+    return useSWR(isAdmin && !requestIsLoading && request && request.status === StockRequestStatus.PENDING ? `/api/inventory/currentsnapshots?ids=${ids.toString()}` : undefined, fetcher<InventorySnapshotWithOptionalExtras[]>);
 };
 
 type Args = {

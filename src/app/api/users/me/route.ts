@@ -51,7 +51,7 @@ export async function PATCH(req: Request) {
         if (!body)
             return respondWithInit({
                 message: "You must provide some information to update!",
-                status: 401,
+                status: 400,
                 validationErrors: bodyValidated
             });
 
@@ -61,7 +61,7 @@ export async function PATCH(req: Request) {
                 return respond({
                     message: "The password must be between 6 and 256 characters!",
                     init: {
-                        status: 401
+                        status: 400
                     }
                 });
             body.password = await bcrypt.hash(body.password, 12);
@@ -71,7 +71,7 @@ export async function PATCH(req: Request) {
             if (!EMAIL_REGEX.test(body.email))
                 return respond({
                     message: "Invalid email!",
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
 
             const existingUser = await prisma.user.findUnique({
@@ -83,7 +83,7 @@ export async function PATCH(req: Request) {
             if (existingUser)
                 return respond({
                     message: `There is already a user with the email: ${body.email}`,
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
 
             await Mailer.sendEmailUpdate({

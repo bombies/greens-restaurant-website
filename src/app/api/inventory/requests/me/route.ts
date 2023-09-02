@@ -74,7 +74,7 @@ export async function POST(req: Request) {
             return respondWithInit({
                 message: "Invalid payload!",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
         const validStockIds = (await prisma.stock.findMany({
@@ -146,7 +146,7 @@ export async function DELETE(req: Request) {
         if (!idsToBeDeleted)
             return respondWithInit({
                 message: "You must provide an \"ids\" search parameter which contains a comma separated list of request ids to delete!",
-                status: 401
+                status: 400
             });
 
         const ids = idsToBeDeleted.replaceAll(/\s/g, "").split(",");

@@ -64,7 +64,7 @@ export async function PATCH(req: Request, { params }: Context) {
             return respondWithInit({
                 message: "Invalid body!",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
         const request = await prisma.stockRequest.findUnique({
@@ -76,7 +76,7 @@ export async function PATCH(req: Request, { params }: Context) {
         if (!request)
             return respondWithInit({
                 message: `There was no request with the ID ${params.id}`,
-                status: 401
+                status: 400
             });
 
         const updatedRequest = await prisma.stockRequest.update({

@@ -2,11 +2,12 @@
 
 import React, { Dispatch, SetStateAction } from "react";
 import { StockSnapshot } from "@prisma/client";
+import { StockSnapshotWithStock } from "../../../../../api/inventory/[name]/utils";
 
-const CurrentStockContext = React.createContext<[StockSnapshot[], Dispatch<SetStateAction<StockSnapshot[]>>] | undefined>(undefined);
+const CurrentStockContext = React.createContext<[StockSnapshotWithStock[], Dispatch<SetStateAction<StockSnapshotWithStock[]>>] | undefined>(undefined);
 
 export default function CurrentStockProvider({ children }: React.PropsWithChildren) {
-    const currentStockState = React.useState<StockSnapshot[]>([]);
+    const currentStockState = React.useState<StockSnapshotWithStock[]>([]);
 
     return (
         <CurrentStockContext.Provider value={currentStockState}>

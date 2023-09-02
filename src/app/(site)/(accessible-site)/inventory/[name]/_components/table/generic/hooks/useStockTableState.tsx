@@ -3,6 +3,7 @@
 import { StockSnapshot } from "@prisma/client";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import { SortDescriptor } from "@nextui-org/react";
+import { StockSnapshotWithStock } from "../../../../../../../../api/inventory/[name]/utils";
 
 enum StockAction {
     UPDATE,
@@ -10,7 +11,7 @@ enum StockAction {
     SET
 }
 
-const reducer = (state: StockSnapshot[], action: {
+const reducer = (state: StockSnapshotWithStock[], action: {
     type: StockAction,
     payload: Partial<StockSnapshot> | StockSnapshot[]
 }) => {
@@ -38,7 +39,7 @@ const reducer = (state: StockSnapshot[], action: {
             break;
         }
         case StockAction.SET: {
-            newState = action.payload as StockSnapshot[];
+            newState = action.payload as StockSnapshotWithStock[];
             break;
         }
         default: {
@@ -49,9 +50,9 @@ const reducer = (state: StockSnapshot[], action: {
     return newState;
 };
 
-const useStockTableState = (stock: StockSnapshot[]) => {
+const useStockTableState = (stock: StockSnapshotWithStock[]) => {
     const [stockState, dispatchStockState] = useReducer(reducer, stock ?? []);
-    const [visibleStockState, setVisibleStockState] = useState<StockSnapshot[]>(stockState);
+    const [visibleStockState, setVisibleStockState] = useState<StockSnapshotWithStock[]>(stockState);
     const [stockSearch, setStockSearch] = useState<string>();
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
 
@@ -72,8 +73,8 @@ const useStockTableState = (stock: StockSnapshot[]) => {
         }
 
         setVisibleStockState(
-            stockState.filter(stock =>
-                stock.name
+            stockState.filter(stockSnapshot =>
+                stockSnapshot.stock.name
                     .toLowerCase()
                     .includes(stockSearch.toLowerCase().trim())
             )
@@ -88,7 +89,7 @@ const useStockTableState = (stock: StockSnapshot[]) => {
 
             switch (sortDescriptor.column) {
                 case "stock_name": {
-                    cmp = a.name.localeCompare(b.name);
+                    cmp = a.stock.name.localeCompare(b.stock.name);
                     break;
                 }
                 case "stock_quantity": {

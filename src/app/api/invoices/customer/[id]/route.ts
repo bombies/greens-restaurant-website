@@ -68,7 +68,7 @@ export function PATCH(req: Request, { params }: Context) {
             if (!CUSTOMER_NAME_REGEX.test(body.customerName))
                 return respondWithInit({
                     message: "That is an invalid customer name!",
-                    status: 401
+                    status: 400
                 });
 
             const validName = body.customerName
@@ -84,7 +84,7 @@ export function PATCH(req: Request, { params }: Context) {
             if (existingCustomer)
                 return respondWithInit({
                     message: `There is already a customer with the name "${body.customerName.capitalize()}"`,
-                    status: 401
+                    status: 400
                 });
 
             newName = validName;
@@ -95,7 +95,7 @@ export function PATCH(req: Request, { params }: Context) {
             if (!EMAIL_REGEX.test(body.customerEmail))
                 return respondWithInit({
                     message: "That is an invalid email!",
-                    status: 401
+                    status: 400
                 });
 
             const existingCustomer = await prisma.invoiceCustomer.findUnique({
@@ -107,7 +107,7 @@ export function PATCH(req: Request, { params }: Context) {
             if (existingCustomer)
                 return respondWithInit({
                     message: "There is already a customer with that email address!",
-                    status: 401
+                    status: 400
                 });
 
             newEmail = body.customerEmail.toLowerCase();

@@ -45,12 +45,12 @@ export async function DELETE(req: Request, { params }: RouteContext) {
         if (user.username === session.user?.username)
             return respond({
                 message: "You cannot delete yourself!",
-                init: { status: 401 }
+                init: { status: 400 }
             });
         else if (user.username === "root")
             return respond({
                 message: "You cannot delete the root user!",
-                init: { status: 401 }
+                init: { status: 400 }
             });
 
         const deletedUser = await prisma.user.delete({
@@ -101,7 +101,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
         if (!body || !bodyValidated.success)
             return respondWithInit({
                 message: "You must provide some information to update!",
-                status: 401,
+                status: 400,
                 validationErrors: bodyValidated
             });
 
@@ -110,7 +110,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             if (!USERNAME_REGEX.test(body.username))
                 return respond({
                     message: "Invalid username! Usernames must include alphanumeric characters only.",
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
 
             const existingUser = await prisma.user.findUnique({
@@ -122,7 +122,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             if (existingUser)
                 return respond({
                     message: `There is already a user with the username ${body.username}`,
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
         }
 
@@ -131,7 +131,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 return respond({
                     message: "The password must be between 6 and 256 characters!",
                     init: {
-                        status: 401
+                        status: 400
                     }
                 });
             body.password = await bcrypt.hash(body.password, 12);
@@ -142,7 +142,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 return respond({
                     message: "That first name is invalid! Remove any spaces or special characters that may be in the name.",
                     init: {
-                        status: 401
+                        status: 400
                     }
                 });
         }
@@ -152,7 +152,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 return respond({
                     message: "That last name is invalid! Remove any spaces or special characters that may be in the name.",
                     init: {
-                        status: 401
+                        status: 400
                     }
                 });
         }
@@ -185,7 +185,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             if (!EMAIL_REGEX.test(body.email))
                 return respond({
                     message: "Invalid email!",
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
 
             const existingUser = await prisma.user.findUnique({
@@ -197,7 +197,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             if (existingUser)
                 return respond({
                     message: `There is already a user with the email: ${body.email}`,
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
 
             await Mailer.sendEmailUpdate({

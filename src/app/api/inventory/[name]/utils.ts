@@ -1,6 +1,14 @@
 import prisma from "../../../../libs/prisma";
 import { respond, respondWithInit } from "../../../../utils/api/ApiUtils";
-import { Inventory, InventorySnapshot, Prisma, Stock, StockSnapshot, StockType } from "@prisma/client";
+import {
+    Inventory,
+    InventorySection, InventorySectionSnapshot,
+    InventorySnapshot,
+    Prisma,
+    Stock,
+    StockSnapshot,
+    StockType
+} from "@prisma/client";
 import { NextResponse } from "next/server";
 import { INVENTORY_NAME_REGEX } from "../../../../utils/regex";
 import { StockSnapshotPostDto } from "./currentsnapshot/stock/route";
@@ -8,10 +16,10 @@ import { InventoryType } from ".prisma/client";
 import InventoryWhereUniqueInput = Prisma.InventoryWhereUniqueInput;
 import { CreateStockDto } from "./stock/route";
 import { v4 } from "uuid";
-import { CreateBarStockDto } from "../bar/[name]/stock/route";
 import { UpdateStockDto } from "./stock/[id]/route";
 import { z } from "zod";
 import { UpdateStockQuantityDto } from "./stock/[id]/quantity/route";
+import { CreateBarStockDto } from "../bar/[name]/[sectionId]/stock/route";
 
 export class Either<S, E> {
     constructor(public readonly success?: S, public readonly error?: E) {
@@ -22,10 +30,10 @@ export const fetchInventory = async (name: string, options?: {
     bar?: boolean,
     stock?: boolean,
     snapshots?: boolean,
-}): Promise<Either<Inventory & {
-    stock?: Stock[],
-    snapshots?: InventorySnapshot[]
-}, NextResponse>> => {
+    inventorySections?: boolean | {
+        stock: boolean
+    }
+}): Promise<Either<InventoryWithOptionalExtras, NextResponse>> => {
     let whereQuery: InventoryWhereUniqueInput = {
         name: name.toLowerCase()
     };
@@ -44,28 +52,32 @@ export const fetchInventory = async (name: string, options?: {
     const inventory = await prisma.inventory.findUnique({
         where: whereQuery,
         include: {
-            stock: options?.stock || false,
-            snapshots: options?.snapshots || false
+            stock: options?.stock ?? false,
+            snapshots: options?.snapshots ?? false,
+            inventorySections: options?.inventorySections !== undefined ? (typeof options.inventorySections === "boolean" ? options.inventorySections : {
+                include: {
+                    stock: "stock" in options.inventorySections && options.inventorySections.stock
+                }
+            }) : false
         }
     });
 
     if (!inventory)
-        return new Either<Inventory & {
-            stock?: Stock[]
-        }, NextResponse>(undefined, respond({
+        return new Either<InventoryWithOptionalExtras, NextResponse>(undefined, respond({
             message: `There was no inventory found with the name: ${name}`,
             init: {
                 status: 404
             }
         }));
 
-    return new Either<Inventory & {
-        stock?: Stock[]
-    }, NextResponse>(inventory, undefined);
+    return new Either<InventoryWithOptionalExtras, NextResponse>(inventory, undefined);
 };
 
 export const fetchStockItem = async (inventoryName: string, itemId: string, inventoryType?: InventoryType): Promise<Either<Stock, NextResponse>> => {
-    const fetchedInventory = await fetchInventory(inventoryName, { bar: inventoryType === InventoryType.BAR, stock: true });
+    const fetchedInventory = await fetchInventory(inventoryName, {
+        bar: inventoryType === InventoryType.BAR,
+        stock: true
+    });
     if (fetchedInventory.error)
         return new Either<Stock, NextResponse>(undefined, fetchedInventory.error);
 
@@ -94,7 +106,7 @@ export const updateStockItem = async (inventoryName: string, itemId: string, dto
         return new Either<Stock, NextResponse>(undefined, respondWithInit({
             message: "Invalid body!",
             validationErrors: bodyValidated,
-            status: 401
+            status: 400
         }));
 
     const fetchedItem = await fetchStockItem(inventoryName, itemId, inventoryType);
@@ -145,18 +157,53 @@ export const deleteStockItem = async (inventoryName: string, itemId: string, inv
     return new Either<Stock, NextResponse>(deletedItem);
 };
 
-export type InventoryWithOptionalStock = Inventory & {
-    stock?: Stock[]
+export type InventoryWithSections = Inventory & {
+    inventorySections: InventorySection[]
 }
 
-export type InventorySnapshotWithInventoryAndStockSnapshots = InventorySnapshot & {
+export type InventoryWithOptionalExtras = Inventory & {
+    stock?: Stock[],
+    snapshots?: InventorySnapshot[],
+    inventorySections?: InventorySection[]
+}
+
+export type InventorySnapshotWithOptionalExtras = InventorySnapshot & {
+    inventory?: Inventory & {
+        stock?: Stock[]
+    },
+    stockSnapshots?: (StockSnapshot & {
+        stock?: Stock
+    })[]
+}
+
+export type InventorySnapshotWithExtras = InventorySnapshot & {
     inventory: Inventory & {
         stock: Stock[]
     },
-    stockSnapshots: StockSnapshot[]
+    stockSnapshots: (StockSnapshot & {
+        stock: Stock
+    })[]
 }
+export type InventorySectionSnapshotWithExtras = InventorySectionSnapshot & {
+    inventory: Inventory & {
+        stock: Stock[]
+    },
+    stockSnapshots: (StockSnapshot & {
+        stock: Stock
+    })[]
+}
+
+
 export type InventorySnapshotWithStockSnapshots = InventorySnapshot & {
     stockSnapshots: StockSnapshot[]
+}
+
+export type StockSnapshotWithOptionalStock = StockSnapshot & {
+    stock?: Stock
+}
+
+export type StockSnapshotWithStock = StockSnapshot & {
+    stock: Stock
 }
 
 export const createStock = async (
@@ -164,7 +211,10 @@ export const createStock = async (
     dto: CreateStockDto | CreateBarStockDto,
     inventoryType?: InventoryType
 ): Promise<Either<Stock, NextResponse>> => {
-    const fetchedInventory = await fetchInventory(inventoryName, { bar: inventoryType === InventoryType.BAR, stock: true });
+    const fetchedInventory = await fetchInventory(inventoryName, {
+        bar: inventoryType === InventoryType.BAR,
+        stock: true
+    });
     if (fetchedInventory.error)
         return new Either<Stock, NextResponse>(undefined, fetchedInventory.error);
     const inventory = fetchedInventory.success!;
@@ -173,7 +223,7 @@ export const createStock = async (
         return new Either<Stock, NextResponse>(undefined, respond({
             message: "Malformed body!",
             init: {
-                status: 401
+                status: 400
             }
         }));
 
@@ -184,7 +234,7 @@ export const createStock = async (
                 "It should also not include any special characters. " +
                 "The item name must also start with a letter.",
             init: {
-                status: 401
+                status: 400
             }
         }));
 
@@ -198,7 +248,7 @@ export const createStock = async (
         return new Either<Stock, NextResponse>(undefined, respond({
             message: "There is already an item with that name in this inventory!",
             init: {
-                status: 401
+                status: 400
             }
         }));
 
@@ -235,7 +285,7 @@ export const createStockSnapshot = async (
         return new Either<StockSnapshot, NextResponse>(undefined, respond({
             message: "Malformed body! You must provide the name of the stock item.",
             init: {
-                status: 401
+                status: 400
             }
         }));
 
@@ -244,25 +294,25 @@ export const createStockSnapshot = async (
         return new Either<StockSnapshot, NextResponse>(undefined, validatedItemName.error);
 
     const validName = validatedItemName.success!;
-    const originalStockItem = snapshot.inventory.stock.find(stock => stock.name === validName);
+    const originalStockItem = snapshot.inventory?.stock?.find(stock => stock.name === validName);
     if (!originalStockItem)
         return new Either<StockSnapshot, NextResponse>(
             undefined,
             respond({
                 message: `Inventory with name "${inventoryName}" doesn't have any stock items called "${validName}"`,
                 init: {
-                    status: 401
+                    status: 400
                 }
             })
         );
 
-    if (snapshot.stockSnapshots.filter(stock => stock.name === validName).length)
+    if (snapshot.stockSnapshots?.filter(stockSnapshot => stockSnapshot.stock?.name === validName).length)
         return new Either<StockSnapshot, NextResponse>(
             undefined,
             respond({
                 message: "There is already an item with this name in the snapshot!",
                 init: {
-                    status: 401
+                    status: 400
                 }
             })
         );
@@ -270,18 +320,16 @@ export const createStockSnapshot = async (
     const stockSnapshot = await prisma.stockSnapshot.create({
         data: {
             uid: originalStockItem.uid,
-            name: validName,
-            type: dto.type,
             quantity: 0,
             inventorySnapshotId: snapshot.id,
-            inventoryId: snapshot.inventory.id
+            stockId: originalStockItem.id
         }
     });
 
     return new Either<StockSnapshot, NextResponse>(stockSnapshot);
 };
 
-export const fetchCurrentSnapshot = async (name: string, type: InventoryType | null = null): Promise<Either<InventorySnapshotWithInventoryAndStockSnapshots, NextResponse>> => {
+export const fetchCurrentSnapshot = async (name: string, type: InventoryType | null = null): Promise<Either<InventorySnapshotWithOptionalExtras, NextResponse>> => {
     const inventory = await prisma.inventory.findUnique({
         where: {
             name: name.toLowerCase(),
@@ -290,12 +338,7 @@ export const fetchCurrentSnapshot = async (name: string, type: InventoryType | n
     });
 
     if (!inventory)
-        return new Either<InventorySnapshot & {
-            inventory: Inventory & {
-                stock: Stock[]
-            };
-            stockSnapshots: StockSnapshot[]
-        }, NextResponse>(
+        return new Either<InventorySnapshotWithOptionalExtras, NextResponse>(
             undefined,
             respond({
                 message: `There was no inventory found with the name: ${name}`,
@@ -325,7 +368,11 @@ export const fetchCurrentSnapshot = async (name: string, type: InventoryType | n
             ]
         },
         include: {
-            stockSnapshots: true,
+            stockSnapshots: {
+                include: {
+                    stock: true
+                }
+            },
             inventory: {
                 include: {
                     stock: true
@@ -341,7 +388,11 @@ export const fetchCurrentSnapshot = async (name: string, type: InventoryType | n
                 inventoryId: inventory.id
             },
             include: {
-                stockSnapshots: true,
+                stockSnapshots: {
+                    include: {
+                        stock: true
+                    }
+                },
                 inventory: {
                     include: {
                         stock: true
@@ -353,7 +404,7 @@ export const fetchCurrentSnapshot = async (name: string, type: InventoryType | n
     } else return await generateWholesomeCurrentSnapshot(inventory, snapshot);
 };
 
-export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<InventorySnapshotWithInventoryAndStockSnapshots[], NextResponse>> => {
+export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<InventorySnapshotWithOptionalExtras[], NextResponse>> => {
     const inventories = await prisma.inventory.findMany({
         where: {
             id: {
@@ -366,7 +417,7 @@ export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<Inven
     });
 
     if (!inventories || !inventories.length)
-        return new Either<InventorySnapshotWithInventoryAndStockSnapshots[], NextResponse>(
+        return new Either<InventorySnapshotWithOptionalExtras[], NextResponse>(
             undefined,
             respond({
                 message: `There were no inventories found with ids: ${ids.toString()}`,
@@ -399,7 +450,11 @@ export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<Inven
             ]
         },
         include: {
-            stockSnapshots: true,
+            stockSnapshots: {
+                include: {
+                    stock: true
+                }
+            },
             inventory: {
                 include: {
                     stock: true
@@ -408,7 +463,7 @@ export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<Inven
         }
     });
 
-    const allSnapshots: InventorySnapshotWithInventoryAndStockSnapshots[] = snapshots;
+    const allSnapshots: InventorySnapshotWithOptionalExtras[] = snapshots;
     if (ids.length !== snapshots.length) {
         const foundSnapshotUids = snapshots.map(snapshot => snapshot.uid);
         const missingInventories = inventories.filter(inventory => !foundSnapshotUids.includes(inventory.uid));
@@ -434,7 +489,11 @@ export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<Inven
                         stock: true
                     }
                 },
-                stockSnapshots: true
+                stockSnapshots: {
+                    include: {
+                        stock: true
+                    }
+                }
             }
         }));
 
@@ -444,25 +503,29 @@ export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<Inven
     return await generateWholesomeCurrentSnapshots(allSnapshots);
 };
 
-const generateWholesomeCurrentSnapshots = async (snapshots: InventorySnapshotWithInventoryAndStockSnapshots[]): Promise<Either<InventorySnapshotWithInventoryAndStockSnapshots[], NextResponse>> => {
+const generateWholesomeCurrentSnapshots = async (snapshots: InventorySnapshotWithOptionalExtras[]): Promise<Either<InventorySnapshotWithOptionalExtras[], NextResponse>> => {
     const todaysDate = new Date();
     todaysDate.setHours(0, 0, 0, 0);
 
-    let emptyStockSnapshots = snapshots.filter(snapshot => !snapshot.stockSnapshots.length);
-    const nonEmptyStockSnapshots = snapshots.filter(snapshot => snapshot.stockSnapshots.length);
+    let emptyStockSnapshots = snapshots.filter(snapshot => snapshot.stockSnapshots?.length === 0);
+    const nonEmptyStockSnapshots = snapshots.filter(snapshot => snapshot.stockSnapshots?.length);
 
     // Handle  all inventory snapshots with empty stock snapshots
     const previousSnapshots = await prisma.inventorySnapshot.findMany({
         where: {
             uid: {
-                in: emptyStockSnapshots.map(snapshot => snapshot.inventory.uid)
+                in: emptyStockSnapshots.map(snapshot => snapshot.inventory!.uid)
             },
             createdAt: {
                 lt: todaysDate
             }
         },
         include: {
-            stockSnapshots: true
+            stockSnapshots: {
+                include: {
+                    stock: true
+                }
+            }
         },
         orderBy: {
             createdAt: "desc"
@@ -509,7 +572,7 @@ const generateWholesomeCurrentSnapshots = async (snapshots: InventorySnapshotWit
         stockSnapshots: createdStockSnapshots.filter(stockSnapshot => stockSnapshot.inventorySnapshotId === snapshot.id)
     }));
 
-    return new Either<InventorySnapshotWithInventoryAndStockSnapshots[], NextResponse>(
+    return new Either<InventorySnapshotWithOptionalExtras[], NextResponse>(
         [
             ...nonEmptyStockSnapshots,
             ...emptyStockSnapshots
@@ -541,7 +604,11 @@ const generateWholesomeCurrentSnapshot = async (inventory: Inventory, snapshot: 
                 }
             },
             include: {
-                stockSnapshots: true
+                stockSnapshots: {
+                    include: {
+                        stock: true
+                    }
+                }
             },
             orderBy: {
                 createdAt: "desc"
@@ -592,7 +659,7 @@ const generateWholesomeCurrentSnapshot = async (inventory: Inventory, snapshot: 
     }, NextResponse>(snapshot);
 };
 
-const updateCurrentStockSnapshotSchema = z.object({
+export const updateCurrentStockSnapshotSchema = z.object({
     name: z.string(),
     quantity: z.number().int().gte(0)
 }).partial().strict();
@@ -608,13 +675,13 @@ export const updateCurrentStockSnapshot = async (
         return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
             message: "Invalid body!",
             validationErrors: dtoValidated,
-            status: 401
+            status: 400
         }));
 
     if (!dto.name && dto.quantity === undefined)
         return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
             message: "You must provide some data to update!",
-            status: 401
+            status: 400
         }));
 
     if (dto.name) {
@@ -629,11 +696,11 @@ export const updateCurrentStockSnapshot = async (
         return new Either<StockSnapshot, NextResponse>(undefined, currentSnapshotMiddleman.error);
 
     const currentSnapshot = currentSnapshotMiddleman.success!;
-    const stockSnapshot = currentSnapshot.stockSnapshots.find(snapshot => snapshot.uid === itemUID);
+    const stockSnapshot = currentSnapshot.stockSnapshots?.find(snapshot => snapshot.uid === itemUID);
     if (!stockSnapshot)
         return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
             message: `There was no item with UID: ${itemUID}`,
-            status: 401
+            status: 400
         }));
 
     return new Either<StockSnapshot, NextResponse>(await prisma.stockSnapshot.update({
@@ -671,7 +738,7 @@ export const generateValidName = (name: string, regex: RegExp, errorMsg: string)
         return new Either<string, NextResponse>(undefined, respond({
             message: errorMsg,
             init: {
-                status: 401
+                status: 400
             }
         }));
 

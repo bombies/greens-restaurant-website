@@ -13,7 +13,7 @@ export async function GET(req: Request) {
                 name: "bar"
             },
             include: {
-                stock: true
+                inventorySections: true
             }
         });
 

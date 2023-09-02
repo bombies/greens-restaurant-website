@@ -97,6 +97,8 @@ model Inventory {
 
   snapshotIds String[]            @db.ObjectId
   snapshots   InventorySnapshot[]
+
+  inventorySections InventorySection[]
 }
 
 model InventorySnapshot {
@@ -111,35 +113,67 @@ model InventorySnapshot {
   stockSnapshots StockSnapshot[]
 }
 
+model InventorySection {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  uid  String @unique
+  name String
+
+  inventoryId String    @db.ObjectId
+  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  snapshots InventorySectionSnapshot[]
+  stock     Stock[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InventorySectionSnapshot {
+  id  String @id @default(auto()) @map("_id") @db.ObjectId
+  uid String
+
+  inventorySectionId String           @db.ObjectId
+  inventorySection   InventorySection @relation(fields: [inventorySectionId], references: [id], onDelete: Cascade)
+  stockSnapshots     StockSnapshot[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Stock {
   id   String     @id @default(auto()) @map("_id") @db.ObjectId
   uid  String     @unique
   name String
   type StockType?
 
+  stockSnapshots      StockSnapshot[]
+  requestedStockItems RequestedStockItem[] @relation()
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  inventoryId String    @db.ObjectId
-
-  requestedStockItems RequestedStockItem[] @relation()
+  inventory          Inventory?        @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  inventoryId        String?           @db.ObjectId
+  inventorySectionId String?           @db.ObjectId
+  inventorySection   InventorySection? @relation(fields: [inventorySectionId], references: [id], onDelete: Cascade)
 }
 
 model StockSnapshot {
-  id       String     @id @default(auto()) @map("_id") @db.ObjectId
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   uid      String
-  name     String
   quantity Int
-  type     StockType?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  inventorySnapshotId String            @db.ObjectId
-  inventorySnapshot   InventorySnapshot @relation(fields: [inventorySnapshotId], references: [id], onDelete: Cascade)
+  stockId String @db.ObjectId
+  stock   Stock  @relation(fields: [stockId], references: [id])
 
-  inventoryId String @db.ObjectId
+  inventorySnapshotId String?            @db.ObjectId
+  inventorySnapshot   InventorySnapshot? @relation(fields: [inventorySnapshotId], references: [id], onDelete: Cascade)
+
+  inventorySectionSnapshotId String?                   @db.ObjectId
+  inventorySectionSnapshot   InventorySectionSnapshot? @relation(fields: [inventorySectionSnapshotId], references: [id], onDelete: Cascade)
 }
 
 model InvoiceInformation {

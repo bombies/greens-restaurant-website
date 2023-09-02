@@ -1,20 +1,20 @@
 "use client";
 
 import GenericModal from "../../../../../../../_components/GenericModal";
-import { StockSnapshot } from "@prisma/client";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import { Spacer } from "@nextui-org/react";
 import { Dispatch, SetStateAction } from "react";
 import subtractIcon from "/public/icons/subtract.svg";
+import { StockSnapshotWithStock } from "../../../../../../../api/inventory/[name]/utils";
 
 type Props = {
     disabled?: boolean,
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>
     onClose: () => void
-    item?: StockSnapshot
+    item?: StockSnapshotWithStock
     onSubmit: SubmitHandler<FieldValues>,
     isUpdating: boolean
 }
@@ -35,7 +35,7 @@ export default function RemoveStockModal({ isOpen, setOpen, onClose, item, onSub
                 onClose();
                 setOpen(false);
             }}
-            title={`Remove ${item?.name
+            title={`Remove ${item?.stock.name
                 ?.replace(
                     /(\w)(\w*)/g,
                     (g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()

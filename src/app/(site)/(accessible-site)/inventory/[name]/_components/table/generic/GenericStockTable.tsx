@@ -1,7 +1,6 @@
 "use client";
 
 import { FC, Fragment, useMemo } from "react";
-import { StockSnapshot } from "@prisma/client";
 import { Column } from "../../../../../invoices/[id]/[invoiceId]/components/table/InvoiceTable";
 import useStockTableValue from "./hooks/useStockTableValue";
 import useStockTableState from "./hooks/useStockTableState";
@@ -10,12 +9,13 @@ import { Spacer, TableCell, TableRow } from "@nextui-org/react";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import AddInventoryItemButton from "../AddInventoryItemButton";
 import SearchIcon from "../../../../../../../_components/icons/SearchIcon";
+import { StockSnapshotWithStock } from "../../../../../../../api/inventory/[name]/utils";
 
 interface Props {
-    stock: StockSnapshot[];
+    stock: StockSnapshotWithStock[];
     stockLoading: boolean,
     mutationAllowed: boolean;
-    getKeyValue: (item: StockSnapshot, key: StockTableColumnKey) => any;
+    getKeyValue: (item: StockSnapshotWithStock, key: StockTableColumnKey) => any;
     onQuantityIncrement: (incrementedBy: number) => void;
     onQuantityDecrement: (decrementedBy: number) => void;
     onStockDelete: (deletedIds: string[]) => void;

@@ -11,7 +11,6 @@ import SubTitle from "../../../../../_components/text/SubTitle";
 import { useUserData } from "../../../../../../utils/Hooks";
 import TableSkeleton from "../../../../../_components/skeletons/TableSkeleton";
 import { useCurrentStock } from "./CurrentStockContext";
-import { InventoryType } from ".prisma/client";
 
 type Props = {
     name: string
@@ -26,7 +25,9 @@ const useInventoryInfo = (name: string) => {
 
 const useCurrentSnapshot = (name: string) => {
     return useSWR(`/api/inventory/${name}/currentsnapshot`, fetcher<InventorySnapshot & {
-        inventory: Inventory & { stock: Stock[] },
+        inventory: Inventory & {
+            stock: Stock[]
+        },
         stockSnapshots: StockSnapshot[]
     }>);
 };
@@ -56,12 +57,12 @@ export default function Inventory({ name }: Props) {
             setCurrentStockSnapshot(currentSnapshotData.inventory.stock.map(stock => {
                 return ({
                     id: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.id || "",
-                    name: stock.name,
                     quantity: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.quantity || 0,
                     uid: stock.uid,
-                    type: InventoryType.DEFAULT,
+                    stockId: stock.id,
+                    stock: stock,
                     inventorySnapshotId: currentSnapshotData.id,
-                    inventoryId: currentSnapshotData.inventoryId,
+                    inventorySectionSnapshotId: null,
                     createdAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.createdAt || new Date(),
                     updatedAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.updatedAt || new Date()
                 });

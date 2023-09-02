@@ -59,7 +59,7 @@ export function PATCH(req: Request, { params }: Context) {
             return respondWithInit({
                 message: "Invalid payload!",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
         const updatedItem = await prisma.requestedStockItem.update({

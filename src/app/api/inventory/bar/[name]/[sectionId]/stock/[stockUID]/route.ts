@@ -1,21 +1,22 @@
-import { authenticatedAny } from "../../../../../../../utils/api/ApiUtils";
-import Permission from "../../../../../../../libs/types/permission";
-import { deleteStockItem, fetchStockItem, updateStockItem } from "../../../../[name]/utils";
+import { authenticatedAny } from "../../../../../../../../utils/api/ApiUtils";
+import Permission from "../../../../../../../../libs/types/permission";
+import barService from "../../../service";
 import { NextResponse } from "next/server";
-import { InventoryType } from ".prisma/client";
-import { UpdateStockDto } from "../../../../[name]/stock/[id]/route";
+import { UpdateStockDto } from "../../../../../[name]/stock/[id]/route";
+import { StockType } from "@prisma/client";
 
 type Context = {
     params: {
         name: string,
-        id: string,
+        sectionId: string,
+        stockUID: string,
     }
 }
 
 export async function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const fetchedItem = await fetchStockItem(params.name, params.id, InventoryType.BAR);
-        return fetchedItem.error ?? NextResponse.json(fetchedItem.success);
+        const fetchedItem = await barService.fetchSectionStock(params.sectionId, params.stockUID);
+        return fetchedItem.error ?? NextResponse.json(fetchedItem.success!);
     }, [
         Permission.CREATE_INVENTORY,
         Permission.VIEW_BAR_INVENTORY,
@@ -23,10 +24,14 @@ export async function GET(req: Request, { params }: Context) {
     ]);
 }
 
+export type UpdateBarSectionStockDto = Partial<UpdateStockDto> & {
+    type?: StockType
+}
+
 export async function PATCH(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const dto: UpdateStockDto = await req.json();
-        const updatedItem = await updateStockItem(params.name, params.id, dto, InventoryType.BAR);
+        const body: UpdateBarSectionStockDto = await req.json();
+        const updatedItem = await barService.updateSectionStock(params.sectionId, params.stockUID, body);
         return updatedItem.error ?? NextResponse.json(updatedItem.success!);
     }, [
         Permission.CREATE_INVENTORY,
@@ -36,7 +41,7 @@ export async function PATCH(req: Request, { params }: Context) {
 
 export async function DELETE(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const deletedItem = await deleteStockItem(params.name, params.id, InventoryType.BAR);
+        const deletedItem = await barService.deleteSectionStock(params.sectionId, params.stockUID);
         return deletedItem.error ?? NextResponse.json(deletedItem.success!);
     }, [
         Permission.CREATE_INVENTORY,

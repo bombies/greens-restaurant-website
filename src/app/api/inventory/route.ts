@@ -53,7 +53,7 @@ export function POST(req: Request) {
             return respond({
                 message: "Malformed body!",
                 init: {
-                    status: 401
+                    status: 400
                 }
             });
 
@@ -64,7 +64,7 @@ export function POST(req: Request) {
                     "It should also not include any special characters. " +
                     "The inventory name must also start with a letter.",
                 init: {
-                    status: 401
+                    status: 400
                 }
             });
 
@@ -88,7 +88,7 @@ export function POST(req: Request) {
             return respond({
                 message: `There is already an inventory with the name: ${validName.replaceAll("-", " ")}`,
                 init: {
-                    status: 401
+                    status: 400
                 }
             });
 

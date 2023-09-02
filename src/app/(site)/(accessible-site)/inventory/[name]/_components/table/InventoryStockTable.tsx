@@ -29,10 +29,11 @@ import searchIcon from "/public/icons/search.svg";
 import "../../../../../../../utils/GeneralUtils";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../../../utils/Hooks";
+import { StockSnapshotWithStock } from "../../../../../../api/inventory/[name]/utils";
 
 type Props = {
     inventoryName: string,
-    stock?: StockSnapshot[],
+    stock?: StockSnapshotWithStock[],
     mutationAllowed?: boolean
 }
 
@@ -86,7 +87,7 @@ const DeleteStockItem = (inventoryName: string) => {
     return useSWRMutation(`/api/inventory/${inventoryName}/stock/{item_id}`, mutator);
 };
 
-const reducer = (state: StockSnapshot[], action: {
+const reducer = (state: StockSnapshotWithStock[], action: {
     type: StockAction,
     payload: Partial<StockSnapshot> | StockSnapshot[]
 }) => {
@@ -114,7 +115,7 @@ const reducer = (state: StockSnapshot[], action: {
             break;
         }
         case StockAction.SET: {
-            newState = action.payload as StockSnapshot[];
+            newState = action.payload as StockSnapshotWithStock[];
             break;
         }
         default: {
@@ -127,13 +128,13 @@ const reducer = (state: StockSnapshot[], action: {
 
 export default function InventoryStockTable({ inventoryName, stock, mutationAllowed }: Props) {
     const [stockState, dispatchStockState] = useReducer(reducer, stock ?? []);
-    const [visibleStockState, setVisibleStockState] = useState<StockSnapshot[]>(stockState);
+    const [visibleStockState, setVisibleStockState] = useState<StockSnapshotWithStock[]>(stockState);
     const [stockSearch, setStockSearch] = useState<string>();
 
     const [addStockModalOpen, setAddStockModalOpen] = useState(false);
     const [removeStockModalOpen, setRemoveStockModalOpen] = useState(false);
     const [deleteStockModalOpen, setDeleteStockModalOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<StockSnapshot>();
+    const [selectedItem, setSelectedItem] = useState<StockSnapshotWithStock>();
     const {
         trigger: triggerStockUpdate,
         isMutating: isUpdating
@@ -159,7 +160,7 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
 
             switch (sortDescriptor.column) {
                 case "stock_name": {
-                    cmp = a.name.localeCompare(b.name);
+                    cmp = a.stock.name.localeCompare(b.stock.name);
                     break;
                 }
                 case "stock_quantity": {
@@ -187,17 +188,17 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
         }
 
         setVisibleStockState(
-            stockState.filter(stock =>
-                stock.name
+            stockState.filter(stockSnapshot =>
+                stockSnapshot.stock.name
                     .toLowerCase()
                     .includes(stockSearch.toLowerCase().trim())
             )
         );
     }, [stockSearch, stockState]);
 
-    const getKeyValue = useCallback((item: StockSnapshot, key: Key) => {
+    const getKeyValue = useCallback((item: StockSnapshotWithStock, key: Key) => {
         if (key === "stock_name")
-            return item.name.replaceAll("-", " ");
+            return item.stock.name.replaceAll("-", " ");
         if (key === "stock_quantity")
             return <StockQuantityField
                 disabled={isUpdating || !mutationAllowed || stockIsDeleting}
@@ -214,14 +215,14 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
                                     quantity: res.data.quantity
                                 }
                             });
-                            toast.success(`Successfully updated ${item.name}!`, {
+                            toast.success(`Successfully updated ${item.stock.name}!`, {
                                 position: "top-right"
                             });
                             setEditMode(false);
                         })
                         .catch(e => {
                             console.error(e);
-                            errorToast(e, `Failed to update ${item.name}!`, {
+                            errorToast(e, `Failed to update ${item.stock.name}!`, {
                                 position: "top-right"
                             });
                         });
@@ -248,13 +249,13 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
                                                 quantity: item.quantity + 1
                                             }
                                         });
-                                        toast.success(`Successfully incremented ${item.name}!`, {
+                                        toast.success(`Successfully incremented ${item.stock.name}!`, {
                                             position: "top-right"
                                         });
                                     })
                                     .catch(e => {
                                         console.error(e);
-                                        errorToast(e, `Failed to increment ${item.name}!`, {
+                                        errorToast(e, `Failed to increment ${item.stock.name}!`, {
                                             position: "top-right"
                                         });
                                     });
@@ -276,13 +277,13 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
                                                 quantity: item.quantity - 1
                                             }
                                         });
-                                        toast.success(`Successfully decremented ${item.name}!`, {
+                                        toast.success(`Successfully decremented ${item.stock.name}!`, {
                                             position: "top-right"
                                         });
                                     })
                                     .catch(e => {
                                         console.error(e);
-                                        errorToast(e, `Failed to decrement ${item.name}!`, {
+                                        errorToast(e, `Failed to decrement ${item.stock.name}!`, {
                                             position: "top-right"
                                         });
                                     });
@@ -336,12 +337,12 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
                                     quantity: res.data.quantity
                                 }
                             });
-                            toast.success(`Successfully updated ${selectedItem!.name}!`);
+                            toast.success(`Successfully updated ${selectedItem!.stock.name}!`);
                             setAddStockModalOpen(false);
                         })
                         .catch(e => {
                             console.error(e);
-                            errorToast(e, `Failed to update ${selectedItem!.name}!`);
+                            errorToast(e, `Failed to update ${selectedItem!.stock.name}!`);
                         });
                 }}
                 isUpdating={isUpdating}
@@ -370,12 +371,12 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
                                     quantity: res.data.quantity
                                 }
                             });
-                            toast.success(`Successfully updated ${selectedItem!.name}!`);
+                            toast.success(`Successfully updated ${selectedItem!.stock.name}!`);
                             setRemoveStockModalOpen(false);
                         })
                         .catch(e => {
                             console.error(e);
-                            errorToast(e, `Failed to update ${selectedItem!.name}!`);
+                            errorToast(e, `Failed to update ${selectedItem!.stock.name}!`);
                         });
                 }}
                 isOpen={removeStockModalOpen}
@@ -386,10 +387,10 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
             <ConfirmationModal
                 isOpen={deleteStockModalOpen}
                 setOpen={setDeleteStockModalOpen}
-                title={`Delete ${selectedItem?.name}`}
+                title={`Delete ${selectedItem?.stock.name}`}
                 accepting={stockIsDeleting}
                 message={
-                    `Are you sure you want to delete ${selectedItem?.name
+                    `Are you sure you want to delete ${selectedItem?.stock.name
                         ?.replace(
                             /(\w)(\w*)/g,
                             (g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()

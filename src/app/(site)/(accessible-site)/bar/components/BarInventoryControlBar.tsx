@@ -1,17 +1,25 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import GenericButton from "../../../../_components/inputs/GenericButton";
 import EyeIcon from "../../../../_components/icons/EyeIcon";
 import SparklesIcon from "../../../../_components/icons/SparklesIcon";
+import AddSectionButton from "./AddSectionButton";
+import { Inventory } from "@prisma/client";
+import { useUserData } from "../../../../../utils/Hooks";
+import Permission, { hasAnyPermission } from "../../../../../libs/types/permission";
 
 const customSnapshotRegex = /\/bar\/snapshots\/.+/;
 const currentSnapshotRegex = /\/bar/;
 const snapshotPageRegex = /\/bar\/snapshots/;
 const insightPageRegex = /\/bar\/insights/;
 
-const BarInventoryControlBar: FC = () => {
+type Props = {
+    barInfo?: Inventory
+}
+
+const BarInventoryControlBar: FC<Props> = ({ barInfo }) => {
     const router = useRouter();
     const pathName = usePathname();
 

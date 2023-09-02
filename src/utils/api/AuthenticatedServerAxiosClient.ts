@@ -7,7 +7,7 @@ export class AuthenticatedServerAxiosClient {
         this.client = axios.create({
             baseURL: process.env.BASE_URL,
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${this.token}`
             }
         });
     }

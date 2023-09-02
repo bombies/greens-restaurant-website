@@ -1,13 +1,13 @@
 "use client";
 
-import { StockSnapshot } from "@prisma/client";
 import { StockTableColumnKey } from "../GenericStockTable";
 import { Key, useCallback } from "react";
 import IconButton from "../../../../../../../../_components/inputs/IconButton";
 import StockOptionsDropdown from "../StockOptionsDropdown";
+import { StockSnapshotWithStock } from "../../../../../../../../api/inventory/[name]/utils";
 
-const useStockTableValue = (getKeyValue: (item: StockSnapshot, key: StockTableColumnKey) => any, mutationAllowed: boolean) => {
-    return useCallback((item: StockSnapshot, key: Key) => {
+const useStockTableValue = (getKeyValue: (item: StockSnapshotWithStock, key: StockTableColumnKey) => any, mutationAllowed: boolean) => {
+    return useCallback((item: StockSnapshotWithStock, key: Key) => {
         switch (key) {
             case "stock_actions": {
                 return (
@@ -59,7 +59,7 @@ const useStockTableValue = (getKeyValue: (item: StockSnapshot, key: StockTableCo
                 return getKeyValue(item, key as StockTableColumnKey);
             }
         }
-    }, [getKeyValue]);
+    }, [getKeyValue, mutationAllowed]);
 };
 
 export default useStockTableValue;

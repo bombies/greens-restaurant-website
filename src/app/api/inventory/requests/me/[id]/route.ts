@@ -54,7 +54,7 @@ export async function POST(req: Request, { params }: Context) {
             return respondWithInit({
                 message: "Invalid paylod!",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
         const createdItems = await prisma.requestedStockItem.createMany({
@@ -98,7 +98,7 @@ export async function PATCH(req: Request, { params }: Context) {
             return respondWithInit({
                 message: "Invalid body!",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
         let updatedRequest = await prisma.stockRequest.update({

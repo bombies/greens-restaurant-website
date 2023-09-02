@@ -30,7 +30,7 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
             errors && (errors[id] && "ring-danger")
         ),
         input: "placeholder:text-neutral-600",
-        label: "text-neutral-100",
+        label: "text-neutral-100"
     };
 
     return register ?
@@ -54,6 +54,7 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
                     iconRight && <GenericImage src={iconRight} width={1.25} />)
             }
             classNames={className}
+            validationState={(errors && errors[id]) && "invalid"}
         />
         :
         <Input
@@ -75,5 +76,6 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
                     iconRight && <GenericImage src={iconRight} width={1.25} />)
             }
             classNames={className}
-        />
+            validationState={(errors && errors[id]) && "invalid"}
+        />;
 }

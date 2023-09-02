@@ -4,7 +4,7 @@ import { Dispatch, FC, Fragment, SetStateAction, useEffect, useMemo, useReducer 
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import {
-    InventoryWithOptionalStock
+    InventoryWithOptionalExtras
 } from "../../../../../../../api/inventory/[name]/utils";
 import InventoryRequestedItemsTable from "./InventoryRequestedItemsTable";
 import AddRequestedItemsButton from "./AddRequestedItemsButton";
@@ -31,7 +31,7 @@ interface Props {
 }
 
 const FetchInventories = (ids: string[], withStock?: boolean) => {
-    return useSWR(`/api/inventory?${ids.length ? `ids=${ids.toString()}&` : ""}with_stock=${withStock ?? false}`, fetcher<InventoryWithOptionalStock[]>);
+    return useSWR(`/api/inventory?${ids.length ? `ids=${ids.toString()}&` : ""}with_stock=${withStock ?? false}`, fetcher<InventoryWithOptionalExtras[]>);
 };
 
 export enum ProposedStockRequestsAction {
