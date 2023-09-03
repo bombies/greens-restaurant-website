@@ -1,16 +1,20 @@
 "use client";
 
-import { Dispatch, FC, SetStateAction, useCallback } from "react";
+import { Dispatch, FC, SetStateAction, useCallback, useMemo, useState } from "react";
 import GenericModal from "../../../../../../_components/GenericModal";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { InventorySnapshotWithExtras } from "../../../../../../api/inventory/[name]/utils";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { Stock, StockSnapshot } from "@prisma/client";
+import { Stock, StockSnapshot, StockType } from "@prisma/client";
 import { errorToast } from "../../../../../../../utils/Hooks";
 import GenericInput from "../../../../../../_components/inputs/GenericInput";
 import PlusIcon from "../../../../../../_components/icons/PlusIcon";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
+import { Chip } from "@nextui-org/chip";
+import { SelectItem } from "@nextui-org/react";
+import GenericSelectMenu from "../../../../../../_components/GenericSelectMenu";
+import { CreateStockDto } from "../../../../../../api/inventory/[name]/stock/route";
 
 type Props = {
     inventoryName: string,
@@ -22,14 +26,12 @@ type Props = {
 
 type AddItemProps = {
     arg: {
-        name: string,
+        dto: CreateStockDto
     }
 }
 
 const AddItem = (inventoryName: string) => {
-    const mutator = (url: string, { arg }: AddItemProps) => {
-        return axios.post(url, { name: arg.name });
-    };
+    const mutator = (url: string, { arg }: AddItemProps) => axios.post(url, arg.dto);
     return useSWRMutation(`/api/inventory/${inventoryName}/stock`, mutator);
 };
 
@@ -45,14 +47,23 @@ const AddStockItemModal: FC<Props> = ({
         isMutating: isCreating
     } = AddItem(inventoryName);
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
+    const [selectedStockType, setSelectedStockType] = useState<StockType>(StockType.DEFAULT);
+
+    const selectItems = useMemo(() => Object.keys(StockType).map(type => ({
+        key: type,
+        label: type.replaceAll("_", " ")
+    })), []);
 
     const onSubmit: SubmitHandler<FieldValues> = useCallback((data) => {
         if (!inventorySnapshot)
             return;
 
-        const { itemName } = data;
+        const { itemName, itemType } = data;
         createStockItem({
-            name: itemName
+            dto: {
+                name: itemName,
+                type: itemType.toUpperCase()
+            }
         }).then(async (res) => {
             const createdItem: Stock = res.data;
             await addOptimisticStockItem({
@@ -91,6 +102,41 @@ const AddStockItemModal: FC<Props> = ({
                         isRequired
                         isDisabled={isCreating}
                     />
+                    <GenericSelectMenu
+                        isDisabled={isCreating}
+                        selectionMode="single"
+                        isRequired
+                        label="Item Type"
+                        id="itemType"
+                        placeholder="Select a type..."
+                        items={selectItems}
+                        register={register}
+                        selectedKeys={[selectedStockType.toLowerCase()]}
+                        onSelectionChange={selection => setSelectedStockType((Array.from(selection) as StockType[])[0].toUpperCase() as StockType)}
+                        variant="flat"
+                        renderValue={(items) => {
+                            return (
+                                <div className="flex flex-wrap gap-2">
+                                    {items.map((item) => (
+                                        <Chip
+                                            color="primary"
+                                            variant="flat"
+                                            className="capitalize"
+                                            key={item.key}
+                                        >
+                                            {item.data?.label.replaceAll("_", " ")}
+                                        </Chip>
+                                    ))}
+                                </div>
+                            );
+                        }}
+                    >
+                        {(type) => (
+                            <SelectItem key={type.key.toLowerCase()}>
+                                {type.label.replaceAll("_", " ")}
+                            </SelectItem>
+                        )}
+                    </GenericSelectMenu>
                     <GenericButton
                         variant="flat"
                         type="submit"

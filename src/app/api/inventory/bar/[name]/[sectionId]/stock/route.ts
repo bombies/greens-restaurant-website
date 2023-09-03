@@ -1,9 +1,8 @@
-import { authenticatedAny, respondWithInit } from "../../../../../../../utils/api/ApiUtils";
+import { authenticatedAny } from "../../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../../libs/types/permission";
 import barService from "../../service";
 import { NextResponse } from "next/server";
 import { CreateStockDto } from "../../../../[name]/stock/route";
-import { StockType } from "@prisma/client";
 
 type Context = {
     params: {
@@ -24,7 +23,6 @@ export async function GET(req: Request, { params }: Context) {
 }
 
 export interface CreateBarStockDto extends CreateStockDto {
-    type?: StockType;
 }
 
 export async function POST(req: Request, { params }: Context) {

@@ -6,6 +6,7 @@ import { INVENTORY_NAME_REGEX } from "../../../../../utils/regex";
 import { v4 } from "uuid";
 import { createStock, createStockSnapshot, deleteStockItems, fetchInventory } from "../utils";
 import { z } from "zod";
+import { StockType } from "@prisma/client";
 
 type RouteContext = {
     params: {
@@ -24,6 +25,7 @@ export async function GET(req: Request, { params }: RouteContext) {
 
 export interface CreateStockDto {
     name: string;
+    type?: StockType;
 }
 
 export async function POST(req: Request, { params }: RouteContext) {

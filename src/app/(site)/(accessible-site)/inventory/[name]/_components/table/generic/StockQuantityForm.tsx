@@ -20,11 +20,16 @@ type Props = {
 enum QuantityUnit {
     DRINKS = "Drinks",
     BOTTLES = "Bottles",
+    CASES = "Cases",
+    ITEMS = "Items",
     DEFAULT = "Default"
 }
 
 const IMPERIAL_DRINKS_MAX = 33;
 const QUART_DRINKS_MAX = 24;
+const SIX_CASE_MAX = 6;
+const TWELVE_CASE_MAX = 12;
+const TWENTY_FOUR_CASE_MAX = 24;
 
 const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, buttonIcon, buttonLabel, item }) => {
     const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
@@ -54,21 +59,52 @@ const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, b
                     break;
                 }
             }
+        else if (quantityUnit === QuantityUnit.CASES.toLowerCase())
+            switch (item?.type) {
+                case StockType.SIX_CASE: {
+                    quantity *= SIX_CASE_MAX;
+                    break;
+                }
+                case StockType.TWELVE_CASE: {
+                    quantity *= TWELVE_CASE_MAX;
+                    break;
+
+                }
+                case StockType.TWENTY_FOUR_CASE: {
+                    quantity *= TWENTY_FOUR_CASE_MAX;
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
 
         onQuantitySubmit(Number(quantity))
             .then(() => reset());
     }, [item?.type, onQuantitySubmit, quantityUnit, reset]);
+
+    const isCaseItem = useCallback(() => {
+        return [StockType.SIX_CASE.toString(), StockType.TWELVE_CASE.toString(), StockType.TWENTY_FOUR_CASE.toString()]
+            .includes(item?.type?.toString() ?? "");
+    }, [item?.type]);
+
+    const validKeys = useMemo(() => (
+        isCaseItem() ?
+            [QuantityUnit.CASES, QuantityUnit.ITEMS]
+            :
+            [QuantityUnit.BOTTLES, QuantityUnit.DRINKS]
+    ), [isCaseItem]);
 
     const quantityDropdown = useMemo(() => (
         <DropdownInput
             selectedValueLabel
             selectionRequired
             variant="flat"
-            keys={[QuantityUnit.BOTTLES, QuantityUnit.DRINKS]}
-            selectedKeys={quantityUnit === QuantityUnit.DEFAULT ? [QuantityUnit.DRINKS] : [quantityUnit]}
+            keys={validKeys}
+            selectedKeys={quantityUnit === QuantityUnit.DEFAULT ? [isCaseItem() ? QuantityUnit.ITEMS : QuantityUnit.DRINKS] : [quantityUnit]}
             setSelectedKeys={(keys) => setQuantityUnit(Array.from(keys)[0] as QuantityUnit)}
         />
-    ), [quantityUnit]);
+    ), [isCaseItem, quantityUnit, validKeys]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -82,7 +118,7 @@ const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, b
                 isRequired={true}
                 type="number"
                 endContent={
-                    (item?.type === StockType.IMPERIAL_BOTTLE || item?.type === StockType.QUART_BOTTLE)
+                    ((item?.type === StockType.IMPERIAL_BOTTLE || item?.type === StockType.QUART_BOTTLE) || isCaseItem())
                     && quantityDropdown
                 }
                 min={1}
