@@ -237,7 +237,14 @@ class BarService {
                     inventorySectionSnapshotId: snapshot.id
                 });
             }) ?? section.stock?.map(sectionStockItem => {
-                const { id, createdAt, updatedAt, inventoryId, inventorySectionId, ...validSnapshot } = sectionStockItem;
+                const {
+                    id,
+                    createdAt,
+                    updatedAt,
+                    inventoryId,
+                    inventorySectionId,
+                    ...validSnapshot
+                } = sectionStockItem;
                 return ({
                     ...validSnapshot,
                     quantity: 0,
@@ -271,7 +278,9 @@ class BarService {
 
     private updateStockItemDtoSchema = z.object({
         name: z.string(),
-        quantity: z.number()
+        quantity: z.number(),
+        price: z.number(),
+        type: z.string()
     }).partial().strict();
 
     async updateSectionStockItem(sectionId: string, itemUID: string, dto: UpdateBarSectionStockDto): Promise<Either<Stock | StockSnapshot, NextResponse>> {
@@ -303,19 +312,20 @@ class BarService {
             },
             data: {
                 name: dto.name,
-                type: dto.type
+                type: dto.type,
+                price: dto.price
             }
         });
 
-        if (dto.quantity !== undefined)
-            return this.updateCurrentSectionStockSnapshot(sectionId, itemUID, { quantity: dto.quantity });
+        if (dto.quantity !== undefined || dto.price !== undefined || dto.name || dto.type)
+            return this.updateCurrentSectionStockSnapshot(sectionId, itemUID, dto);
         return new Either<Stock, NextResponse>(updatedStock);
     };
 
     async updateCurrentSectionStockSnapshot(
         sectionId: string,
         itemUID: string,
-        dto: Pick<UpdateStockDto, "quantity">
+        dto: UpdateStockDto
     ): Promise<Either<StockSnapshot, NextResponse>> {
         const dtoValidated = updateCurrentStockSnapshotSchema.safeParse(dto);
         if (!dtoValidated.success)
@@ -325,7 +335,7 @@ class BarService {
                 status: 400
             }));
 
-        if (dto.quantity === undefined)
+        if (dto.quantity === undefined && !dto.name && dto.price === undefined)
             return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
                 message: "You must provide some data to update!",
                 status: 400
@@ -417,13 +427,15 @@ class BarService {
                 name: validName,
                 inventorySectionId: inventorySection.id,
                 uid: v4(),
-                type: "type" in dto ? dto.type : StockType.DEFAULT
+                type: "type" in dto ? dto.type : StockType.DEFAULT,
+                price: dto.price
             }
         });
 
         const createdStockSnapshot = await this.createStockSnapshot(sectionId, {
             name: validName,
-            type: "type" in dto ? dto.type : StockType.DEFAULT
+            type: "type" in dto ? dto.type : StockType.DEFAULT,
+            price: dto.price
         });
 
         if (createdStockSnapshot.error)
@@ -433,7 +445,8 @@ class BarService {
 
     private createBarStockDtoSchema = z.object({
         name: z.string(),
-        type: z.string().optional()
+        type: z.string().optional(),
+        price: z.number()
     }).strict();
 
     private async createStockSnapshot(sectionId: string, dto: CreateBarStockDto): Promise<Either<StockSnapshot, NextResponse>> {
@@ -483,6 +496,7 @@ class BarService {
                 uid: originalStockItem.uid,
                 name: originalStockItem.name,
                 type: originalStockItem.type,
+                price: originalStockItem.price,
                 quantity: 0,
                 inventorySectionSnapshotId: currentSectionSnapshot.id
             }

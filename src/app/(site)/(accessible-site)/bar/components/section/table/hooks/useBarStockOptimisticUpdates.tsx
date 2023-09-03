@@ -8,7 +8,7 @@ import { errorToast } from "../../../../../../../../utils/Hooks";
 import { PartialStockSnapshotWithStock } from "../BarStockTable";
 import useBarStockDelete from "./useBarStockDelete";
 import useBarStockUpdate from "./useBarStockUpdate";
-import { InventorySection, StockSnapshot } from "@prisma/client";
+import { InventorySection, StockSnapshot, StockType } from "@prisma/client";
 import { KeyedMutator } from "swr";
 
 type Props = {
@@ -70,13 +70,18 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
         snapshots[foundIndex] = {
             ...snapshot,
             ...item,
-            quantity: (quantity ?? item.quantity) ?? 0
+            quantity: (quantity ?? snapshot.quantity) ?? 0
         };
 
         await mutateCurrentSnapshot(
             updateBarStock({
                 stockUID: snapshot.uid,
-                dto: { quantity }
+                dto: {
+                    quantity,
+                    name: item.name,
+                    price: item.price,
+                    type: item.type ?? StockType.DEFAULT
+                }
             })
                 .then(() => ({
                     ...currentSnapshot,

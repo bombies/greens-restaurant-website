@@ -19,6 +19,7 @@ export function GET(req: Request, { params }: RouteContext) {
 
 export type UpdateStockDto = Partial<{
     name: string,
+    price: number,
     quantity: number,
 }>
 

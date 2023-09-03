@@ -26,6 +26,7 @@ export async function GET(req: Request, { params }: RouteContext) {
 export interface CreateStockDto {
     name: string;
     type?: StockType;
+    price?: number;
 }
 
 export async function POST(req: Request, { params }: RouteContext) {

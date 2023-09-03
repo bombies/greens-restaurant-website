@@ -108,7 +108,8 @@ export const fetchStockItems = async (inventoryName: string, itemUIDs: string[],
 
 const updateStockItemDtoSchema = z.object({
     name: z.string(),
-    quantity: z.number()
+    quantity: z.number(),
+    price: z.number()
 }).partial().strict();
 
 export const updateStockItem = async (inventoryName: string, itemId: string, dto: UpdateStockDto, inventoryType?: InventoryType): Promise<Either<Stock | StockSnapshot, NextResponse>> => {
@@ -139,15 +140,16 @@ export const updateStockItem = async (inventoryName: string, itemId: string, dto
             id: item.id
         },
         data: {
-            name: dto.name
+            name: dto.name,
+            price: dto.price
         }
     });
 
-    if (dto.quantity) {
+    if (dto.quantity !== undefined || dto.price !== undefined || dto.name) {
         const updatedSnapshot = await updateCurrentStockSnapshot(
             inventoryName,
             itemId,
-            { quantity: dto.quantity },
+            dto,
             inventoryType
         );
 
@@ -307,13 +309,15 @@ export const createStock = async (
             name: validName,
             inventoryId: inventory.id,
             uid: v4(),
-            type: "type" in dto ? dto.type : StockType.DEFAULT
+            type: "type" in dto ? dto.type : StockType.DEFAULT,
+            price: dto.price
         }
     });
 
     const createdStockSnapshot = await createStockSnapshot(inventoryName, {
         name: validName,
-        type: "type" in dto ? dto.type : StockType.DEFAULT
+        type: "type" in dto ? dto.type : StockType.DEFAULT,
+        price: dto.price
     });
 
     if (createdStockSnapshot.error)
@@ -372,6 +376,7 @@ export const createStockSnapshot = async (
             uid: originalStockItem.uid,
             name: originalStockItem.name,
             type: originalStockItem.type,
+            price: originalStockItem.price,
             quantity: 0,
             inventorySnapshotId: snapshot.id
         }
@@ -697,7 +702,9 @@ const generateWholesomeCurrentSnapshot = async (inventory: InventoryWithOptional
 
 export const updateCurrentStockSnapshotSchema = z.object({
     name: z.string(),
-    quantity: z.number().int().gte(0)
+    quantity: z.number().int().gte(0),
+    price: z.number().gte(0),
+    type: z.string()
 }).partial().strict();
 
 export const updateCurrentStockSnapshot = async (
@@ -714,7 +721,7 @@ export const updateCurrentStockSnapshot = async (
             status: 400
         }));
 
-    if (!dto.name && dto.quantity === undefined)
+    if (!dto.name && dto.quantity === undefined && dto.price === undefined)
         return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
             message: "You must provide some data to update!",
             status: 400

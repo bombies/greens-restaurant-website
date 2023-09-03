@@ -95,6 +95,10 @@ const useStockTableState = (stock: StockSnapshot[]) => {
                     cmp = a.quantity < b.quantity ? -1 : 1;
                     break;
                 }
+                case "stock_price": {
+                    cmp = a.price < b.price ? -1 : -1;
+                    break;
+                }
                 default: {
                     cmp = 0;
                     break;

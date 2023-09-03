@@ -25,6 +25,7 @@ interface Props {
 export enum StockTableColumnKey {
     STOCK_NAME = "stock_name",
     STOCK_QUANTITY = "stock_quantity",
+    STOCK_PRICE = "stock_price"
 }
 
 
@@ -51,6 +52,10 @@ const GenericStockTable: FC<Props> = ({
             {
                 key: "stock_quantity",
                 value: "Quantity"
+            },
+            {
+                key: "stock_price",
+                value: "Stock Price"
             }
         ];
 
@@ -87,7 +92,7 @@ const GenericStockTable: FC<Props> = ({
             <GenericTable
                 columns={columns}
                 items={visibleStockState}
-                sortableColumns={["stock_name", "stock_quantity"]}
+                sortableColumns={["stock_name", "stock_quantity", "stock_price"]}
                 emptyContent="There are no items..."
                 isLoading={stockLoading}
                 aria-label="Inventory Stock Table"

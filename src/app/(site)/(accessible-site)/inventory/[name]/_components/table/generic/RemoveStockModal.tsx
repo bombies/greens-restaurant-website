@@ -2,7 +2,7 @@
 
 import GenericModal from "../../../../../../../_components/GenericModal";
 import { Dispatch, SetStateAction } from "react";
-import StockQuantityForm from "./StockQuantityForm";
+import StockNumericForm from "./StockNumericForm";
 import MinusIcon from "../../../../../../../_components/icons/MinusIcon";
 import { StockSnapshot } from "@prisma/client";
 
@@ -33,7 +33,7 @@ export default function RemoveStockModal({ isOpen, setOpen, onClose, item, onRem
                 .replaceAll("-", " ")
             } Stock`}
         >
-            <StockQuantityForm
+            <StockNumericForm
                 onQuantitySubmit={onRemove}
                 buttonLabel={"Remove Stock"}
                 buttonIcon={<MinusIcon />}

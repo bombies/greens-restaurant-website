@@ -15,6 +15,8 @@ type Props = {
     buttonLabel: string,
     buttonIcon?: ReactNode,
     item?: StockSnapshot,
+    min?: number,
+    isCurrency?: boolean,
 }
 
 enum QuantityUnit {
@@ -22,7 +24,7 @@ enum QuantityUnit {
     BOTTLES = "Bottles",
     CASES = "Cases",
     ITEMS = "Items",
-    DEFAULT = "Default"
+    DEFAULT = "Default",
 }
 
 const IMPERIAL_DRINKS_MAX = 33;
@@ -31,7 +33,16 @@ const SIX_CASE_MAX = 6;
 const TWELVE_CASE_MAX = 12;
 const TWENTY_FOUR_CASE_MAX = 24;
 
-const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, buttonIcon, buttonLabel, item }) => {
+const StockNumericForm: FC<Props> = ({
+                                         onQuantitySubmit,
+                                         isWorking,
+                                         disabled,
+                                         buttonIcon,
+                                         buttonLabel,
+                                         item,
+                                         min,
+                                         isCurrency
+                                     }) => {
     const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
     const {
         register,
@@ -113,15 +124,17 @@ const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, b
                 register={register}
                 errors={errors}
                 id="quantity"
-                label="Quantity"
+                label={isCurrency ? "Price" : "Quantity"}
                 placeholder="Enter an amount..."
                 isRequired={true}
                 type="number"
+                step={isCurrency ? "0.01" : undefined}
                 endContent={
-                    ((item?.type === StockType.IMPERIAL_BOTTLE || item?.type === StockType.QUART_BOTTLE) || isCaseItem())
+                    (!isCurrency && ((item?.type === StockType.IMPERIAL_BOTTLE || item?.type === StockType.QUART_BOTTLE) || isCaseItem()))
                     && quantityDropdown
                 }
-                min={1}
+                startContent={isCurrency && "JMD"}
+                min={min ?? 1}
             />
             <Spacer y={6} />
             <GenericButton
@@ -130,6 +143,7 @@ const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, b
                 type="submit"
                 variant="flat"
                 startContent={buttonIcon}
+                className="capitalize"
             >
                 {buttonLabel}
             </GenericButton>
@@ -137,4 +151,4 @@ const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, b
     );
 };
 
-export default StockQuantityForm;
+export default StockNumericForm;

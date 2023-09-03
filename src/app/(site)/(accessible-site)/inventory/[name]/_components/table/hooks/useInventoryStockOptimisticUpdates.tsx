@@ -67,13 +67,13 @@ const useInventoryStockOptimisticUpdates = ({ inventoryName, currentSnapshot, mu
         snapshots[foundIndex] = {
             ...snapshot,
             ...item,
-            quantity: (quantity ?? item.quantity) ?? 0
+            quantity: (quantity ?? snapshot.quantity) ?? 0
         };
 
         await mutateCurrentSnapshot(
             updateStock({
                 stockUID: snapshot.uid,
-                dto: { quantity }
+                dto: { quantity, price: item.price, name: item.name }
             })
                 .then(() => ({
                     ...currentSnapshot,
@@ -81,7 +81,7 @@ const useInventoryStockOptimisticUpdates = ({ inventoryName, currentSnapshot, mu
                 }))
                 .catch(e => {
                     console.error(e);
-                    errorToast(e, "Could not delete items!");
+                    errorToast(e, `Could not update ${item.name?.replaceAll("-", " ")}!`);
                 }),
             {
                 optimisticData: {

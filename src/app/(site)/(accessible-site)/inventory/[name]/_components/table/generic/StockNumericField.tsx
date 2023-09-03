@@ -3,16 +3,18 @@
 import { Fragment, useState } from "react";
 import clsx from "clsx";
 import GenericModal from "../../../../../../../_components/GenericModal";
-import StockQuantityForm from "./StockQuantityForm";
+import StockNumericForm from "./StockNumericForm";
 import { StockSnapshot } from "@prisma/client";
+import { dollarFormat } from "../../../../../../../../utils/GeneralUtils";
 
 type Props = {
     stockSnapshot: StockSnapshot,
     disabled?: boolean,
-    onSet: (quantity: number) => Promise<void>;
+    onSet: (quantity: number) => Promise<void>,
+    isCurrency?: boolean,
 }
 
-export default function StockQuantityField({ stockSnapshot, onSet, disabled }: Props) {
+export default function StockNumericField({ stockSnapshot, onSet, disabled, isCurrency }: Props) {
     const [editModalOpen, setEditModalOpen] = useState(false);
 
     return (
@@ -22,22 +24,18 @@ export default function StockQuantityField({ stockSnapshot, onSet, disabled }: P
                 onClose={() => {
                     setEditModalOpen(false);
                 }}
-                title={`Set ${stockSnapshot?.name
-                    ?.replace(
-                        /(\w)(\w*)/g,
-                        (_g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
-                    )
-                    .replace("-", " ")
-                } Stock`}
+                title={`Set ${stockSnapshot?.name?.replace("-", " ")} ${isCurrency ? "Price" : "Stock"}`}
             >
-                <StockQuantityForm
+                <StockNumericForm
                     onQuantitySubmit={async (quantity) => {
-                        onSet(quantity)
-                        setEditModalOpen(false)
+                        setEditModalOpen(false);
+                        await onSet(quantity);
                     }}
-                    buttonLabel="Set Stock"
+                    buttonLabel={`Set ${isCurrency ? "Price" : "Stock"}`}
                     disabled={disabled}
                     item={stockSnapshot}
+                    min={0}
+                    isCurrency={isCurrency}
                 />
             </GenericModal>
             <p className={clsx(
@@ -48,7 +46,7 @@ export default function StockQuantityField({ stockSnapshot, onSet, disabled }: P
                        return;
                    setEditModalOpen(true);
                }}>
-                {stockSnapshot.quantity}
+                {isCurrency ? dollarFormat.format(stockSnapshot.price) : stockSnapshot.quantity}
             </p>
         </Fragment>
     );

@@ -13,7 +13,7 @@ import AddBarSectionStockItemModal from "../AddBarSectionStockItemModal";
 import { toast } from "react-hot-toast";
 import "../../../../../../../utils/GeneralUtils";
 import useBarStockOptimisticUpdates from "./hooks/useBarStockOptimisticUpdates";
-import StockQuantityField from "../../../../inventory/[name]/_components/table/generic/StockQuantityField";
+import StockNumericField from "../../../../inventory/[name]/_components/table/generic/StockNumericField";
 
 type Props = {
     barName?: string,
@@ -62,11 +62,22 @@ const BarStockTable: FC<Props> = ({
                         }
                         case StockTableColumnKey.STOCK_QUANTITY: {
                             return (
-                                <StockQuantityField
+                                <StockNumericField
                                     stockSnapshot={item}
                                     onSet={async (quantity) => {
                                         await updateOptimisticStockSnapshot(item, quantity);
                                     }}
+                                />
+                            );
+                        }
+                        case StockTableColumnKey.STOCK_PRICE: {
+                            return (
+                                <StockNumericField
+                                    stockSnapshot={item}
+                                    onSet={async (quantity) => {
+                                        await updateOptimisticStockSnapshot({ uid: item.uid, price: quantity });
+                                    }}
+                                    isCurrency
                                 />
                             );
                         }

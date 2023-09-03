@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import StockQuantityField from "./generic/StockQuantityField";
+import StockNumericField from "./generic/StockNumericField";
 import "../../../../../../../utils/GeneralUtils";
 import { toast } from "react-hot-toast";
 import { InventorySnapshotWithExtras } from "../../../../../../api/inventory/[name]/utils";
@@ -73,11 +73,23 @@ export default function InventoryStockTable({
                         }
                         case StockTableColumnKey.STOCK_QUANTITY: {
                             return (
-                                <StockQuantityField
+                                <StockNumericField
                                     stockSnapshot={item}
                                     onSet={async (quantity) => {
                                         await updateOptimisticStockSnapshot(item, quantity);
                                     }}
+                                />
+                            );
+                        }
+                        case StockTableColumnKey.STOCK_PRICE: {
+                            return (
+                                <StockNumericField
+                                    stockSnapshot={item}
+                                    onSet={async (quantity) => {
+                                        console.log(quantity);
+                                        await updateOptimisticStockSnapshot({ uid: item.uid, price: quantity });
+                                    }}
+                                    isCurrency
                                 />
                             );
                         }

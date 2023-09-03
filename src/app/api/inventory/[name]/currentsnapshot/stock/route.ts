@@ -12,7 +12,8 @@ type RouteContext = {
 
 export type StockSnapshotPostDto = {
     name: string,
-    type?: StockType
+    type?: StockType,
+    price?: number
 }
 
 export async function POST(req: Request, { params }: RouteContext) {

@@ -32,8 +32,3 @@ export const updateInventorySectionDtoSchema = z.object({
 export interface CreateBarSectionStockItem extends CreateStockDto {
     type?: StockType;
 }
-
-export const createBarSectionStockDtoSchema = z.object({
-    name: z.string(),
-    type: z.string().optional()
-}).strict();

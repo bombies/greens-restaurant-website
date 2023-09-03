@@ -2,7 +2,7 @@
 
 import GenericModal from "../../../../../../../_components/GenericModal";
 import { Dispatch, SetStateAction } from "react";
-import StockQuantityForm from "./StockQuantityForm";
+import StockNumericForm from "./StockNumericForm";
 import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
 import { StockSnapshot } from "@prisma/client";
 
@@ -33,7 +33,7 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item, onAdd, i
                 .replace("-", " ")
             } Stock`}
         >
-            <StockQuantityForm
+            <StockNumericForm
                 onQuantitySubmit={onAdd}
                 buttonLabel={"Add Stock"}
                 buttonIcon={<PlusIcon />}

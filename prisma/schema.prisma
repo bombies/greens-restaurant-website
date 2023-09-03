@@ -144,10 +144,11 @@ model InventorySectionSnapshot {
 }
 
 model Stock {
-  id   String     @id @default(auto()) @map("_id") @db.ObjectId
-  uid  String     @unique
-  name String
-  type StockType?
+  id    String     @id @default(auto()) @map("_id") @db.ObjectId
+  uid   String     @unique
+  name  String
+  price Float      @default(value: 0.0)
+  type  StockType?
 
   requestedStockItems RequestedStockItem[] @relation()
 
@@ -165,6 +166,7 @@ model StockSnapshot {
   uid      String
   quantity Int
   name     String
+  price    Float      @default(value: 0.0)
   type     StockType?
 
   createdAt DateTime @default(now())
