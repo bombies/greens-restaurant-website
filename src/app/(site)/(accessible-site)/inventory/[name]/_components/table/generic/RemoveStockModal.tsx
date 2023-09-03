@@ -2,16 +2,16 @@
 
 import GenericModal from "../../../../../../../_components/GenericModal";
 import { Dispatch, SetStateAction } from "react";
-import { StockSnapshotWithStock } from "../../../../../../../api/inventory/[name]/utils";
 import StockQuantityForm from "./StockQuantityForm";
 import MinusIcon from "../../../../../../../_components/icons/MinusIcon";
+import { StockSnapshot } from "@prisma/client";
 
 type Props = {
     disabled?: boolean,
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>
     onClose?: () => void
-    item?: StockSnapshotWithStock
+    item?: StockSnapshot
     onRemove: (removed: number) => Promise<void>,
     isUpdating?: boolean
 }
@@ -25,10 +25,10 @@ export default function RemoveStockModal({ isOpen, setOpen, onClose, item, onRem
                     onClose();
                 setOpen(false);
             }}
-            title={`Remove ${item?.stock.name
+            title={`Remove ${item?.name
                 ?.replace(
                     /(\w)(\w*)/g,
-                    (g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
+                    (_g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
                 )
                 .replaceAll("-", " ")
             } Stock`}

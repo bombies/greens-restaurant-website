@@ -1,9 +1,7 @@
 "use client";
 
-import AddStockItemButton from "./AddStockItemButton";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import { errorToast, useUserData } from "../../../../../../utils/Hooks";
-import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import { usePathname, useRouter } from "next/navigation";
 import sparklesIcon from "/public/icons/sparkles-green.svg";
 import eyeIcon from "/public/icons/green-eye.svg";
@@ -57,10 +55,6 @@ export default function SpecificInventoryControlBar({ inventoryName }: Props) {
             />
             <div
                 className="default-container p-12 phone:px-4 grid grid-cols-5 tablet:grid-cols-2 phone:grid-cols-1 gap-4 phone:gap-6">
-                <AddStockItemButton
-                    inventoryName={inventoryName}
-                    disabled={!hasAnyPermission(data?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
-                />
                 <GenericButton
                     fullWidth
                     variant="flat"

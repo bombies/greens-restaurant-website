@@ -4,7 +4,6 @@ import {
     Inventory,
     InventorySection, InventorySectionSnapshot,
     InventorySnapshot,
-    Prisma,
     Stock,
     StockSnapshot,
     StockType
@@ -13,13 +12,13 @@ import { NextResponse } from "next/server";
 import { INVENTORY_NAME_REGEX } from "../../../../utils/regex";
 import { StockSnapshotPostDto } from "./currentsnapshot/stock/route";
 import { InventoryType } from ".prisma/client";
-import InventoryWhereUniqueInput = Prisma.InventoryWhereUniqueInput;
 import { CreateStockDto } from "./stock/route";
 import { v4 } from "uuid";
 import { UpdateStockDto } from "./stock/[id]/route";
 import { z } from "zod";
 import { UpdateStockQuantityDto } from "./stock/[id]/quantity/route";
 import { CreateBarStockDto } from "../bar/[name]/[sectionId]/stock/route";
+
 
 export class Either<S, E> {
     constructor(public readonly success?: S, public readonly error?: E) {
@@ -34,23 +33,11 @@ export const fetchInventory = async (name: string, options?: {
         stock: boolean
     }
 }): Promise<Either<InventoryWithOptionalExtras, NextResponse>> => {
-    let whereQuery: InventoryWhereUniqueInput = {
-        name: name.toLowerCase()
-    };
 
-    whereQuery = options?.bar ? {
-        ...whereQuery,
-        type: InventoryType.BAR
-    } : {
-        ...whereQuery,
-        OR: [
-            { type: null },
-            { type: InventoryType.DEFAULT }
-        ]
-    };
-
-    const inventory = await prisma.inventory.findUnique({
-        where: whereQuery,
+    let inventory = await prisma.inventory.findFirst({
+        where: {
+            name: name.toLowerCase()
+        },
         include: {
             stock: options?.stock ?? false,
             snapshots: options?.snapshots ?? false,
@@ -96,12 +83,35 @@ export const fetchStockItem = async (inventoryName: string, itemId: string, inve
     return new Either<Stock, NextResponse>(item);
 };
 
+export const fetchStockItems = async (inventoryName: string, itemUIDs: string[], inventoryType?: InventoryType): Promise<Either<Stock[], NextResponse>> => {
+    const fetchedInventory = await fetchInventory(inventoryName, {
+        bar: inventoryType === InventoryType.BAR,
+        stock: true
+    });
+    if (fetchedInventory.error)
+        return new Either<Stock[], NextResponse>(undefined, fetchedInventory.error);
+
+    const inventory = fetchedInventory.success!;
+    const items = inventory.stock?.filter(item => itemUIDs.includes(item.uid));
+    if (!items || !items.length)
+        return new Either<Stock[], NextResponse>(
+            undefined,
+            respond({
+                message: `There were no stock items found in ${inventoryName} with ids: ${itemUIDs.toString()}`,
+                init: {
+                    status: 404
+                }
+            })
+        );
+    return new Either<Stock[], NextResponse>(items);
+};
+
 const updateStockItemDtoSchema = z.object({
     name: z.string(),
     quantity: z.number()
 }).partial().strict();
 
-export const updateStockItem = async (inventoryName: string, itemId: string, dto: UpdateStockDto, inventoryType?: InventoryType): Promise<Either<Stock, NextResponse>> => {
+export const updateStockItem = async (inventoryName: string, itemId: string, dto: UpdateStockDto, inventoryType?: InventoryType): Promise<Either<Stock | StockSnapshot, NextResponse>> => {
     const bodyValidated = updateStockItemDtoSchema.safeParse(dto);
     if (!bodyValidated.success)
         return new Either<Stock, NextResponse>(undefined, respondWithInit({
@@ -134,7 +144,16 @@ export const updateStockItem = async (inventoryName: string, itemId: string, dto
     });
 
     if (dto.quantity) {
-        // TODO: Update snapshot quantity
+        const updatedSnapshot = await updateCurrentStockSnapshot(
+            inventoryName,
+            itemId,
+            { quantity: dto.quantity },
+            inventoryType
+        );
+
+        if (updatedSnapshot.error)
+            return new Either<Stock | StockSnapshot, NextResponse>(undefined, updatedSnapshot.error);
+        return new Either<StockSnapshot, NextResponse>(updatedSnapshot.success);
     }
 
     return new Either<Stock, NextResponse>(updatedStock);
@@ -167,6 +186,37 @@ export const deleteStockItem = async (inventoryName: string, itemId: string, inv
     return new Either<Stock, NextResponse>(deletedItem);
 };
 
+export const deleteStockItems = async (inventoryName: string, itemUIDs: string[], inventoryType?: InventoryType): Promise<Either<Stock[], NextResponse>> => {
+    const fetchedItem = await fetchStockItems(inventoryName, itemUIDs, inventoryType);
+    if (fetchedItem.error)
+        return fetchedItem;
+
+    const items = fetchedItem.success!;
+    await prisma.stock.deleteMany({
+        where: {
+            uid: {
+                in: itemUIDs
+            }
+        }
+    });
+
+    // Delete item from current snapshot
+    const currentSnapshot = await fetchCurrentSnapshot(inventoryName, inventoryType);
+    if (currentSnapshot.error)
+        return new Either<Stock[], NextResponse>(undefined, currentSnapshot.error);
+
+    await prisma.stockSnapshot.deleteMany({
+        where: {
+            inventorySnapshotId: currentSnapshot.success!.id,
+            uid: {
+                in: itemUIDs
+            }
+        }
+    });
+
+    return new Either<Stock[], NextResponse>(items);
+};
+
 export type InventoryWithSections = Inventory & {
     inventorySections: InventorySection[]
 }
@@ -190,9 +240,7 @@ export type InventorySnapshotWithExtras = InventorySnapshot & {
     inventory: Inventory & {
         stock: Stock[]
     },
-    stockSnapshots: (StockSnapshot & {
-        stock: Stock
-    })[]
+    stockSnapshots: StockSnapshot[]
 }
 export type InventorySectionSnapshotWithExtras = InventorySectionSnapshot & {
     inventory: Inventory & {
@@ -206,14 +254,6 @@ export type InventorySectionSnapshotWithExtras = InventorySectionSnapshot & {
 
 export type InventorySnapshotWithStockSnapshots = InventorySnapshot & {
     stockSnapshots: StockSnapshot[]
-}
-
-export type StockSnapshotWithOptionalStock = StockSnapshot & {
-    stock?: Stock
-}
-
-export type StockSnapshotWithStock = StockSnapshot & {
-    stock: Stock
 }
 
 export const createStock = async (
@@ -330,9 +370,10 @@ export const createStockSnapshot = async (
     const stockSnapshot = await prisma.stockSnapshot.create({
         data: {
             uid: originalStockItem.uid,
+            name: originalStockItem.name,
+            type: originalStockItem.type,
             quantity: 0,
-            inventorySnapshotId: snapshot.id,
-            stockId: originalStockItem.id
+            inventorySnapshotId: snapshot.id
         }
     });
 
@@ -340,10 +381,12 @@ export const createStockSnapshot = async (
 };
 
 export const fetchCurrentSnapshot = async (name: string, type: InventoryType | null = null): Promise<Either<InventorySnapshotWithOptionalExtras, NextResponse>> => {
-    const inventory = await prisma.inventory.findUnique({
+    let inventory = await prisma.inventory.findUnique({
         where: {
-            name: name.toLowerCase(),
-            type
+            name: name.toLowerCase()
+        },
+        include: {
+            stock: true
         }
     });
 
@@ -378,11 +421,7 @@ export const fetchCurrentSnapshot = async (name: string, type: InventoryType | n
             ]
         },
         include: {
-            stockSnapshots: {
-                include: {
-                    stock: true
-                }
-            },
+            stockSnapshots: true,
             inventory: {
                 include: {
                     stock: true
@@ -398,11 +437,7 @@ export const fetchCurrentSnapshot = async (name: string, type: InventoryType | n
                 inventoryId: inventory.id
             },
             include: {
-                stockSnapshots: {
-                    include: {
-                        stock: true
-                    }
-                },
+                stockSnapshots: true,
                 inventory: {
                     include: {
                         stock: true
@@ -460,11 +495,7 @@ export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<Inven
             ]
         },
         include: {
-            stockSnapshots: {
-                include: {
-                    stock: true
-                }
-            },
+            stockSnapshots: true,
             inventory: {
                 include: {
                     stock: true
@@ -499,11 +530,7 @@ export const fetchCurrentSnapshots = async (ids: string[]): Promise<Either<Inven
                         stock: true
                     }
                 },
-                stockSnapshots: {
-                    include: {
-                        stock: true
-                    }
-                }
+                stockSnapshots: true
             }
         }));
 
@@ -531,11 +558,7 @@ const generateWholesomeCurrentSnapshots = async (snapshots: InventorySnapshotWit
             }
         },
         include: {
-            stockSnapshots: {
-                include: {
-                    stock: true
-                }
-            }
+            stockSnapshots: true
         },
         orderBy: {
             createdAt: "desc"
@@ -590,7 +613,7 @@ const generateWholesomeCurrentSnapshots = async (snapshots: InventorySnapshotWit
     );
 };
 
-const generateWholesomeCurrentSnapshot = async (inventory: Inventory, snapshot: InventorySnapshot & {
+const generateWholesomeCurrentSnapshot = async (inventory: InventoryWithOptionalExtras, snapshot: InventorySnapshot & {
     inventory: Inventory & {
         stock: Stock[]
     };
@@ -614,50 +637,53 @@ const generateWholesomeCurrentSnapshot = async (inventory: Inventory, snapshot: 
                 }
             },
             include: {
-                stockSnapshots: {
-                    include: {
-                        stock: true
-                    }
-                }
+                stockSnapshots: true
             },
             orderBy: {
                 createdAt: "desc"
             }
         });
 
-        if (previousSnapshot) {
-            const newStockSnapshots = previousSnapshot.stockSnapshots.map(stockSnapshot => {
-                const { id, createdAt, updatedAt, inventorySnapshotId, ...validSnapshot } = stockSnapshot;
-                return ({
-                    ...validSnapshot,
-                    createdAt: todaysDate,
-                    updatedAt: todaysDate,
-                    inventorySnapshotId: snapshot.id
-                });
+        const newStockSnapshots = previousSnapshot?.stockSnapshots.map(stockSnapshot => {
+            const { id, createdAt, updatedAt, inventorySnapshotId, ...validSnapshot } = stockSnapshot;
+            return ({
+                ...validSnapshot,
+                createdAt: todaysDate,
+                updatedAt: todaysDate,
+                inventorySnapshotId: snapshot.id
             });
+        }) ?? inventory.stock?.map(inventoryStockItem => {
+            const { id, createdAt, updatedAt, inventoryId, inventorySectionId, ...validSnapshot } = inventoryStockItem;
+            return ({
+                ...validSnapshot,
+                quantity: 0,
+                createdAt: todaysDate,
+                updatedAt: todaysDate,
+                inventorySnapshotId: snapshot.id
+            });
+        }) ?? [];
 
-            if (newStockSnapshots.length) {
-                const createdSnapshots = await prisma.stockSnapshot.createMany({
-                    data: newStockSnapshots
-                }).then(() => prisma.stockSnapshot.findMany({
-                    where: {
-                        inventorySnapshotId: snapshot.id,
-                        createdAt: {
-                            gte: todaysDate
-                        }
+        if (newStockSnapshots.length) {
+            const createdSnapshots = await prisma.stockSnapshot.createMany({
+                data: newStockSnapshots
+            }).then(() => prisma.stockSnapshot.findMany({
+                where: {
+                    inventorySnapshotId: snapshot.id,
+                    createdAt: {
+                        gte: todaysDate
                     }
-                }));
+                }
+            }));
 
-                return new Either<InventorySnapshot & {
-                    inventory: Inventory & {
-                        stock: Stock[]
-                    };
-                    stockSnapshots: StockSnapshot[]
-                }, NextResponse>({
-                    ...snapshot,
-                    stockSnapshots: createdSnapshots
-                });
-            }
+            return new Either<InventorySnapshot & {
+                inventory: Inventory & {
+                    stock: Stock[]
+                };
+                stockSnapshots: StockSnapshot[]
+            }, NextResponse>({
+                ...snapshot,
+                stockSnapshots: createdSnapshots
+            });
         }
     }
 

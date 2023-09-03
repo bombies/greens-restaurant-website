@@ -5,9 +5,8 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
-import { StockSnapshotWithStock } from "../../../../../../../api/inventory/[name]/utils";
 import DropdownInput from "../../../../../../../_components/inputs/DropdownInput";
-import { StockType } from "@prisma/client";
+import { StockSnapshot, StockType } from "@prisma/client";
 
 type Props = {
     onQuantitySubmit: (quantity: number) => Promise<void>,
@@ -15,7 +14,7 @@ type Props = {
     isWorking?: boolean,
     buttonLabel: string,
     buttonIcon?: ReactNode,
-    item?: StockSnapshotWithStock,
+    item?: StockSnapshot,
 }
 
 enum QuantityUnit {
@@ -42,7 +41,7 @@ const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, b
         let { quantity } = data;
 
         if (quantityUnit === QuantityUnit.BOTTLES.toLowerCase())
-            switch (item?.stock.type) {
+            switch (item?.type) {
                 case StockType.QUART_BOTTLE: {
                     quantity *= QUART_DRINKS_MAX;
                     break;
@@ -58,7 +57,7 @@ const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, b
 
         onQuantitySubmit(Number(quantity))
             .then(() => reset());
-    }, [item?.stock.type, onQuantitySubmit, quantityUnit, reset]);
+    }, [item?.type, onQuantitySubmit, quantityUnit, reset]);
 
     const quantityDropdown = useMemo(() => (
         <DropdownInput
@@ -83,7 +82,7 @@ const StockQuantityForm: FC<Props> = ({ onQuantitySubmit, isWorking, disabled, b
                 isRequired={true}
                 type="number"
                 endContent={
-                    (item?.stock.type === StockType.IMPERIAL_BOTTLE || item?.stock.type === StockType.QUART_BOTTLE)
+                    (item?.type === StockType.IMPERIAL_BOTTLE || item?.type === StockType.QUART_BOTTLE)
                     && quantityDropdown
                 }
                 min={1}

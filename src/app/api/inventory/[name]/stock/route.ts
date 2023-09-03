@@ -4,7 +4,7 @@ import prisma from "../../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import { INVENTORY_NAME_REGEX } from "../../../../../utils/regex";
 import { v4 } from "uuid";
-import { createStock, createStockSnapshot, fetchInventory } from "../utils";
+import { createStock, createStockSnapshot, deleteStockItems, fetchInventory } from "../utils";
 import { z } from "zod";
 
 type RouteContext = {
@@ -34,4 +34,15 @@ export async function POST(req: Request, { params }: RouteContext) {
             return createdStock.error;
         return NextResponse.json(createdStock.success);
     }, [Permission.MUTATE_STOCK, Permission.CREATE_INVENTORY]);
+}
+
+export async function DELETE(req: Request, { params }: RouteContext) {
+    return authenticatedAny(req, async () => {
+        const { searchParams } = new URL(req.url);
+        const ids = searchParams.get("ids")?.split(",") ?? [];
+        const deletedItems = await deleteStockItems(params.name, ids);
+        return deletedItems.error ?? NextResponse.json(deletedItems.success!);
+    }, [
+        Permission.MUTATE_STOCK, Permission.CREATE_INVENTORY
+    ]);
 }

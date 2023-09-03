@@ -1,26 +1,23 @@
 "use client";
 
-import { useCallback } from "react";
-import {
-    InventorySectionSnapshotWithExtras
-} from "../../../../../../../api/inventory/[name]/utils";
-import { errorToast } from "../../../../../../../../utils/Hooks";
-import { PartialStockSnapshotWithStock } from "../BarStockTable";
-import useBarStockDelete from "./useBarStockDelete";
-import useBarStockUpdate from "./useBarStockUpdate";
-import { InventorySection, StockSnapshot } from "@prisma/client";
+import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/utils";
 import { KeyedMutator } from "swr";
+import useInventoryStockUpdate from "./useInventoryStockUpdate";
+import useInventoryStockDelete from "./useInventoryStockDelete";
+import { useCallback } from "react";
+import { errorToast } from "../../../../../../../../utils/Hooks";
+import { PartialStockSnapshotWithStock } from "../../../../../bar/components/section/table/BarStockTable";
+import { StockSnapshot } from "@prisma/client";
 
 type Props = {
-    barName?: string,
-    section?: InventorySection,
-    currentSnapshot?: InventorySectionSnapshotWithExtras
-    mutateCurrentSnapshot: KeyedMutator<InventorySectionSnapshotWithExtras | undefined>
+    inventoryName: string,
+    currentSnapshot?: InventorySnapshotWithExtras,
+    mutateCurrentSnapshot: KeyedMutator<InventorySnapshotWithExtras | undefined>
 }
 
-const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutateCurrentSnapshot }: Props) => {
-    const { trigger: deleteBarStock } = useBarStockDelete(barName, section?.id);
-    const { trigger: updateBarStock } = useBarStockUpdate(barName, section?.id);
+const useInventoryStockOptimisticUpdates = ({ inventoryName, currentSnapshot, mutateCurrentSnapshot }: Props) => {
+    const { trigger: updateStock } = useInventoryStockUpdate(inventoryName);
+    const { trigger: deleteStock } = useInventoryStockDelete(inventoryName);
 
     const addOptimisticStockItem = useCallback(async (item: StockSnapshot) => {
         await mutateCurrentSnapshot({
@@ -35,7 +32,7 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
 
         const stockSnapshots = currentSnapshot.stockSnapshots.filter(item => !itemUIDs.includes(item.uid));
         await mutateCurrentSnapshot(
-            deleteBarStock({
+            deleteStock({
                 uids: itemUIDs
             })
                 .then(() => {
@@ -55,7 +52,7 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
                 },
                 revalidate: false
             });
-    }, [currentSnapshot, deleteBarStock, mutateCurrentSnapshot]);
+    }, [currentSnapshot, deleteStock, mutateCurrentSnapshot]);
 
     const updateOptimisticStockSnapshot = useCallback(async (item: PartialStockSnapshotWithStock, quantity?: number) => {
         if (!currentSnapshot)
@@ -74,7 +71,7 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
         };
 
         await mutateCurrentSnapshot(
-            updateBarStock({
+            updateStock({
                 stockUID: snapshot.uid,
                 dto: { quantity }
             })
@@ -93,9 +90,9 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
                 },
                 revalidate: false
             });
-    }, [currentSnapshot, mutateCurrentSnapshot, updateBarStock]);
+    }, [currentSnapshot, mutateCurrentSnapshot, updateStock]);
 
     return { addOptimisticStockItem, removeOptimisticStockItems, updateOptimisticStockSnapshot };
 };
 
-export default useBarStockOptimisticUpdates;
+export default useInventoryStockOptimisticUpdates;

@@ -1,8 +1,6 @@
 import {
     Either,
-    fetchInventory, fetchStockItem,
-    generateValidStockName, StockSnapshotWithStock,
-    updateCurrentStockSnapshotSchema
+    fetchInventory, generateValidStockName, updateCurrentStockSnapshotSchema
 } from "../../[name]/utils";
 import { InventorySection, Prisma, Stock, StockSnapshot, StockType } from "@prisma/client";
 import { NextResponse } from "next/server";
@@ -22,7 +20,7 @@ import { z } from "zod";
 import { CreateBarStockDto } from "./[sectionId]/stock/route";
 import { UpdateBarSectionStockDto } from "./[sectionId]/stock/[stockUID]/route";
 import { UpdateStockDto } from "../../[name]/stock/[id]/route";
-import { UpdateStockQuantityDto } from "../../[name]/stock/[id]/quantity/route";
+import StockSnapshotCreateManyInput = Prisma.StockSnapshotCreateManyInput;
 
 class BarService {
 
@@ -144,6 +142,9 @@ class BarService {
         const inventorySection = await prisma.inventorySection.findUnique({
             where: {
                 id: sectionId
+            },
+            include: {
+                stock: true
             }
         });
 
@@ -173,11 +174,7 @@ class BarService {
                 ]
             },
             include: {
-                stockSnapshots: {
-                    include: {
-                        stock: true
-                    }
-                },
+                stockSnapshots: true,
                 inventorySection: {
                     include: {
                         stock: true,
@@ -194,11 +191,7 @@ class BarService {
                     inventorySectionId: inventorySection.id
                 },
                 include: {
-                    stockSnapshots: {
-                        include: {
-                            stock: true
-                        }
-                    },
+                    stockSnapshots: true,
                     inventorySection: {
                         include: {
                             stock: true,
@@ -212,7 +205,7 @@ class BarService {
     }
 
     private async generateWholesomeCurrentSectionSnapshot(
-        section: InventorySection,
+        section: InventorySectionWithOptionalExtras,
         snapshot: InventorySectionSnapshotWithOptionalExtras
     ): Promise<Either<InventorySectionSnapshotWithOptionalExtras, NextResponse>> {
         if (!snapshot.stockSnapshots?.length) {
@@ -228,45 +221,48 @@ class BarService {
                     }
                 },
                 include: {
-                    stockSnapshots: {
-                        include: {
-                            stock: true
-                        }
-                    }
+                    stockSnapshots: true
                 },
                 orderBy: {
                     createdAt: "desc"
                 }
             });
 
-            if (previousSnapshot) {
-                const newStockSnapshots = previousSnapshot.stockSnapshots.map(stockSnapshot => {
-                    const { id, createdAt, updatedAt, inventorySnapshotId, ...validSnapshot } = stockSnapshot;
-                    return ({
-                        ...validSnapshot,
-                        createdAt: todaysDate,
-                        updatedAt: todaysDate,
-                        inventorySectionSnapshotId: snapshot.id
-                    });
+            const newStockSnapshots = previousSnapshot?.stockSnapshots.map<StockSnapshotCreateManyInput>(stockSnapshot => {
+                const { id, createdAt, updatedAt, inventorySnapshotId, ...validSnapshot } = stockSnapshot;
+                return ({
+                    ...validSnapshot,
+                    createdAt: todaysDate,
+                    updatedAt: todaysDate,
+                    inventorySectionSnapshotId: snapshot.id
                 });
+            }) ?? section.stock?.map(sectionStockItem => {
+                const { id, createdAt, updatedAt, inventoryId, inventorySectionId, ...validSnapshot } = sectionStockItem;
+                return ({
+                    ...validSnapshot,
+                    quantity: 0,
+                    createdAt: todaysDate,
+                    updatedAt: todaysDate,
+                    inventorySectionSnapshotId: snapshot.id
+                });
+            }) ?? [];
 
-                if (newStockSnapshots.length) {
-                    const createdSnapshots = await prisma.stockSnapshot.createMany({
-                        data: newStockSnapshots
-                    }).then(() => prisma.stockSnapshot.findMany({
-                        where: {
-                            inventorySectionSnapshotId: snapshot.id,
-                            createdAt: {
-                                gte: todaysDate
-                            }
+            if (newStockSnapshots.length) {
+                const createdSnapshots = await prisma.stockSnapshot.createMany({
+                    data: newStockSnapshots
+                }).then(() => prisma.stockSnapshot.findMany({
+                    where: {
+                        inventorySectionSnapshotId: snapshot.id,
+                        createdAt: {
+                            gte: todaysDate
                         }
-                    }));
+                    }
+                }));
 
-                    return new Either<InventorySectionSnapshotWithOptionalExtras, NextResponse>({
-                        ...snapshot,
-                        stockSnapshots: createdSnapshots
-                    });
-                }
+                return new Either<InventorySectionSnapshotWithOptionalExtras, NextResponse>({
+                    ...snapshot,
+                    stockSnapshots: createdSnapshots
+                });
             }
         }
 
@@ -278,7 +274,7 @@ class BarService {
         quantity: z.number()
     }).partial().strict();
 
-    async updateSectionStockItem(sectionId: string, itemUID: string, dto: UpdateBarSectionStockDto): Promise<Either<Stock | StockSnapshotWithStock, NextResponse>> {
+    async updateSectionStockItem(sectionId: string, itemUID: string, dto: UpdateBarSectionStockDto): Promise<Either<Stock | StockSnapshot, NextResponse>> {
         const bodyValidated = this.updateStockItemDtoSchema.safeParse(dto);
         if (!bodyValidated.success)
             return new Either<Stock, NextResponse>(undefined, respondWithInit({
@@ -289,14 +285,14 @@ class BarService {
 
         const fetchedItem = await this.fetchSectionStock(sectionId, itemUID);
         if (fetchedItem.error)
-            return new Either<Stock | StockSnapshotWithStock, NextResponse>(undefined, fetchedItem.error);
+            return new Either<Stock | StockSnapshot, NextResponse>(undefined, fetchedItem.error);
 
         const item = fetchedItem.success!;
 
         if (dto.name) {
             const validatedName = generateValidStockName(dto.name);
             if (validatedName.error)
-                return new Either<Stock | StockSnapshotWithStock, NextResponse>(undefined, validatedName.error);
+                return new Either<Stock | StockSnapshot, NextResponse>(undefined, validatedName.error);
             dto.name = validatedName.success!;
         }
 
@@ -320,41 +316,38 @@ class BarService {
         sectionId: string,
         itemUID: string,
         dto: Pick<UpdateStockDto, "quantity">
-    ): Promise<Either<StockSnapshotWithStock, NextResponse>> {
+    ): Promise<Either<StockSnapshot, NextResponse>> {
         const dtoValidated = updateCurrentStockSnapshotSchema.safeParse(dto);
         if (!dtoValidated.success)
-            return new Either<StockSnapshotWithStock, NextResponse>(undefined, respondWithInit({
+            return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
                 message: "Invalid body!",
                 validationErrors: dtoValidated,
                 status: 400
             }));
 
         if (dto.quantity === undefined)
-            return new Either<StockSnapshotWithStock, NextResponse>(undefined, respondWithInit({
+            return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
                 message: "You must provide some data to update!",
                 status: 400
             }));
 
         const currentSnapshotMiddleman = await this.fetchCurrentSectionSnapshot(sectionId);
         if (currentSnapshotMiddleman.error)
-            return new Either<StockSnapshotWithStock, NextResponse>(undefined, currentSnapshotMiddleman.error);
+            return new Either<StockSnapshot, NextResponse>(undefined, currentSnapshotMiddleman.error);
 
         const currentSnapshot = currentSnapshotMiddleman.success!;
         const stockSnapshot = currentSnapshot.stockSnapshots?.find(snapshot => snapshot.uid === itemUID);
         if (!stockSnapshot)
-            return new Either<StockSnapshotWithStock, NextResponse>(undefined, respondWithInit({
+            return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
                 message: `There was no item with UID: ${itemUID}`,
                 status: 400
             }));
 
-        return new Either<StockSnapshotWithStock, NextResponse>(await prisma.stockSnapshot.update({
+        return new Either<StockSnapshot, NextResponse>(await prisma.stockSnapshot.update({
             where: {
                 id: stockSnapshot.id
             },
-            data: dto,
-            include: {
-                stock: true
-            }
+            data: dto
         }));
     }
 
@@ -488,7 +481,8 @@ class BarService {
         const stockSnapshot = await prisma.stockSnapshot.create({
             data: {
                 uid: originalStockItem.uid,
-                stockId: originalStockItem.id,
+                name: originalStockItem.name,
+                type: originalStockItem.type,
                 quantity: 0,
                 inventorySectionSnapshotId: currentSectionSnapshot.id
             }
@@ -509,17 +503,16 @@ class BarService {
         });
 
         // Delete from current snapshot
-        const currentSnapshot = await this.fetchCurrentSectionSnapshot(sectionId);
-        if (currentSnapshot.error)
-            return new Either<Stock, NextResponse>(undefined, currentSnapshot.error);
-
+        const currentSnapshotMiddleman = await this.fetchCurrentSectionSnapshot(sectionId);
+        if (currentSnapshotMiddleman.error)
+            return new Either<Stock, NextResponse>(undefined, currentSnapshotMiddleman.error);
+        const currentSnapshot = currentSnapshotMiddleman.success!;
         await prisma.stockSnapshot.deleteMany({
             where: {
-                inventorySectionSnapshotId: sectionId,
+                inventorySectionSnapshotId: currentSnapshot.id,
                 uid: item.uid
             }
         });
-
         return new Either<Stock, NextResponse>(deletedItem);
     }
 
@@ -537,19 +530,18 @@ class BarService {
         });
 
         // Delete from current snapshot
-        const currentSnapshot = await this.fetchCurrentSectionSnapshot(sectionId);
-        if (currentSnapshot.error)
-            return new Either<Stock[], NextResponse>(undefined, currentSnapshot.error);
-
+        const currentSnapshotMiddleman = await this.fetchCurrentSectionSnapshot(sectionId);
+        if (currentSnapshotMiddleman.error)
+            return new Either<Stock[], NextResponse>(undefined, currentSnapshotMiddleman.error);
+        const currentSnapshot = currentSnapshotMiddleman.success!;
         await prisma.stockSnapshot.deleteMany({
             where: {
-                inventorySectionSnapshotId: sectionId,
+                inventorySectionSnapshotId: currentSnapshot.id,
                 uid: {
                     in: stockUIDs
                 }
             }
         });
-
         return new Either<Stock[], NextResponse>(items);
     }
 

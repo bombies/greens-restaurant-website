@@ -2,14 +2,13 @@
 
 import useSWR from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
-import { InventorySnapshot } from "@prisma/client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import InventoryStockTable, { columns } from "../../../_components/table/InventoryStockTable";
 import TableSkeleton from "../../../../../../../_components/skeletons/TableSkeleton";
 import { Spacer } from "@nextui-org/react";
 import SubTitle from "../../../../../../../_components/text/SubTitle";
-import { StockSnapshotWithStock } from "../../../../../../../api/inventory/[name]/utils";
+import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/utils";
 
 type Props = {
     inventoryName: string,
@@ -17,13 +16,11 @@ type Props = {
 }
 
 const FetchSpecificSnapshot = (inventoryName: string, snapshotId: string) => {
-    return useSWR(`/api/inventory/${inventoryName}/snapshots/${snapshotId}`, fetcher<InventorySnapshot & {
-        stockSnapshots: StockSnapshotWithStock[]
-    }>);
+    return useSWR(`/api/inventory/${inventoryName}/snapshots/${snapshotId}`, fetcher<InventorySnapshotWithExtras>);
 };
 
 export default function SpecificSnapshotContainer({ inventoryName, snapshotId }: Props) {
-    const { data, isLoading } = FetchSpecificSnapshot(inventoryName, snapshotId);
+    const { data, isLoading, mutate } = FetchSpecificSnapshot(inventoryName, snapshotId);
     const router = useRouter();
 
     useEffect(() => {
@@ -57,8 +54,10 @@ export default function SpecificSnapshotContainer({ inventoryName, snapshotId }:
                         data &&
                         <InventoryStockTable
                             inventoryName={inventoryName}
-                            stock={data!.stockSnapshots}
+                            currentSnapshot={data}
+                            snapshotLoading={isLoading}
                             mutationAllowed={false}
+                            mutateCurrentSnapshot={mutate}
                         />
                 }
             </div>

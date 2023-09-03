@@ -2,7 +2,7 @@
 
 import { Dispatch, FC, SetStateAction, useCallback, useMemo, useState } from "react";
 import GenericModal from "../../../../../_components/GenericModal";
-import { Stock, StockType } from "@prisma/client";
+import { Stock, StockSnapshot, StockType } from "@prisma/client";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
 import { CreateBarStockDto } from "../../../../../api/inventory/bar/[name]/[sectionId]/stock/route";
@@ -14,14 +14,14 @@ import { SelectItem } from "@nextui-org/react";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import PlusIcon from "../../../../../_components/icons/PlusIcon";
 import { errorToast } from "../../../../../../utils/Hooks";
-import { InventorySectionSnapshotWithExtras, StockSnapshotWithStock } from "../../../../../api/inventory/[name]/utils";
+import { InventorySectionSnapshotWithExtras } from "../../../../../api/inventory/[name]/utils";
 
 type Props = {
     barName?: string,
     sectionSnapshot?: InventorySectionSnapshotWithExtras
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>,
-    addOptimisticStockItem: (item: StockSnapshotWithStock) => Promise<void>
+    addOptimisticStockItem: (item: StockSnapshot) => Promise<void>
 }
 
 type CreateStockItemArgs = {
@@ -64,8 +64,8 @@ const AddBarSectionStockItemModal: FC<Props> = ({
                 quantity: 0,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                stockId: createdItem.id,
-                stock: createdItem,
+                name: createdItem.name,
+                type: createdItem.type,
                 inventorySectionSnapshotId: sectionSnapshot.id,
                 inventorySnapshotId: null
             });

@@ -1,17 +1,17 @@
 "use client";
 
 import GenericModal from "../../../../../../../_components/GenericModal";
-import { Dispatch, SetStateAction, useCallback } from "react";
-import { StockSnapshotWithStock } from "../../../../../../../api/inventory/[name]/utils";
+import { Dispatch, SetStateAction } from "react";
 import StockQuantityForm from "./StockQuantityForm";
 import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
+import { StockSnapshot } from "@prisma/client";
 
 type Props = {
     disabled?: boolean,
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>
     onClose?: () => void
-    item?: StockSnapshotWithStock,
+    item?: StockSnapshot,
     onAdd: (amountAdded: number) => Promise<void>,
     isUpdating?: boolean
 }
@@ -25,10 +25,10 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item, onAdd, i
                     onClose();
                 setOpen(false);
             }}
-            title={`Add ${item?.stock.name
+            title={`Add ${item?.name
                 ?.replace(
                     /(\w)(\w*)/g,
-                    (g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
+                    (_g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
                 )
                 .replace("-", " ")
             } Stock`}

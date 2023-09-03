@@ -17,7 +17,7 @@ import PendingIcon from "../../../../../../../_components/icons/PendingIcon";
 import EditAmountRequestedButton from "./self-actions/EditAmountRequestedButton";
 import RemoveRequestedItemButton from "./self-actions/RemoveRequestedItemButton";
 import {
-    InventorySnapshotWithOptionalExtras, StockSnapshotWithOptionalStock
+    InventorySnapshotWithOptionalExtras
 } from "../../../../../../../api/inventory/[name]/utils";
 import { StockSnapshot } from "@prisma/client";
 import { StockRequestStatus } from ".prisma/client";
@@ -55,7 +55,7 @@ const getValueForKey = (
     key: Key, adminActions?: boolean,
     onAdminAction?: OnAdminAction,
     onSelfAction?: OnSelfAction,
-    snapshots?: StockSnapshotWithOptionalStock[]
+    snapshots?: StockSnapshot[]
 ) => {
     const findItemSnapshot = (): StockSnapshot | undefined => snapshots?.find(snapshot => snapshot.uid === item.stock?.uid);
 

@@ -9,14 +9,14 @@ import GenericDropdown from "../../../../../../../_components/GenericDropdown";
 import { Button, DropdownItem, DropdownSection } from "@nextui-org/react";
 import VerticalDotsIcon from "../../../../../../../_components/icons/VerticalDotsIcon";
 import TrashIcon from "../../../../../../../_components/icons/TrashIcon";
-import { StockSnapshotWithStock } from "../../../../../../../api/inventory/[name]/utils";
 import RemoveStockModal from "./RemoveStockModal";
 import ConfirmationModal from "../../../../../../../_components/ConfirmationModal";
+import { StockSnapshot } from "@prisma/client";
 
 type Props = {
-    item: StockSnapshotWithStock,
-    onQuantityIncrement: (item: StockSnapshotWithStock, incrementedBy: number) => Promise<void>,
-    onQuantityDecrement: (item: StockSnapshotWithStock, decrementedBy: number) => Promise<void>,
+    item: StockSnapshot,
+    onQuantityIncrement: (item: StockSnapshot, incrementedBy: number) => Promise<void>,
+    onQuantityDecrement: (item: StockSnapshot, decrementedBy: number) => Promise<void>,
     onStockDelete: (deletedIds: string[]) => void;
 }
 
@@ -48,8 +48,8 @@ const StockTableActions: FC<Props> = ({ item, onQuantityDecrement, onQuantityInc
             <ConfirmationModal
                 isOpen={deleteModalOpen}
                 setOpen={setDeleteModalOpen}
-                title={`Delete ${item.stock.name.replaceAll("-", " ")}`}
-                message={`Are you sure you want to delete ${item.stock.name.replaceAll("-", " ")}`}
+                title={`Delete ${item.name.replaceAll("-", " ")}`}
+                message={`Are you sure you want to delete ${item.name.replaceAll("-", " ")}`}
                 onAccept={() => {
                     onStockDelete([item.uid]);
                     setDeleteModalOpen(false);

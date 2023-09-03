@@ -7,10 +7,9 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import InventoryStockTable, { columns } from "./table/InventoryStockTable";
-import SubTitle from "../../../../../_components/text/SubTitle";
 import { useUserData } from "../../../../../../utils/Hooks";
 import TableSkeleton from "../../../../../_components/skeletons/TableSkeleton";
-import { useCurrentStock } from "./CurrentStockContext";
+import { InventorySnapshotWithExtras } from "../../../../../api/inventory/[name]/utils";
 
 type Props = {
     name: string
@@ -24,19 +23,17 @@ const useInventoryInfo = (name: string) => {
 };
 
 const useCurrentSnapshot = (name: string) => {
-    return useSWR(`/api/inventory/${name}/currentsnapshot`, fetcher<InventorySnapshot & {
-        inventory: Inventory & {
-            stock: Stock[]
-        },
-        stockSnapshots: StockSnapshot[]
-    }>);
+    return useSWR(`/api/inventory/${name}/currentsnapshot`, fetcher<InventorySnapshotWithExtras>);
 };
 
 export default function Inventory({ name }: Props) {
     const { isLoading: userDataIsLoading, data: userData } = useUserData();
     const { data: inventoryData, isLoading: inventoryDataLoading, error: inventoryDataError } = useInventoryInfo(name);
-    const { data: currentSnapshotData, isLoading: currentSnapshotDataLoading } = useCurrentSnapshot(name);
-    const [currentStockSnapshot, setCurrentStockSnapshot] = useCurrentStock();
+    const {
+        data: currentSnapshotData,
+        isLoading: currentSnapshotDataLoading,
+        mutate: mutateCurrentSnapshot
+    } = useCurrentSnapshot(name);
     const router = useRouter();
 
     useEffect(() => {
@@ -53,21 +50,7 @@ export default function Inventory({ name }: Props) {
     useEffect(() => {
         if ((!inventoryDataLoading && (!inventoryData || inventoryDataError)) || (!currentSnapshotDataLoading && !currentSnapshotData))
             return router.replace("/inventory");
-        else if (!currentSnapshotDataLoading && currentSnapshotData)
-            setCurrentStockSnapshot(currentSnapshotData.inventory.stock.map(stock => {
-                return ({
-                    id: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.id || "",
-                    quantity: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.quantity || 0,
-                    uid: stock.uid,
-                    stockId: stock.id,
-                    stock: stock,
-                    inventorySnapshotId: currentSnapshotData.id,
-                    inventorySectionSnapshotId: null,
-                    createdAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.createdAt || new Date(),
-                    updatedAt: currentSnapshotData.stockSnapshots.find(snapshot => snapshot.uid === stock.uid)?.updatedAt || new Date()
-                });
-            }));
-    }, [currentSnapshotData, currentSnapshotDataLoading, inventoryData, inventoryDataError, inventoryDataLoading, router, setCurrentStockSnapshot]);
+    }, [currentSnapshotData, currentSnapshotDataLoading, inventoryData, inventoryDataError, inventoryDataLoading, router]);
 
     return (
         <div className="default-container p-12 phone:px-4">
@@ -76,17 +59,13 @@ export default function Inventory({ name }: Props) {
                     <TableSkeleton columns={columns} contentRepeat={20} />
                     :
                     !inventoryDataError ?
-                        (currentStockSnapshot.length > 0 ?
-                                <InventoryStockTable
-                                    inventoryName={name}
-                                    stock={currentStockSnapshot}
-                                    mutationAllowed={hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
-                                />
-                                :
-                                <div className="default-container p-12">
-                                    <SubTitle>There are no items...</SubTitle>
-                                </div>
-                        )
+                        <InventoryStockTable
+                            inventoryName={name}
+                            currentSnapshot={currentSnapshotData}
+                            mutateCurrentSnapshot={mutateCurrentSnapshot}
+                            snapshotLoading={currentSnapshotDataLoading}
+                            mutationAllowed={hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
+                        />
                         :
                         <div>There was an error</div>
             }

@@ -146,7 +146,6 @@ model Stock {
   name String
   type StockType?
 
-  stockSnapshots      StockSnapshot[]
   requestedStockItems RequestedStockItem[] @relation()
 
   createdAt DateTime @default(now())
@@ -159,15 +158,14 @@ model Stock {
 }
 
 model StockSnapshot {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  id       String     @id @default(auto()) @map("_id") @db.ObjectId
   uid      String
   quantity Int
+  name     String
+  type     StockType?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  stockId String @db.ObjectId
-  stock   Stock  @relation(fields: [stockId], references: [id], onDelete: Cascade)
 
   inventorySnapshotId String?            @db.ObjectId
   inventorySnapshot   InventorySnapshot? @relation(fields: [inventorySnapshotId], references: [id], onDelete: Cascade)

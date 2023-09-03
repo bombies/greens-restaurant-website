@@ -34,7 +34,7 @@ export async function GET(req: Request, { params }: RouteContext) {
 
         const stockSnapshots = await prisma.stockSnapshot.findMany({
             where: {
-                stock: {
+                inventorySnapshot: {
                     inventoryId: inventory.success!.id
                 }
             }

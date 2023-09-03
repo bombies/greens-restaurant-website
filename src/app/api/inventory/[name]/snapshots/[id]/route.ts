@@ -16,11 +16,8 @@ export function GET(req: Request, { params }: RouteContext) {
                 id: params.id
             },
             include: {
-                stockSnapshots: {
-                    include: {
-                        stock: true
-                    }
-                }
+                stockSnapshots: true,
+                inventory: true
             }
         });
 

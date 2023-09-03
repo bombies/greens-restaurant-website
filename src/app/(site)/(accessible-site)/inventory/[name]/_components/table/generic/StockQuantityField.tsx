@@ -1,82 +1,55 @@
 "use client";
 
-import { StockSnapshot } from "@prisma/client";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import GenericInput from "../../../../../../../_components/inputs/GenericInput";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { Fragment, useState } from "react";
 import clsx from "clsx";
-import { CSSTransition } from "react-transition-group";
+import GenericModal from "../../../../../../../_components/GenericModal";
+import StockQuantityForm from "./StockQuantityForm";
+import { StockSnapshot } from "@prisma/client";
 
 type Props = {
-    stock: StockSnapshot,
+    stockSnapshot: StockSnapshot,
     disabled?: boolean,
-    submitHandler: (data: { quantity: number }, setEditMode: Dispatch<SetStateAction<boolean>>) => void,
+    onSet: (quantity: number) => Promise<void>;
 }
 
-export default function StockQuantityField({ stock, submitHandler, disabled }: Props) {
-    const [editMode, setEditMode] = useState(false);
-    const { register, handleSubmit } = useForm<FieldValues>();
-    const formRef = useRef<any>(null);
-
-    useEffect(() => {
-        const handle = (event: MouseEvent) => {
-            if (formRef.current && (!formRef.current?.contains(event.target)) && editMode)
-                setEditMode(false);
-        };
-
-        document.addEventListener("mousedown", handle);
-        return () => {
-            document.removeEventListener("mousedown", handle);
-        };
-    }, [editMode, formRef]);
-
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        submitHandler(data as { quantity: number }, setEditMode);
-    };
+export default function StockQuantityField({ stockSnapshot, onSet, disabled }: Props) {
+    const [editModalOpen, setEditModalOpen] = useState(false);
 
     return (
-        <div className="flex transition-fast w-fit">
-            <CSSTransition
-                in={!editMode}
-                timeout={200}
-                unmountOnExit
-                classNames="stock-quantity-value"
+        <Fragment>
+            <GenericModal
+                isOpen={editModalOpen}
+                onClose={() => {
+                    setEditModalOpen(false);
+                }}
+                title={`Set ${stockSnapshot?.name
+                    ?.replace(
+                        /(\w)(\w*)/g,
+                        (_g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
+                    )
+                    .replace("-", " ")
+                } Stock`}
             >
-                <p className={clsx(
-                    "cursor-pointer border-2 border-neutral-800/0 hover:default-container transition-fast w-fit py-3 px-5 rounded-2xl"
-                )}
-                   onClick={() => {
-                       if (disabled)
-                           return;
-                       setEditMode(true);
-                   }}>
-                    {stock.quantity}
-                </p>
-            </CSSTransition>
-            <CSSTransition
-                in={editMode}
-                timeout={350}
-                unmountOnExit
-                classNames="stock-quantity-value"
-            >
-                <form
-                    className={clsx(
-                        "w-fit"
-                    )}
-                    ref={formRef}
-                    onSubmit={handleSubmit(onSubmit)}
-                >
-                    <GenericInput
-                        isDisabled={disabled}
-                        register={register}
-                        label="New Quantity"
-                        placeholder="Enter a new quantity"
-                        id="quantity"
-                        type="number"
-                        isRequired={true}
-                    />
-                </form>
-            </CSSTransition>
-        </div>
+                <StockQuantityForm
+                    onQuantitySubmit={async (quantity) => {
+                        onSet(quantity)
+                        setEditModalOpen(false)
+                    }}
+                    buttonLabel="Set Stock"
+                    disabled={disabled}
+                    item={stockSnapshot}
+                />
+            </GenericModal>
+            <p className={clsx(
+                "cursor-pointer border-2 border-neutral-800/0 hover:default-container transition-fast w-fit py-3 px-5"
+            )}
+               onClick={() => {
+                   if (disabled)
+                       return;
+                   setEditModalOpen(true);
+               }}>
+                {stockSnapshot.quantity}
+            </p>
+        </Fragment>
     );
 }

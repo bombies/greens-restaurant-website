@@ -6,14 +6,14 @@ import GenericStockTable, {
 } from "../../../../inventory/[name]/_components/table/generic/GenericStockTable";
 import { KeyedMutator } from "swr";
 import {
-    InventorySectionSnapshotWithExtras,
-    StockSnapshotWithStock
+    InventorySectionSnapshotWithExtras
 } from "../../../../../../api/inventory/[name]/utils";
-import { InventorySection } from "@prisma/client";
+import { InventorySection, StockSnapshot } from "@prisma/client";
 import AddBarSectionStockItemModal from "../AddBarSectionStockItemModal";
 import { toast } from "react-hot-toast";
 import "../../../../../../../utils/GeneralUtils";
 import useBarStockOptimisticUpdates from "./hooks/useBarStockOptimisticUpdates";
+import StockQuantityField from "../../../../inventory/[name]/_components/table/generic/StockQuantityField";
 
 type Props = {
     barName?: string,
@@ -24,7 +24,7 @@ type Props = {
     mutationAllowed: boolean,
 }
 
-export type PartialStockSnapshotWithStock = Partial<Omit<StockSnapshotWithStock, "id">>
+export type PartialStockSnapshotWithStock = Partial<Omit<StockSnapshot, "id">>
 
 const BarStockTable: FC<Props> = ({
                                       barName,
@@ -58,11 +58,17 @@ const BarStockTable: FC<Props> = ({
                 getKeyValue={(item, key) => {
                     switch (key) {
                         case StockTableColumnKey.STOCK_NAME: {
-                            return item.stock.name.replaceAll("-", " ");
+                            return item.name.replaceAll("-", " ");
                         }
                         case StockTableColumnKey.STOCK_QUANTITY: {
-                            // TODO: Implement stock quantity inline update
-                            return item.quantity.toString();
+                            return (
+                                <StockQuantityField
+                                    stockSnapshot={item}
+                                    onSet={async (quantity) => {
+                                        await updateOptimisticStockSnapshot(item, quantity);
+                                    }}
+                                />
+                            );
                         }
                     }
                 }}
@@ -72,7 +78,7 @@ const BarStockTable: FC<Props> = ({
                 onQuantityDecrement={async (item, decrementedBy) => {
                     const newQuantity = item.quantity - decrementedBy;
                     if (newQuantity < 0) {
-                        toast.error(`You can't decrement ${item.stock.name.replaceAll("-", " ").capitalize()} ${decrementedBy === 1 ? "anymore" : `by ${decrementedBy}`}!`);
+                        toast.error(`You can't decrement ${item.name.replaceAll("-", " ").capitalize()} ${decrementedBy === 1 ? "anymore" : `by ${decrementedBy}`}!`);
                         return;
                     }
                     await updateOptimisticStockSnapshot(item, newQuantity);

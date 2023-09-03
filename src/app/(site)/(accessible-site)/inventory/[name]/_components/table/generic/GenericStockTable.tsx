@@ -9,15 +9,15 @@ import { Spacer, TableCell, TableRow } from "@nextui-org/react";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import AddInventoryItemButton from "../AddInventoryItemButton";
 import SearchIcon from "../../../../../../../_components/icons/SearchIcon";
-import { StockSnapshotWithStock } from "../../../../../../../api/inventory/[name]/utils";
+import { StockSnapshot } from "@prisma/client";
 
 interface Props {
-    stock: StockSnapshotWithStock[];
+    stock: StockSnapshot[];
     stockLoading: boolean,
     mutationAllowed: boolean;
-    getKeyValue: (item: StockSnapshotWithStock, key: StockTableColumnKey) => any;
-    onQuantityIncrement: (item: StockSnapshotWithStock, incrementedBy: number) => Promise<void>;
-    onQuantityDecrement: (item: StockSnapshotWithStock, decrementedBy: number) => Promise<void>;
+    getKeyValue: (item: StockSnapshot, key: StockTableColumnKey) => any;
+    onQuantityIncrement: (item: StockSnapshot, incrementedBy: number) => Promise<void>;
+    onQuantityDecrement: (item: StockSnapshot, decrementedBy: number) => Promise<void>;
     onStockDelete: (deletedIds: string[]) => Promise<void>;
     onItemAddButtonPress: () => void,
 }
