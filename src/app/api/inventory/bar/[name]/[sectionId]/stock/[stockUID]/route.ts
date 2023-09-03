@@ -31,7 +31,7 @@ export type UpdateBarSectionStockDto = Partial<UpdateStockDto> & {
 export async function PATCH(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
         const body: UpdateBarSectionStockDto = await req.json();
-        const updatedItem = await barService.updateSectionStock(params.sectionId, params.stockUID, body);
+        const updatedItem = await barService.updateSectionStockItem(params.sectionId, params.stockUID, body);
         return updatedItem.error ?? NextResponse.json(updatedItem.success!);
     }, [
         Permission.CREATE_INVENTORY,

@@ -43,7 +43,7 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData
                     id="selected_inventories"
                     placeholder="Select inventories..."
                     items={data ?? []}
-                    disabled={isLoading || snapshotsLoading}
+                    isDisabled={isLoading || snapshotsLoading}
                     selectedKeys={selectedInventoryIds}
                     onSelectionChange={selection => setSelectedInventoryIds(Array.from(selection) as string[])}
                     variant="flat"

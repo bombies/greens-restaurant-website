@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, Fragment, useCallback } from "react";
+import { FC, useCallback } from "react";
 import { InventorySection, User } from "@prisma/client";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
@@ -8,7 +8,7 @@ import {
     InventorySectionSnapshotWithExtras, InventoryWithSections
 } from "../../../../../api/inventory/[name]/utils";
 import Permission, { hasAnyPermission } from "../../../../../../libs/types/permission";
-import BarStockTable from "./BarStockTable";
+import BarStockTable from "./table/BarStockTable";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
 import BarSectionControl from "./control/BarSectionControl";
@@ -27,7 +27,11 @@ const useCurrentBarSectionSnapshot = (name?: string, sectionId?: string) => {
 export type PartialInventorySection = Partial<Omit<InventorySection, "id">>
 
 const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData }) => {
-    const { data: currentSnapshot, isLoading: currentSnapshotLoading, mutate: mutateCurrentSnapshot } = useCurrentBarSectionSnapshot(barInfo?.name, section?.id);
+    const {
+        data: currentSnapshot,
+        isLoading: currentSnapshotLoading,
+        mutate: mutateCurrentSnapshot
+    } = useCurrentBarSectionSnapshot(barInfo?.name, section?.id);
 
     const mutateSection = useCallback(async (newInfo: PartialInventorySection) => {
         if (!barInfo)
@@ -82,6 +86,7 @@ const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData }) =>
             <Spacer y={6} />
             <BarStockTable
                 barName={barInfo?.name}
+                section={section}
                 currentSnapshot={currentSnapshot}
                 mutateCurrentSnapshot={mutateCurrentSnapshot}
                 stockIsLoading={currentSnapshotLoading}

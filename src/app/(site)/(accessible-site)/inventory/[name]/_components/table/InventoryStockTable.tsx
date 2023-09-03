@@ -321,13 +321,13 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
     return (
         <>
             <AddStockModal
-                onSubmit={(data) => {
+                onAdd={async (added) => {
                     if (!mutationAllowed)
                         return;
 
-                    triggerStockUpdate({
+                    return triggerStockUpdate({
                         item: selectedItem!,
-                        quantity: selectedItem!.quantity + Number(data.quantity)
+                        quantity: selectedItem!.quantity + added
                     })
                         .then((res) => {
                             dispatchStockState({
@@ -355,13 +355,13 @@ export default function InventoryStockTable({ inventoryName, stock, mutationAllo
             <RemoveStockModal
                 disabled={isUpdating || !mutationAllowed}
                 isUpdating={isUpdating}
-                onSubmit={(data) => {
+                onRemove={async (removed) => {
                     if (!mutationAllowed)
                         return;
 
-                    triggerStockUpdate({
+                    return triggerStockUpdate({
                         item: selectedItem!,
-                        quantity: selectedItem!.quantity - Number(data.quantity)
+                        quantity: selectedItem!.quantity - removed
                     })
                         .then((res) => {
                             dispatchStockState({

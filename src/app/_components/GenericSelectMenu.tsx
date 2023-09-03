@@ -21,7 +21,8 @@ export default function GenericSelectMenu<T>({
         <Select
             {...props}
             classNames={{
-                trigger: "!default-container !h-fit py-6 px-3"
+                label: "text-neutral-100 mb-4 text-sm font-semibold",
+                trigger: "!default-container !h-fit py-6 pr-3 pl-6",
             }}
             listboxProps={{
                 itemClasses: {

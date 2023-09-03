@@ -10,6 +10,7 @@ import EditBarSectionModal from "./EditBarSectionModal";
 import { InventorySection } from "@prisma/client";
 import { PartialInventorySection } from "../BarSection";
 import DeleteBarSectionModal from "./DeleteBarSectionModal";
+import VerticalDotsIcon from "../../../../../../_components/icons/VerticalDotsIcon";
 
 type Props = {
     barName: string,
@@ -55,11 +56,12 @@ const BarSectionControl: FC<Props> = ({ barName, section, mutateSection, deleteS
                 placement="bottom-end"
                 trigger={
                     <Button
+                        size="sm"
                         isIconOnly
                         color="default"
-                        variant="light"
+                        variant="flat"
                     >
-                        <PlusIcon />
+                        <VerticalDotsIcon width={18} />
                     </Button>
                 }
                 onAction={handleAction}

@@ -1,8 +1,7 @@
 import {
     Either,
-    fetchCurrentSnapshot,
-    fetchInventory,
-    generateValidStockName,
+    fetchInventory, fetchStockItem,
+    generateValidStockName, StockSnapshotWithStock,
     updateCurrentStockSnapshotSchema
 } from "../../[name]/utils";
 import { InventorySection, Prisma, Stock, StockSnapshot, StockType } from "@prisma/client";
@@ -274,54 +273,93 @@ class BarService {
         return new Either<InventorySectionSnapshotWithOptionalExtras, NextResponse>(snapshot);
     }
 
+    private updateStockItemDtoSchema = z.object({
+        name: z.string(),
+        quantity: z.number()
+    }).partial().strict();
+
+    async updateSectionStockItem(sectionId: string, itemUID: string, dto: UpdateBarSectionStockDto): Promise<Either<Stock | StockSnapshotWithStock, NextResponse>> {
+        const bodyValidated = this.updateStockItemDtoSchema.safeParse(dto);
+        if (!bodyValidated.success)
+            return new Either<Stock, NextResponse>(undefined, respondWithInit({
+                message: "Invalid body!",
+                validationErrors: bodyValidated,
+                status: 400
+            }));
+
+        const fetchedItem = await this.fetchSectionStock(sectionId, itemUID);
+        if (fetchedItem.error)
+            return new Either<Stock | StockSnapshotWithStock, NextResponse>(undefined, fetchedItem.error);
+
+        const item = fetchedItem.success!;
+
+        if (dto.name) {
+            const validatedName = generateValidStockName(dto.name);
+            if (validatedName.error)
+                return new Either<Stock | StockSnapshotWithStock, NextResponse>(undefined, validatedName.error);
+            dto.name = validatedName.success!;
+        }
+
+
+        const updatedStock = await prisma.stock.update({
+            where: {
+                id: item.id
+            },
+            data: {
+                name: dto.name,
+                type: dto.type
+            }
+        });
+
+        if (dto.quantity !== undefined)
+            return this.updateCurrentSectionStockSnapshot(sectionId, itemUID, { quantity: dto.quantity });
+        return new Either<Stock, NextResponse>(updatedStock);
+    };
+
     async updateCurrentSectionStockSnapshot(
         sectionId: string,
         itemUID: string,
-        dto: Partial<UpdateStockDto & UpdateStockQuantityDto>
-    ): Promise<Either<StockSnapshot, NextResponse>> {
+        dto: Pick<UpdateStockDto, "quantity">
+    ): Promise<Either<StockSnapshotWithStock, NextResponse>> {
         const dtoValidated = updateCurrentStockSnapshotSchema.safeParse(dto);
         if (!dtoValidated.success)
-            return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
+            return new Either<StockSnapshotWithStock, NextResponse>(undefined, respondWithInit({
                 message: "Invalid body!",
                 validationErrors: dtoValidated,
                 status: 400
             }));
 
-        if (!dto.name && dto.quantity === undefined)
-            return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
+        if (dto.quantity === undefined)
+            return new Either<StockSnapshotWithStock, NextResponse>(undefined, respondWithInit({
                 message: "You must provide some data to update!",
                 status: 400
             }));
 
-        if (dto.name) {
-            const validatedName = generateValidStockName(dto.name);
-            if (validatedName.error)
-                return new Either<StockSnapshot, NextResponse>(undefined, validatedName.error);
-            dto.name = validatedName.success!;
-        }
-
         const currentSnapshotMiddleman = await this.fetchCurrentSectionSnapshot(sectionId);
         if (currentSnapshotMiddleman.error)
-            return new Either<StockSnapshot, NextResponse>(undefined, currentSnapshotMiddleman.error);
+            return new Either<StockSnapshotWithStock, NextResponse>(undefined, currentSnapshotMiddleman.error);
 
         const currentSnapshot = currentSnapshotMiddleman.success!;
         const stockSnapshot = currentSnapshot.stockSnapshots?.find(snapshot => snapshot.uid === itemUID);
         if (!stockSnapshot)
-            return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
+            return new Either<StockSnapshotWithStock, NextResponse>(undefined, respondWithInit({
                 message: `There was no item with UID: ${itemUID}`,
                 status: 400
             }));
 
-        return new Either<StockSnapshot, NextResponse>(await prisma.stockSnapshot.update({
+        return new Either<StockSnapshotWithStock, NextResponse>(await prisma.stockSnapshot.update({
             where: {
                 id: stockSnapshot.id
             },
-            data: dto
+            data: dto,
+            include: {
+                stock: true
+            }
         }));
     }
 
     async fetchSectionStock(sectionId: string, stockUID: string): Promise<Either<Stock, NextResponse>> {
-        const fetchedSectionMiddleman = await this.fetchInventorySection(sectionId);
+        const fetchedSectionMiddleman = await this.fetchInventorySection(sectionId, true);
         if (fetchedSectionMiddleman.error)
             return new Either<Stock, NextResponse>(undefined, fetchedSectionMiddleman.error);
         const fetchedSection = fetchedSectionMiddleman.success!;
@@ -335,40 +373,19 @@ class BarService {
         return new Either<Stock, NextResponse>(item);
     }
 
-    private updateBarSectionStockDtoSchema = z.object({
-        name: z.string(),
-        type: z.string()
-    }).partial().strict();
+    async fetchSectionStocks(sectionId: string, stockUIDs: string[]): Promise<Either<Stock[], NextResponse>> {
+        const fetchedSectionMiddleman = await this.fetchInventorySection(sectionId, true);
+        if (fetchedSectionMiddleman.error)
+            return new Either<Stock[], NextResponse>(undefined, fetchedSectionMiddleman.error);
+        const fetchedSection = fetchedSectionMiddleman.success!;
 
-    async updateSectionStock(sectionId: string, stockUID: string, dto: UpdateBarSectionStockDto): Promise<Either<Stock, NextResponse>> {
-        const dtoValidated = this.updateBarSectionStockDtoSchema.safeParse(dto);
-        if (!dtoValidated.success)
-            return new Either<Stock, NextResponse>(undefined, respondWithInit({
-                message: "Invalid body!",
-                validationErrors: dtoValidated,
-                status: 400
+        const items = fetchedSection.stock?.filter(item => stockUIDs.includes(item.uid));
+        if (!items || !items.length)
+            return new Either<Stock[], NextResponse>(undefined, respondWithInit({
+                message: `There was no stock item found in inventory section with id ${sectionId} with stock any UID ${stockUIDs.toString()}`,
+                status: 404
             }));
-
-        const fetchedItemMiddleman = await this.fetchSectionStock(sectionId, stockUID);
-        if (fetchedItemMiddleman.error)
-            return fetchedItemMiddleman;
-        const item = fetchedItemMiddleman.success!;
-
-        if (dto.name) {
-            const validatedName = generateValidStockName(dto.name);
-            if (validatedName.error)
-                return new Either<Stock, NextResponse>(undefined, validatedName.error);
-            dto.name = validatedName.success!;
-        }
-
-        const updatedStock = await prisma.stock.update({
-            where: {
-                id: item.id
-            },
-            data: dto
-        });
-
-        return new Either<Stock, NextResponse>(updatedStock);
+        return new Either<Stock[], NextResponse>(items);
     }
 
     async createSectionStock(sectionId: string, dto: CreateBarSectionStockItem): Promise<Either<Stock, NextResponse>> {
@@ -504,6 +521,36 @@ class BarService {
         });
 
         return new Either<Stock, NextResponse>(deletedItem);
+    }
+
+    async deleteSectionStocks(sectionId: string, stockUIDs: string[]): Promise<Either<Stock[], NextResponse>> {
+        const fetchedItemMiddleman = await this.fetchSectionStocks(sectionId, stockUIDs);
+        if (fetchedItemMiddleman.error)
+            return fetchedItemMiddleman;
+        const items = fetchedItemMiddleman.success!;
+        await prisma.stock.deleteMany({
+            where: {
+                uid: {
+                    in: stockUIDs
+                }
+            }
+        });
+
+        // Delete from current snapshot
+        const currentSnapshot = await this.fetchCurrentSectionSnapshot(sectionId);
+        if (currentSnapshot.error)
+            return new Either<Stock[], NextResponse>(undefined, currentSnapshot.error);
+
+        await prisma.stockSnapshot.deleteMany({
+            where: {
+                inventorySectionSnapshotId: sectionId,
+                uid: {
+                    in: stockUIDs
+                }
+            }
+        });
+
+        return new Either<Stock[], NextResponse>(items);
     }
 
     private async handlePrismaErrors<T>(logic: () => Promise<Either<T, NextResponse>>, { notFound }: {

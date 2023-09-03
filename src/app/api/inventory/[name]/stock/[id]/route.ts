@@ -17,9 +17,10 @@ export function GET(req: Request, { params }: RouteContext) {
     }, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK, Permission.VIEW_INVENTORY]);
 }
 
-export type UpdateStockDto = {
+export type UpdateStockDto = Partial<{
     name: string,
-}
+    quantity: number,
+}>
 
 export function PATCH(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {

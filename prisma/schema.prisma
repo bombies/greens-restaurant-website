@@ -167,7 +167,7 @@ model StockSnapshot {
   updatedAt DateTime @updatedAt
 
   stockId String @db.ObjectId
-  stock   Stock  @relation(fields: [stockId], references: [id])
+  stock   Stock  @relation(fields: [stockId], references: [id], onDelete: Cascade)
 
   inventorySnapshotId String?            @db.ObjectId
   inventorySnapshot   InventorySnapshot? @relation(fields: [inventorySnapshotId], references: [id], onDelete: Cascade)

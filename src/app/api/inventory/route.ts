@@ -6,18 +6,14 @@ import { INVENTORY_NAME_REGEX } from "../../../utils/regex";
 import { v4 } from "uuid";
 import { InventoryType, Prisma } from ".prisma/client";
 import InventoryWhereInput = Prisma.InventoryWhereInput;
+import { StockType } from "@prisma/client";
 
 export function GET(req: Request) {
     return authenticatedAny(req, async () => {
         const { searchParams } = new URL(req.url);
         const ids = searchParams.get("ids")?.replaceAll(/\s/g, "").split(",").filter(id => id.length > 0);
         const withStock = searchParams.get("with_stock") === "true";
-        let whereQuery: InventoryWhereInput = {
-            OR: [
-                { type: null },
-                { type: InventoryType.DEFAULT }
-            ]
-        };
+        let whereQuery: InventoryWhereInput = {};
 
         if (ids && ids.length)
             whereQuery = {
@@ -33,7 +29,7 @@ export function GET(req: Request) {
                 stock: withStock
             }
         });
-        return NextResponse.json(inventories);
+        return NextResponse.json(inventories.filter(inv => inv.type === null || inv.type === StockType.DEFAULT));
     }, [
         Permission.CREATE_INVENTORY,
         Permission.VIEW_INVENTORY,

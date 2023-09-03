@@ -97,8 +97,9 @@ export const fetchStockItem = async (inventoryName: string, itemId: string, inve
 };
 
 const updateStockItemDtoSchema = z.object({
-    name: z.string()
-}).strict();
+    name: z.string(),
+    quantity: z.number()
+}).partial().strict();
 
 export const updateStockItem = async (inventoryName: string, itemId: string, dto: UpdateStockDto, inventoryType?: InventoryType): Promise<Either<Stock, NextResponse>> => {
     const bodyValidated = updateStockItemDtoSchema.safeParse(dto);
@@ -114,9 +115,14 @@ export const updateStockItem = async (inventoryName: string, itemId: string, dto
         return new Either<Stock, NextResponse>(undefined, fetchedItem.error);
 
     const item = fetchedItem.success!;
-    const validatedName = generateValidStockName(dto.name);
-    if (validatedName.error)
-        return new Either<Stock, NextResponse>(undefined, validatedName.error);
+
+    if (dto.name) {
+        const validatedName = generateValidStockName(dto.name);
+        if (validatedName.error)
+            return new Either<Stock, NextResponse>(undefined, validatedName.error);
+        dto.name = validatedName.success!;
+    }
+
 
     const updatedStock = await prisma.stock.update({
         where: {
@@ -126,6 +132,10 @@ export const updateStockItem = async (inventoryName: string, itemId: string, dto
             name: dto.name
         }
     });
+
+    if (dto.quantity) {
+        // TODO: Update snapshot quantity
+    }
 
     return new Either<Stock, NextResponse>(updatedStock);
 };

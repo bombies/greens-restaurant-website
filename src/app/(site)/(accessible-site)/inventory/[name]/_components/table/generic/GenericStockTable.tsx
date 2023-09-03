@@ -16,9 +16,9 @@ interface Props {
     stockLoading: boolean,
     mutationAllowed: boolean;
     getKeyValue: (item: StockSnapshotWithStock, key: StockTableColumnKey) => any;
-    onQuantityIncrement: (item: StockSnapshotWithStock, incrementedBy: number) => void;
-    onQuantityDecrement: (item: StockSnapshotWithStock, decrementedBy: number) => void;
-    onStockDelete: (deletedIds: string[]) => void;
+    onQuantityIncrement: (item: StockSnapshotWithStock, incrementedBy: number) => Promise<void>;
+    onQuantityDecrement: (item: StockSnapshotWithStock, decrementedBy: number) => Promise<void>;
+    onStockDelete: (deletedIds: string[]) => Promise<void>;
     onItemAddButtonPress: () => void,
 }
 
@@ -39,8 +39,9 @@ const GenericStockTable: FC<Props> = ({
                                           onItemAddButtonPress
                                       }) => {
     const fetchKeyValue = useStockTableValue({
-        getKeyValue, mutationAllowed, onQuantityDecrement, onQuantityIncrement
+        getKeyValue, mutationAllowed, onQuantityDecrement, onQuantityIncrement, onStockDelete
     });
+
     const columns: Column[] = useMemo(() => {
         const cols: Column[] = [
             {
@@ -94,7 +95,7 @@ const GenericStockTable: FC<Props> = ({
                 onSortChange={setSortDescriptor}
             >
                 {item => (
-                    <TableRow key={item.id}>
+                    <TableRow key={item.uid}>
                         {key => (
                             <TableCell className="capitalize">{fetchKeyValue(item, key)}</TableCell>
                         )}

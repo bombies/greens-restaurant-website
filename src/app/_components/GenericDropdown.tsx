@@ -1,14 +1,15 @@
 import { FC, Key, ReactNode } from "react";
-import { Dropdown, DropdownMenu, DropdownProps, DropdownTrigger } from "@nextui-org/react";
+import { Dropdown, DropdownMenu, DropdownMenuProps, DropdownProps, DropdownTrigger } from "@nextui-org/react";
 import { CollectionChildren } from "@react-types/shared";
 
 type Props = Omit<DropdownProps, "children" | "trigger"> & {
     trigger: ReactNode,
     children: CollectionChildren<any>,
     onAction?: (key: Key) => void,
+    menuProps?: Omit<DropdownMenuProps, "children">
 }
 
-const GenericDropdown: FC<Props> = ({ trigger, children, onAction, ...props }) => {
+const GenericDropdown: FC<Props> = ({ trigger, children, onAction, menuProps, ...props }) => {
     return (
         <Dropdown
             {...props}
@@ -22,6 +23,7 @@ const GenericDropdown: FC<Props> = ({ trigger, children, onAction, ...props }) =
             </DropdownTrigger>
             <DropdownMenu
                 onAction={onAction}
+                {...menuProps}
             >
                 {children}
             </DropdownMenu>
