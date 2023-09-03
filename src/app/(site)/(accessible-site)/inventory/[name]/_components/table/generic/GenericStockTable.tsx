@@ -55,7 +55,7 @@ const GenericStockTable: FC<Props> = ({
             },
             {
                 key: "stock_price",
-                value: "Stock Price"
+                value: "Selling Price"
             }
         ];
 

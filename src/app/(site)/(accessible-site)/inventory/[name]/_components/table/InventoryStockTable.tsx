@@ -34,8 +34,8 @@ export const columns: Column[] = [
         value: "Quantity"
     },
     {
-        key: "stock_actions",
-        value: "Actions"
+        key: "stock_price",
+        value: "Selling Price"
     }
 ];
 
