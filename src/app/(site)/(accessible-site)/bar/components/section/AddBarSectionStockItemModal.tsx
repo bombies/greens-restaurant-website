@@ -66,6 +66,7 @@ const AddBarSectionStockItemModal: FC<Props> = ({
                 updatedAt: new Date(),
                 name: createdItem.name,
                 type: createdItem.type,
+                price: createdItem.price,
                 inventorySectionSnapshotId: sectionSnapshot.id,
                 inventorySnapshotId: null
             });

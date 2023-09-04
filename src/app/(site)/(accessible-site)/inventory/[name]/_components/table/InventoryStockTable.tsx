@@ -8,7 +8,7 @@ import { InventorySnapshotWithExtras } from "../../../../../../api/inventory/[na
 import { KeyedMutator } from "swr";
 import useInventoryStockOptimisticUpdates from "./hooks/useInventoryStockOptimisticUpdates";
 import GenericStockTable, { StockTableColumnKey } from "./generic/GenericStockTable";
-import AddStockItemModal from "./AddStockItemModal";
+import AddStockItemModal from "./generic/AddStockItemModal";
 
 type Props = {
     inventoryName: string,

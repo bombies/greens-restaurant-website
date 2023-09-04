@@ -7,7 +7,7 @@ import useStockTableState from "./hooks/useStockTableState";
 import GenericTable from "../../../../../../../_components/table/GenericTable";
 import { Spacer, TableCell, TableRow } from "@nextui-org/react";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
-import AddInventoryItemButton from "../AddInventoryItemButton";
+import AddInventoryItemButton from "./AddInventoryItemButton";
 import SearchIcon from "../../../../../../../_components/icons/SearchIcon";
 import { StockSnapshot } from "@prisma/client";
 

@@ -1,20 +1,20 @@
 "use client";
 
 import { Dispatch, FC, SetStateAction, useCallback, useMemo, useState } from "react";
-import GenericModal from "../../../../../../_components/GenericModal";
+import GenericModal from "../../../../../../../_components/GenericModal";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { InventorySnapshotWithExtras } from "../../../../../../api/inventory/[name]/utils";
+import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/utils";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { Stock, StockSnapshot, StockType } from "@prisma/client";
-import { errorToast } from "../../../../../../../utils/Hooks";
-import GenericInput from "../../../../../../_components/inputs/GenericInput";
-import PlusIcon from "../../../../../../_components/icons/PlusIcon";
-import GenericButton from "../../../../../../_components/inputs/GenericButton";
+import { errorToast } from "../../../../../../../../utils/Hooks";
+import GenericInput from "../../../../../../../_components/inputs/GenericInput";
+import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
+import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import { Chip } from "@nextui-org/chip";
 import { SelectItem } from "@nextui-org/react";
-import GenericSelectMenu from "../../../../../../_components/GenericSelectMenu";
-import { CreateStockDto } from "../../../../../../api/inventory/[name]/stock/route";
+import GenericSelectMenu from "../../../../../../../_components/GenericSelectMenu";
+import { CreateStockDto } from "../../../../../../../api/inventory/[name]/stock/route";
 
 type Props = {
     inventoryName: string,
@@ -74,6 +74,7 @@ const AddStockItemModal: FC<Props> = ({
                 updatedAt: new Date(),
                 name: createdItem.name,
                 type: createdItem.type,
+                price: createdItem.price,
                 inventorySnapshotId: inventorySnapshot.id,
                 inventorySectionSnapshotId: null
             });
