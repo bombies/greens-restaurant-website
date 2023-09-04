@@ -1,7 +1,7 @@
 import { authenticatedAny } from "../../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../../libs/types/permission";
 import { NextResponse } from "next/server";
-import { updateCurrentStockSnapshot } from "../../../utils";
+import inventoryService from "../../../service";
 
 type RouteContext = {
     params: {
@@ -17,7 +17,7 @@ export type UpdateStockQuantityDto = {
 export async function POST(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
         const dto: UpdateStockQuantityDto = await req.json();
-        const updatedSnapshot = await updateCurrentStockSnapshot(params.name, params.id, dto);
+        const updatedSnapshot = await inventoryService.updateCurrentStockSnapshot(params.name, params.id, dto);
         return updatedSnapshot.error ?? NextResponse.json(updatedSnapshot.success);
     }, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK]);
 }

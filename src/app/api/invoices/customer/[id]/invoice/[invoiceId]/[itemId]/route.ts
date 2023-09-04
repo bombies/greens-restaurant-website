@@ -1,7 +1,7 @@
 import { authenticated, respondWithInit } from "../../../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../../../libs/types/permission";
 import { fetchInvoice } from "../route";
-import { Either } from "../../../../../../inventory/[name]/utils";
+import { Either } from "../../../../../../inventory/[name]/service";
 import { NextResponse } from "next/server";
 import { InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../../libs/prisma";

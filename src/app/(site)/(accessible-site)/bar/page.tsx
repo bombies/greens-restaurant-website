@@ -4,7 +4,6 @@ import useSWR from "swr";
 import { fetcher } from "../employees/_components/EmployeeGrid";
 import { useUserData } from "../../../../utils/Hooks";
 import Permission, { hasAnyPermission } from "../../../../libs/types/permission";
-import { InventoryWithSections } from "../../../api/inventory/[name]/utils";
 import { Fragment, useCallback, useMemo } from "react";
 import BarSection from "./components/section/BarSection";
 import { Spinner } from "@nextui-org/spinner";
@@ -14,6 +13,7 @@ import AddSectionButton from "./components/AddSectionButton";
 import { Skeleton, Spacer } from "@nextui-org/react";
 import { InventorySectionWithOptionalExtras } from "../../../api/inventory/bar/[name]/types";
 import TableSkeleton from "../../../_components/skeletons/TableSkeleton";
+import { InventoryWithSections } from "../../../api/inventory/[name]/types";
 
 const useBarInfo = () => {
     return useSWR("/api/inventory/bar", fetcher<InventoryWithSections>);

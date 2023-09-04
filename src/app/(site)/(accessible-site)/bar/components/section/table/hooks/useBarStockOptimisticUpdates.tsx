@@ -1,15 +1,13 @@
 "use client";
 
 import { useCallback } from "react";
-import {
-    InventorySectionSnapshotWithExtras
-} from "../../../../../../../api/inventory/[name]/utils";
 import { errorToast } from "../../../../../../../../utils/Hooks";
 import { PartialStockSnapshotWithStock } from "../BarStockTable";
 import useBarStockDelete from "./useBarStockDelete";
 import useBarStockUpdate from "./useBarStockUpdate";
 import { InventorySection, StockSnapshot, StockType } from "@prisma/client";
 import { KeyedMutator } from "swr";
+import { InventorySectionSnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
 
 type Props = {
     barName?: string,

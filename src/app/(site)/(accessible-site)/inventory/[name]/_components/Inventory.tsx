@@ -1,6 +1,6 @@
 "use client";
 
-import { Inventory, InventorySnapshot, Stock, StockSnapshot } from "@prisma/client";
+import { Inventory, InventorySnapshot, Stock } from "@prisma/client";
 import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
 import { useEffect } from "react";
@@ -9,7 +9,7 @@ import { hasAnyPermission, Permission } from "../../../../../../libs/types/permi
 import InventoryStockTable, { columns } from "./table/InventoryStockTable";
 import { useUserData } from "../../../../../../utils/Hooks";
 import TableSkeleton from "../../../../../_components/skeletons/TableSkeleton";
-import { InventorySnapshotWithExtras } from "../../../../../api/inventory/[name]/utils";
+import { InventorySnapshotWithExtras } from "../../../../../api/inventory/[name]/types";
 
 type Props = {
     name: string

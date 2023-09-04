@@ -6,8 +6,8 @@ import Prisma from "../../../../../../libs/prisma";
 import prisma from "../../../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import { Inventory, RequestedStockItem, Stock } from "@prisma/client";
-import { fetchCurrentSnapshots } from "../../../[name]/utils";
 import { arrayCompare } from "../../../../../../utils/GeneralUtils";
+import inventoryService from "../../../[name]/service";
 
 type Context = {
     params: {
@@ -130,7 +130,7 @@ type RequestStockItemWithStockAndOptionalInventory = RequestedStockItem & {
 
 const updateSnapshots = async (items: RequestStockItemWithStockAndOptionalInventory[]) => {
     const transformedItems = transformItems(items);
-    const snapshots = await fetchCurrentSnapshots(transformedItems.map(item => item.inventory.id));
+    const snapshots = await inventoryService.fetchCurrentSnapshots(transformedItems.map(item => item.inventory.id));
     const todaysDate = new Date();
     todaysDate.setHours(0, 0, 0, 0);
 

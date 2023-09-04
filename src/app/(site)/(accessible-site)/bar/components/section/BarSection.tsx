@@ -4,14 +4,12 @@ import { FC, useCallback } from "react";
 import { InventorySection, User } from "@prisma/client";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
-import {
-    InventorySectionSnapshotWithExtras, InventoryWithSections
-} from "../../../../../api/inventory/[name]/utils";
 import Permission, { hasAnyPermission } from "../../../../../../libs/types/permission";
 import BarStockTable from "./table/BarStockTable";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
 import BarSectionControl from "./control/BarSectionControl";
+import { InventorySectionSnapshotWithExtras, InventoryWithSections } from "../../../../../api/inventory/[name]/types";
 
 type Props = {
     barInfo?: InventoryWithSections,

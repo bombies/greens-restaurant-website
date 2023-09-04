@@ -1,7 +1,4 @@
-import {
-    Either,
-    fetchInventory, generateValidStockName, updateCurrentStockSnapshotSchema
-} from "../../[name]/utils";
+import inventoryService, { Either } from "../../[name]/service";
 import { InventorySection, Prisma, Stock, StockSnapshot, StockType } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { respond, respondWithInit } from "../../../../../utils/api/ApiUtils";
@@ -21,11 +18,15 @@ import { CreateBarStockDto } from "./[sectionId]/stock/route";
 import { UpdateBarSectionStockDto } from "./[sectionId]/stock/[stockUID]/route";
 import { UpdateStockDto } from "../../[name]/stock/[id]/route";
 import StockSnapshotCreateManyInput = Prisma.StockSnapshotCreateManyInput;
+import { updateCurrentStockSnapshotSchema } from "../../[name]/types";
 
 class BarService {
 
     public async fetchInventorySections(inventoryName: string): Promise<Either<InventorySectionWithOptionalExtras[], NextResponse>> {
-        const inventoryMiddleman = await fetchInventory(inventoryName, { bar: true, inventorySections: true });
+        const inventoryMiddleman = await inventoryService.fetchInventory(inventoryName, {
+            bar: true,
+            inventorySections: true
+        });
         if (inventoryMiddleman.error)
             return new Either<InventorySectionWithOptionalExtras[], NextResponse>(undefined, inventoryMiddleman.error);
         const inventory = inventoryMiddleman.success!;
@@ -60,7 +61,7 @@ class BarService {
                 status: 400
             }));
 
-        const inventoryMiddleman = await fetchInventory(inventoryName, { bar: true });
+        const inventoryMiddleman = await inventoryService.fetchInventory(inventoryName, { bar: true });
         if (inventoryMiddleman.error)
             return new Either<InventorySection, NextResponse>(undefined, inventoryMiddleman.error);
         const inventory = inventoryMiddleman.success!;
@@ -299,7 +300,7 @@ class BarService {
         const item = fetchedItem.success!;
 
         if (dto.name) {
-            const validatedName = generateValidStockName(dto.name);
+            const validatedName = inventoryService.generateValidStockName(dto.name);
             if (validatedName.error)
                 return new Either<Stock | StockSnapshot, NextResponse>(undefined, validatedName.error);
             dto.name = validatedName.success!;
@@ -463,7 +464,7 @@ class BarService {
             return new Either<StockSnapshot, NextResponse>(undefined, fetchedSnapshot.error);
         const currentSectionSnapshot = fetchedSnapshot.success!;
 
-        const validatedItemName = generateValidStockName(dto.name);
+        const validatedItemName = inventoryService.generateValidStockName(dto.name);
         if (validatedItemName.error)
             return new Either<StockSnapshot, NextResponse>(undefined, validatedItemName.error);
 

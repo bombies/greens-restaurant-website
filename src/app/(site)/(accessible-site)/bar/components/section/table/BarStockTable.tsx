@@ -5,15 +5,13 @@ import GenericStockTable, {
     StockTableColumnKey
 } from "../../../../inventory/[name]/_components/table/generic/GenericStockTable";
 import { KeyedMutator } from "swr";
-import {
-    InventorySectionSnapshotWithExtras
-} from "../../../../../../api/inventory/[name]/utils";
 import { InventorySection, StockSnapshot } from "@prisma/client";
 import AddBarSectionStockItemModal from "../AddBarSectionStockItemModal";
 import { toast } from "react-hot-toast";
 import "../../../../../../../utils/GeneralUtils";
 import useBarStockOptimisticUpdates from "./hooks/useBarStockOptimisticUpdates";
 import StockNumericField from "../../../../inventory/[name]/_components/table/generic/StockNumericField";
+import { InventorySectionSnapshotWithExtras } from "../../../../../../api/inventory/[name]/types";
 
 type Props = {
     barName?: string,

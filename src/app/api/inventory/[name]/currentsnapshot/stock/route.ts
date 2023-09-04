@@ -1,8 +1,8 @@
 import { authenticatedAny } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
 import { NextResponse } from "next/server";
-import { createStockSnapshot } from "../../utils";
 import { StockType } from "@prisma/client";
+import inventoryService from "../../service";
 
 type RouteContext = {
     params: {
@@ -18,7 +18,7 @@ export type StockSnapshotPostDto = {
 
 export async function POST(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async (_) => {
-        const createdStockSnapshot = await createStockSnapshot(params.name, await req.json());
+        const createdStockSnapshot = await inventoryService.createStockSnapshot(params.name, await req.json());
         if (createdStockSnapshot.error)
             return createdStockSnapshot.error;
         return NextResponse.json(createdStockSnapshot.success);

@@ -4,11 +4,11 @@ import { Fragment, useState } from "react";
 import StockNumericField from "./generic/StockNumericField";
 import "../../../../../../../utils/GeneralUtils";
 import { toast } from "react-hot-toast";
-import { InventorySnapshotWithExtras } from "../../../../../../api/inventory/[name]/utils";
 import { KeyedMutator } from "swr";
 import useInventoryStockOptimisticUpdates from "./hooks/useInventoryStockOptimisticUpdates";
 import GenericStockTable, { StockTableColumnKey } from "./generic/GenericStockTable";
 import AddStockItemModal from "./generic/AddStockItemModal";
+import { InventorySnapshotWithExtras } from "../../../../../../api/inventory/[name]/types";
 
 type Props = {
     inventoryName: string,

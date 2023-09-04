@@ -4,7 +4,6 @@ import { Dispatch, FC, SetStateAction, useCallback, useMemo, useState } from "re
 import GenericModal from "../../../../../../../_components/GenericModal";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/utils";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { Stock, StockSnapshot, StockType } from "@prisma/client";
 import { errorToast } from "../../../../../../../../utils/Hooks";
@@ -15,6 +14,7 @@ import { Chip } from "@nextui-org/chip";
 import { SelectItem } from "@nextui-org/react";
 import GenericSelectMenu from "../../../../../../../_components/GenericSelectMenu";
 import { CreateStockDto } from "../../../../../../../api/inventory/[name]/stock/route";
+import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
 
 type Props = {
     inventoryName: string,

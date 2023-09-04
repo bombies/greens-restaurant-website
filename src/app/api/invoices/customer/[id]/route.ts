@@ -4,7 +4,7 @@ import prisma from "../../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import Permission from "../../../../../libs/types/permission";
 import { CreateInvoiceCustomerDto } from "../route";
-import { Either } from "../../../inventory/[name]/utils";
+import { Either } from "../../../inventory/[name]/service";
 import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 
 type Context = {

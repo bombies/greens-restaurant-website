@@ -1,7 +1,7 @@
 import { InventorySection, InventorySectionSnapshot, Stock, StockSnapshot, StockType } from "@prisma/client";
 import { z } from "zod";
-import { InventoryWithOptionalExtras } from "../../[name]/utils";
 import { CreateStockDto } from "../../[name]/stock/route";
+import { InventoryWithOptionalExtras } from "../../[name]/types";
 
 export type InventorySectionWithOptionalExtras = InventorySection & {
     inventory?: InventoryWithOptionalExtras,

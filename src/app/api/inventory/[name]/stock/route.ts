@@ -1,11 +1,7 @@
-import { authenticatedAny, respond } from "../../../../../utils/api/ApiUtils";
+import { authenticatedAny } from "../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../libs/types/permission";
-import prisma from "../../../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { INVENTORY_NAME_REGEX } from "../../../../../utils/regex";
-import { v4 } from "uuid";
-import { createStock, createStockSnapshot, deleteStockItems, fetchInventory } from "../utils";
-import { z } from "zod";
+import inventoryService from "../service";
 import { StockType } from "@prisma/client";
 
 type RouteContext = {
@@ -16,7 +12,7 @@ type RouteContext = {
 
 export async function GET(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
-        const fetchedInventory = await fetchInventory(params.name, { stock: true });
+        const fetchedInventory = await inventoryService.fetchInventory(params.name, { stock: true });
         if (fetchedInventory.error)
             return fetchedInventory.error;
         return NextResponse.json(fetchedInventory.success!.stock);
@@ -32,7 +28,7 @@ export interface CreateStockDto {
 export async function POST(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async (_, axios) => {
         const body: CreateStockDto = await req.json();
-        const createdStock = await createStock(params.name, body);
+        const createdStock = await inventoryService.createStock(params.name, body);
         if (createdStock.error)
             return createdStock.error;
         return NextResponse.json(createdStock.success);
@@ -43,7 +39,7 @@ export async function DELETE(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
         const { searchParams } = new URL(req.url);
         const ids = searchParams.get("ids")?.split(",") ?? [];
-        const deletedItems = await deleteStockItems(params.name, ids);
+        const deletedItems = await inventoryService.deleteStockItems(params.name, ids);
         return deletedItems.error ?? NextResponse.json(deletedItems.success!);
     }, [
         Permission.MUTATE_STOCK, Permission.CREATE_INVENTORY

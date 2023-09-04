@@ -3,9 +3,6 @@
 import { Dispatch, FC, Fragment, SetStateAction, useEffect, useMemo, useReducer } from "react";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
-import {
-    InventoryWithOptionalExtras
-} from "../../../../../../../api/inventory/[name]/utils";
 import InventoryRequestedItemsTable from "./InventoryRequestedItemsTable";
 import AddRequestedItemsButton from "./AddRequestedItemsButton";
 import { CreateStockRequestDto } from "../../../../../../../api/inventory/requests/me/route";
@@ -20,6 +17,7 @@ import GenericButton from "../../../../../../../_components/inputs/GenericButton
 import { useRequestCreationTrigger } from "../TriggerRequestCreationProvider";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../../../../utils/Hooks";
+import { InventoryWithOptionalExtras } from "../../../../../../../api/inventory/[name]/types";
 
 interface Props {
     selectedIds: string[];

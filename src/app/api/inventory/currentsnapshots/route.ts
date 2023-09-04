@@ -1,6 +1,6 @@
-import { authenticatedAny, respondWithInit } from "../../../../utils/api/ApiUtils";
+import { authenticatedAny } from "../../../../utils/api/ApiUtils";
 import Permission from "../../../../libs/types/permission";
-import { fetchCurrentSnapshots } from "../[name]/utils";
+import inventoryService from "../[name]/service";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -12,7 +12,7 @@ export async function GET(req: Request) {
             return NextResponse.json([]);
 
         const parsedIds = ids.replaceAll(/\s/g, "").split(",");
-        const fetchedSnapshots = await fetchCurrentSnapshots(parsedIds);
+        const fetchedSnapshots = await inventoryService.fetchCurrentSnapshots(parsedIds);
         if (fetchedSnapshots.error)
             return fetchedSnapshots.error;
         return NextResponse.json(fetchedSnapshots.success);

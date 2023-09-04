@@ -8,7 +8,7 @@ import InventoryStockTable, { columns } from "../../../_components/table/Invento
 import TableSkeleton from "../../../../../../../_components/skeletons/TableSkeleton";
 import { Spacer } from "@nextui-org/react";
 import SubTitle from "../../../../../../../_components/text/SubTitle";
-import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/utils";
+import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
 
 type Props = {
     inventoryName: string,

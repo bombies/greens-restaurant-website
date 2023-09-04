@@ -2,7 +2,7 @@ import { authenticated, authenticatedAny, respond } from "../../../../utils/api/
 import Permission from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { fetchInventory, generateValidInventoryName } from "./utils";
+import inventoryService from "./service";
 
 type RouteContext = {
     params: {
@@ -12,7 +12,7 @@ type RouteContext = {
 
 export async function GET(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
-        const fetchResult = await fetchInventory(params.name);
+        const fetchResult = await inventoryService.fetchInventory(params.name);
         if (fetchResult.error)
             return fetchResult.error;
         return NextResponse.json(fetchResult.success);
@@ -25,7 +25,7 @@ export type UpdateInventoryDto = {
 
 export async function PATCH(req: Request, { params }: RouteContext) {
     return authenticated(req, async () => {
-        const fetchResult = await fetchInventory(params.name);
+        const fetchResult = await inventoryService.fetchInventory(params.name);
         if (fetchResult.error)
             return fetchResult.error;
 
@@ -38,7 +38,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 }
             });
 
-        const validatedName = generateValidInventoryName(body.name);
+        const validatedName = inventoryService.generateValidInventoryName(body.name);
         if (validatedName.error)
             return validatedName.error;
 
@@ -59,7 +59,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
 
 export async function DELETE(req: Request, { params }: RouteContext) {
     return authenticated(req, async () => {
-        const fetchResult = await fetchInventory(params.name);
+        const fetchResult = await inventoryService.fetchInventory(params.name);
         if (fetchResult.error)
             return fetchResult.error;
 

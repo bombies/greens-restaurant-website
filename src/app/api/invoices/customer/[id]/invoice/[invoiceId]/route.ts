@@ -4,7 +4,7 @@ import { fetchCustomerInfo } from "../../route";
 import { NextResponse } from "next/server";
 import { Invoice, InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../libs/prisma";
-import { Either } from "../../../../../inventory/[name]/utils";
+import { Either } from "../../../../../inventory/[name]/service";
 import { INVOICE_ITEM_NAME_REGEX } from "../../../../../../../utils/regex";
 import { z } from "zod";
 

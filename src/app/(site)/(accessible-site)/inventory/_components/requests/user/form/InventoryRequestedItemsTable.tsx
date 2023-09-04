@@ -16,11 +16,9 @@ import { Chip } from "@nextui-org/chip";
 import PendingIcon from "../../../../../../../_components/icons/PendingIcon";
 import EditAmountRequestedButton from "./self-actions/EditAmountRequestedButton";
 import RemoveRequestedItemButton from "./self-actions/RemoveRequestedItemButton";
-import {
-    InventorySnapshotWithOptionalExtras
-} from "../../../../../../../api/inventory/[name]/utils";
 import { StockSnapshot } from "@prisma/client";
 import { StockRequestStatus } from ".prisma/client";
+import { InventorySnapshotWithOptionalExtras } from "../../../../../../../api/inventory/[name]/types";
 
 interface Props {
     items: Partial<RequestedStockItemWithOptionalStock>[];

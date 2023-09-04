@@ -1,7 +1,7 @@
 import { authenticatedAny } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
 import prisma from "../../../../../../libs/prisma";
-import { fetchInventory } from "../../utils";
+import inventoryService from "../../service";
 import { NextResponse } from "next/server";
 
 type RouteContext = {
@@ -22,7 +22,7 @@ type TimeSeriesData = {
 
 export async function GET(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
-        const inventory = await fetchInventory(params.name);
+        const inventory = await inventoryService.fetchInventory(params.name);
         if (inventory.error)
             return inventory.error;
 

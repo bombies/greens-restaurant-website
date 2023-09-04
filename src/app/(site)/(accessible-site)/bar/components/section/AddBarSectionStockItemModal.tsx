@@ -14,7 +14,7 @@ import { SelectItem } from "@nextui-org/react";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import PlusIcon from "../../../../../_components/icons/PlusIcon";
 import { errorToast } from "../../../../../../utils/Hooks";
-import { InventorySectionSnapshotWithExtras } from "../../../../../api/inventory/[name]/utils";
+import { InventorySectionSnapshotWithExtras } from "../../../../../api/inventory/[name]/types";
 
 type Props = {
     barName?: string,
