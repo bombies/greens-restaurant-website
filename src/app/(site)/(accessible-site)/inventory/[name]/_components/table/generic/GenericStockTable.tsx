@@ -20,6 +20,7 @@ interface Props {
     onQuantityDecrement: (item: StockSnapshot, decrementedBy: number) => Promise<void>;
     onStockDelete: (deletedIds: string[]) => Promise<void>;
     onItemAddButtonPress: () => void,
+    priceIsCost?: boolean,
 }
 
 export enum StockTableColumnKey {
@@ -37,7 +38,8 @@ const GenericStockTable: FC<Props> = ({
                                           onQuantityIncrement,
                                           onQuantityDecrement,
                                           onStockDelete,
-                                          onItemAddButtonPress
+                                          onItemAddButtonPress,
+                                          priceIsCost
                                       }) => {
     const fetchKeyValue = useStockTableValue({
         getKeyValue, mutationAllowed, onQuantityDecrement, onQuantityIncrement, onStockDelete
@@ -55,7 +57,7 @@ const GenericStockTable: FC<Props> = ({
             },
             {
                 key: "stock_price",
-                value: "Selling Price"
+                value: priceIsCost ? "Cost" : "Selling Price"
             }
         ];
 
@@ -65,7 +67,7 @@ const GenericStockTable: FC<Props> = ({
                 value: "Actions"
             });
         return cols;
-    }, [mutationAllowed]);
+    }, [mutationAllowed, priceIsCost]);
 
     const {
         stockState,

@@ -12,6 +12,7 @@ import "../../../../../../../utils/GeneralUtils";
 import useBarStockOptimisticUpdates from "./hooks/useBarStockOptimisticUpdates";
 import StockNumericField from "../../../../inventory/[name]/_components/table/generic/StockNumericField";
 import { InventorySectionSnapshotWithExtras } from "../../../../../../api/inventory/[name]/types";
+import StockTextField from "../../../../inventory/[name]/_components/table/generic/StockTextField";
 
 type Props = {
     barName?: string,
@@ -56,7 +57,15 @@ const BarStockTable: FC<Props> = ({
                 getKeyValue={(item, key) => {
                     switch (key) {
                         case StockTableColumnKey.STOCK_NAME: {
-                            return item.name.replaceAll("-", " ");
+                            return (
+                                <StockTextField
+                                    stockSnapshot={item}
+                                    field="name"
+                                    onSet={async (text) => {
+                                        await updateOptimisticStockSnapshot({ uid: item.uid, name: text });
+                                    }}
+                                />
+                            );
                         }
                         case StockTableColumnKey.STOCK_QUANTITY: {
                             return (

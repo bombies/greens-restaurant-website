@@ -3,7 +3,7 @@
 import { Fragment, useState } from "react";
 import clsx from "clsx";
 import GenericModal from "../../../../../../../_components/GenericModal";
-import StockNumericForm from "./StockNumericForm";
+import StockNumericForm from "./forms/StockNumericForm";
 import { StockSnapshot } from "@prisma/client";
 import { dollarFormat } from "../../../../../../../../utils/GeneralUtils";
 

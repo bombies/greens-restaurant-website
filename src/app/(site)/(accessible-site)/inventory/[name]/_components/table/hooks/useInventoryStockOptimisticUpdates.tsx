@@ -54,7 +54,9 @@ const useInventoryStockOptimisticUpdates = ({ inventoryName, currentSnapshot, mu
             });
     }, [currentSnapshot, deleteStock, mutateCurrentSnapshot]);
 
-    const updateOptimisticStockSnapshot = useCallback(async (item: PartialStockSnapshotWithStock, quantity?: number) => {
+    const updateOptimisticStockSnapshot = useCallback(async (item: PartialStockSnapshotWithStock & {
+        uid: string
+    }, quantity?: number) => {
         if (!currentSnapshot)
             return;
 

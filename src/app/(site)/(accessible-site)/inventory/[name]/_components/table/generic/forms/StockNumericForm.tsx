@@ -2,10 +2,10 @@
 
 import { FC, ReactNode, useCallback, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import GenericInput from "../../../../../../../_components/inputs/GenericInput";
+import GenericInput from "../../../../../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
-import GenericButton from "../../../../../../../_components/inputs/GenericButton";
-import DropdownInput from "../../../../../../../_components/inputs/DropdownInput";
+import GenericButton from "../../../../../../../../_components/inputs/GenericButton";
+import DropdownInput from "../../../../../../../../_components/inputs/DropdownInput";
 import { StockSnapshot, StockType } from "@prisma/client";
 
 type Props = {

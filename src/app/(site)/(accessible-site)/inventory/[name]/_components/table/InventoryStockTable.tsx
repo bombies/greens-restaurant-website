@@ -9,6 +9,7 @@ import useInventoryStockOptimisticUpdates from "./hooks/useInventoryStockOptimis
 import GenericStockTable, { StockTableColumnKey } from "./generic/GenericStockTable";
 import AddStockItemModal from "./generic/AddStockItemModal";
 import { InventorySnapshotWithExtras } from "../../../../../../api/inventory/[name]/types";
+import StockTextField from "./generic/StockTextField";
 
 type Props = {
     inventoryName: string,
@@ -35,7 +36,7 @@ export const columns: Column[] = [
     },
     {
         key: "stock_price",
-        value: "Selling Price"
+        value: "Cost"
     }
 ];
 
@@ -66,10 +67,19 @@ export default function InventoryStockTable({
                 stock={currentSnapshot?.stockSnapshots ?? []}
                 stockLoading={snapshotLoading}
                 mutationAllowed={mutationAllowed ?? false}
+                priceIsCost
                 getKeyValue={(item, key) => {
                     switch (key) {
                         case StockTableColumnKey.STOCK_NAME: {
-                            return item.name.replaceAll("-", " ");
+                            return (
+                                <StockTextField
+                                    stockSnapshot={item}
+                                    field="name"
+                                    onSet={async (text) => {
+                                        await updateOptimisticStockSnapshot({ uid: item.uid, name: text });
+                                    }}
+                                />
+                            );
                         }
                         case StockTableColumnKey.STOCK_QUANTITY: {
                             return (
@@ -86,7 +96,6 @@ export default function InventoryStockTable({
                                 <StockNumericField
                                     stockSnapshot={item}
                                     onSet={async (quantity) => {
-                                        console.log(quantity);
                                         await updateOptimisticStockSnapshot({ uid: item.uid, price: quantity });
                                     }}
                                     isCurrency

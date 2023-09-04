@@ -2,7 +2,7 @@
 
 import GenericModal from "../../../../../../../_components/GenericModal";
 import { Dispatch, SetStateAction } from "react";
-import StockNumericForm from "./StockNumericForm";
+import StockNumericForm from "./forms/StockNumericForm";
 import MinusIcon from "../../../../../../../_components/icons/MinusIcon";
 import { StockSnapshot } from "@prisma/client";
 
