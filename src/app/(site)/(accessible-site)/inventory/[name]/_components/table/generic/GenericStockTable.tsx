@@ -10,6 +10,7 @@ import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import AddInventoryItemButton from "./AddInventoryItemButton";
 import SearchIcon from "../../../../../../../_components/icons/SearchIcon";
 import { StockSnapshot } from "@prisma/client";
+import ItemsSelectedBar from "./ItemsSelectedBar";
 
 interface Props {
     stock: StockSnapshot[];
@@ -75,11 +76,18 @@ const GenericStockTable: FC<Props> = ({
         sortDescriptor,
         visibleStockState,
         setStockSearch,
-        setSortDescriptor
+        setSortDescriptor,
+        selectedKeys,
+        setSelectedKeys
     } = useStockTableState(stock);
 
     return (
         <Fragment>
+            <ItemsSelectedBar
+                selectedIds={selectedKeys}
+                setSelectedIds={setSelectedKeys}
+                onDelete={(ids) => onStockDelete(ids)}
+            />
             <div className="w-1/4 tablet:w-1/2 phone:w-full">
                 <GenericInput
                     startContent={<SearchIcon />}
@@ -100,6 +108,13 @@ const GenericStockTable: FC<Props> = ({
                 aria-label="Inventory Stock Table"
                 sortDescriptor={sortDescriptor}
                 onSortChange={setSortDescriptor}
+                selectionMode={mutationAllowed ? "multiple" : undefined}
+                selectedKeys={selectedKeys}
+                onSelectionChange={(keys) => {
+                    if (keys === "all")
+                        setSelectedKeys(stockState.map(stock => stock.uid));
+                    else setSelectedKeys(Array.from(keys));
+                }}
             >
                 {item => (
                     <TableRow key={item.uid}>

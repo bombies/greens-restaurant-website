@@ -58,11 +58,12 @@ const AddStockItemModal: FC<Props> = ({
         if (!inventorySnapshot)
             return;
 
-        const { itemName, itemType } = data;
+        const { itemName, itemType, itemPrice } = data;
         createStockItem({
             dto: {
                 name: itemName,
-                type: itemType.toUpperCase()
+                type: itemType.toUpperCase(),
+                price: Number(itemPrice)
             }
         }).then(async (res) => {
             const createdItem: Stock = res.data;
@@ -102,6 +103,17 @@ const AddStockItemModal: FC<Props> = ({
                         label="Item Name"
                         isRequired
                         isDisabled={isCreating}
+                    />
+                    <GenericInput
+                        register={register}
+                        errors={errors}
+                        id="itemPrice"
+                        label="Item Cost"
+                        startContent="JMD"
+                        isRequired
+                        isDisabled={isCreating}
+                        type="number"
+                        step="0.01"
                     />
                     <GenericSelectMenu
                         isDisabled={isCreating}

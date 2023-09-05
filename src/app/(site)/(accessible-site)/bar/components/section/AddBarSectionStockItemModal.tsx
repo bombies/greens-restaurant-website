@@ -53,9 +53,9 @@ const AddBarSectionStockItemModal: FC<Props> = ({
         if (!sectionSnapshot)
             return;
 
-        const { itemName, itemType } = data;
+        const { itemName, itemType, itemPrice } = data;
         createStockItem({
-            dto: { name: itemName, type: itemType.toUpperCase() }
+            dto: { name: itemName, type: itemType.toUpperCase(), price: Number(itemPrice) }
         }).then(async (res) => {
             const createdItem: Stock = res.data;
             await addOptimisticStockItem({
@@ -98,6 +98,17 @@ const AddBarSectionStockItemModal: FC<Props> = ({
                         label="Item Name"
                         isRequired
                         isDisabled={isCreating}
+                    />
+                    <GenericInput
+                        register={register}
+                        errors={errors}
+                        id="itemPrice"
+                        label="Item Cost"
+                        startContent="JMD"
+                        isRequired
+                        isDisabled={isCreating}
+                        type="number"
+                        step="0.01"
                     />
                     <GenericSelectMenu
                         isDisabled={isCreating}

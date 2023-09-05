@@ -11,7 +11,7 @@ type DeleteStockItemsArgs = {
 
 const DeleteStockItems = (inventoryName?: string) => {
     const mutator = (url: string, { arg }: DeleteStockItemsArgs) => axios.delete(url.replaceAll("{uids}", arg.uids.toString()));
-    return useSWRMutation(`/api/inventory/${inventoryName}/stock`, mutator);
+    return useSWRMutation(`/api/inventory/${inventoryName}/stock?ids={uids}`, mutator);
 };
 
 const useInventoryStockDelete = (inventoryName?: string) => {

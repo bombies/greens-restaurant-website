@@ -54,7 +54,7 @@ export default function SpecificInventoryControlBar({ inventoryName }: Props) {
                 }}
             />
             <div
-                className="default-container p-12 phone:px-4 grid grid-cols-5 tablet:grid-cols-2 phone:grid-cols-1 gap-4 phone:gap-6">
+                className="default-container p-12 phone:px-4 grid grid-cols-4 tablet:grid-cols-2 phone:grid-cols-1 gap-4 phone:gap-6">
                 <GenericButton
                     fullWidth
                     variant="flat"
