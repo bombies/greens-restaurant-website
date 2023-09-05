@@ -22,6 +22,7 @@ import {
     InventoryWithOptionalExtras, updateCurrentStockSnapshotSchema,
     updateStockItemDtoSchema
 } from "./types";
+import { StockTimeSeries, TimeSeriesData } from "./insights/stock/route";
 
 
 export class Either<S, E> {
@@ -714,6 +715,63 @@ class InventoryService {
             data: dto
         }));
     };
+
+    async fetchInsightsData(inventoryName: string): Promise<Either<StockTimeSeries[], NextResponse>> {
+        const inventory = await inventoryService.fetchInventory(inventoryName, {
+            inventorySections: true
+        });
+        if (inventory.error)
+            return new Either<StockTimeSeries[], NextResponse>(undefined, inventory.error);
+
+        const stock = await prisma.stock.findMany({
+            where: {
+                OR: [
+                    {
+                        inventoryId: inventory.success!.id
+                    },
+                    {
+                        inventorySectionId: {
+                            in: inventory.success!.inventorySections?.map(section => section.id)
+                        }
+                    }
+                ]
+            }
+        });
+
+        const stockSnapshots = await prisma.stockSnapshot.findMany({
+            where: {
+                OR: [
+                    {
+                        inventorySnapshot: {
+                            inventoryId: inventory.success!.id
+                        }
+                    },
+                    {
+                        inventorySectionSnapshot: {
+                            inventorySectionId: {
+                                in: inventory.success!.inventorySections?.map(section => section.id)
+                            }
+                        }
+                    }
+                ]
+            }
+        });
+
+        const data: StockTimeSeries[] = stock.map(item => {
+            const itemSnapshots = stockSnapshots.filter(snapshotItem => snapshotItem.uid === item.uid);
+            const timeData: TimeSeriesData[] = itemSnapshots.map(snapshot => ({
+                date: new Date(snapshot.createdAt.setHours(0, 0, 0, 0)),
+                value: snapshot.quantity
+            }));
+
+            return ({
+                name: item.name,
+                data: timeData
+            });
+        });
+
+        return new Either<StockTimeSeries[], NextResponse>(data);
+    }
 
     generateValidInventoryName(name: string) {
         return this.generateValidName(
