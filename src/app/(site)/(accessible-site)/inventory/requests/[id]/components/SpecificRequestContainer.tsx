@@ -111,7 +111,11 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                 changesMade={changesMade}
                 isChanging={false}
                 onAccept={() => {
-                    setConfirmReviewModalOpen(true);
+                    const pendingItem = optimisticRequest.items.find(item => item.amountProvided === -1 || item.amountProvided === null || item.amountProvided === undefined);
+                    if (pendingItem)
+                        toast.error("You must review all items before finishing your review!");
+                    else
+                        setConfirmReviewModalOpen(true);
                 }}
                 onReject={() => {
                     dispatchOptimisticRequest({
