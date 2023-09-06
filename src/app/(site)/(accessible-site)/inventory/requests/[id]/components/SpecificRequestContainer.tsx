@@ -107,6 +107,7 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                 optimisticRequest={optimisticRequest}
             />
             <ChangesMadeBar
+                className="!py-5"
                 changesMade={changesMade}
                 isChanging={false}
                 onAccept={() => {

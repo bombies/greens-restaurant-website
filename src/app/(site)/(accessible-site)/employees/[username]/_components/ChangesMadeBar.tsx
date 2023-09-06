@@ -5,6 +5,7 @@ import SlidingBar from "../../../../../_components/SlidingBar";
 import { JSX } from "react";
 import TrashIcon from "../../../../../_components/icons/TrashIcon";
 import CheckIcon from "../../../../../_components/icons/CheckIcon";
+import clsx from "clsx";
 
 type Props = {
     changesMade: boolean,
@@ -19,7 +20,8 @@ type Props = {
     rejectButtonConfig?: {
         icon?: JSX.Element,
         label?: string
-    }
+    },
+    className?: string
 }
 
 export default function ChangesMadeBar({
@@ -29,10 +31,11 @@ export default function ChangesMadeBar({
                                            isChanging,
                                            label,
                                            saveButtonConfig,
-                                           rejectButtonConfig
+                                           rejectButtonConfig,
+                                           className
                                        }: Props) {
     return (
-        <SlidingBar visible={changesMade} className="justify-between">
+        <SlidingBar visible={changesMade} className={clsx(className, "justify-between")}>
             <p className="text-xl phone:text-lg self-center">{label || "Careful - You have unsaved changes!"}</p>
             <div className="flex tablet:flex-col gap-4">
                 <GenericButton
