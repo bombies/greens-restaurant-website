@@ -37,7 +37,9 @@ export default function HomePage() {
                         Permission.ADMINISTRATOR,
                         Permission.MANAGE_STOCK_REQUESTS,
                         Permission.VIEW_STOCK_REQUESTS,
-                        Permission.VIEW_STOCK_REQUESTS
+                        Permission.VIEW_STOCK_REQUESTS,
+                        Permission.VIEW_BAR_INVENTORY,
+                        Permission.MUTATE_BAR_INVENTORY
                     ]) &&
                     <div className={"w-[90%] mx-auto tablet:w-full mt-12 p-12 phone:p-6 default-container"}>
                         <h4 className="font-light text-xl phone:text-lg tracking-widest uppercase mb-12 phone:mb-6 phone:text-center">Quick
@@ -95,7 +97,7 @@ export default function HomePage() {
                 )
             }
             <Spacer y={12} />
-            <div className="grid grid-cols-3 place-items-center tablet:grid-cols-1 gap-20">
+            <div className="mx-auto default-container p-6 grid grid-cols-2 place-items-center tablet:grid-cols-1 w-fit gap-6">
                 {
                     hasAnyPermission(user?.permissions, [
                         Permission.CREATE_INVENTORY,
