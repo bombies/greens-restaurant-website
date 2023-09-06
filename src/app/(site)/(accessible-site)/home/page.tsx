@@ -14,6 +14,7 @@ import { Spacer } from "@nextui-org/react";
 import InvoiceWidget from "./_components/widgets/invoice/InvoiceWidget";
 import CreateInventoryRequestQuickAction from "./_components/quick-actions/CreateInventoryRequestQuickAction";
 import InventoryRequestWidget from "./_components/widgets/InventoryRequestWidget";
+import ManageBarQuickAction from "./_components/quick-actions/ManageBarQuickAction";
 
 export default function HomePage() {
     const session = useSession();
@@ -42,7 +43,7 @@ export default function HomePage() {
                         <h4 className="font-light text-xl phone:text-lg tracking-widest uppercase mb-12 phone:mb-6 phone:text-center">Quick
                             Actions</h4>
                         <div
-                            className="grid grid-cols-4 tablet:grid-cols-3 phone:grid-cols-1 gap-x-6 gap-y-10 tablet:place-items-center">
+                            className="grid grid-cols-6 tablet:grid-cols-3 phone:grid-cols-1 gap-x-6 gap-y-10 tablet:place-items-center">
                             {
                                 hasAnyPermission(user?.permissions, [
                                     Permission.CREATE_INVENTORY,
@@ -51,6 +52,15 @@ export default function HomePage() {
                                 ])
                                 &&
                                 <ManageInventoryQuickAction />
+                            }
+                            {
+                                hasAnyPermission(user?.permissions, [
+                                    Permission.CREATE_INVENTORY,
+                                    Permission.VIEW_BAR_INVENTORY,
+                                    Permission.MUTATE_BAR_INVENTORY
+                                ])
+                                &&
+                                <ManageBarQuickAction />
                             }
                             {
                                 hasAnyPermission(user?.permissions, [
