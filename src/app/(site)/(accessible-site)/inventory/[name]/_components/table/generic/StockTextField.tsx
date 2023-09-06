@@ -7,6 +7,7 @@ import { StockSnapshot } from "@prisma/client";
 import StockTextForm from "./forms/StockTextForm";
 import "../../../../../../../../utils/GeneralUtils";
 import { INVENTORY_NAME_REGEX } from "../../../../../../../../utils/regex";
+import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 
 type Props = {
     stockSnapshot: StockSnapshot,
@@ -56,17 +57,18 @@ export default function StockTextField({ stockSnapshot, field, onSet, disabled }
                     }}
                 />
             </GenericModal>
-            <p className={clsx(
-                "border-2 border-neutral-800/0 transition-fast w-fit py-3 px-5",
-                !disabled && "hover:default-container cursor-pointer"
-            )}
-               onClick={() => {
-                   if (disabled)
-                       return;
-                   setEditModalOpen(true);
-               }}>
-                {stockSnapshot[field].replaceAll("-", " ")}
-            </p>
+            <GenericButton
+                color="default"
+                variant="light"
+                onPress={() => {
+                    if (disabled)
+                        return;
+                    setEditModalOpen(true);
+                }}
+                className="capitalize"
+            >
+                <p className="capitalize">{stockSnapshot[field].replaceAll("-", " ")}</p>
+            </GenericButton>
         </Fragment>
     );
 }

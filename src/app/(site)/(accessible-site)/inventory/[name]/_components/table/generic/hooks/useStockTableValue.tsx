@@ -1,7 +1,7 @@
 "use client";
 
 import { StockTableColumnKey } from "../GenericStockTable";
-import { Key, useCallback } from "react";
+import { Dispatch, Key, SetStateAction, useCallback } from "react";
 import StockTableActions from "../StockTableActions";
 import { StockSnapshot } from "@prisma/client";
 
@@ -10,7 +10,7 @@ type Props = {
     mutationAllowed: boolean,
     onQuantityIncrement: (item: StockSnapshot, incrementedBy: number) => Promise<void>,
     onQuantityDecrement: (item: StockSnapshot, decrementedBy: number) => Promise<void>,
-    onStockDelete: (deletedIds: string[]) => Promise<void>;
+    onStockDelete: (deletedIds: string[]) => Promise<void>,
 }
 
 const useStockTableValue = ({

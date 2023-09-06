@@ -42,8 +42,22 @@ const GenericStockTable: FC<Props> = ({
                                           onItemAddButtonPress,
                                           priceIsCost
                                       }) => {
+    const {
+        stockState,
+        stockSearch,
+        sortDescriptor,
+        visibleStockState,
+        setStockSearch,
+        setSortDescriptor,
+        selectedKeys,
+        setSelectedKeys
+    } = useStockTableState(stock);
     const fetchKeyValue = useStockTableValue({
-        getKeyValue, mutationAllowed, onQuantityDecrement, onQuantityIncrement, onStockDelete
+        getKeyValue,
+        mutationAllowed,
+        onQuantityDecrement,
+        onQuantityIncrement,
+        onStockDelete,
     });
 
     const columns: Column[] = useMemo(() => {
@@ -69,17 +83,6 @@ const GenericStockTable: FC<Props> = ({
             });
         return cols;
     }, [mutationAllowed, priceIsCost]);
-
-    const {
-        stockState,
-        stockSearch,
-        sortDescriptor,
-        visibleStockState,
-        setStockSearch,
-        setSortDescriptor,
-        selectedKeys,
-        setSelectedKeys
-    } = useStockTableState(stock);
 
     return (
         <Fragment>

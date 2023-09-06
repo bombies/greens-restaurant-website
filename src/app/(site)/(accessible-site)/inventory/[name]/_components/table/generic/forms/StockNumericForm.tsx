@@ -30,6 +30,7 @@ const StockNumericForm: FC<Props> = ({
                                          min,
                                          isCurrency
                                      }) => {
+    const [quantity, setQuantity] = useState(item?.quantity ?? 0);
     const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item });
     const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
     const {
@@ -58,6 +59,8 @@ const StockNumericForm: FC<Props> = ({
                 placeholder="Enter an amount..."
                 isRequired={true}
                 type="number"
+                value={quantity.toString()}
+                onValueChange={(value) => setQuantity(Number(value))}
                 step={isCurrency ? "0.01" : undefined}
                 endContent={
                     (!isCurrency && (isDrinkBottle() || isCaseItem()))
