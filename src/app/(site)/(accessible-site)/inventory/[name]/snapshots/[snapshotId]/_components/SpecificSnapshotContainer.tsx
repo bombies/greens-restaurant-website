@@ -40,7 +40,7 @@ export default function SpecificSnapshotContainer({ inventoryName, snapshotId }:
                     <>
                         <div className="default-container p-12">
                             <SubTitle>You are currently viewing the inventory snapshot
-                                for {new Date(data.createdAt).toDateString()}</SubTitle>
+                                for {new Date(data.createdAt).toLocaleDateString("en-JM")}</SubTitle>
                         </div>
                         <Spacer y={6} />
                     </>

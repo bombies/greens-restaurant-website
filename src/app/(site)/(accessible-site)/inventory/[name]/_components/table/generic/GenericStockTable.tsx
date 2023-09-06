@@ -125,7 +125,7 @@ const GenericStockTable: FC<Props> = ({
                 )}
             </GenericTable>
             <Spacer y={6} />
-            <AddInventoryItemButton onPress={onItemAddButtonPress} />
+            {mutationAllowed && <AddInventoryItemButton onPress={onItemAddButtonPress} />}
         </Fragment>
     );
 };

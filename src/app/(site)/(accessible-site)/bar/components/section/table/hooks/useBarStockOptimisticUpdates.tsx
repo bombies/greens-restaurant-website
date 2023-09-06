@@ -13,7 +13,7 @@ type Props = {
     barName?: string,
     section?: InventorySection,
     currentSnapshot?: InventorySectionSnapshotWithExtras
-    mutateCurrentSnapshot: KeyedMutator<InventorySectionSnapshotWithExtras | undefined>
+    mutateCurrentSnapshot?: KeyedMutator<InventorySectionSnapshotWithExtras | undefined>
 }
 
 const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutateCurrentSnapshot }: Props) => {
@@ -21,10 +21,12 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
     const { trigger: updateBarStock } = useBarStockUpdate(barName, section?.id);
 
     const addOptimisticStockItem = useCallback(async (item: StockSnapshot) => {
-        await mutateCurrentSnapshot({
-            ...currentSnapshot,
-            stockSnapshots: currentSnapshot?.stockSnapshots ? [...currentSnapshot.stockSnapshots, item] : [item]
-        });
+        if (mutateCurrentSnapshot) {
+            await mutateCurrentSnapshot({
+                ...currentSnapshot,
+                stockSnapshots: currentSnapshot?.stockSnapshots ? [...currentSnapshot.stockSnapshots, item] : [item]
+            });
+        }
     }, [currentSnapshot, mutateCurrentSnapshot]);
 
     const removeOptimisticStockItems = useCallback(async (itemUIDs: string[]) => {
@@ -32,27 +34,29 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
             return;
 
         const stockSnapshots = currentSnapshot.stockSnapshots.filter(item => !itemUIDs.includes(item.uid));
-        await mutateCurrentSnapshot(
-            deleteBarStock({
-                uids: itemUIDs
-            })
-                .then(() => {
-                    return {
+        if (mutateCurrentSnapshot) {
+            await mutateCurrentSnapshot(
+                deleteBarStock({
+                    uids: itemUIDs
+                })
+                    .then(() => {
+                        return {
+                            ...currentSnapshot,
+                            stockSnapshots
+                        };
+                    })
+                    .catch(e => {
+                        console.error(e);
+                        errorToast(e, "Could not delete items!");
+                    }),
+                {
+                    optimisticData: {
                         ...currentSnapshot,
                         stockSnapshots
-                    };
-                })
-                .catch(e => {
-                    console.error(e);
-                    errorToast(e, "Could not delete items!");
-                }),
-            {
-                optimisticData: {
-                    ...currentSnapshot,
-                    stockSnapshots
-                },
-                revalidate: false
-            });
+                    },
+                    revalidate: false
+                });
+        }
     }, [currentSnapshot, deleteBarStock, mutateCurrentSnapshot]);
 
     const updateOptimisticStockSnapshot = useCallback(async (item: PartialStockSnapshotWithStock, quantity?: number) => {
@@ -71,31 +75,33 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
             quantity: (quantity ?? snapshot.quantity) ?? 0
         };
 
-        await mutateCurrentSnapshot(
-            updateBarStock({
-                stockUID: snapshot.uid,
-                dto: {
-                    quantity,
-                    name: item.name,
-                    price: item.price,
-                    type: item.type ?? StockType.DEFAULT
-                }
-            })
-                .then(() => ({
-                    ...currentSnapshot,
-                    stockSnapshots: snapshots
-                }))
-                .catch(e => {
-                    console.error(e);
-                    errorToast(e, "Could not delete items!");
-                }),
-            {
-                optimisticData: {
-                    ...currentSnapshot,
-                    stockSnapshots: snapshots
-                },
-                revalidate: false
-            });
+        if (mutateCurrentSnapshot) {
+            await mutateCurrentSnapshot(
+                updateBarStock({
+                    stockUID: snapshot.uid,
+                    dto: {
+                        quantity,
+                        name: item.name,
+                        price: item.price,
+                        type: item.type ?? StockType.DEFAULT
+                    }
+                })
+                    .then(() => ({
+                        ...currentSnapshot,
+                        stockSnapshots: snapshots
+                    }))
+                    .catch(e => {
+                        console.error(e);
+                        errorToast(e, "Could not delete items!");
+                    }),
+                {
+                    optimisticData: {
+                        ...currentSnapshot,
+                        stockSnapshots: snapshots
+                    },
+                    revalidate: false
+                });
+        }
     }, [currentSnapshot, mutateCurrentSnapshot, updateBarStock]);
 
     return { addOptimisticStockItem, removeOptimisticStockItems, updateOptimisticStockSnapshot };

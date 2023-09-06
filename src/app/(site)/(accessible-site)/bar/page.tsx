@@ -1,23 +1,16 @@
 "use client";
 
-import useSWR from "swr";
-import { fetcher } from "../employees/_components/EmployeeGrid";
 import { useUserData } from "../../../../utils/Hooks";
 import Permission, { hasAnyPermission } from "../../../../libs/types/permission";
 import { Fragment, useCallback, useMemo } from "react";
 import BarSection from "./components/section/BarSection";
-import { Spinner } from "@nextui-org/spinner";
 import SubTitle from "../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 import AddSectionButton from "./components/AddSectionButton";
 import { Skeleton, Spacer } from "@nextui-org/react";
 import { InventorySectionWithOptionalExtras } from "../../../api/inventory/bar/[name]/types";
 import TableSkeleton from "../../../_components/skeletons/TableSkeleton";
-import { InventoryWithSections } from "../../../api/inventory/[name]/types";
-
-const useBarInfo = () => {
-    return useSWR("/api/inventory/bar", fetcher<InventoryWithSections>);
-};
+import useBarInfo from "./components/hooks/useBarInfo";
 
 export default function BarPage() {
     const { data: userData } = useUserData([Permission.MUTATE_BAR_INVENTORY, Permission.VIEW_BAR_INVENTORY, Permission.CREATE_INVENTORY]);
@@ -33,10 +26,11 @@ export default function BarPage() {
                 mutateBarInfo={mutateBarInfo}
                 section={section}
                 userData={userData}
+                mutationAllowed={mutationAllowed}
             />
             <Divider className="my-6" />
         </Fragment>
-    )), [barInfo, mutateBarInfo, userData]);
+    )), [barInfo, mutateBarInfo, mutationAllowed, userData]);
 
     const addSection = useCallback(async (newSection: InventorySectionWithOptionalExtras) => {
         if (!barInfo)

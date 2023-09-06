@@ -1,7 +1,7 @@
 import { InventorySection, InventorySectionSnapshot, Stock, StockSnapshot, StockType } from "@prisma/client";
 import { z } from "zod";
 import { CreateStockDto } from "../../[name]/stock/route";
-import { InventoryWithOptionalExtras } from "../../[name]/types";
+import { InventoryWithOptionalExtras, InventoryWithSections } from "../../[name]/types";
 
 export type InventorySectionWithOptionalExtras = InventorySection & {
     inventory?: InventoryWithOptionalExtras,
@@ -31,4 +31,9 @@ export const updateInventorySectionDtoSchema = z.object({
 
 export interface CreateBarSectionStockItem extends CreateStockDto {
     type?: StockType;
+}
+
+export type BarSnapshot = {
+    createdAt: Date,
+    data: InventorySectionSnapshotWithOptionalExtras[],
 }

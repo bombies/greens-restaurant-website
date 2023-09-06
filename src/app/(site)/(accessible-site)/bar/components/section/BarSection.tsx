@@ -13,9 +13,10 @@ import { InventorySectionSnapshotWithExtras, InventoryWithSections } from "../..
 
 type Props = {
     barInfo?: InventoryWithSections,
-    mutateBarInfo: KeyedMutator<InventoryWithSections | undefined>
+    mutateBarInfo?: KeyedMutator<InventoryWithSections | undefined>
     section?: InventorySection,
-    userData?: User
+    userData?: User,
+    mutationAllowed: boolean,
 }
 
 const useCurrentBarSectionSnapshot = (name?: string, sectionId?: string) => {
@@ -24,7 +25,7 @@ const useCurrentBarSectionSnapshot = (name?: string, sectionId?: string) => {
 
 export type PartialInventorySection = Partial<Omit<InventorySection, "id">>
 
-const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData }) => {
+const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData, mutationAllowed }) => {
     const {
         data: currentSnapshot,
         isLoading: currentSnapshotLoading,
@@ -46,10 +47,12 @@ const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData }) =>
             ...newInfo
         };
 
-        await mutateBarInfo({
-            ...barInfo,
-            inventorySections: sections
-        });
+        if (mutateBarInfo) {
+            await mutateBarInfo({
+                ...barInfo,
+                inventorySections: sections
+            });
+        }
     }, [barInfo, mutateBarInfo, section?.id]);
 
     const deleteSection = useCallback(async () => {
@@ -62,17 +65,19 @@ const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData }) =>
             return;
 
         sections.splice(sectionIndex);
-        await mutateBarInfo({
-            ...barInfo,
-            inventorySections: sections
-        });
+        if (mutateBarInfo) {
+            await mutateBarInfo({
+                ...barInfo,
+                inventorySections: sections
+            });
+        }
     }, [barInfo, mutateBarInfo, section?.id]);
 
     return (
         <div className="default-container p-6">
             <div className="flex gap-4">
                 <SubTitle thick className="self-center">{section?.name ?? "Unknown"}</SubTitle>
-                {(section && barInfo) &&
+                {(mutationAllowed && section && barInfo) &&
                     <BarSectionControl
                         barName={barInfo.name}
                         section={section}
@@ -88,10 +93,7 @@ const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData }) =>
                 currentSnapshot={currentSnapshot}
                 mutateCurrentSnapshot={mutateCurrentSnapshot}
                 stockIsLoading={currentSnapshotLoading}
-                mutationAllowed={hasAnyPermission(userData?.permissions, [
-                    Permission.CREATE_INVENTORY,
-                    Permission.MUTATE_BAR_INVENTORY
-                ])}
+                mutationAllowed={mutationAllowed}
             />
         </div>
     );

@@ -1,11 +1,12 @@
 import inventoryService, { Either } from "../../[name]/service";
-import { InventorySection, Prisma, Stock, StockSnapshot, StockType } from "@prisma/client";
+import { InventorySection, InventorySectionSnapshot, Prisma, Stock, StockSnapshot, StockType } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { respond, respondWithInit } from "../../../../../utils/api/ApiUtils";
 import prisma from "../../../../../libs/prisma";
 import { InventoryType } from ".prisma/client";
 import { v4 } from "uuid";
 import {
+    BarSnapshot,
     CreateBarSectionStockItem,
     CreateInventorySectionDto,
     createInventorySectionDtoSchema, InventorySectionSnapshotWithOptionalExtras,
@@ -558,6 +559,97 @@ class BarService {
             }
         });
         return new Either<Stock[], NextResponse>(items);
+    }
+
+    async fetchSnapshots(inventoryName: string): Promise<Either<BarSnapshot[], NextResponse>> {
+        const sectionsMiddleMan = await this.fetchInventorySections(inventoryName);
+        if (sectionsMiddleMan.error)
+            return new Either<BarSnapshot[], NextResponse>(undefined, sectionsMiddleMan.error);
+        const sections = sectionsMiddleMan.success!;
+
+        const groupedSections = await prisma.$transaction(
+            sections.map(section => prisma.inventorySectionSnapshot.findMany({
+                where: {
+                    inventorySectionId: section.id
+                },
+                include: {
+                    inventorySection: true
+                }
+            }))
+        );
+
+        const groupedDates = (await prisma.inventorySectionSnapshot.groupBy({
+            by: ["createdAt"],
+            where: {
+                inventorySectionId: {
+                    in: sections.map(section => section.id)
+                }
+            }
+        })).map(date => {
+            const dateObj = new Date(date.createdAt);
+            dateObj.setHours(0, 0, 0, 0);
+            return { createdAt: dateObj };
+        });
+
+        const snapshots = groupedDates.map<BarSnapshot>(date => {
+            const dateObj = new Date(date.createdAt);
+            const correspondingSectionSnapshots = groupedSections
+                .map(sectionArr => sectionArr.find(section => {
+                    const endOfDay = new Date(section.createdAt);
+                    endOfDay.setHours(23, 59, 59, 999);
+
+                    const sectionDate = new Date(section.createdAt);
+                    return sectionDate >= dateObj && sectionDate <= endOfDay;
+                })!)
+                .filter((snapshot) => !!snapshot);
+
+            return {
+                createdAt: dateObj,
+                data: correspondingSectionSnapshots
+            };
+        });
+
+        return new Either<BarSnapshot[], NextResponse>(snapshots);
+    }
+
+    async fetchSnapshot(inventoryName: string, date: number): Promise<Either<BarSnapshot, NextResponse>> {
+        const dateObj = new Date(date);
+        dateObj.setHours(0, 0, 0, 0);
+        const endOfDayObj = new Date(date);
+        endOfDayObj.setHours(23, 59, 59, 999);
+
+        const sectionsMiddleMan = await this.fetchInventorySections(inventoryName);
+        if (sectionsMiddleMan.error)
+            return new Either<BarSnapshot, NextResponse>(undefined, sectionsMiddleMan.error);
+        const sections = sectionsMiddleMan.success!;
+
+        const groupedSections = await prisma.$transaction(
+            sections.map(section => prisma.inventorySectionSnapshot.findMany({
+                where: {
+                    inventorySectionId: section.id,
+                    createdAt: {
+                        gte: dateObj,
+                        lte: endOfDayObj
+                    }
+                },
+                include: {
+                    inventorySection: true,
+                    stockSnapshots: true,
+                }
+            }))
+        );
+
+        const correspondingSectionSnapshots = groupedSections
+            .map(sectionArr => sectionArr.find(section => {
+                const sectionDate = new Date(section.createdAt);
+                return sectionDate >= dateObj && sectionDate <= endOfDayObj;
+            })!)
+            .filter((snapshot) => !!snapshot);
+
+        return new Either<BarSnapshot, NextResponse>({
+            createdAt: dateObj,
+            data: correspondingSectionSnapshots
+        });
     }
 
     private async handlePrismaErrors<T>(logic: () => Promise<Either<T, NextResponse>>, { notFound }: {

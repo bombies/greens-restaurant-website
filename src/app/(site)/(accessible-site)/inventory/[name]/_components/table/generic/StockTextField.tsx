@@ -57,7 +57,8 @@ export default function StockTextField({ stockSnapshot, field, onSet, disabled }
                 />
             </GenericModal>
             <p className={clsx(
-                "cursor-pointer border-2 border-neutral-800/0 hover:default-container transition-fast w-fit py-3 px-5"
+                "border-2 border-neutral-800/0 transition-fast w-fit py-3 px-5",
+                !disabled && "hover:default-container cursor-pointer"
             )}
                onClick={() => {
                    if (disabled)

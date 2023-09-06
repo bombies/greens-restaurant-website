@@ -18,7 +18,7 @@ type Props = {
     barName?: string,
     section?: InventorySection
     currentSnapshot?: InventorySectionSnapshotWithExtras
-    mutateCurrentSnapshot: KeyedMutator<InventorySectionSnapshotWithExtras | undefined>
+    mutateCurrentSnapshot?: KeyedMutator<InventorySectionSnapshotWithExtras | undefined>
     stockIsLoading: boolean,
     mutationAllowed: boolean,
 }
@@ -46,7 +46,7 @@ const BarStockTable: FC<Props> = ({
             <AddBarSectionStockItemModal
                 barName={barName}
                 sectionSnapshot={currentSnapshot}
-                isOpen={addItemModelOpen}
+                isOpen={addItemModelOpen && mutationAllowed}
                 setOpen={setAddItemModalOpen}
                 addOptimisticStockItem={addOptimisticStockItem}
             />
@@ -59,6 +59,7 @@ const BarStockTable: FC<Props> = ({
                         case StockTableColumnKey.STOCK_NAME: {
                             return (
                                 <StockTextField
+                                    disabled={!mutationAllowed}
                                     stockSnapshot={item}
                                     field="name"
                                     onSet={async (text) => {
@@ -70,6 +71,7 @@ const BarStockTable: FC<Props> = ({
                         case StockTableColumnKey.STOCK_QUANTITY: {
                             return (
                                 <StockNumericField
+                                    disabled={!mutationAllowed}
                                     stockSnapshot={item}
                                     onSet={async (quantity) => {
                                         await updateOptimisticStockSnapshot(item, quantity);
@@ -81,6 +83,7 @@ const BarStockTable: FC<Props> = ({
                             return (
                                 <StockNumericField
                                     stockSnapshot={item}
+                                    disabled={!mutationAllowed}
                                     onSet={async (quantity) => {
                                         await updateOptimisticStockSnapshot({ uid: item.uid, price: quantity });
                                     }}
