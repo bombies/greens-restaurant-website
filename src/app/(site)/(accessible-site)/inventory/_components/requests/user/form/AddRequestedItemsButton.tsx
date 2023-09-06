@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, FC, Fragment, useState } from "react";
-import { RequestedStockItem, Stock, StockSnapshot } from "@prisma/client";
+import { RequestedStockItem, Stock } from "@prisma/client";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
@@ -12,6 +12,11 @@ import "../../../../../../../../utils/GeneralUtils";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ProposedStockRequestsAction } from "./InventoryRequestedItemsContainer";
+import useStockQuantityDropdownUtils
+    from "../../../../[name]/_components/table/generic/forms/useStockQuantityDropdownUtils";
+import StockQuantityDropdown, {
+    QuantityUnit
+} from "../../../../[name]/_components/table/generic/forms/StockQuantityDropdown";
 
 interface Props {
     disabled?: boolean,
@@ -35,20 +40,27 @@ const AddRequestedItemsButton: FC<Props> = ({
                                             }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
-    const { register, handleSubmit, formState: { errors } } = useForm<FieldValues>();
+    const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
+    const [currentItem, setCurrentItem] = useState<Stock>();
+    const { register, handleSubmit } = useForm<FieldValues>();
+    const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item: currentItem });
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
+        const amountRequested = mutateQuantity(Number(data.amount_requested), quantityUnit);
+
         dispatchProposedRequests({
             type: ProposedStockRequestsAction.ADD_ITEM,
             payload: {
-                amountRequested: Number(data.amount_requested),
+                amountRequested,
                 stockId: selectedItemIds[0]
             }
         });
 
         setSelectedItemIds([]);
+        setCurrentItem(undefined);
         setModalOpen(false);
     };
+
 
     return (
         <Fragment>
@@ -67,7 +79,19 @@ const AddRequestedItemsButton: FC<Props> = ({
                             disabled={snapshotsLoading}
                             selectedKeys={selectedItemIds}
                             disabledKeys={proposedSnapshotIds}
-                            onSelectionChange={keys => setSelectedItemIds(Array.from(keys) as string[])}
+                            onSelectionChange={keys => {
+                                const keyArr = Array.from(keys) as string[];
+                                setSelectedItemIds(keyArr);
+
+                                if (!keyArr.length)
+                                    setCurrentItem(undefined);
+                                else {
+                                    const lastItem = stock.find(item => item.id === keyArr[keyArr.length - 1]);
+                                    if (lastItem)
+                                        setCurrentItem(lastItem);
+                                }
+
+                            }}
                             renderValue={items => items.map(item => item.data?.name.replaceAll("-", " ").capitalize()).toString()}
                         >
                             {snapshot => (
@@ -86,6 +110,13 @@ const AddRequestedItemsButton: FC<Props> = ({
                             placeholder="Enter an amount"
                             type="number"
                             min="1"
+                            endContent={(currentItem && (isDrinkBottle() || isCaseItem())) &&
+                                <StockQuantityDropdown
+                                    item={currentItem}
+                                    selectedUnit={quantityUnit}
+                                    setSelectedUnit={setQuantityUnit}
+                                />
+                            }
                         />
                         <Divider className="my-6" />
                         <GenericButton

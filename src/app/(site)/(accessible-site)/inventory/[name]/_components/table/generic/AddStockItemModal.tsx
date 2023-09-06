@@ -10,11 +10,9 @@ import { errorToast } from "../../../../../../../../utils/Hooks";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
-import { Chip } from "@nextui-org/chip";
-import { SelectItem } from "@nextui-org/react";
-import GenericSelectMenu from "../../../../../../../_components/GenericSelectMenu";
 import { CreateStockDto } from "../../../../../../../api/inventory/[name]/stock/route";
 import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
+import ItemTypeSelectMenu from "./ItemTypeSelectMenu";
 
 type Props = {
     inventoryName: string,
@@ -48,11 +46,6 @@ const AddStockItemModal: FC<Props> = ({
     } = AddItem(inventoryName);
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const [selectedStockType, setSelectedStockType] = useState<StockType>(StockType.DEFAULT);
-
-    const selectItems = useMemo(() => Object.keys(StockType).map(type => ({
-        key: type,
-        label: type.replaceAll("_", " ")
-    })), []);
 
     const onSubmit: SubmitHandler<FieldValues> = useCallback((data) => {
         if (!inventorySnapshot)
@@ -115,41 +108,11 @@ const AddStockItemModal: FC<Props> = ({
                         type="number"
                         step="0.01"
                     />
-                    <GenericSelectMenu
-                        isDisabled={isCreating}
-                        selectionMode="single"
-                        isRequired
-                        label="Item Type"
-                        id="itemType"
-                        placeholder="Select a type..."
-                        items={selectItems}
+                    <ItemTypeSelectMenu
+                        selectedStockType={selectedStockType}
+                        setSelectedStockType={setSelectedStockType}
                         register={register}
-                        selectedKeys={[selectedStockType.toLowerCase()]}
-                        onSelectionChange={selection => setSelectedStockType((Array.from(selection) as StockType[])[0].toUpperCase() as StockType)}
-                        variant="flat"
-                        renderValue={(items) => {
-                            return (
-                                <div className="flex flex-wrap gap-2">
-                                    {items.map((item) => (
-                                        <Chip
-                                            color="primary"
-                                            variant="flat"
-                                            className="capitalize"
-                                            key={item.key}
-                                        >
-                                            {item.data?.label.replaceAll("_", " ")}
-                                        </Chip>
-                                    ))}
-                                </div>
-                            );
-                        }}
-                    >
-                        {(type) => (
-                            <SelectItem key={type.key.toLowerCase()}>
-                                {type.label.replaceAll("_", " ")}
-                            </SelectItem>
-                        )}
-                    </GenericSelectMenu>
+                    />
                     <GenericButton
                         variant="flat"
                         type="submit"

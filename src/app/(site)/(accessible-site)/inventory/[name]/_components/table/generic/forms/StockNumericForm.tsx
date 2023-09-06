@@ -1,12 +1,13 @@
 "use client";
 
-import { FC, ReactNode, useCallback, useMemo, useState } from "react";
+import { FC, ReactNode, useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
 import GenericButton from "../../../../../../../../_components/inputs/GenericButton";
-import DropdownInput from "../../../../../../../../_components/inputs/DropdownInput";
 import { StockSnapshot, StockType } from "@prisma/client";
+import StockQuantityDropdown, { QuantityUnit } from "./StockQuantityDropdown";
+import useStockQuantityDropdownUtils from "./useStockQuantityDropdownUtils";
 
 type Props = {
     onQuantitySubmit: (quantity: number) => Promise<void>,
@@ -19,20 +20,6 @@ type Props = {
     isCurrency?: boolean,
 }
 
-enum QuantityUnit {
-    DRINKS = "Drinks",
-    BOTTLES = "Bottles",
-    CASES = "Cases",
-    ITEMS = "Items",
-    DEFAULT = "Default",
-}
-
-const IMPERIAL_DRINKS_MAX = 33;
-const QUART_DRINKS_MAX = 24;
-const SIX_CASE_MAX = 6;
-const TWELVE_CASE_MAX = 12;
-const TWENTY_FOUR_CASE_MAX = 24;
-
 const StockNumericForm: FC<Props> = ({
                                          onQuantitySubmit,
                                          isWorking,
@@ -43,6 +30,7 @@ const StockNumericForm: FC<Props> = ({
                                          min,
                                          isCurrency
                                      }) => {
+    const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item });
     const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
     const {
         register,
@@ -54,68 +42,10 @@ const StockNumericForm: FC<Props> = ({
     } = useForm<FieldValues>();
 
     const onSubmit: SubmitHandler<FieldValues> = useCallback((data) => {
-        let { quantity } = data;
-
-        if (quantityUnit === QuantityUnit.BOTTLES.toLowerCase())
-            switch (item?.type) {
-                case StockType.QUART_BOTTLE: {
-                    quantity *= QUART_DRINKS_MAX;
-                    break;
-                }
-                case StockType.IMPERIAL_BOTTLE: {
-                    quantity *= IMPERIAL_DRINKS_MAX;
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-        else if (quantityUnit === QuantityUnit.CASES.toLowerCase())
-            switch (item?.type) {
-                case StockType.SIX_CASE: {
-                    quantity *= SIX_CASE_MAX;
-                    break;
-                }
-                case StockType.TWELVE_CASE: {
-                    quantity *= TWELVE_CASE_MAX;
-                    break;
-
-                }
-                case StockType.TWENTY_FOUR_CASE: {
-                    quantity *= TWENTY_FOUR_CASE_MAX;
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-
+        const quantity = mutateQuantity(Number(data.quantity), quantityUnit);
         onQuantitySubmit(Number(quantity))
             .then(() => reset());
-    }, [item?.type, onQuantitySubmit, quantityUnit, reset]);
-
-    const isCaseItem = useCallback(() => {
-        return [StockType.SIX_CASE.toString(), StockType.TWELVE_CASE.toString(), StockType.TWENTY_FOUR_CASE.toString()]
-            .includes(item?.type?.toString() ?? "");
-    }, [item?.type]);
-
-    const validKeys = useMemo(() => (
-        isCaseItem() ?
-            [QuantityUnit.CASES, QuantityUnit.ITEMS]
-            :
-            [QuantityUnit.BOTTLES, QuantityUnit.DRINKS]
-    ), [isCaseItem]);
-
-    const quantityDropdown = useMemo(() => (
-        <DropdownInput
-            selectedValueLabel
-            selectionRequired
-            variant="flat"
-            keys={validKeys}
-            selectedKeys={quantityUnit === QuantityUnit.DEFAULT ? [isCaseItem() ? QuantityUnit.ITEMS : QuantityUnit.DRINKS] : [quantityUnit]}
-            setSelectedKeys={(keys) => setQuantityUnit(Array.from(keys)[0] as QuantityUnit)}
-        />
-    ), [isCaseItem, quantityUnit, validKeys]);
+    }, [mutateQuantity, onQuantitySubmit, quantityUnit, reset]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -130,8 +60,13 @@ const StockNumericForm: FC<Props> = ({
                 type="number"
                 step={isCurrency ? "0.01" : undefined}
                 endContent={
-                    (!isCurrency && ((item?.type === StockType.IMPERIAL_BOTTLE || item?.type === StockType.QUART_BOTTLE) || isCaseItem()))
-                    && quantityDropdown
+                    (!isCurrency && (isDrinkBottle() || isCaseItem()))
+                    &&
+                    <StockQuantityDropdown
+                        item={item}
+                        selectedUnit={quantityUnit}
+                        setSelectedUnit={setQuantityUnit}
+                    />
                 }
                 startContent={isCurrency && "JMD"}
                 min={min ?? 1}
