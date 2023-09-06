@@ -4,7 +4,7 @@ import Providers from "./_components/Providers";
 import "./globals.scss";
 import clsx from "clsx";
 import { getServerSession } from "next-auth";
-import { authHandler } from "./api/auth/[...nextauth]/route";
+import { authHandler } from "./api/auth/[...nextauth]/utils";
 
 export const metadata = {
     title: "Green's Restaurant & Pub",

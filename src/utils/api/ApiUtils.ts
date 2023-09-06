@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Permission, { hasAnyPermission, hasPermissions } from "../../libs/types/permission";
 import { getServerSession, Session } from "next-auth";
-import { authHandler } from "../../app/api/auth/[...nextauth]/route";
+import { authHandler } from "../../app/api/auth/[...nextauth]/utils";
 import { AuthenticatedServerAxiosClient } from "./AuthenticatedServerAxiosClient";
 import { getToken } from "next-auth/jwt";
 import prisma from "../../libs/prisma";
