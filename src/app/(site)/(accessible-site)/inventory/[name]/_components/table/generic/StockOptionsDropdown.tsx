@@ -2,10 +2,9 @@
 
 import { DropdownItem, DropdownMenu, DropdownSection } from "@nextui-org/react";
 import { Key } from "react";
-import addIcon from "/public/icons/add.svg";
-import trashIcon from "/public/icons/red-trash.svg";
-import subtractIcon from "/public/icons/subtract.svg";
-import GenericImage from "../../../../../../../_components/GenericImage";
+import TrashIcon from "../../../../../../../_components/icons/TrashIcon";
+import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
+import MinusIcon from "../../../../../../../_components/icons/MinusIcon";
 
 type Props = {
     onAdd: () => void,
@@ -44,14 +43,14 @@ export default function StockOptionsDropdown({ onAdd, onRemove, onDelete, disabl
                     <DropdownItem
                         key="add"
                         description="Add a custom amount of stock to this item"
-                        startContent={<GenericImage src={addIcon} width={1.35} />}
+                        startContent={<PlusIcon />}
                     >
                         Add Multiple
                     </DropdownItem>
                     <DropdownItem
                         key="remove"
                         description="Remove a custom amount of stock from this item"
-                        startContent={<GenericImage src={subtractIcon} width={1.35} />}
+                        startContent={<MinusIcon />}
                     >
                         Remove Multiple
                     </DropdownItem>
@@ -61,7 +60,7 @@ export default function StockOptionsDropdown({ onAdd, onRemove, onDelete, disabl
                         key="delete"
                         className="text-danger hover:text-white"
                         color="danger"
-                        startContent={<GenericImage src={trashIcon} width={1.15} />}
+                        startContent={<TrashIcon />}
                     >
                         Remove Item
                     </DropdownItem>

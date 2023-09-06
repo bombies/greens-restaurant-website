@@ -6,13 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import sparklesIcon from "/public/icons/sparkles-green.svg";
 import eyeIcon from "/public/icons/green-eye.svg";
 import backIcon from "/public/icons/back-green.svg";
-import trashIcon from "/public/icons/red-trash.svg";
 import { Link } from "@nextui-org/react";
 import ConfirmationModal from "../../../../../_components/ConfirmationModal";
 import { useState } from "react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { toast } from "react-hot-toast";
+import TrashIcon from "../../../../../_components/icons/TrashIcon";
 
 type Props = {
     inventoryName: string,
@@ -99,7 +99,7 @@ export default function SpecificInventoryControlBar({ inventoryName }: Props) {
                 <GenericButton
                     variant="flat"
                     color="danger"
-                    icon={trashIcon}
+                    startContent={<TrashIcon />}
                     onPress={() => setDeleteModalOpen(true)}
                 >Delete Inventory</GenericButton>
             </div>

@@ -1,10 +1,10 @@
 "use client";
 
 import GenericButton from "../../../../../_components/inputs/GenericButton";
-import saveIcon from "/public/icons/save.svg";
-import trashIcon from "/public/icons/trash.svg";
 import SlidingBar from "../../../../../_components/SlidingBar";
 import { JSX } from "react";
+import TrashIcon from "../../../../../_components/icons/TrashIcon";
+import CheckIcon from "../../../../../_components/icons/CheckIcon";
 
 type Props = {
     changesMade: boolean,
@@ -22,7 +22,15 @@ type Props = {
     }
 }
 
-export default function ChangesMadeBar({ changesMade, onAccept, onReject, isChanging, label, saveButtonConfig, rejectButtonConfig }: Props) {
+export default function ChangesMadeBar({
+                                           changesMade,
+                                           onAccept,
+                                           onReject,
+                                           isChanging,
+                                           label,
+                                           saveButtonConfig,
+                                           rejectButtonConfig
+                                       }: Props) {
     return (
         <SlidingBar visible={changesMade} className="justify-between">
             <p className="text-xl phone:text-lg self-center">{label || "Careful - You have unsaved changes!"}</p>
@@ -31,8 +39,7 @@ export default function ChangesMadeBar({ changesMade, onAccept, onReject, isChan
                     onPress={() => onAccept()}
                     disabled={!changesMade || isChanging}
                     isLoading={isChanging}
-                    icon={saveButtonConfig?.icon ? undefined : saveIcon}
-                    startContent={saveButtonConfig?.icon}
+                    startContent={saveButtonConfig?.icon ?? <CheckIcon />}
                 >
                     {saveButtonConfig?.label ?? "Save"}
                 </GenericButton>
@@ -40,8 +47,7 @@ export default function ChangesMadeBar({ changesMade, onAccept, onReject, isChan
                     color="danger"
                     onPress={() => onReject()}
                     disabled={!changesMade || isChanging}
-                    icon={rejectButtonConfig?.icon ? undefined : trashIcon}
-                    startContent={rejectButtonConfig?.icon}
+                    startContent={rejectButtonConfig?.icon ?? <TrashIcon />}
                 >
                     {rejectButtonConfig?.label ?? "Discard"}
                 </GenericButton>
