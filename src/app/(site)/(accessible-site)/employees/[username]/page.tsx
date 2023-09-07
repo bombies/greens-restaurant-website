@@ -2,7 +2,7 @@ import Title from "../../../../_components/text/Title";
 import Employee from "./_components/Employee";
 import { Spacer } from "@nextui-org/spacer";
 import { getServerSession } from "next-auth";
-import { authHandler } from "../../../../api/auth/[...nextauth]/route";
+import { authHandler } from "../../../../api/auth/[...nextauth]/utils";
 
 type Context = {
     params: {

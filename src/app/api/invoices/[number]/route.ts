@@ -13,7 +13,7 @@ export async function GET(req: Request, { params }: Context) {
     if (isNaN(parseInt(number)))
         return respondWithInit({
             message: "The number param wasn't a valid integer!",
-            status: 401
+            status: 400
         });
 
     const invoice = await prisma.invoice.findUnique({
@@ -28,7 +28,7 @@ export async function GET(req: Request, { params }: Context) {
     if (!invoice)
         return respondWithInit({
             message: `There was no invoice with number: ${number}`,
-            status: 401
+            status: 400
         });
 
     return NextResponse.json(invoice);

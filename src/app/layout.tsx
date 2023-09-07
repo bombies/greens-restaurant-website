@@ -3,6 +3,8 @@ import React from "react";
 import Providers from "./_components/Providers";
 import "./globals.scss";
 import clsx from "clsx";
+import { getServerSession } from "next-auth";
+import { authHandler } from "./api/auth/[...nextauth]/utils";
 
 export const metadata = {
     title: "Green's Restaurant & Pub",
@@ -14,12 +16,11 @@ const inter = Inter({
 });
 
 
+type Props = React.PropsWithChildren
 
-interface Props extends React.PropsWithChildren {
-    session: any;
-}
+export default async function HomeLayout(props: Props) {
+    const session = await getServerSession(authHandler);
 
-export default function HomeLayout(props: Props) {
     return (
         <html
             className={clsx(
@@ -28,10 +29,11 @@ export default function HomeLayout(props: Props) {
             style={{
                 backgroundImage: "url(\"/images/mesh-bg-2.png\")",
                 backgroundRepeat: "no-repeat",
-                backgroundAttachment: "fixed"
+                backgroundAttachment: "fixed",
+                backgroundSize: "cover"
             }}
         >
-        <Providers session={props.session}>
+        <Providers session={session}>
             {props.children}
         </Providers>
         </html>

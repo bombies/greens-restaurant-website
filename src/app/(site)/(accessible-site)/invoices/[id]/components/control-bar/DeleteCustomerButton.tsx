@@ -8,10 +8,10 @@ import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { useRouter } from "next/navigation";
-import trashIcon from "/public/icons/red-trash.svg";
 import IconButton from "../../../../../../_components/inputs/IconButton";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../../../utils/Hooks";
+import TrashIcon from "../../../../../../_components/icons/TrashIcon";
 
 type Props = {
     customer?: InvoiceCustomer,
@@ -59,7 +59,7 @@ export default function DeleteCustomerButton({ customer, disabled, iconOnly, onS
             {
                 iconOnly ?
                     <IconButton
-                        icon={trashIcon}
+                        startContent={<TrashIcon />}
                         toolTip="Delete"
                         variant="flat"
                         color="danger"
@@ -71,7 +71,7 @@ export default function DeleteCustomerButton({ customer, disabled, iconOnly, onS
                         color="danger"
                         variant="flat"
                         onPress={() => setModalOpen(true)}
-                        icon={trashIcon}
+                        startContent={<TrashIcon />}
                     >
                         Delete {customer?.customerName.capitalize()}
                     </GenericButton>

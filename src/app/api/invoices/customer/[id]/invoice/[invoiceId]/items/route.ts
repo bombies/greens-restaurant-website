@@ -20,7 +20,7 @@ export function DELETE(req: Request, { params }: Context) {
         if (!body.itemsToDelete)
             return respondWithInit({
                 message: "You must provide ids to delete!",
-                status: 401
+                status: 400
             });
 
         const deletedItems = await prisma.invoiceItem.deleteMany({

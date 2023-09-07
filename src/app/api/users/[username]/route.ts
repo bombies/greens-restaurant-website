@@ -1,4 +1,4 @@
-import { authenticated, Mailer, respond, respondWithInit } from "../../../../utils/api/ApiUtils";
+import { authenticated, respond, respondWithInit } from "../../../../utils/api/ApiUtils";
 import Permission, { permissionCheck } from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { NextResponse } from "next/server";
@@ -6,6 +6,7 @@ import { EMAIL_REGEX, NAME_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "../../.
 import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 import { z } from "zod";
+import { Mailer } from "../../../../utils/api/Mailer";
 
 type RouteContext = {
     params: {
@@ -44,12 +45,12 @@ export async function DELETE(req: Request, { params }: RouteContext) {
         if (user.username === session.user?.username)
             return respond({
                 message: "You cannot delete yourself!",
-                init: { status: 401 }
+                init: { status: 400 }
             });
         else if (user.username === "root")
             return respond({
                 message: "You cannot delete the root user!",
-                init: { status: 401 }
+                init: { status: 400 }
             });
 
         const deletedUser = await prisma.user.delete({
@@ -100,7 +101,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
         if (!body || !bodyValidated.success)
             return respondWithInit({
                 message: "You must provide some information to update!",
-                status: 401,
+                status: 400,
                 validationErrors: bodyValidated
             });
 
@@ -109,7 +110,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             if (!USERNAME_REGEX.test(body.username))
                 return respond({
                     message: "Invalid username! Usernames must include alphanumeric characters only.",
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
 
             const existingUser = await prisma.user.findUnique({
@@ -121,7 +122,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             if (existingUser)
                 return respond({
                     message: `There is already a user with the username ${body.username}`,
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
         }
 
@@ -130,7 +131,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 return respond({
                     message: "The password must be between 6 and 256 characters!",
                     init: {
-                        status: 401
+                        status: 400
                     }
                 });
             body.password = await bcrypt.hash(body.password, 12);
@@ -141,7 +142,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 return respond({
                     message: "That first name is invalid! Remove any spaces or special characters that may be in the name.",
                     init: {
-                        status: 401
+                        status: 400
                     }
                 });
         }
@@ -151,7 +152,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
                 return respond({
                     message: "That last name is invalid! Remove any spaces or special characters that may be in the name.",
                     init: {
-                        status: 401
+                        status: 400
                     }
                 });
         }
@@ -184,7 +185,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             if (!EMAIL_REGEX.test(body.email))
                 return respond({
                     message: "Invalid email!",
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
 
             const existingUser = await prisma.user.findUnique({
@@ -196,68 +197,14 @@ export async function PATCH(req: Request, { params }: RouteContext) {
             if (existingUser)
                 return respond({
                     message: `There is already a user with the email: ${body.email}`,
-                    init: { status: 401 }
+                    init: { status: 400 }
                 });
 
-            await Mailer.sendMail({
-                from: "\"Green's Pub\" <no-reply@robertify.me>",
+            await Mailer.sendEmailUpdate({
                 to: body.email,
-                subject: "Email Updated",
-                html: `
-                <!DOCTYPE HTML>
-                <html lang="en">
-                  <head>
-                    <link rel="preconnect" href="https://fonts.googleapis.com">
-                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-                    <style>
-                      body {
-                        background-color: white;
-                        font-family: "Inter", sans-serif;
-                      }
-                      
-                      main {
-                        padding: 2rem;+
-                      }
-                
-                      .banner {
-                        background-image: linear-gradient(to right, #007d0d, #00D615);
-                        padding: 1rem;
-                      }
-                
-                      .primary-text {
-                        color: #00D615;
-                      }
-                
-                      .details-container {
-                        margin-top: 4rem;
-                        padding: 4rem 2rem;
-                        background: #00D615;
-                        border-radius: 16px;
-                        width: fit-content;
-                        box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-                      }
-                      
-                      .bold {
-                        font-weight: 700;
-                      }
-                
-                    </style>
-                  </head>
-                
-                  <body>
-                    <div>
-                      <div class="banner">
-                        <img src="https://i.imgur.com/HLTQ78m.png" alt="" width="128" height="128" />
-                      </div>
-                      <main>
-                        <h1>Hello <span class="primary-text">${user.firstName}</span>,</h1>
-                        <p>Your email for account with username <b>${body.username || user.username}</b> has been updated to this one. (${body.email})</p>
-                      </main>
-                    </div>
-                  </body>
-                </html>
-            `
+                username: body.username || user.username,
+                firstName: user.firstName,
+                email: body.email
             });
         }
 

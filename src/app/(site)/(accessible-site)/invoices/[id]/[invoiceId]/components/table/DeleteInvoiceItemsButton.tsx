@@ -10,9 +10,9 @@ import {
 import ConfirmationModal from "../../../../../../../_components/ConfirmationModal";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import axios from "axios";
-import trashIcon from "/public/icons/red-trash.svg";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../../../../utils/Hooks";
+import TrashIcon from "../../../../../../../_components/icons/TrashIcon";
 
 type Props = {
     disabled: boolean,
@@ -88,7 +88,7 @@ export default function DeleteInvoiceItemsButton({
                 variant="flat"
                 color="danger"
                 onPress={() => setModalOpen(true)}
-                icon={trashIcon}
+                startContent={<TrashIcon />}
             >Delete Items</GenericButton>
         </>
     );
