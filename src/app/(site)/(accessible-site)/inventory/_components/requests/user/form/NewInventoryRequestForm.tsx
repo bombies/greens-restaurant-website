@@ -1,7 +1,6 @@
 "use client";
 
 import { Dispatch, FC, SetStateAction, useState } from "react";
-import { FetchAllInventories } from "../../../InventoryGrid";
 import { SelectItem } from "@nextui-org/react";
 import GenericSelectMenu from "../../../../../../../_components/GenericSelectMenu";
 import { Chip } from "@nextui-org/chip";
@@ -12,6 +11,7 @@ import useSWR, { KeyedMutator } from "swr";
 import { StockRequestWithOptionalCreatorAndAssignees } from "../../inventory-requests-utils";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import { User } from "@prisma/client";
+import { FetchAllInventories } from "../../../InventoryGrid";
 
 type Props = {
     setModalOpen: Dispatch<SetStateAction<boolean>>

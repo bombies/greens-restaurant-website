@@ -19,7 +19,7 @@ export default function BarPage() {
         Permission.MUTATE_BAR_INVENTORY, Permission.CREATE_INVENTORY
     ]), [userData?.permissions]);
 
-    const sections = useMemo(() => barInfo?.inventorySections.map(section => (
+    const sections = useMemo(() => barInfo?.inventorySections?.map(section => (
         <Fragment key={section.id}>
             <BarSection
                 barInfo={barInfo}
