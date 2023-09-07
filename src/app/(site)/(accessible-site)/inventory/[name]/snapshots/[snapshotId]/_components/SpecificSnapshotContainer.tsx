@@ -2,13 +2,13 @@
 
 import useSWR from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
-import { InventorySnapshot, StockSnapshot } from "@prisma/client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import StockTable, { columns } from "../../../_components/table/StockTable";
+import InventoryStockTable, { columns } from "../../../_components/table/InventoryStockTable";
 import TableSkeleton from "../../../../../../../_components/skeletons/TableSkeleton";
 import { Spacer } from "@nextui-org/react";
 import SubTitle from "../../../../../../../_components/text/SubTitle";
+import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
 
 type Props = {
     inventoryName: string,
@@ -16,13 +16,11 @@ type Props = {
 }
 
 const FetchSpecificSnapshot = (inventoryName: string, snapshotId: string) => {
-    return useSWR(`/api/inventory/${inventoryName}/snapshots/${snapshotId}`, fetcher<InventorySnapshot & {
-        stockSnapshots: StockSnapshot[]
-    }>);
+    return useSWR(`/api/inventory/${inventoryName}/snapshots/${snapshotId}`, fetcher<InventorySnapshotWithExtras>);
 };
 
 export default function SpecificSnapshotContainer({ inventoryName, snapshotId }: Props) {
-    const { data, isLoading, error } = FetchSpecificSnapshot(inventoryName, snapshotId);
+    const { data, isLoading, mutate } = FetchSpecificSnapshot(inventoryName, snapshotId);
     const router = useRouter();
 
     useEffect(() => {
@@ -42,7 +40,7 @@ export default function SpecificSnapshotContainer({ inventoryName, snapshotId }:
                     <>
                         <div className="default-container p-12">
                             <SubTitle>You are currently viewing the inventory snapshot
-                                for {new Date(data.createdAt).toDateString()}</SubTitle>
+                                for {new Date(data.createdAt).toLocaleDateString("en-JM")}</SubTitle>
                         </div>
                         <Spacer y={6} />
                     </>
@@ -54,10 +52,12 @@ export default function SpecificSnapshotContainer({ inventoryName, snapshotId }:
                         <TableSkeleton columns={columns} contentRepeat={20} />
                         :
                         data &&
-                        <StockTable
+                        <InventoryStockTable
                             inventoryName={inventoryName}
-                            stock={data!.stockSnapshots}
+                            currentSnapshot={data}
+                            snapshotLoading={isLoading}
                             mutationAllowed={false}
+                            mutateCurrentSnapshot={mutate}
                         />
                 }
             </div>

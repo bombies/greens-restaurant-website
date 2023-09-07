@@ -1,7 +1,7 @@
 import { authenticatedAny } from "../../../../../utils/api/ApiUtils";
-import { fetchInventory } from "../utils";
 import { NextResponse } from "next/server";
 import Permission from "../../../../../libs/types/permission";
+import inventoryService from "../service";
 
 type RouteContext = {
     params: {
@@ -11,7 +11,7 @@ type RouteContext = {
 
 export async function GET(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
-        const fetchResult = await fetchInventory(params.name, {
+        const fetchResult = await inventoryService.fetchInventory(params.name, {
             snapshots: true
         });
         if (fetchResult.error)

@@ -59,7 +59,7 @@ type Props = {
     mutationAllowed: boolean
 }
 
-export default function InvoiceTable({ customer, mutationAllowed, mutator }: Props) {
+export default function InvoiceTable({ customer, mutationAllowed }: Props) {
     const { data: invoice, isLoading } = useInvoice();
     const { state: items, dispatch: dispatchItems, mutate: mutateItems } = useInvoiceItems();
     const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);

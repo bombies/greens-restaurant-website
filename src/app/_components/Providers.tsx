@@ -8,9 +8,10 @@ import { Toaster } from "react-hot-toast";
 import { NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider } from "next-themes";
 import { AppProgressBar } from "next-nprogress-bar";
+import { Session } from "next-auth";
 
 interface Props extends React.PropsWithChildren {
-    session: any;
+    session: Session | null;
 }
 
 export default function Providers(props: Props) {

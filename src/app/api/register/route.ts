@@ -1,4 +1,3 @@
-import { NextApiRequest } from "next";
 import { NextResponse } from "next/server";
 import bcrypt from 'bcrypt';
 import prisma from "../../../libs/prisma";
@@ -29,7 +28,7 @@ export async function POST(req: Request) {
         return respond({
             message: "Malformed body!",
             init: {
-                status: 401
+                status: 400
             }
         })
 

@@ -4,7 +4,7 @@ import { fetchCustomerInfo } from "../../route";
 import { NextResponse } from "next/server";
 import { Invoice, InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../libs/prisma";
-import { Either } from "../../../../../inventory/[name]/utils";
+import { Either } from "../../../../../inventory/[name]/service";
 import { INVOICE_ITEM_NAME_REGEX } from "../../../../../../../utils/regex";
 import { z } from "zod";
 
@@ -63,7 +63,7 @@ export function POST(req: Request, { params }: Context) {
             return respondWithInit({
                 message: "Invalid payload!",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
         // Check item names
@@ -77,7 +77,7 @@ export function POST(req: Request, { params }: Context) {
         if (invalidNames.length)
             return respondWithInit({
                 message: `Some item names are invalid! These include: ${invalidNames.toString()}. Item names must not include "/".`,
-                status: 401
+                status: 400
             });
 
         const items = body.map(info => ({
@@ -113,7 +113,7 @@ export function PATCH(req: Request, { params }: Context) {
             return respondWithInit({
                 message: "Invalid payload",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
         if (body.dueAt)

@@ -4,7 +4,7 @@ import { User } from "@prisma/client";
 import Link from "next/link";
 import { Avatar } from "@nextui-org/avatar";
 import { useState } from "react";
-import { useS3Base64AvatarString } from "../../../../_components/hooks/useS3Base64String";
+import { useS3UserAvatarUrl } from "../../../../_components/hooks/useS3Base64String";
 import clsx from "clsx";
 import { Skeleton } from "@nextui-org/react";
 
@@ -13,7 +13,7 @@ type Props = {
 }
 
 export default function EmployeeCard({ user }: Props) {
-    const { avatar, isLoading: avatarIsLoading } = useS3Base64AvatarString(user.id, user.avatar);
+    const { url, isLoading: avatarIsLoading } = useS3UserAvatarUrl(user.id, user.avatar);
     const [avatarColor, setAvatarColor] = useState<"default" | "primary" | "secondary" | "success" | "warning" | "danger">("default");
 
     return (
@@ -35,7 +35,7 @@ export default function EmployeeCard({ user }: Props) {
                         <Avatar
                             isBordered
                             className="transition-fast"
-                            src={avatar || (user.image || undefined)}
+                            src={url || (user.image || undefined)}
                             color={avatarColor}
                         />
                     </Skeleton>

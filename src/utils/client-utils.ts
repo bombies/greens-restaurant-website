@@ -2,6 +2,10 @@
 
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
+import useSWR from "swr";
+import { fetcher } from "../app/(site)/(accessible-site)/employees/_components/EmployeeGrid";
+import { User } from "@prisma/client";
+import Permission from "../libs/types/permission";
 
 export const downloadFileFromBlob = async (blob: Blob, fileName: string) => {
     const objUrl = URL.createObjectURL(blob);
@@ -25,6 +29,11 @@ export const FetchS3ObjectBuffer = () => {
     const fetcher = (url: string, { arg }: S3FileFetchArgs) => axios.get(url.replaceAll("{key}", arg.key || ""));
     return useSWRMutation(`/api/s3?key={key}`, fetcher);
 };
+
+export const FetchS3ObjectUrl = () => {
+    const fetcher = (url: string, { arg }: S3FileFetchArgs) => axios.get(url.replaceAll("{key}", arg.key || ""));
+    return useSWRMutation(`/api/s3/url?key={key}`, fetcher);
+}
 
 type S3FileUploadArgs = {
     arg: {
@@ -57,4 +66,8 @@ export const UploadFileToS3 = () => {
         });
     };
     return useSWRMutation(`/api/s3/upload?fileName={file_name}&fileType=$file_type}&key={key}`, mutator);
+};
+
+export const FetchUsersWithPermissions = (permissions: Permission[]) => {
+    return useSWR(`/api/users?with_perms=${permissions.toString()}`, fetcher<User[]>);
 };

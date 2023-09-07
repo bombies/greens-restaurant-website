@@ -7,9 +7,9 @@ import { Dispatch, Key, SetStateAction, useState } from "react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { InvoiceItemChangeAction } from "../InvoiceItemsProvider";
-import trashIcon from "/public/icons/red-trash.svg";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../../../../utils/Hooks";
+import TrashIcon from "../../../../../../../_components/icons/TrashIcon";
 
 type Props = {
     disabled: boolean,
@@ -67,7 +67,7 @@ export default function DeleteInvoiceItemButton({ customerId, item, setSelectedK
                 variant="flat"
                 color="danger"
                 onPress={() => setModalOpen(true)}
-                icon={trashIcon}
+                startContent={<TrashIcon />}
             >Delete</GenericButton>
         </>
     );

@@ -1,6 +1,5 @@
 "use client";
 
-import trashIcon from "/public/icons/trash.svg";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import React, { useState } from "react";
 import axios from "axios";
@@ -10,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import ConfirmationModal from "../../../../../_components/ConfirmationModal";
 import { toast } from "react-hot-toast";
+import TrashIcon from "../../../../../_components/icons/TrashIcon";
 
 const DeleteUser = (username: string) => {
     const mutator = async (url: string) => await axios.delete(url);
@@ -34,7 +34,7 @@ export default function DeleteEmployeeButton({ username, allowed }: Props) {
         <>
             <GenericButton
                 color="danger"
-                icon={trashIcon}
+                startContent={<TrashIcon />}
                 onPress={() => setModalOpen(true)}
                 disabled={!allowed}
             >

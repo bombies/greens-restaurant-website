@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 
 type Props = {
     toolTip?: string,
-    icon: string | StaticImageData;
+    icon?: string | StaticImageData;
     width?: number
     withDropdown?: ReactElement<DropdownMenuProps> | ReactElement<DropdownInputProps>
     dropdownProps?: UseDropdownProps
@@ -24,6 +24,7 @@ export default function IconButton({
                                        withDropdown,
                                        dropdownProps,
                                        cooldown,
+                                       children,
                                        ...buttonProps
                                    }: Props) {
     const [lastClick, setLastClick] = useState<number>();
@@ -43,7 +44,7 @@ export default function IconButton({
             {...buttonProps}
             isIconOnly
             variant={buttonProps.variant || "light"}
-            color={color || "secondary"}
+            color={color || "primary"}
             onPress={(e: PressEvent) => {
                 if (!isOnCoolDown()) {
                     if (buttonProps.onPress)
@@ -58,9 +59,9 @@ export default function IconButton({
                 }
             }}
         >
-            <GenericImage className="self-center" src={icon} width={width || 1.35} />
+            {children ?? <GenericImage className="self-center" src={icon ?? ""} width={width || 1.35} />}
         </Button>
-    ), [buttonProps, color, cooldown, icon, isOnCoolDown, lastClick, width]);
+    ), [buttonProps, children, color, cooldown, icon, isOnCoolDown, lastClick, width]);
 
     return (
         withDropdown ?

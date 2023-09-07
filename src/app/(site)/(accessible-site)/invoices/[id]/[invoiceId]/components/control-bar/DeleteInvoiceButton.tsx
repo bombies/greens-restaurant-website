@@ -8,8 +8,8 @@ import ConfirmationModal from "../../../../../../../_components/ConfirmationModa
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { errorToast } from "../../../../../../../../utils/Hooks";
-import trashIcon from "/public/icons/red-trash.svg";
 import { toast } from "react-hot-toast";
+import TrashIcon from "../../../../../../../_components/icons/TrashIcon";
 
 type Props = {
     customerId?: string
@@ -52,7 +52,7 @@ export default function DeleteInvoiceButton({ customerId, invoice, disabled }: P
                 color="danger"
                 variant="flat"
                 onPress={() => setModalOpen(true)}
-                icon={trashIcon}
+                startContent={<TrashIcon />}
             >
                 Delete Invoice
             </GenericButton>

@@ -1,5 +1,5 @@
 import TableSkeleton from "../../../../../../_components/skeletons/TableSkeleton";
-import { columns } from "../../_components/table/StockTable";
+import { columns } from "../../_components/table/InventoryStockTable";
 
 export default function LoadingPage() {
     return (
