@@ -1,5 +1,5 @@
 import inventoryService, { Either } from "../../[name]/service";
-import { InventorySection, InventorySectionSnapshot, Prisma, Stock, StockSnapshot, StockType } from "@prisma/client";
+import { InventorySection, Prisma, Stock, StockSnapshot, StockType } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { respond, respondWithInit } from "../../../../../utils/api/ApiUtils";
 import prisma from "../../../../../libs/prisma";
@@ -434,14 +434,9 @@ class BarService {
             }
         });
 
-        const createdStockSnapshot = await this.createStockSnapshot(sectionId, {
-            name: validName,
-            type: "type" in dto ? dto.type : StockType.DEFAULT,
-            price: dto.price
-        });
-
-        if (createdStockSnapshot.error)
-            return new Either<Stock, NextResponse>(undefined, createdStockSnapshot.error);
+        const currentSnapshot = await this.fetchCurrentSectionSnapshot(sectionId);
+        if (currentSnapshot.error)
+            return new Either<Stock, NextResponse>(undefined, currentSnapshot.error);
         return new Either<Stock, NextResponse>(createdStock);
     }
 
@@ -450,62 +445,6 @@ class BarService {
         type: z.string().optional(),
         price: z.number()
     }).strict();
-
-    private async createStockSnapshot(sectionId: string, dto: CreateBarStockDto): Promise<Either<StockSnapshot, NextResponse>> {
-        const dtoValidated = this.createBarStockDtoSchema.safeParse(dto);
-        if (!dtoValidated.success)
-            return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
-                message: "Invalid body!",
-                validationErrors: dtoValidated,
-                status: 400
-            }));
-
-        const fetchedSnapshot = await this.fetchCurrentSectionSnapshot(sectionId);
-        if (fetchedSnapshot.error)
-            return new Either<StockSnapshot, NextResponse>(undefined, fetchedSnapshot.error);
-        const currentSectionSnapshot = fetchedSnapshot.success!;
-
-        const validatedItemName = inventoryService.generateValidStockName(dto.name);
-        if (validatedItemName.error)
-            return new Either<StockSnapshot, NextResponse>(undefined, validatedItemName.error);
-
-        const validName = validatedItemName.success!;
-        const originalStockItem = currentSectionSnapshot.inventorySection?.stock?.find(stock => stock.name === validName);
-        if (!originalStockItem)
-            return new Either<StockSnapshot, NextResponse>(
-                undefined,
-                respond({
-                    message: `Inventory sections with id "${sectionId}" doesn't have any stock items called "${validName}"`,
-                    init: {
-                        status: 400
-                    }
-                })
-            );
-
-        if (currentSectionSnapshot.stockSnapshots?.filter(stockSnapshot => stockSnapshot.stock?.name === validName).length)
-            return new Either<StockSnapshot, NextResponse>(
-                undefined,
-                respond({
-                    message: "There is already an item with this name in the snapshot!",
-                    init: {
-                        status: 400
-                    }
-                })
-            );
-
-        const stockSnapshot = await prisma.stockSnapshot.create({
-            data: {
-                uid: originalStockItem.uid,
-                name: originalStockItem.name,
-                type: originalStockItem.type,
-                price: originalStockItem.price,
-                quantity: 0,
-                inventorySectionSnapshotId: currentSectionSnapshot.id
-            }
-        });
-
-        return new Either<StockSnapshot, NextResponse>(stockSnapshot);
-    }
 
     async deleteSectionStock(sectionId: string, stockUID: string): Promise<Either<Stock, NextResponse>> {
         const fetchedItemMiddleman = await this.fetchSectionStock(sectionId, stockUID);
@@ -634,7 +573,7 @@ class BarService {
                 },
                 include: {
                     inventorySection: true,
-                    stockSnapshots: true,
+                    stockSnapshots: true
                 }
             }))
         );

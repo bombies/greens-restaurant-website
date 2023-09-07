@@ -11,14 +11,14 @@ import { toast } from "react-hot-toast";
 import "../../../../../../../utils/GeneralUtils";
 import useBarStockOptimisticUpdates from "./hooks/useBarStockOptimisticUpdates";
 import StockNumericField from "../../../../inventory/[name]/_components/table/generic/StockNumericField";
-import { InventorySectionSnapshotWithExtras } from "../../../../../../api/inventory/[name]/types";
 import StockTextField from "../../../../inventory/[name]/_components/table/generic/StockTextField";
+import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../../api/inventory/bar/[name]/types";
 
 type Props = {
     barName?: string,
     section?: InventorySection
-    currentSnapshot?: InventorySectionSnapshotWithExtras
-    mutateCurrentSnapshot?: KeyedMutator<InventorySectionSnapshotWithExtras | undefined>
+    currentSnapshot?: InventorySectionSnapshotWithOptionalExtras
+    mutateCurrentSnapshot?: KeyedMutator<InventorySectionSnapshotWithOptionalExtras | undefined>
     stockIsLoading: boolean,
     mutationAllowed: boolean,
 }

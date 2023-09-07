@@ -10,7 +10,7 @@ export type InventorySectionWithOptionalExtras = InventorySection & {
 
 export type InventorySectionSnapshotWithOptionalExtras = InventorySectionSnapshot & {
     inventorySection?: InventorySectionWithOptionalExtras,
-    stockSnapshots?: (StockSnapshot & { stock?: Stock })[]
+    stockSnapshots?: StockSnapshot[]
 }
 
 export type CreateInventorySectionDto = {

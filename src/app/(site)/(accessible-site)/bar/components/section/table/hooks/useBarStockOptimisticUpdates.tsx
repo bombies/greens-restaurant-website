@@ -7,13 +7,13 @@ import useBarStockDelete from "./useBarStockDelete";
 import useBarStockUpdate from "./useBarStockUpdate";
 import { InventorySection, StockSnapshot, StockType } from "@prisma/client";
 import { KeyedMutator } from "swr";
-import { InventorySectionSnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
+import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../../../api/inventory/bar/[name]/types";
 
 type Props = {
     barName?: string,
     section?: InventorySection,
-    currentSnapshot?: InventorySectionSnapshotWithExtras
-    mutateCurrentSnapshot?: KeyedMutator<InventorySectionSnapshotWithExtras | undefined>
+    currentSnapshot?: InventorySectionSnapshotWithOptionalExtras
+    mutateCurrentSnapshot?: KeyedMutator<InventorySectionSnapshotWithOptionalExtras | undefined>
 }
 
 const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutateCurrentSnapshot }: Props) => {
@@ -21,10 +21,13 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
     const { trigger: updateBarStock } = useBarStockUpdate(barName, section?.id);
 
     const addOptimisticStockItem = useCallback(async (item: StockSnapshot) => {
+        if (!currentSnapshot)
+            return;
+
         if (mutateCurrentSnapshot) {
             await mutateCurrentSnapshot({
                 ...currentSnapshot,
-                stockSnapshots: currentSnapshot?.stockSnapshots ? [...currentSnapshot.stockSnapshots, item] : [item]
+                stockSnapshots: currentSnapshot.stockSnapshots?.length ? [...currentSnapshot.stockSnapshots, item] : [item]
             });
         }
     }, [currentSnapshot, mutateCurrentSnapshot]);
@@ -33,7 +36,7 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
         if (!currentSnapshot)
             return;
 
-        const stockSnapshots = currentSnapshot.stockSnapshots.filter(item => !itemUIDs.includes(item.uid));
+        const stockSnapshots = currentSnapshot.stockSnapshots?.filter(item => !itemUIDs.includes(item.uid));
         if (mutateCurrentSnapshot) {
             await mutateCurrentSnapshot(
                 deleteBarStock({
@@ -52,7 +55,7 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
                 {
                     optimisticData: {
                         ...currentSnapshot,
-                        stockSnapshots
+                        stockSnapshots: stockSnapshots ?? []
                     },
                     revalidate: false
                 });
@@ -63,7 +66,7 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
         if (!currentSnapshot)
             return;
 
-        const snapshots = [...currentSnapshot.stockSnapshots];
+        const snapshots = currentSnapshot.stockSnapshots ? [...currentSnapshot.stockSnapshots] : [];
         const foundIndex = snapshots.findIndex(i => i.uid === item.uid);
         if (foundIndex === -1)
             return;
@@ -97,7 +100,7 @@ const useBarStockOptimisticUpdates = ({ barName, section, currentSnapshot, mutat
                 {
                     optimisticData: {
                         ...currentSnapshot,
-                        stockSnapshots: snapshots
+                        stockSnapshots: snapshots ?? []
                     },
                     revalidate: false
                 });

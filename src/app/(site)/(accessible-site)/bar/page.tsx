@@ -36,7 +36,7 @@ export default function BarPage() {
         if (!barInfo)
             return;
 
-        let sections = barInfo.inventorySections;
+        let sections = barInfo.inventorySections ?? [];
         sections.push(newSection);
 
         await mutateBarInfo({

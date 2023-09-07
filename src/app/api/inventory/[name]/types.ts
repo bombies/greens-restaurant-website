@@ -35,12 +35,10 @@ export type InventorySnapshotWithExtras = InventorySnapshot & {
 }
 
 export type InventorySectionSnapshotWithExtras = InventorySectionSnapshot & {
-    inventory: Inventory & {
+    inventorySection: InventorySection & {
         stock: Stock[]
     },
-    stockSnapshots: (StockSnapshot & {
-        stock: Stock
-    })[]
+    stockSnapshots: StockSnapshot[]
 }
 
 export type InventorySnapshotWithStockSnapshots = InventorySnapshot & {

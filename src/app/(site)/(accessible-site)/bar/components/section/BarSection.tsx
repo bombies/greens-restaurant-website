@@ -4,23 +4,23 @@ import { FC, useCallback } from "react";
 import { InventorySection, User } from "@prisma/client";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
-import Permission, { hasAnyPermission } from "../../../../../../libs/types/permission";
 import BarStockTable from "./table/BarStockTable";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
 import BarSectionControl from "./control/BarSectionControl";
-import { InventorySectionSnapshotWithExtras, InventoryWithSections } from "../../../../../api/inventory/[name]/types";
+import { InventoryWithOptionalExtras } from "../../../../../api/inventory/[name]/types";
+import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../api/inventory/bar/[name]/types";
 
 type Props = {
-    barInfo?: InventoryWithSections,
-    mutateBarInfo?: KeyedMutator<InventoryWithSections | undefined>
+    barInfo?: InventoryWithOptionalExtras,
+    mutateBarInfo?: KeyedMutator<InventoryWithOptionalExtras | undefined>
     section?: InventorySection,
     userData?: User,
     mutationAllowed: boolean,
 }
 
 const useCurrentBarSectionSnapshot = (name?: string, sectionId?: string) => {
-    return useSWR(`/api/inventory/bar/${name}/${sectionId}/currentsnapshot`, fetcher<InventorySectionSnapshotWithExtras>);
+    return useSWR(`/api/inventory/bar/${name}/${sectionId}/currentsnapshot`, fetcher<InventorySectionSnapshotWithOptionalExtras>);
 };
 
 export type PartialInventorySection = Partial<Omit<InventorySection, "id">>
@@ -36,9 +36,9 @@ const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData, muta
         if (!barInfo)
             return;
 
-        let sections = barInfo.inventorySections;
-        const sectionIndex = sections.findIndex(sec => sec.id === section?.id);
-        if (sectionIndex === -1)
+        let sections = barInfo.inventorySections ?? [];
+        const sectionIndex = sections?.findIndex(sec => sec.id === section?.id);
+        if (sectionIndex === undefined || sectionIndex === -1)
             return;
 
         const foundSection = sections[sectionIndex];
@@ -59,8 +59,8 @@ const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData, muta
         if (!barInfo)
             return;
 
-        let sections = barInfo.inventorySections;
-        const sectionIndex = sections.findIndex(sec => sec.id === section?.id);
+        let sections = barInfo.inventorySections ?? [];
+        const sectionIndex = sections?.findIndex(sec => sec.id === section?.id) ?? -1;
         if (sectionIndex === -1)
             return;
 

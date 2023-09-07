@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import useBarInfo from "../../../components/hooks/useBarInfo";
 import { Skeleton, Spacer } from "@nextui-org/react";
 import TableSkeleton from "../../../../../../_components/skeletons/TableSkeleton";
-import BarSection from "../../../components/section/BarSection";
 import { Divider } from "@nextui-org/divider";
 import BarStockTable from "../../../components/section/table/BarStockTable";
 import { InventorySectionSnapshotWithExtras } from "../../../../../../api/inventory/[name]/types";

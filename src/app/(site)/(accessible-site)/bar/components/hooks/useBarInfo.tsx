@@ -2,10 +2,10 @@
 
 import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
-import { InventoryWithSections } from "../../../../../api/inventory/[name]/types";
+import { InventoryWithOptionalExtras, InventoryWithSections } from "../../../../../api/inventory/[name]/types";
 
 const useBarInfo = () => {
-    return useSWR("/api/inventory/bar", fetcher<InventoryWithSections>);
+    return useSWR("/api/inventory/bar", fetcher<InventoryWithOptionalExtras>);
 };
 
 export default useBarInfo;

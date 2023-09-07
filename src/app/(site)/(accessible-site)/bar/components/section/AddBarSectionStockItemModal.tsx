@@ -14,11 +14,11 @@ import { SelectItem } from "@nextui-org/react";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import PlusIcon from "../../../../../_components/icons/PlusIcon";
 import { errorToast } from "../../../../../../utils/Hooks";
-import { InventorySectionSnapshotWithExtras } from "../../../../../api/inventory/[name]/types";
+import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../api/inventory/bar/[name]/types";
 
 type Props = {
     barName?: string,
-    sectionSnapshot?: InventorySectionSnapshotWithExtras
+    sectionSnapshot?: InventorySectionSnapshotWithOptionalExtras
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>,
     addOptimisticStockItem: (item: StockSnapshot) => Promise<void>
@@ -59,7 +59,7 @@ const AddBarSectionStockItemModal: FC<Props> = ({
         }).then(async (res) => {
             const createdItem: Stock = res.data;
             await addOptimisticStockItem({
-                id: "",
+                id: createdItem.id,
                 uid: createdItem.uid,
                 quantity: 0,
                 createdAt: new Date(),
