@@ -30,7 +30,7 @@ export default function BarPage() {
             />
             <Divider className="my-6" />
         </Fragment>
-    )), [barInfo, mutateBarInfo, mutationAllowed, userData]);
+    )) ?? [], [barInfo, mutateBarInfo, mutationAllowed, userData]);
 
     const addSection = useCallback(async (newSection: InventorySectionWithOptionalExtras) => {
         if (!barInfo)
