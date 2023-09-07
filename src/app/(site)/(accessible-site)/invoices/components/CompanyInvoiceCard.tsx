@@ -83,53 +83,52 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                 }}
                 onReject={() => setProposedCompanyInfo(data)}
             />
-            <div className="default-container p-12 phone:px-3 w-[50%] tablet:w-full h-fit">
+            <div className="default-container p-12 phone:px-3 w-[30%] tablet:w-full h-fit">
                 {
                     <>
                         <SubTitle>Company Information</SubTitle>
                         <Divider className="my-6" />
-                        <div className="flex gap-6 phone:flex-col-reverse">
-                            <div className="w-1/2 phone:w-full self-center">
-                                <EditableField
-                                    label="Company Name"
-                                    editAllowed={controlsEnabled}
-                                    field={proposedCompanyInfo?.companyName || data?.companyName}
-                                    fieldIsLoaded={!isLoading}
-                                    capitalizeField
-                                    validate={{
-                                        test(value) {
-                                            return COMPANY_NAME_REGEX.test(value);
-                                        },
-                                        message: "Invalid company name! It must contain only alphanumeric characters with the exception of the following characters: &, ', (, ), -"
-                                    }}
-                                    onValueChange={(value) => {
-                                        setProposedCompanyInfo(prev => ({
-                                            ...prev,
-                                            companyName: value
-                                        }));
-                                    }}
-                                />
-                            </div>
-                            {
-                                controlsEnabled ?
-                                    <Skeleton isLoaded={!companyAvatarIsLoading} className={clsx(
-                                        "rounded-full p-1",
-                                        !companyAvatarIsLoading && "!bg-transparent"
-                                    )}>
-                                        {avatarComponent}
-                                    </Skeleton>
-                                    :
-                                    <Skeleton isLoaded={!isLoading && !companyAvatarIsLoading} className={clsx(
-                                        "rounded-full p-1 flex items-center justify-center",
-                                        !isLoading && "!bg-transparent"
-                                    )}>
-                                        <Avatar
-                                            isBordered
-                                            className="self-center mx-auto w-32 h-32"
-                                            src={companyAvatar || (data?.companyLogo || undefined)}
-                                        />
-                                    </Skeleton>
-                            }
+                        {
+                            controlsEnabled ?
+                                <Skeleton isLoaded={!companyAvatarIsLoading} className={clsx(
+                                    "rounded-full p-1 w-40 h-40 mx-auto",
+                                    !companyAvatarIsLoading && "!bg-transparent"
+                                )}>
+                                    {avatarComponent}
+                                </Skeleton>
+                                :
+                                <Skeleton isLoaded={!isLoading && !companyAvatarIsLoading} className={clsx(
+                                    "rounded-full p-1 flex items-center justify-center w-40 h-40",
+                                    !isLoading && "!bg-transparent"
+                                )}>
+                                    <Avatar
+                                        isBordered
+                                        className="self-center mx-auto w-32 h-32"
+                                        src={companyAvatar || (data?.companyLogo || undefined)}
+                                    />
+                                </Skeleton>
+                        }
+                        <Spacer y={6} />
+                        <div className="w-full self-center">
+                            <EditableField
+                                label="Company Name"
+                                editAllowed={controlsEnabled}
+                                field={proposedCompanyInfo?.companyName || data?.companyName}
+                                fieldIsLoaded={!isLoading}
+                                capitalizeField
+                                validate={{
+                                    test(value) {
+                                        return COMPANY_NAME_REGEX.test(value);
+                                    },
+                                    message: "Invalid company name! It must contain only alphanumeric characters with the exception of the following characters: &, ', (, ), -"
+                                }}
+                                onValueChange={(value) => {
+                                    setProposedCompanyInfo(prev => ({
+                                        ...prev,
+                                        companyName: value
+                                    }));
+                                }}
+                            />
                         </div>
                         <Spacer y={6} />
                         <EditableField
