@@ -29,7 +29,8 @@ export default async function HomeLayout(props: Props) {
             style={{
                 backgroundImage: "url(\"/images/mesh-bg-2.png\")",
                 backgroundRepeat: "no-repeat",
-                backgroundAttachment: "fixed"
+                backgroundAttachment: "fixed",
+                backgroundSize: "cover"
             }}
         >
         <Providers session={session}>
