@@ -1,7 +1,7 @@
 import { authenticated, respondWithInit } from "../../../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../../../libs/types/permission";
 import { fetchInvoice } from "../route";
-import { Either } from "../../../../../../inventory/[name]/utils";
+import { Either } from "../../../../../../inventory/[name]/service";
 import { NextResponse } from "next/server";
 import { InvoiceItem } from "@prisma/client";
 import prisma from "../../../../../../../../libs/prisma";
@@ -53,14 +53,14 @@ export function PATCH(req: Request, { params }: Context) {
             return respondWithInit({
                 message: "Invalid payload!",
                 validationErrors: bodyValidated,
-                status: 401
+                status: 400
             });
 
 
         if (body.name && !INVOICE_ITEM_NAME_REGEX.test(body.name))
             return respondWithInit({
                 message: "That name is invalid! The item name must not contain \"/\".",
-                status: 401
+                status: 400
             });
 
         const updatedItem = await prisma.invoiceItem.update({

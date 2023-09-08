@@ -7,9 +7,5 @@ type Context = {
 }
 
 export default function SpecificInventoryPage({ params }: Context) {
-    return (
-        <>
-            <Inventory name={params.name} />
-        </>
-    );
+    return <Inventory name={params.name} />;
 }

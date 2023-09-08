@@ -6,28 +6,36 @@ import { Checkbox, CheckboxGroup, Spacer } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import GenericButton from "../../../../_components/inputs/GenericButton";
 import inviteIcon from "/public/icons/invite.svg";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Permission, Permissions } from "../../../../../libs/types/permission";
 import { InviteDto } from "../../../../api/users/invite/route";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { errorToast } from "../../../../../utils/Hooks";
-import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { KeyedMutator } from "swr";
+import { User } from "@prisma/client";
 
 
-const SendInvitationMail = (dto?: InviteDto) => {
-    const mutator = async (url: string) => await axios.post(url, dto);
+type SendInvitationMailArgs = {
+    arg: {
+        dto?: InviteDto
+    }
+}
+
+const SendInvitationMail = () => {
+    const mutator = async (url: string, {arg}: SendInvitationMailArgs) => await axios.post(url, arg.dto);
     return useSWRMutation("/api/users/invite", mutator);
 };
 
 type Props = {
     setModalVisible: Dispatch<SetStateAction<boolean>>
     userHasPermission: boolean,
+    employees: User[]
+    mutateEmployees: KeyedMutator<User[] | undefined>
 }
 
-export default function InviteEmployeeForm({ setModalVisible, userHasPermission }: Props) {
-    const router = useRouter();
+export default function InviteEmployeeForm({ setModalVisible, userHasPermission, employees, mutateEmployees }: Props) {
     const {
         register,
         handleSubmit,
@@ -36,24 +44,7 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
         }
     } = useForm<FieldValues>();
     const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>();
-    const [inviteInfo, setInviteInfo] = useState<InviteDto>();
-    const { isMutating: invitationIsSending, trigger: triggerInvitation } = SendInvitationMail(inviteInfo);
-
-    useEffect(() => {
-        if (!inviteInfo || !userHasPermission)
-            return;
-
-        triggerInvitation()
-            .then(() => {
-                toast.success("Invitation sent!");
-                router.refresh();
-                setModalVisible(false);
-            })
-            .catch((err) => {
-                console.error(err);
-                errorToast(err, "Could not send invitation!");
-            });
-    }, [inviteInfo, router, setModalVisible, triggerInvitation, userHasPermission]);
+    const { isMutating: invitationIsSending, trigger: triggerInvitation } = SendInvitationMail();
 
     const permissionCheckBoxes = Permissions
         .filter(permission => permission.value !== Permission.ADMINISTRATOR || (permission.value === Permission.ADMINISTRATOR && userHasPermission))
@@ -67,14 +58,26 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
         ));
 
     const submitHandler: SubmitHandler<FieldValues> = (data) => {
-        const inviteData: InviteDto = {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.newEmail,
-            username: data.newUsername,
-            permissions: selectedPermissions?.reduce((acc, next) => acc + next) ?? 0
-        };
-        setInviteInfo(inviteData);
+        triggerInvitation({
+            dto: {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.newEmail,
+                username: data.newUsername,
+                permissions: selectedPermissions?.reduce((acc, next) => acc + next) ?? 0
+            }
+        })
+            .then(async (res) => {
+                const user: User = res.data;
+                const newArr = [...employees, user];
+                await mutateEmployees(newArr);
+                toast.success("Invitation sent!");
+                setModalVisible(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                errorToast(err, "Could not send invitation!");
+            });
     };
 
     return (
@@ -124,7 +127,9 @@ export default function InviteEmployeeForm({ setModalVisible, userHasPermission 
                     setSelectedPermissions(value.map(permissionString => Number(permissionString)));
                 }}
             >
-                {permissionCheckBoxes}
+                <div className="grid grid-cols-2 phone:grid-cols-1">
+                    {permissionCheckBoxes}
+                </div>
             </CheckboxGroup>
             <Spacer y={6} />
             <Divider />

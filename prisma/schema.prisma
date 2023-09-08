@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -25,13 +22,73 @@ model User {
 
   createdInventoryIds String[]    @db.ObjectId
   createdInventories  Inventory[]
+
+  openStockRequests StockRequest[] @relation(name: "openStocks")
+
+  assignedStockRequestsIds String[]       @db.ObjectId
+  assignedStockRequests    StockRequest[] @relation(name: "assignedStocks", fields: [assignedStockRequestsIds], references: [id])
+}
+
+model StockRequest {
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  status        StockRequestStatus
+  reviewedNotes String?
+
+  assignedToUsersId String[] @db.ObjectId
+  assignedToUsers   User[]   @relation(name: "assignedStocks", fields: [assignedToUsersId], references: [id])
+
+  requestedByUserId String               @db.ObjectId
+  requestedByUser   User                 @relation(name: "openStocks", fields: [requestedByUserId], references: [id])
+  requestedItems    RequestedStockItem[] @relation()
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum StockRequestStatus {
+  DELIVERED
+  PARTIALLY_DELIVERED
+  REJECTED
+  PENDING
+}
+
+model RequestedStockItem {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  amountRequested Int
+  amountProvided  Int?
+
+  stockRequest   StockRequest? @relation(fields: [stockRequestId], references: [id], onDelete: Cascade)
+  stockRequestId String?       @db.ObjectId
+
+  stock   Stock  @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  stockId String @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum InventoryType {
+  BAR
+  DEFAULT
+}
+
+enum StockType {
+  FLASK_DRINK
+  QUART_BOTTLE
+  IMPERIAL_BOTTLE
+  SIX_CASE
+  TWELVE_CASE
+  TWENTY_FOUR_CASE
+  DEFAULT
 }
 
 model Inventory {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  uid       String   @unique
-  name      String   @unique
-  userId    String?  @db.ObjectId
+  id     String         @id @default(auto()) @map("_id") @db.ObjectId
+  uid    String         @unique
+  name   String         @unique
+  userId String?        @db.ObjectId
+  type   InventoryType?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -43,6 +100,8 @@ model Inventory {
 
   snapshotIds String[]            @db.ObjectId
   snapshots   InventorySnapshot[]
+
+  inventorySections InventorySection[]
 }
 
 model InventorySnapshot {
@@ -57,29 +116,67 @@ model InventorySnapshot {
   stockSnapshots StockSnapshot[]
 }
 
+model InventorySection {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  uid  String @unique
+  name String
+
+  inventoryId String    @db.ObjectId
+  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  snapshots InventorySectionSnapshot[]
+  stock     Stock[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InventorySectionSnapshot {
+  id  String @id @default(auto()) @map("_id") @db.ObjectId
+  uid String
+
+  inventorySectionId String           @db.ObjectId
+  inventorySection   InventorySection @relation(fields: [inventorySectionId], references: [id], onDelete: Cascade)
+  stockSnapshots     StockSnapshot[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Stock {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  uid       String   @unique
-  name      String
+  id    String     @id @default(auto()) @map("_id") @db.ObjectId
+  uid   String     @unique
+  name  String
+  price Float      @default(value: 0.0)
+  type  StockType?
+
+  requestedStockItems RequestedStockItem[] @relation()
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  inventoryId String    @db.ObjectId
+  inventory          Inventory?        @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  inventoryId        String?           @db.ObjectId
+  inventorySectionId String?           @db.ObjectId
+  inventorySection   InventorySection? @relation(fields: [inventorySectionId], references: [id], onDelete: Cascade)
 }
 
 model StockSnapshot {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  uid       String
-  name      String
-  quantity  Int
+  id       String     @id @default(auto()) @map("_id") @db.ObjectId
+  uid      String
+  quantity Int
+  name     String
+  price    Float      @default(value: 0.0)
+  type     StockType?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  inventorySnapshotId String            @db.ObjectId
-  inventorySnapshot   InventorySnapshot @relation(fields: [inventorySnapshotId], references: [id], onDelete: Cascade)
+  inventorySnapshotId String?            @db.ObjectId
+  inventorySnapshot   InventorySnapshot? @relation(fields: [inventorySnapshotId], references: [id], onDelete: Cascade)
 
-  inventoryId String @db.ObjectId
+  inventorySectionSnapshotId String?                   @db.ObjectId
+  inventorySectionSnapshot   InventorySectionSnapshot? @relation(fields: [inventorySectionSnapshotId], references: [id], onDelete: Cascade)
 }
 
 model InvoiceInformation {

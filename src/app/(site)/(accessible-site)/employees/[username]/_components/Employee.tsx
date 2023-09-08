@@ -43,7 +43,7 @@ export type UpdateUserArgs = {
 export const UpdateUser = (username?: string, nonAdmin?: boolean) => {
     const mutator = (url: string, { arg }: UpdateUserArgs) => {
         // @ts-ignore
-        const { id, createdAt, updatedAt, image, createdInventoryIds, assignedStockRequestsIds, ...validDto } = arg.dto;
+        const { id, createdAt, updatedAt, image, createdInventoryIds, assignedStockRequestsIds, password, ...validDto } = arg.dto;
         return axios.patch(url, validDto);
     };
     return useSWRMutation(nonAdmin ? `/api/users/me` : `/api/users/${username}`, mutator);
@@ -270,25 +270,33 @@ export default function Employee({ username }: Props) {
                                                     }));
                                                 }}
                                             >
-                                                <Checkbox
-                                                    value={Permission.ADMINISTRATOR.toString()}
-                                                    isDisabled={
-                                                        session.data?.user?.username === username
-                                                        || session.data?.user?.username !== "root"
-                                                    }
-                                                >
-                                                    Administrator
-                                                </Checkbox>
-                                                <Checkbox value={Permission.CREATE_INVENTORY.toString()}>Create
-                                                    Inventory</Checkbox>
-                                                <Checkbox value={Permission.VIEW_INVENTORY.toString()}>View
-                                                    Inventory</Checkbox>
-                                                <Checkbox value={Permission.MUTATE_STOCK.toString()}>Mutate
-                                                    Stock</Checkbox>
-                                                <Checkbox value={Permission.CREATE_INVOICE.toString()}>Create
-                                                    Invoice</Checkbox>
-                                                <Checkbox value={Permission.VIEW_INVOICES.toString()}>View
-                                                    Invoices</Checkbox>
+                                                <div className="grid grid-rows-5 phone:grid-flow-row phone:grid-cols-1 grid-flow-col gap-y-4">
+                                                    <Checkbox
+                                                        value={Permission.ADMINISTRATOR.toString()}
+                                                        isDisabled={
+                                                            session.data?.user?.username === username
+                                                            || session.data?.user?.username !== "root"
+                                                        }
+                                                    >
+                                                        Administrator
+                                                    </Checkbox>
+                                                    <Checkbox value={Permission.CREATE_INVENTORY.toString()}>Create
+                                                        Inventory</Checkbox>
+                                                    <Checkbox value={Permission.VIEW_INVENTORY.toString()}>View
+                                                        Inventory</Checkbox>
+                                                    <Checkbox value={Permission.MUTATE_STOCK.toString()}>Mutate
+                                                        Stock</Checkbox>
+                                                    <Checkbox value={Permission.CREATE_INVOICE.toString()}>Create
+                                                        Invoice</Checkbox>
+                                                    <Checkbox value={Permission.MANAGE_STOCK_REQUESTS.toString()}>Manage
+                                                        Stock Requests</Checkbox>
+                                                    <Checkbox value={Permission.VIEW_STOCK_REQUESTS.toString()}>View Stock
+                                                        Requests</Checkbox>
+                                                    <Checkbox value={Permission.CREATE_STOCK_REQUEST.toString()}>Create
+                                                        Stock Request</Checkbox>
+                                                    <Checkbox value={Permission.VIEW_INVOICES.toString()}>View
+                                                        Invoices</Checkbox>
+                                                </div>
                                             </CheckboxGroup>
                                         </div>
                                         <Spacer y={6} />

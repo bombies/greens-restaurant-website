@@ -4,24 +4,24 @@ import Title from "../../../_components/text/Title";
 import SubTitle from "../../../_components/text/SubTitle";
 import GenericButton from "../../../_components/inputs/GenericButton";
 import inviteIcon from "/public/icons/invite.svg";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import InviteEmployeeForm from "./_components/InviteEmployeeForm";
-import EmployeeGrid from "./_components/EmployeeGrid";
+import EmployeeGrid, { fetcher } from "./_components/EmployeeGrid";
 import { hasPermission, Permission } from "../../../../libs/types/permission";
-import { useRouter } from "next/navigation";
 import { useUserData } from "../../../../utils/Hooks";
 import GenericModal from "../../../_components/GenericModal";
+import useSWR from "swr";
+import { User } from "@prisma/client";
+
+const useEmployeeInfo = () => {
+    return useSWR("/api/users", fetcher<User[]>);
+};
 
 export default function EmployeesPage() {
-    const { data: user, isLoading: userIsLoading } = useUserData();
-    const router = useRouter();
+    const { data: user } = useUserData([Permission.ADMINISTRATOR]);
+    const employeeInfo = useEmployeeInfo();
     const [inviteModalVisible, setInviteModalVisible] = useState(false);
-    const userHasPermission = hasPermission(user?.permissions, Permission.ADMINISTRATOR)
-
-    useEffect(() => {
-        if (!userIsLoading && user && !hasPermission(user.permissions, Permission.ADMINISTRATOR))
-            return router.push("/home");
-    }, [router, user, userIsLoading]);
+    const userHasPermission = hasPermission(user?.permissions, Permission.ADMINISTRATOR);
 
     return (
         <div>
@@ -44,12 +44,14 @@ export default function EmployeesPage() {
                     <InviteEmployeeForm
                         setModalVisible={setInviteModalVisible}
                         userHasPermission={userHasPermission}
+                        employees={employeeInfo.data ?? []}
+                        mutateEmployees={employeeInfo.mutate}
                     />
                 </GenericModal>
             </div>
             <div className="p-12 default-container w-5/6">
                 <SubTitle>Employees</SubTitle>
-                <EmployeeGrid />
+                <EmployeeGrid employees={employeeInfo} />
             </div>
         </div>
     );

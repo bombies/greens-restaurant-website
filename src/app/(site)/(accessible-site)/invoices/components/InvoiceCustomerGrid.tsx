@@ -35,7 +35,7 @@ const InvoiceCustomerGrid: FC<InvoiceCustomerHook> = ({
     ));
 
     return (
-        <div className="default-container p-12 w-[50%] tablet:w-full">
+        <Fragment>
             <SubTitle>Select a customer</SubTitle>
             <Spacer y={6} />
             <div className="w-1/2 phone:w-full">
@@ -67,7 +67,7 @@ const InvoiceCustomerGrid: FC<InvoiceCustomerHook> = ({
                             <GenericCard>There are no customers...</GenericCard>)
                 }
             </div>
-        </div>
+        </Fragment>
     );
 };
 

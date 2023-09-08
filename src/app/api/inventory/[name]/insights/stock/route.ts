@@ -1,7 +1,6 @@
 import { authenticatedAny } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
-import prisma from "../../../../../../libs/prisma";
-import { fetchInventory } from "../../utils";
+import inventoryService from "../../service";
 import { NextResponse } from "next/server";
 
 type RouteContext = {
@@ -15,42 +14,14 @@ export type StockTimeSeries = {
     data: TimeSeriesData[]
 }
 
-type TimeSeriesData = {
+export type TimeSeriesData = {
     date: Date,
     value: number,
 }
 
 export async function GET(req: Request, { params }: RouteContext) {
     return authenticatedAny(req, async () => {
-        const inventory = await fetchInventory(params.name);
-        if (inventory.error)
-            return inventory.error;
-
-        const stock = await prisma.stock.findMany({
-            where: {
-                inventoryId: inventory.success!.id
-            }
-        });
-
-        const stockSnapshots = await prisma.stockSnapshot.findMany({
-            where: {
-                inventoryId: inventory.success!.id
-            }
-        });
-
-        const data: StockTimeSeries[] = stock.map(item => {
-            const itemSnapshots = stockSnapshots.filter(snapshotItem => snapshotItem.uid === item.uid);
-            const timeData: TimeSeriesData[] = itemSnapshots.map(snapshot => ({
-                date: new Date(snapshot.createdAt.setHours(0,0,0,0)),
-                value: snapshot.quantity
-            }));
-
-            return ({
-                name: item.name,
-                data: timeData
-            });
-        });
-
-        return NextResponse.json(data);
+        const data = await inventoryService.fetchInsightsData(params.name);
+        return data.error ?? NextResponse.json(data.success!);
     }, [Permission.VIEW_INVENTORY, Permission.MUTATE_STOCK, Permission.CREATE_INVENTORY]);
 }

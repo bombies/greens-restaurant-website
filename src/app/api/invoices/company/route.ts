@@ -36,7 +36,7 @@ export function PATCH(req: Request) {
         if (!bodyValidated.success)
             return respondWithInit({
                 message: "Invalid payload!",
-                status: 401,
+                status: 400,
                 validationErrors: bodyValidated
             });
 
@@ -47,7 +47,7 @@ export function PATCH(req: Request) {
                     message: "Invalid company name! " +
                         "The company name must not be more than 30 characters. " +
                         "It should also not include any special characters. ",
-                    status: 401
+                    status: 400
                 });
 
             newName = body.companyName

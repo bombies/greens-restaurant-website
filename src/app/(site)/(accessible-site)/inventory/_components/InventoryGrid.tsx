@@ -11,12 +11,12 @@ import ContainerSkeleton from "../../../../_components/skeletons/ContainerSkelet
 import CardSkeleton from "../../../../_components/skeletons/CardSkeleton";
 import GenericCard from "../../../../_components/GenericCard";
 
-const useInventoryData = () => {
+export const FetchAllInventories = () => {
     return useSWR("/api/inventory", fetcher<Inventory[]>);
 };
 
 export default function InventoryGrid() {
-    const { data, isLoading } = useInventoryData();
+    const { data, isLoading } = FetchAllInventories();
     const [visibleInventories, setVisibleInventories] = useState<Inventory[]>([]);
 
     useEffect(() => {

@@ -12,7 +12,7 @@ const SearchIcon = ({ className, fill, width, height }: IconProps) => (
         viewBox="0 0 24 24"
     >
         <path
-            stroke={clsx(fill ?? "#000")}
+            stroke={clsx(fill ?? "currentColor")}
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}

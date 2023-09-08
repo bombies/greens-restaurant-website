@@ -1,6 +1,7 @@
+"use client"
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import UsersIcon from "../../../../../_components/icons/UsersIcon";
 import QuickAction from "./QuickAction";
 import GearsIcon from "../../../../../_components/icons/GearsIcon";
 import Link from "next/link";

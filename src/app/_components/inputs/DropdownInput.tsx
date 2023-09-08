@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Selection } from "@nextui-org/react";
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
 import clsx from "clsx";
@@ -18,7 +18,7 @@ export type DropdownInputProps = {
     keys: string[],
     selectedKeys: string[],
     setSelectedKeys: (keys: Selection) => any
-    icon?: string | StaticImageData
+    icon?: ReactNode
     disabled?: boolean,
     selectedValueLabel?: boolean
     labelIsIcon?: boolean,
@@ -80,7 +80,7 @@ export default function DropdownInput({
                         isLoading={isLoading}
                         color={color || "primary"}
                         className={clsx("capitalize", buttonClassName)}
-                        endContent={icon && <GenericImage src={icon} width={1.5} />}
+                        endContent={icon}
                     >
                         {(selectedValueLabel && selectedValue) || fallbackTriggerLabel}
                     </Button>

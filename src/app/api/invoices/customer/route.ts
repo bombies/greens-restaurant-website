@@ -33,7 +33,7 @@ export function POST(req: Request) {
         if (!CUSTOMER_NAME_REGEX.test(body.customerName))
             return respondWithInit({
                 message: "That is an invalid customer name!",
-                status: 401
+                status: 400
             });
 
         const validName = body.customerName
@@ -50,14 +50,14 @@ export function POST(req: Request) {
         if (existingCustomer)
             return respondWithInit({
                 message: `There is already a customer with the name "${body.customerName.capitalize()}"`,
-                status: 401
+                status: 400
             });
 
         if (body.customerEmail) {
             if (!EMAIL_REGEX.test(body.customerEmail))
                 return respondWithInit({
                     message: "That is an invalid email!",
-                    status: 401
+                    status: 400
                 });
 
             const existingEmail = await prisma.invoiceCustomer.findUnique({
@@ -69,7 +69,7 @@ export function POST(req: Request) {
             if (existingEmail)
                 return respondWithInit({
                     message: "There is already a customer with that email address!",
-                    status: 401
+                    status: 400
                 });
         }
 

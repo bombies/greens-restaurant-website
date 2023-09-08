@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import GenericInput from "../../../../_components/inputs/GenericInput";
 import searchIcon from "/public/icons/search.svg";
 import { Spacer } from "@nextui-org/react";
-import useSWR from "swr";
+import { SWRResponse } from "swr";
 import { User } from "@prisma/client";
 import axios from "axios";
 import EmployeeCard from "./EmployeeCard";
@@ -24,10 +24,6 @@ export interface SWRArgs {
     arg: any;
 }
 
-const useEmployeeInfo = () => {
-    return useSWR("/api/users", fetcher<User[]>);
-};
-
 const extractValidEmployees = (users: User[], selfUsername?: string) => {
     return selfUsername === "root" ?
         users
@@ -35,10 +31,14 @@ const extractValidEmployees = (users: User[], selfUsername?: string) => {
         users.filter(info => info.username !== "root");
 };
 
-export default function EmployeeGrid() {
+type Props = {
+    employees: SWRResponse<User[] | undefined, any>
+}
+
+export default function EmployeeGrid({ employees }: Props) {
+    const { data: employeeInfo, isLoading: employeesLoading } = employees;
     const session = useSession();
     const [search, setSearch] = useState("");
-    const { data: employeeInfo, error: employeeError, isLoading: employeesLoading } = useEmployeeInfo();
     const [visibleEmployees, setVisibleEmployees] = useState<User[]>([]);
 
     useEffect(() => {
