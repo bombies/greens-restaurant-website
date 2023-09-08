@@ -125,6 +125,26 @@ export const Permissions: PermissionObject[] = [
         value: Permission.MUTATE_STOCK
     },
     {
+        label: "View Bar Inventory",
+        value: Permission.VIEW_BAR_INVENTORY
+    },
+    {
+        label: "Mutate Bar Stock",
+        value: Permission.MUTATE_BAR_INVENTORY
+    },
+    {
+        label: "Create Stock Request",
+        value: Permission.CREATE_STOCK_REQUEST
+    },
+    {
+        label: "View Stock Requests",
+        value: Permission.VIEW_STOCK_REQUESTS
+    },
+    {
+        label: "Manage Stock Requests",
+        value: Permission.MANAGE_STOCK_REQUESTS
+    },
+    {
         label: "Create Invoice",
         value: Permission.CREATE_INVOICE
     },
