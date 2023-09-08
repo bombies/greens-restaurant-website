@@ -322,16 +322,9 @@ class InventoryService {
                 })
             );
 
-        if (snapshot.stockSnapshots?.filter(stockSnapshot => stockSnapshot.stock?.name === validName).length)
-            return new Either<StockSnapshot, NextResponse>(
-                undefined,
-                respond({
-                    message: "There is already an item with this name in the snapshot!",
-                    init: {
-                        status: 400
-                    }
-                })
-            );
+        const existingSnapshot = snapshot.stockSnapshots?.find(stockSnapshot => stockSnapshot.stock?.name === validName);
+        if (existingSnapshot)
+            return new Either<StockSnapshot, NextResponse>(existingSnapshot);
 
         const stockSnapshot = await prisma.stockSnapshot.create({
             data: {

@@ -434,10 +434,63 @@ class BarService {
             }
         });
 
-        const currentSnapshot = await this.fetchCurrentSectionSnapshot(sectionId);
-        if (currentSnapshot.error)
-            return new Either<Stock, NextResponse>(undefined, currentSnapshot.error);
+        const createdSnapshot = await this.createStockSnapshot(sectionId, {
+            name: validName,
+            type: "type" in dto ? dto.type : StockType.DEFAULT,
+            price: dto.price
+        });
+        if (createdSnapshot.error)
+            return new Either<Stock, NextResponse>(undefined, createdSnapshot.error);
         return new Either<Stock, NextResponse>(createdStock);
+    }
+
+    private async createStockSnapshot(sectionId: string, dto: CreateBarStockDto): Promise<Either<StockSnapshot, NextResponse>> {
+        const dtoValidated = this.createBarStockDtoSchema.safeParse(dto);
+        if (!dtoValidated.success)
+            return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
+                message: "Invalid body!",
+                validationErrors: dtoValidated,
+                status: 400
+            }));
+
+        const fetchedSnapshot = await this.fetchCurrentSectionSnapshot(sectionId);
+        if (fetchedSnapshot.error)
+            return new Either<StockSnapshot, NextResponse>(undefined, fetchedSnapshot.error);
+        const currentSectionSnapshot = fetchedSnapshot.success!;
+
+        const validatedItemName = inventoryService.generateValidStockName(dto.name);
+        if (validatedItemName.error)
+            return new Either<StockSnapshot, NextResponse>(undefined, validatedItemName.error);
+
+        const validName = validatedItemName.success!;
+        const originalStockItem = currentSectionSnapshot.inventorySection?.stock?.find(stock => stock.name === validName);
+        if (!originalStockItem)
+            return new Either<StockSnapshot, NextResponse>(
+                undefined,
+                respond({
+                    message: `Inventory sections with id "${sectionId}" doesn't have any stock items called "${validName}"`,
+                    init: {
+                        status: 400
+                    }
+                })
+            );
+
+        const existingSnapshot = currentSectionSnapshot.stockSnapshots?.find(stockSnapshot => stockSnapshot.name === validName);
+        if (existingSnapshot)
+            return new Either<StockSnapshot, NextResponse>(existingSnapshot);
+
+        const stockSnapshot = await prisma.stockSnapshot.create({
+            data: {
+                uid: originalStockItem.uid,
+                name: originalStockItem.name,
+                type: originalStockItem.type,
+                price: originalStockItem.price,
+                quantity: 0,
+                inventorySectionSnapshotId: currentSectionSnapshot.id
+            }
+        });
+
+        return new Either<StockSnapshot, NextResponse>(stockSnapshot);
     }
 
     private createBarStockDtoSchema = z.object({
