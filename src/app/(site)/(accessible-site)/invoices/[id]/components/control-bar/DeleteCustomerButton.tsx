@@ -59,12 +59,13 @@ export default function DeleteCustomerButton({ customer, disabled, iconOnly, onS
             {
                 iconOnly ?
                     <IconButton
-                        startContent={<TrashIcon />}
                         toolTip="Delete"
                         variant="flat"
                         color="danger"
                         onPress={() => setModalOpen(true)}
-                    />
+                    >
+                        <TrashIcon />
+                    </IconButton>
                     :
                     <GenericButton
                         disabled={disabled}
