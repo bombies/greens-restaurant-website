@@ -178,6 +178,7 @@ const InventoryRequestedItemsContainer: FC<Props> = ({
     return (
         <Fragment>
             <InventoryRequestedItemsTable
+                editAllowed={true}
                 items={optimisticRequestedItems}
                 onSelfAction={{
                     onAmountChange: {
