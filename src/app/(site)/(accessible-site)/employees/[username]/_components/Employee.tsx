@@ -43,7 +43,7 @@ export type UpdateUserArgs = {
 export const UpdateUser = (username?: string, nonAdmin?: boolean) => {
     const mutator = (url: string, { arg }: UpdateUserArgs) => {
         // @ts-ignore
-        const { id, createdAt, updatedAt, image, createdInventoryIds, assignedStockRequestsIds, ...validDto } = arg.dto;
+        const { id, createdAt, updatedAt, image, createdInventoryIds, assignedStockRequestsIds, password, ...validDto } = arg.dto;
         return axios.patch(url, validDto);
     };
     return useSWRMutation(nonAdmin ? `/api/users/me` : `/api/users/${username}`, mutator);

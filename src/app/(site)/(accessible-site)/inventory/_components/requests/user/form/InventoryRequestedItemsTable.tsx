@@ -28,7 +28,8 @@ interface Props {
     onAdminAction?: OnAdminAction,
     onSelfAction?: OnSelfAction,
     inventorySnapshots?: InventorySnapshotWithOptionalExtras[],
-    requestStatus?: StockRequestStatus
+    requestStatus?: StockRequestStatus,
+    editAllowed: boolean
 }
 
 type OnAdminAction = {
@@ -195,7 +196,8 @@ const InventoryRequestedItemsTable: FC<Props> = ({
                                                      onSelfAction,
                                                      showItemStatus,
                                                      inventorySnapshots,
-                                                     requestStatus
+                                                     requestStatus,
+                                                     editAllowed
                                                  }) => {
     const columns: Column[] = useMemo(() => {
         const ret = [
@@ -207,7 +209,7 @@ const InventoryRequestedItemsTable: FC<Props> = ({
             ret.push({ key: "amount_available", value: "Amount Available" });
         if (showItemStatus)
             ret.push({ key: "status", value: "Status" });
-        if ((adminActions && onAdminAction) || onSelfAction)
+        if ((adminActions && onAdminAction) || (onSelfAction && editAllowed))
             ret.push({ key: "actions", value: "Actions" });
 
         return ret;

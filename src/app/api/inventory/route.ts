@@ -5,8 +5,8 @@ import { NextResponse } from "next/server";
 import { INVENTORY_NAME_REGEX } from "../../../utils/regex";
 import { v4 } from "uuid";
 import { InventoryType, Prisma } from ".prisma/client";
-import InventoryWhereInput = Prisma.InventoryWhereInput;
 import { StockType } from "@prisma/client";
+import InventoryWhereInput = Prisma.InventoryWhereInput;
 
 export function GET(req: Request) {
     return authenticatedAny(req, async () => {
@@ -32,6 +32,9 @@ export function GET(req: Request) {
         return NextResponse.json(inventories.filter(inv => inv.type === null || inv.type === StockType.DEFAULT));
     }, [
         Permission.CREATE_INVENTORY,
+        Permission.CREATE_STOCK_REQUEST,
+        Permission.MANAGE_STOCK_REQUESTS,
+        Permission.VIEW_STOCK_REQUESTS,
         Permission.VIEW_INVENTORY,
         Permission.MUTATE_STOCK
     ]);
