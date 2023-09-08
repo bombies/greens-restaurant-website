@@ -322,7 +322,7 @@ class InventoryService {
                 })
             );
 
-        const existingSnapshot = snapshot.stockSnapshots?.find(stockSnapshot => stockSnapshot.stock?.name === validName);
+        const existingSnapshot = snapshot.stockSnapshots?.find(stockSnapshot => stockSnapshot.uid === originalStockItem.uid);
         if (existingSnapshot)
             return new Either<StockSnapshot, NextResponse>(existingSnapshot);
 

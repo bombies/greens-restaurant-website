@@ -475,7 +475,7 @@ class BarService {
                 })
             );
 
-        const existingSnapshot = currentSectionSnapshot.stockSnapshots?.find(stockSnapshot => stockSnapshot.name === validName);
+        const existingSnapshot = currentSectionSnapshot.stockSnapshots?.find(stockSnapshot => stockSnapshot.uid === originalStockItem.uid);
         if (existingSnapshot)
             return new Either<StockSnapshot, NextResponse>(existingSnapshot);
 
