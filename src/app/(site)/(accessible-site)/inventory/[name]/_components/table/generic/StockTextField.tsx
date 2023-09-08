@@ -6,7 +6,7 @@ import GenericModal from "../../../../../../../_components/GenericModal";
 import { StockSnapshot } from "@prisma/client";
 import StockTextForm from "./forms/StockTextForm";
 import "../../../../../../../../utils/GeneralUtils";
-import { INVENTORY_NAME_REGEX } from "../../../../../../../../utils/regex";
+import { INVENTORY_ITEM_NAME_REGEX } from "../../../../../../../../utils/regex";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 
 type Props = {
@@ -43,7 +43,7 @@ export default function StockTextField({ stockSnapshot, field, onSet, disabled }
                         test(text) {
                             switch (field) {
                                 case "name": {
-                                    return INVENTORY_NAME_REGEX.test(text);
+                                    return INVENTORY_ITEM_NAME_REGEX.test(text);
                                 }
                                 default: {
                                     return true;
@@ -52,8 +52,7 @@ export default function StockTextField({ stockSnapshot, field, onSet, disabled }
                         },
                         failMessage: field === "name" ? "Invalid item name! " +
                             "The item name must not be more than 30 characters. " +
-                            "It should also not include any special characters. " +
-                            "The item name must also start with a letter." : undefined
+                            "The only special characters allowed are \"'\", \".\" and \"-\"." : undefined
                     }}
                 />
             </GenericModal>

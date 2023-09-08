@@ -13,7 +13,7 @@ import {
     InventorySectionWithOptionalExtras, UpdateInventorySectionDto, updateInventorySectionDtoSchema
 } from "./types";
 import PrismaClientKnownRequestError = Prisma.PrismaClientKnownRequestError;
-import { INVENTORY_NAME_REGEX } from "../../../../../utils/regex";
+import { INVENTORY_ITEM_NAME_REGEX } from "../../../../../utils/regex";
 import { z } from "zod";
 import { CreateBarStockDto } from "./[sectionId]/stock/route";
 import { UpdateBarSectionStockDto } from "./[sectionId]/stock/[stockUID]/route";
@@ -399,12 +399,11 @@ class BarService {
             return new Either<Stock, NextResponse>(undefined, fetchedSection.error);
         const inventorySection = fetchedSection.success!;
 
-        if (!INVENTORY_NAME_REGEX.test(dto.name))
+        if (!INVENTORY_ITEM_NAME_REGEX.test(dto.name))
             return new Either<Stock, NextResponse>(undefined, respond({
                 message: "Invalid item name! " +
                     "The item name must not be more than 30 characters. " +
-                    "It should also not include any special characters. " +
-                    "The item name must also start with a letter.",
+                    "The only special characters allowed are \"'\", \".\" and \"-\".",
                 init: {
                     status: 400
                 }
