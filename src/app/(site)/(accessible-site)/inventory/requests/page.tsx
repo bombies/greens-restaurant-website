@@ -4,14 +4,9 @@ import { useUserData } from "../../../../../utils/Hooks";
 import Permission, { hasAnyPermission } from "../../../../../libs/types/permission";
 import Title from "../../../../_components/text/Title";
 import SubTitle from "../../../../_components/text/SubTitle";
-import { Spacer, Tab } from "@nextui-org/react";
+import { Spacer } from "@nextui-org/react";
 import { Fragment } from "react";
-import InventoryIcon from "../../../../_components/icons/InventoryIcon";
-import InventoryGrid from "../_components/InventoryGrid";
-import RequestIcon from "../../../../_components/icons/RequestIcon";
 import InventoryRequestsContainer from "../_components/requests/InventoryRequestsContainer";
-import GenericTabs from "../../../../_components/GenericTabs";
-import useSelectedInventoryTab from "../_components/hooks/useSelectedInventoryTab";
 import { GoBackButton } from "../../invoices/[id]/components/control-bar/InvoiceCustomerControlBar";
 
 export default function InventoryRequestsPage() {
@@ -27,7 +22,15 @@ export default function InventoryRequestsPage() {
             <Title>Inventory Requests</Title>
             <SubTitle>Create and manage inventory requests</SubTitle>
             <Spacer y={12} />
-            <GoBackButton label="View All Inventories" href="/inventory" />
+            {
+                hasAnyPermission(userData?.permissions, [
+                    Permission.CREATE_INVENTORY,
+                    Permission.VIEW_INVENTORY,
+                    Permission.MUTATE_STOCK
+                ])
+                &&
+                <GoBackButton label="View All Inventories" href="/inventory" />
+            }
             <Spacer y={6} />
             {
                 !userDataIsLoading &&
