@@ -98,7 +98,7 @@ export default function InventoryStockTable({
                                     onSet={async (quantity) => {
                                         await updateOptimisticStockSnapshot({ uid: item.uid, price: quantity });
                                     }}
-                                    isCurrency
+                                    currency="cost"
                                 />
                             );
                         }

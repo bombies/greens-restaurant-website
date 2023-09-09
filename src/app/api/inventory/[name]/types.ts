@@ -43,6 +43,11 @@ export type InventorySnapshotWithStockSnapshots = InventorySnapshot & {
     stockSnapshots: StockSnapshot[]
 }
 
+export type StockWithOptionalExtras = Stock & {
+    inventory?: Inventory,
+    inventorySection?: InventorySection
+}
+
 export const updateStockItemDtoSchema = z.object({
     name: z.string(),
     quantity: z.number(),
@@ -53,5 +58,6 @@ export const updateCurrentStockSnapshotSchema = z.object({
     name: z.string(),
     quantity: z.number().int().gte(0),
     price: z.number().gte(0),
+    sellingPrice: z.number().gte(0),
     type: z.string()
 }).partial().strict();

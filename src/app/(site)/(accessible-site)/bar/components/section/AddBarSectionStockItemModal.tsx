@@ -1,32 +1,33 @@
 "use client";
 
-import { Dispatch, FC, SetStateAction, useCallback, useMemo, useState } from "react";
+import { Dispatch, FC, SetStateAction, useCallback, useMemo } from "react";
 import GenericModal from "../../../../../_components/GenericModal";
-import { Stock, StockSnapshot, StockType } from "@prisma/client";
+import { Stock, StockSnapshot } from "@prisma/client";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
-import { CreateBarStockDto } from "../../../../../api/inventory/bar/[name]/[sectionId]/stock/route";
+import { AddBarStockDto } from "../../../../../api/inventory/bar/[name]/[sectionId]/stock/route";
 import useSWRMutation from "swr/mutation";
-import GenericInput from "../../../../../_components/inputs/GenericInput";
 import GenericSelectMenu from "../../../../../_components/GenericSelectMenu";
-import { Chip } from "@nextui-org/chip";
-import { SelectItem } from "@nextui-org/react";
+import { SelectItem, SelectSection } from "@nextui-org/react";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
 import PlusIcon from "../../../../../_components/icons/PlusIcon";
 import { errorToast } from "../../../../../../utils/Hooks";
 import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../api/inventory/bar/[name]/types";
+import { StockWithOptionalExtras } from "../../../../../api/inventory/[name]/types";
+import "../../../../../../utils/GeneralUtils";
 
 type Props = {
     barName?: string,
     sectionSnapshot?: InventorySectionSnapshotWithOptionalExtras
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>,
-    addOptimisticStockItem: (item: StockSnapshot) => Promise<void>
+    addOptimisticStockItem: (item: StockSnapshot) => Promise<void>,
+    items: StockWithOptionalExtras[]
 }
 
 type CreateStockItemArgs = {
     arg: {
-        dto: CreateBarStockDto
+        dto: AddBarStockDto
     }
 }
 
@@ -40,28 +41,49 @@ const AddBarSectionStockItemModal: FC<Props> = ({
                                                     sectionSnapshot,
                                                     isOpen,
                                                     setOpen,
-                                                    addOptimisticStockItem
+                                                    addOptimisticStockItem,
+                                                    items
                                                 }) => {
+    const sectionedItems = useMemo(() => {
+        const sectionIds = Array.from(new Set(items.map(item => {
+            if (item.inventoryId)
+                return item.inventoryId;
+            else return item.inventorySectionId!;
+        })));
+
+        return sectionIds.map(id => {
+            const correspondingItem = items.find(item => item.inventoryId === id || item.inventorySectionId === id)!;
+            const correspondingInventory = correspondingItem.inventory ?? correspondingItem.inventorySection!;
+
+            const allStock = items.filter(item => item.inventorySectionId === id || item.inventoryId === id);
+            return ({
+                id,
+                name: correspondingInventory.name,
+                items: allStock.sort((a, b) => a.name.localeCompare(b.name))
+            });
+        });
+    }, [items]);
+
     const {
         trigger: createStockItem,
         isMutating: isCreating
     } = CreateStockItem(barName, sectionSnapshot?.inventorySectionId);
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
-    const [selectedStockType, setSelectedStockType] = useState<StockType>(StockType.DEFAULT);
 
     const onSubmit: SubmitHandler<FieldValues> = useCallback((data) => {
         if (!sectionSnapshot)
             return;
 
-        const { itemName, itemType, itemPrice } = data;
+        const { stockId } = data;
         createStockItem({
-            dto: { name: itemName, type: itemType.toUpperCase(), price: Number(itemPrice) }
+            dto: { stockId: stockId }
         }).then(async (res) => {
             const createdItem: Stock = res.data;
             await addOptimisticStockItem({
                 id: createdItem.id,
                 uid: createdItem.uid,
                 quantity: 0,
+                sellingPrice: 0,
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 name: createdItem.name,
@@ -79,11 +101,6 @@ const AddBarSectionStockItemModal: FC<Props> = ({
             });
     }, [addOptimisticStockItem, createStockItem, reset, sectionSnapshot, setOpen]);
 
-    const selectItems = useMemo(() => Object.keys(StockType).map(type => ({
-        key: type,
-        label: type.replaceAll("_", " ")
-    })), []);
-
     return (
         <GenericModal
             title={`Add New Item To ${barName}`}
@@ -92,57 +109,27 @@ const AddBarSectionStockItemModal: FC<Props> = ({
         >
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="space-y-4">
-                    <GenericInput
-                        register={register}
-                        id="itemName"
-                        label="Item Name"
-                        isRequired
-                        isDisabled={isCreating}
-                    />
-                    <GenericInput
-                        register={register}
-                        errors={errors}
-                        id="itemPrice"
-                        label="Item Cost"
-                        startContent="JMD"
-                        isRequired
-                        isDisabled={isCreating}
-                        type="number"
-                        step="0.01"
-                    />
                     <GenericSelectMenu
                         isDisabled={isCreating}
                         selectionMode="single"
                         isRequired
-                        label="Item Type"
-                        id="itemType"
-                        placeholder="Select a type..."
-                        items={selectItems}
+                        label="Item"
+                        id="stockId"
+                        placeholder="Select an item..."
+                        items={sectionedItems}
                         register={register}
-                        selectedKeys={[selectedStockType.toLowerCase()]}
-                        onSelectionChange={selection => setSelectedStockType((Array.from(selection) as StockType[])[0].toUpperCase() as StockType)}
                         variant="flat"
-                        renderValue={(items) => {
-                            return (
-                                <div className="flex flex-wrap gap-2">
-                                    {items.map((item) => (
-                                        <Chip
-                                            color="primary"
-                                            variant="flat"
-                                            className="capitalize"
-                                            key={item.key}
-                                        >
-                                            {item.data?.label.replaceAll("_", " ")}
-                                        </Chip>
-                                    ))}
-                                </div>
-                            );
-                        }}
                     >
-                        {(type) => (
-                            <SelectItem key={type.key.toLowerCase()}>
-                                {type.label.replaceAll("_", " ")}
-                            </SelectItem>
+                        {(item) => (
+                            <SelectSection
+                                key={item.id}
+                                title={item.name.capitalize().replaceAll("-", " ")}
+                            >
+                                {item.items.map(selectItem => (
+                                    <SelectItem
+                                        key={selectItem.id}>{selectItem.name.capitalize().replaceAll("-", " ")}</SelectItem>
+                                ))}
+                            </SelectSection>
                         )}
                     </GenericSelectMenu>
                     <GenericButton

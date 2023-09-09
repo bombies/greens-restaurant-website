@@ -23,6 +23,7 @@ export type UpdateStockDto = Partial<{
     price: number,
     quantity: number,
     type: StockType,
+    sellingPrice: number,
 }>
 
 export function PATCH(req: Request, { params }: RouteContext) {

@@ -15,11 +15,10 @@ import { CreateStockDto } from "./stock/route";
 import { v4 } from "uuid";
 import { UpdateStockDto } from "./stock/[id]/route";
 import { UpdateStockQuantityDto } from "./stock/[id]/quantity/route";
-import { CreateBarStockDto } from "../bar/[name]/[sectionId]/stock/route";
 import {
     InventorySnapshotWithOptionalExtras,
     InventorySnapshotWithStockSnapshots,
-    InventoryWithOptionalExtras, updateCurrentStockSnapshotSchema,
+    InventoryWithOptionalExtras, StockWithOptionalExtras, updateCurrentStockSnapshotSchema,
     updateStockItemDtoSchema
 } from "./types";
 import { StockTimeSeries, TimeSeriesData } from "./insights/stock/route";
@@ -34,7 +33,10 @@ class InventoryService {
 
     async fetchInventory(name: string, options?: {
         bar?: boolean,
-        stock?: boolean,
+        stock?: boolean | {
+            inventory?: boolean,
+            inventorySection?: boolean,
+        },
         snapshots?: boolean,
         inventorySections?: boolean | {
             stock: boolean
@@ -46,7 +48,13 @@ class InventoryService {
                 name: name.toLowerCase()
             },
             include: {
-                stock: options?.stock ?? false,
+                stock: options?.stock !== undefined ? (typeof options.stock === "boolean" ? options.stock : {
+                        include: {
+                            inventory: "inventory" in options.stock && options.stock.inventory,
+                            inventorySection: "inventorySection" in options.stock && options.stock.inventorySection
+                        }
+                    })
+                    : false,
                 snapshots: options?.snapshots ?? false,
                 inventorySections: options?.inventorySections !== undefined ? (typeof options.inventorySections === "boolean" ? options.inventorySections : {
                     include: {
@@ -90,18 +98,31 @@ class InventoryService {
         return new Either<Stock, NextResponse>(item);
     };
 
-    async fetchStockItems(inventoryName: string, itemUIDs: string[], inventoryType?: InventoryType): Promise<Either<Stock[], NextResponse>> {
+    async fetchStockItems(inventoryName?: string, itemUIDs?: string[], inventoryType?: InventoryType): Promise<Either<StockWithOptionalExtras[], NextResponse>> {
+        if (!inventoryName || !itemUIDs) {
+            const stock = await prisma.stock.findMany({
+                include: {
+                    inventory: true,
+                    inventorySection: true
+                }
+            });
+            return new Either<Stock[], NextResponse>(stock);
+        }
+
         const fetchedInventory = await this.fetchInventory(inventoryName, {
             bar: inventoryType === InventoryType.BAR,
-            stock: true
+            stock: {
+                inventory: true,
+                inventorySection: true
+            }
         });
         if (fetchedInventory.error)
-            return new Either<Stock[], NextResponse>(undefined, fetchedInventory.error);
+            return new Either<StockWithOptionalExtras[], NextResponse>(undefined, fetchedInventory.error);
 
         const inventory = fetchedInventory.success!;
         const items = inventory.stock?.filter(item => itemUIDs.includes(item.uid));
         if (!items || !items.length)
-            return new Either<Stock[], NextResponse>(
+            return new Either<StockWithOptionalExtras[], NextResponse>(
                 undefined,
                 respond({
                     message: `There were no stock items found in ${inventoryName} with ids: ${itemUIDs.toString()}`,
@@ -110,7 +131,7 @@ class InventoryService {
                     }
                 })
             );
-        return new Either<Stock[], NextResponse>(items);
+        return new Either<StockWithOptionalExtras[], NextResponse>(items);
     };
 
     async updateStockItem(inventoryName: string, itemId: string, dto: UpdateStockDto, inventoryType?: InventoryType): Promise<Either<Stock | StockSnapshot, NextResponse>> {
@@ -222,7 +243,7 @@ class InventoryService {
 
     async createStock(
         inventoryName: string,
-        dto: CreateStockDto | CreateBarStockDto,
+        dto: CreateStockDto,
         inventoryType?: InventoryType
     ): Promise<Either<Stock, NextResponse>> {
         const fetchedInventory = await this.fetchInventory(inventoryName, {
@@ -618,6 +639,8 @@ class InventoryService {
                     updatedAt,
                     inventoryId,
                     inventorySectionId,
+                    assignedInventoryIds,
+                    assignedInventorySectionIds,
                     ...validSnapshot
                 } = inventoryStockItem;
                 return ({

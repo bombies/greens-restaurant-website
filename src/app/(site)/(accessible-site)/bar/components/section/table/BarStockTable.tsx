@@ -4,15 +4,15 @@ import { FC, Fragment, useState } from "react";
 import GenericStockTable, {
     StockTableColumnKey
 } from "../../../../inventory/[name]/_components/table/generic/GenericStockTable";
-import { KeyedMutator } from "swr";
-import { InventorySection, StockSnapshot } from "@prisma/client";
+import useSWR, { KeyedMutator } from "swr";
+import { InventorySection, Stock, StockSnapshot } from "@prisma/client";
 import AddBarSectionStockItemModal from "../AddBarSectionStockItemModal";
 import { toast } from "react-hot-toast";
 import "../../../../../../../utils/GeneralUtils";
 import useBarStockOptimisticUpdates from "./hooks/useBarStockOptimisticUpdates";
 import StockNumericField from "../../../../inventory/[name]/_components/table/generic/StockNumericField";
-import StockTextField from "../../../../inventory/[name]/_components/table/generic/StockTextField";
 import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../../api/inventory/bar/[name]/types";
+import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 
 type Props = {
     barName?: string,
@@ -25,6 +25,10 @@ type Props = {
 
 export type PartialStockSnapshotWithStock = Partial<Omit<StockSnapshot, "id">>
 
+const useAllStock = () => (
+    useSWR("/api/inventory/stock", fetcher<Stock[]>)
+);
+
 const BarStockTable: FC<Props> = ({
                                       barName,
                                       section,
@@ -35,6 +39,7 @@ const BarStockTable: FC<Props> = ({
                                   }) => {
 
     const [addItemModelOpen, setAddItemModalOpen] = useState(false);
+    const { data: allStock, isLoading: allStocksLoading } = useAllStock();
     const {
         addOptimisticStockItem,
         removeOptimisticStockItems,
@@ -49,24 +54,17 @@ const BarStockTable: FC<Props> = ({
                 isOpen={addItemModelOpen && mutationAllowed}
                 setOpen={setAddItemModalOpen}
                 addOptimisticStockItem={addOptimisticStockItem}
+                items={allStock ?? []}
             />
             <GenericStockTable
                 stock={currentSnapshot?.stockSnapshots ?? []}
                 stockLoading={stockIsLoading}
-                mutationAllowed={mutationAllowed}
+                mutationAllowed={mutationAllowed && !allStocksLoading}
                 getKeyValue={(item, key) => {
+                    const correspondingStock = allStock?.find(stock => stock.uid === item.uid);
                     switch (key) {
                         case StockTableColumnKey.STOCK_NAME: {
-                            return (
-                                <StockTextField
-                                    disabled={!mutationAllowed}
-                                    stockSnapshot={item}
-                                    field="name"
-                                    onSet={async (text) => {
-                                        await updateOptimisticStockSnapshot({ uid: item.uid, name: text });
-                                    }}
-                                />
-                            );
+                            return correspondingStock ? correspondingStock.name.capitalize().replaceAll("-", " ") : item.name.capitalize().replaceAll("-", " ");
                         }
                         case StockTableColumnKey.STOCK_QUANTITY: {
                             return (
@@ -85,9 +83,9 @@ const BarStockTable: FC<Props> = ({
                                     stockSnapshot={item}
                                     disabled={!mutationAllowed}
                                     onSet={async (quantity) => {
-                                        await updateOptimisticStockSnapshot({ uid: item.uid, price: quantity });
+                                        await updateOptimisticStockSnapshot({ uid: item.uid, sellingPrice: quantity });
                                     }}
-                                    isCurrency
+                                    currency="selling"
                                 />
                             );
                         }

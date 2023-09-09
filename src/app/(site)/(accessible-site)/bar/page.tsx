@@ -102,8 +102,7 @@ export default function BarPage() {
                         <Spacer y={6} />
                         {
                             (sections?.length === 0 ?
-                                    <SubTitle>{`There are no sections. Click on the "Add Section" button to create a
-                                section.`}</SubTitle>
+                                    <SubTitle>{`There are no sections.${mutationAllowed ? " Click on the \"Add Section\" button to create a section." : ""}`}</SubTitle>
                                     :
                                     sections
                             )

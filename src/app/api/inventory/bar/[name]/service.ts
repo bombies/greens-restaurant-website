@@ -7,7 +7,6 @@ import { InventoryType } from ".prisma/client";
 import { v4 } from "uuid";
 import {
     BarSnapshot,
-    CreateBarSectionStockItem,
     CreateInventorySectionDto,
     createInventorySectionDtoSchema,
     InventorySectionSnapshotWithOptionalExtras,
@@ -15,18 +14,14 @@ import {
     UpdateInventorySectionDto,
     updateInventorySectionDtoSchema
 } from "./types";
-import { INVENTORY_ITEM_NAME_REGEX } from "../../../../../utils/regex";
 import { z } from "zod";
-import { CreateBarStockDto } from "./[sectionId]/stock/route";
+import { AddBarStockDto } from "./[sectionId]/stock/route";
 import { UpdateBarSectionStockDto } from "./[sectionId]/stock/[stockUID]/route";
 import { UpdateStockDto } from "../../[name]/stock/[id]/route";
-import {
-    InventorySnapshotWithOptionalExtras,
-    InventorySnapshotWithStockSnapshots,
-    updateCurrentStockSnapshotSchema
-} from "../../[name]/types";
+import { updateCurrentStockSnapshotSchema } from "../../[name]/types";
 import PrismaClientKnownRequestError = Prisma.PrismaClientKnownRequestError;
 import StockSnapshotCreateManyInput = Prisma.StockSnapshotCreateManyInput;
+import "../../../../../utils/GeneralUtils";
 
 class BarService {
 
@@ -47,7 +42,8 @@ class BarService {
                 id: sectionId
             },
             include: {
-                stock: withStock
+                stock: withStock,
+                assignedStock: withStock
             }
         });
 
@@ -153,7 +149,8 @@ class BarService {
                 id: sectionId
             },
             include: {
-                stock: true
+                stock: true,
+                assignedStock: true
             }
         });
 
@@ -326,7 +323,8 @@ class BarService {
                 inventorySection: {
                     include: {
                         stock: true,
-                        inventory: true
+                        inventory: true,
+                        assignedStock: true
                     }
                 }
             }
@@ -579,13 +577,6 @@ class BarService {
         );
     }
 
-    private updateStockItemDtoSchema = z.object({
-        name: z.string(),
-        quantity: z.number(),
-        price: z.number(),
-        type: z.string()
-    }).partial().strict();
-
     async updateSectionStockItem(sectionId: string, itemUID: string, dto: UpdateBarSectionStockDto): Promise<Either<Stock | StockSnapshot, NextResponse>> {
         const bodyValidated = this.updateStockItemDtoSchema.safeParse(dto);
         if (!bodyValidated.success)
@@ -594,36 +585,18 @@ class BarService {
                 validationErrors: bodyValidated,
                 status: 400
             }));
-
-        const fetchedItem = await this.fetchSectionStock(sectionId, itemUID);
-        if (fetchedItem.error)
-            return new Either<Stock | StockSnapshot, NextResponse>(undefined, fetchedItem.error);
-
-        const item = fetchedItem.success!;
-
-        if (dto.name) {
-            const validatedName = inventoryService.generateValidStockName(dto.name);
-            if (validatedName.error)
-                return new Either<Stock | StockSnapshot, NextResponse>(undefined, validatedName.error);
-            dto.name = validatedName.success!;
-        }
-
-
-        const updatedStock = await prisma.stock.update({
-            where: {
-                id: item.id
-            },
-            data: {
-                name: dto.name,
-                type: dto.type,
-                price: dto.price
-            }
-        });
-
-        if (dto.quantity !== undefined || dto.price !== undefined || dto.name || dto.type)
-            return this.updateCurrentSectionStockSnapshot(sectionId, itemUID, dto);
-        return new Either<Stock, NextResponse>(updatedStock);
+        if (dto.quantity === undefined && dto.sellingPrice === undefined)
+            return new Either<Stock, NextResponse>(undefined, respondWithInit({
+                message: "You provided nothing to update!",
+                status: 404
+            }));
+        return this.updateCurrentSectionStockSnapshot(sectionId, itemUID, dto);
     };
+
+    private updateStockItemDtoSchema = z.object({
+        sellingPrice: z.number(),
+        quantity: z.number()
+    }).partial().strict();
 
     async updateCurrentSectionStockSnapshot(
         sectionId: string,
@@ -638,7 +611,7 @@ class BarService {
                 status: 400
             }));
 
-        if (dto.quantity === undefined && !dto.name && dto.price === undefined && dto.type === undefined)
+        if (dto.quantity === undefined && !dto.name && dto.price === undefined && dto.type === undefined && dto.sellingPrice === undefined)
             return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
                 message: "You must provide some data to update!",
                 status: 400
@@ -670,7 +643,7 @@ class BarService {
             return new Either<Stock, NextResponse>(undefined, fetchedSectionMiddleman.error);
         const fetchedSection = fetchedSectionMiddleman.success!;
 
-        const item = fetchedSection.stock?.find(item => item.uid === stockUID);
+        const item = fetchedSection.assignedStock?.find(item => item.uid === stockUID);
         if (!item)
             return new Either<Stock, NextResponse>(undefined, respondWithInit({
                 message: `There was no stock item found in inventory section with id ${sectionId} with stock UID ${stockUID}`,
@@ -685,7 +658,7 @@ class BarService {
             return new Either<Stock[], NextResponse>(undefined, fetchedSectionMiddleman.error);
         const fetchedSection = fetchedSectionMiddleman.success!;
 
-        const items = fetchedSection.stock?.filter(item => stockUIDs.includes(item.uid));
+        const items = fetchedSection.assignedStock?.filter(item => stockUIDs.includes(item.uid));
         if (!items || !items.length)
             return new Either<Stock[], NextResponse>(undefined, respondWithInit({
                 message: `There was no stock item found in inventory section with id ${sectionId} with stock any UID ${stockUIDs.toString()}`,
@@ -694,57 +667,73 @@ class BarService {
         return new Either<Stock[], NextResponse>(items);
     }
 
-    async createSectionStock(sectionId: string, dto: CreateBarSectionStockItem): Promise<Either<Stock, NextResponse>> {
+    async createSectionStock(sectionId: string, dto: AddBarStockDto): Promise<Either<Stock, NextResponse>> {
         const fetchedSection = await this.fetchInventorySection(sectionId, true);
         if (fetchedSection.error)
             return new Either<Stock, NextResponse>(undefined, fetchedSection.error);
         const inventorySection = fetchedSection.success!;
 
-        if (!INVENTORY_ITEM_NAME_REGEX.test(dto.name))
-            return new Either<Stock, NextResponse>(undefined, respond({
-                message: "Invalid item name! " +
-                    "The item name must not be more than 30 characters. " +
-                    "The only special characters allowed are \"'\", \".\" and \"-\".",
-                init: {
-                    status: 400
-                }
+        if (inventorySection.assignedStockIds.includes(dto.stockId))
+            return new Either<Stock, NextResponse>(undefined, respondWithInit({
+                message: "That item has already been added!",
+                status: 400
             }));
 
-        const validName = dto.name
-            .toLowerCase()
-            .trim()
-            .replaceAll(/\s{2,}/g, " ")
-            .replaceAll(/\s/g, "-");
-
-        if (inventorySection.stock?.find(item => item.name === validName))
-            return new Either<Stock, NextResponse>(undefined, respond({
-                message: "There is already an item with that name in this inventory!",
-                init: {
-                    status: 400
-                }
-            }));
-
-        const createdStock = await prisma.stock.create({
-            data: {
-                name: validName,
-                inventorySectionId: inventorySection.id,
-                uid: v4(),
-                type: "type" in dto ? dto.type : StockType.DEFAULT,
-                price: dto.price
+        const fetchedStock = await prisma.stock.findUnique({
+            where: {
+                id: dto.stockId
             }
         });
 
+        if (!fetchedStock)
+            return new Either<Stock, NextResponse>(undefined, respondWithInit({
+                message: `There is no stock with ID: ${dto.stockId}`,
+                status: 404
+            }));
+
+        const updatedStock = await prisma.stock.update({
+            where: {
+                id: fetchedStock.id
+            },
+            data: {
+                assignedInventorySectionIds: {
+                    push: sectionId
+                }
+            }
+        });
+
+        const updatedSection = await prisma.inventorySection.update({
+            where: {
+                id: sectionId
+            },
+            data: {
+                assignedStockIds: {
+                    push: updatedStock.id
+                }
+            }
+        });
+
+        if (!updatedStock || !updatedSection)
+            return new Either<Stock, NextResponse>(undefined, respondWithInit({
+                message: "The stock item or inventory section wasn't updated somehow!",
+                status: 500
+            }));
+
         const createdSnapshot = await this.createStockSnapshot(sectionId, {
-            name: validName,
-            type: "type" in dto ? dto.type : StockType.DEFAULT,
-            price: dto.price
+            name: fetchedStock.name,
+            type: fetchedStock.type,
+            price: fetchedStock.price
         });
         if (createdSnapshot.error)
             return new Either<Stock, NextResponse>(undefined, createdSnapshot.error);
-        return new Either<Stock, NextResponse>(createdStock);
+        return new Either<Stock, NextResponse>(updatedStock);
     }
 
-    private async createStockSnapshot(sectionId: string, dto: CreateBarStockDto): Promise<Either<StockSnapshot, NextResponse>> {
+    private async createStockSnapshot(sectionId: string, dto: {
+        name: string,
+        type: StockType | null,
+        price: number
+    }): Promise<Either<StockSnapshot, NextResponse>> {
         const dtoValidated = this.createBarStockDtoSchema.safeParse(dto);
         if (!dtoValidated.success)
             return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
@@ -763,12 +752,12 @@ class BarService {
             return new Either<StockSnapshot, NextResponse>(undefined, validatedItemName.error);
 
         const validName = validatedItemName.success!;
-        const originalStockItem = currentSectionSnapshot.inventorySection?.stock?.find(stock => stock.name === validName);
+        const originalStockItem = currentSectionSnapshot.inventorySection?.assignedStock?.find(stock => stock.name === validName);
         if (!originalStockItem)
             return new Either<StockSnapshot, NextResponse>(
                 undefined,
                 respond({
-                    message: `Inventory sections with id "${sectionId}" doesn't have any stock items called "${validName}"`,
+                    message: `Inventory section with id "${sectionId}" doesn't have any stock items called "${validName}"`,
                     init: {
                         status: 400
                     }
@@ -804,9 +793,37 @@ class BarService {
         if (fetchedItemMiddleman.error)
             return fetchedItemMiddleman;
         const item = fetchedItemMiddleman.success!;
-        const deletedItem = await prisma.stock.delete({
+
+        const inventorySection = await prisma.inventorySection.findUnique({
             where: {
-                uid: item.uid
+                id: sectionId
+            },
+            select: {
+                assignedStockIds: true
+            }
+        });
+
+        if (!inventorySection)
+            return new Either<Stock, NextResponse>(undefined, respondWithInit({
+                message: `There was no inventory section with the ID: ${sectionId}`,
+                status: 404
+            }));
+
+        await prisma.stock.update({
+            where: {
+                uid: stockUID
+            },
+            data: {
+                assignedInventorySectionIds: item.assignedInventorySectionIds.filter(id => id !== sectionId)
+            }
+        });
+
+        await prisma.inventorySection.update({
+            where: {
+                id: sectionId
+            },
+            data: {
+                assignedStockIds: inventorySection.assignedStockIds.filter(id => id !== item.id)
             }
         });
 
@@ -821,7 +838,7 @@ class BarService {
                 uid: item.uid
             }
         });
-        return new Either<Stock, NextResponse>(deletedItem);
+        return new Either<Stock, NextResponse>(item);
     }
 
     async deleteSectionStocks(sectionId: string, stockUIDs: string[]): Promise<Either<Stock[], NextResponse>> {
@@ -829,12 +846,51 @@ class BarService {
         if (fetchedItemMiddleman.error)
             return fetchedItemMiddleman;
         const items = fetchedItemMiddleman.success!;
-        await prisma.stock.deleteMany({
+        const itemIds = items.map(item => item.id);
+
+        const inventorySection = await prisma.inventorySection.findUnique({
+            where: {
+                id: sectionId
+            },
+            select: {
+                assignedStockIds: true
+            }
+        });
+
+        if (!inventorySection)
+            return new Either<Stock[], NextResponse>(undefined, respondWithInit({
+                message: `There was no inventory section with the ID: ${sectionId}`,
+                status: 404
+            }));
+
+        // Remove all related stock ids from inventory sections
+        await prisma.inventorySection.update({
+            where: {
+                id: sectionId
+            },
+            data: {
+                assignedStockIds: inventorySection.assignedStockIds.filter(id => !itemIds.includes(id))
+            }
+        });
+
+        // Remove all related inventory sections from stock
+        await prisma.stock.findMany({
             where: {
                 uid: {
                     in: stockUIDs
                 }
             }
+        }).then(stock => {
+            return prisma.$transaction(
+                stock.map(item => prisma.stock.update({
+                    where: {
+                        id: item.id
+                    },
+                    data: {
+                        assignedInventorySectionIds: item.assignedInventorySectionIds.filter(id => id != sectionId)
+                    }
+                }))
+            );
         });
 
         // Delete from current snapshot

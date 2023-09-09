@@ -95,13 +95,16 @@ model Inventory {
   createdByUserId String @db.ObjectId
   createdByUser   User   @relation(fields: [createdByUserId], references: [id])
 
-  stock    Stock[]
+  stock    Stock[]  @relation(name: "sourceInventory")
   stockIds String[] @db.ObjectId
 
   snapshotIds String[]            @db.ObjectId
   snapshots   InventorySnapshot[]
 
   inventorySections InventorySection[]
+
+  assignedStock    Stock[]  @relation(name: "assignedInventories", fields: [stockIds], references: [id])
+  assignedStockIds String[] @default([]) @db.ObjectId
 }
 
 model InventorySnapshot {
@@ -125,10 +128,13 @@ model InventorySection {
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
 
   snapshots InventorySectionSnapshot[]
-  stock     Stock[]
+  stock     Stock[]                    @relation(name: "sourceInventorySection")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  assignedStock    Stock[]  @relation(name: "assignedInventorySections", fields: [assignedStockIds], references: [id])
+  assignedStockIds String[] @default([]) @db.ObjectId
 }
 
 model InventorySectionSnapshot {
@@ -155,19 +161,26 @@ model Stock {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  inventory          Inventory?        @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  inventory          Inventory?        @relation(name: "sourceInventory", fields: [inventoryId], references: [id], onDelete: Cascade)
   inventoryId        String?           @db.ObjectId
   inventorySectionId String?           @db.ObjectId
-  inventorySection   InventorySection? @relation(fields: [inventorySectionId], references: [id], onDelete: Cascade)
+  inventorySection   InventorySection? @relation(name: "sourceInventorySection", fields: [inventorySectionId], references: [id], onDelete: Cascade)
+
+  assignedInventories  Inventory[] @relation(name: "assignedInventories", fields: [assignedInventoryIds], references: [id])
+  assignedInventoryIds String[]    @default([]) @db.ObjectId
+
+  assignedInventorySections   InventorySection[] @relation(name: "assignedInventorySections", fields: [assignedInventorySectionIds], references: [id])
+  assignedInventorySectionIds String[]           @default([]) @db.ObjectId
 }
 
 model StockSnapshot {
-  id       String     @id @default(auto()) @map("_id") @db.ObjectId
-  uid      String
-  quantity Int
-  name     String
-  price    Float      @default(value: 0.0)
-  type     StockType?
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  uid          String
+  quantity     Int
+  name         String
+  price        Float      @default(value: 0.0)
+  sellingPrice Float      @default(value: 0.0)
+  type         StockType?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import clsx from "clsx";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import StockNumericForm from "./forms/StockNumericForm";
 import { StockSnapshot } from "@prisma/client";
@@ -12,10 +11,10 @@ type Props = {
     stockSnapshot: StockSnapshot,
     disabled?: boolean,
     onSet: (quantity: number) => Promise<void>,
-    isCurrency?: boolean,
+    currency?: "selling" | "cost"
 }
 
-export default function StockNumericField({ stockSnapshot, onSet, disabled, isCurrency }: Props) {
+export default function StockNumericField({ stockSnapshot, onSet, disabled, currency }: Props) {
     const [editModalOpen, setEditModalOpen] = useState(false);
 
     return (
@@ -25,18 +24,18 @@ export default function StockNumericField({ stockSnapshot, onSet, disabled, isCu
                 onClose={() => {
                     setEditModalOpen(false);
                 }}
-                title={`Set ${stockSnapshot?.name?.replace("-", " ")} ${isCurrency ? "Price" : "Stock"}`}
+                title={`Set ${stockSnapshot?.name?.replace("-", " ")} ${currency ? "Price" : "Stock"}`}
             >
                 <StockNumericForm
                     onQuantitySubmit={async (quantity) => {
                         setEditModalOpen(false);
                         await onSet(quantity);
                     }}
-                    buttonLabel={`Set ${isCurrency ? "Price" : "Stock"}`}
+                    buttonLabel={`Set ${currency ? "Price" : "Stock"}`}
                     disabled={disabled}
                     item={stockSnapshot}
                     min={0}
-                    isCurrency={isCurrency}
+                    isCurrency={!!currency}
                 />
             </GenericModal>
             <GenericButton
@@ -48,7 +47,7 @@ export default function StockNumericField({ stockSnapshot, onSet, disabled, isCu
                     setEditModalOpen(true);
                 }}
             >
-                {isCurrency ? dollarFormat.format(stockSnapshot.price) : stockSnapshot.quantity}
+                {currency ? dollarFormat.format(currency === "cost" ? stockSnapshot.price : stockSnapshot.sellingPrice) : stockSnapshot.quantity}
             </GenericButton>
         </Fragment>
     );

@@ -22,12 +22,13 @@ export async function GET(req: Request, { params }: Context) {
     ]);
 }
 
-export interface CreateBarStockDto extends CreateStockDto {
+export interface AddBarStockDto {
+    stockId: string
 }
 
 export async function POST(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const body: CreateBarStockDto = await req.json();
+        const body: AddBarStockDto = await req.json();
         const createdStock = await barService.createSectionStock(params.sectionId, body);
         return createdStock.error ?? NextResponse.json(createdStock.success!);
     }, [

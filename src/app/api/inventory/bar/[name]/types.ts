@@ -5,7 +5,8 @@ import { InventoryWithOptionalExtras, InventoryWithSections } from "../../[name]
 
 export type InventorySectionWithOptionalExtras = InventorySection & {
     inventory?: InventoryWithOptionalExtras,
-    stock?: Stock[]
+    stock?: Stock[],
+    assignedStock?: Stock[]
 }
 
 export type InventorySectionSnapshotWithOptionalExtras = InventorySectionSnapshot & {

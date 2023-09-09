@@ -12,6 +12,7 @@ import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../api/i
 import ChecksAndBalancesTable from "./table/ChecksAndBalancesTable";
 import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
+import SubTitle from "../../../../../_components/text/SubTitle";
 
 const useMostRecentSnapshot = (barName: string) => {
     const mutator = (url: string) => axios.get(url);
@@ -42,7 +43,7 @@ const ChecksAndBalancesButton: FC = () => {
                 title="Checks & Balances"
                 isOpen={modalOpen}
                 size="5xl"
-                scrollBehavior="outside"
+                scrollBehavior={sectionTables.length ? "outside" : "inside"}
                 onClose={() => setModalOpen(false)}
             >
                 {
@@ -55,7 +56,10 @@ const ChecksAndBalancesButton: FC = () => {
                             />
                         </div>
                         :
-                        sectionTables
+                        sectionTables.length ?
+                            sectionTables
+                            :
+                            <SubTitle className="text-neutral-600">There is no previous data to work with...</SubTitle>
                 }
             </GenericModal>
             <GenericButton

@@ -24,9 +24,7 @@ export async function GET(req: Request, { params }: Context) {
     ]);
 }
 
-export type UpdateBarSectionStockDto = Partial<UpdateStockDto> & {
-    type?: StockType
-}
+export type UpdateBarSectionStockDto = Pick<Partial<UpdateStockDto>, "quantity" | "sellingPrice">
 
 export async function PATCH(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
