@@ -9,6 +9,11 @@ import { Divider } from "@nextui-org/divider";
 import GenericButton from "../../../../../../../../_components/inputs/GenericButton";
 import IconButton from "../../../../../../../../_components/inputs/IconButton";
 import EditIcon from "../../../../../../../../_components/icons/EditIcon";
+import useStockQuantityDropdownUtils
+    from "../../../../../[name]/_components/table/generic/forms/useStockQuantityDropdownUtils";
+import StockQuantityDropdown, {
+    QuantityUnit
+} from "../../../../../[name]/_components/table/generic/forms/StockQuantityDropdown";
 
 interface Props {
     item: Partial<RequestedStockItemWithOptionalStockAndRequest>,
@@ -19,10 +24,13 @@ interface Props {
 const EditAmountRequestedButton: FC<Props> = ({ item, onAmountChange, editing }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const { handleSubmit, register, formState: { errors } } = useForm();
+    const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item: item.stock });
+    const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
 
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+        const quantity = mutateQuantity(Number(data.amount_requested), quantityUnit);
         if (onAmountChange)
-            await onAmountChange(item, Number(data.amount_requested));
+            await onAmountChange(item, quantity);
         setModalOpen(false);
     };
 
@@ -44,6 +52,15 @@ const EditAmountRequestedButton: FC<Props> = ({ item, onAmountChange, editing })
                         placeholder="Enter a number..."
                         type="number"
                         min={1}
+                        endContent={
+                            (isDrinkBottle() || isCaseItem())
+                            &&
+                            <StockQuantityDropdown
+                                item={item.stock}
+                                selectedUnit={quantityUnit}
+                                setSelectedUnit={setQuantityUnit}
+                            />
+                        }
                     />
                     <Divider className="my-6" />
                     <GenericButton

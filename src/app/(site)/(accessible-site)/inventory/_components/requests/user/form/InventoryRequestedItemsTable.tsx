@@ -213,7 +213,7 @@ const InventoryRequestedItemsTable: FC<Props> = ({
             ret.push({ key: "actions", value: "Actions" });
 
         return ret;
-    }, [adminActions, onAdminAction, onSelfAction, requestStatus, showItemStatus]);
+    }, [adminActions, editAllowed, onAdminAction, onSelfAction, requestStatus, showItemStatus]);
 
     const stockSnapshots = useMemo(() => {
         return inventorySnapshots?.map(invSnapshot => invSnapshot.stockSnapshots!).flat();
