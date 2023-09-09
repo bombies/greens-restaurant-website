@@ -2,7 +2,7 @@
 
 import { useUserData } from "../../../../utils/Hooks";
 import Permission, { hasAnyPermission } from "../../../../libs/types/permission";
-import { Fragment, useCallback, useMemo } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import BarSection from "./components/section/BarSection";
 import SubTitle from "../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
@@ -11,13 +11,25 @@ import { Skeleton, Spacer } from "@nextui-org/react";
 import { InventorySectionWithOptionalExtras } from "../../../api/inventory/bar/[name]/types";
 import TableSkeleton from "../../../_components/skeletons/TableSkeleton";
 import useBarInfo from "./components/hooks/useBarInfo";
+import GenericButton from "../../../_components/inputs/GenericButton";
+import ToggleMutationOverrideButton from "./components/ToggleMutationOverrideButton";
 
 export default function BarPage() {
     const { data: userData } = useUserData([Permission.MUTATE_BAR_INVENTORY, Permission.VIEW_BAR_INVENTORY, Permission.CREATE_INVENTORY]);
     const { data: barInfo, isLoading: barInfoLoading, mutate: mutateBarInfo } = useBarInfo();
-    const mutationAllowed = useMemo(() => hasAnyPermission(userData?.permissions, [
-        Permission.MUTATE_BAR_INVENTORY, Permission.CREATE_INVENTORY
-    ]), [userData?.permissions]);
+    const [mutationOverridden, setMutationOverridden] = useState(false);
+
+    const mutationAllowed = useMemo(() => (
+        mutationOverridden || hasAnyPermission(userData?.permissions, [
+            Permission.MUTATE_BAR_INVENTORY, Permission.CREATE_INVENTORY
+        ]) && new Date().getDay() === 0
+    ), [mutationOverridden, userData?.permissions]);
+
+    const mutationOverridable = useMemo(() => (
+        hasAnyPermission(userData?.permissions, [
+            Permission.MUTATE_BAR_INVENTORY, Permission.CREATE_INVENTORY
+        ]) && new Date().getDay() !== 0
+    ), [userData?.permissions]);
 
     const sections = useMemo(() => barInfo?.inventorySections?.map(section => (
         <Fragment key={section.id}>
@@ -67,17 +79,24 @@ export default function BarPage() {
                     </div>
                     :
                     <Fragment>
-                        {
-                            mutationAllowed &&
-                            <Fragment>
-                                <AddSectionButton
-                                    barName="bar"
-                                    addSection={addSection}
-                                    disabled={!mutationAllowed}
-                                />
-                                <Spacer y={6} />
-                            </Fragment>
-                        }
+                        <Fragment>
+                            {
+                                mutationAllowed ?
+                                    <AddSectionButton
+                                        barName="bar"
+                                        addSection={addSection}
+                                        disabled={!mutationAllowed}
+                                    />
+                                    :
+                                    (mutationOverridable &&
+                                        <ToggleMutationOverrideButton
+                                            setMutationOverridden={setMutationOverridden}
+                                        />
+
+                                    )
+                            }
+                            <Spacer y={6} />
+                        </Fragment>
                         {
                             (sections?.length === 0 ?
                                     <SubTitle>{`There are no sections. Click on the "Add Section" button to create a
