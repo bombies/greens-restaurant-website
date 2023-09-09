@@ -9,17 +9,24 @@ import {
     BarSnapshot,
     CreateBarSectionStockItem,
     CreateInventorySectionDto,
-    createInventorySectionDtoSchema, InventorySectionSnapshotWithOptionalExtras,
-    InventorySectionWithOptionalExtras, UpdateInventorySectionDto, updateInventorySectionDtoSchema
+    createInventorySectionDtoSchema,
+    InventorySectionSnapshotWithOptionalExtras,
+    InventorySectionWithOptionalExtras,
+    UpdateInventorySectionDto,
+    updateInventorySectionDtoSchema
 } from "./types";
-import PrismaClientKnownRequestError = Prisma.PrismaClientKnownRequestError;
 import { INVENTORY_ITEM_NAME_REGEX } from "../../../../../utils/regex";
 import { z } from "zod";
 import { CreateBarStockDto } from "./[sectionId]/stock/route";
 import { UpdateBarSectionStockDto } from "./[sectionId]/stock/[stockUID]/route";
 import { UpdateStockDto } from "../../[name]/stock/[id]/route";
+import {
+    InventorySnapshotWithOptionalExtras,
+    InventorySnapshotWithStockSnapshots,
+    updateCurrentStockSnapshotSchema
+} from "../../[name]/types";
+import PrismaClientKnownRequestError = Prisma.PrismaClientKnownRequestError;
 import StockSnapshotCreateManyInput = Prisma.StockSnapshotCreateManyInput;
-import { updateCurrentStockSnapshotSchema } from "../../[name]/types";
 
 class BarService {
 
@@ -156,12 +163,151 @@ class BarService {
                 status: 404
             }));
 
+        const snapshot = await this.fetchCurrentSnapshotRaw(inventorySection);
+        if (!snapshot) {
+            const newSnapshot = await prisma.inventorySectionSnapshot.create({
+                data: {
+                    uid: inventorySection.uid,
+                    inventorySectionId: inventorySection.id
+                },
+                include: {
+                    stockSnapshots: true,
+                    inventorySection: {
+                        include: {
+                            stock: true,
+                            inventory: true
+                        }
+                    }
+                }
+            });
+            return await this.generateWholesomeCurrentSectionSnapshot(inventorySection, newSnapshot);
+        } else return await this.generateWholesomeCurrentSectionSnapshot(inventorySection, snapshot);
+    }
+
+    public async fetchCurrentSectionSnapshots(sectionIds?: string[]): Promise<Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>> {
+        const inventorySections = await prisma.inventorySection.findMany({
+            where: {
+                id: sectionIds && {
+                    in: sectionIds
+                }
+            },
+            include: {
+                stock: true
+            }
+        });
+
+        if (!inventorySections || !inventorySections.length)
+            return new Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>(undefined, respondWithInit({
+                message: `There was so inventory sections found with the ids: ${sectionIds}`,
+                status: 404
+            }));
+
+        const snapshots = await this.fetchCurrentSnapshotsRaw(inventorySections);
+        const allSnapshots: InventorySectionSnapshotWithOptionalExtras[] = snapshots;
+        if (sectionIds && sectionIds.length !== snapshots.length) {
+            const foundSnapshotUids = snapshots.map(snapshot => snapshot.uid);
+            const missingInventories = inventorySections.filter(inventorySection => !foundSnapshotUids.includes(inventorySection.uid));
+            const dataToInsert = missingInventories.map(inv => ({
+                uid: inv.uid,
+                inventorySectionId: inv.id
+            }));
+
+            const fetchedMissingInventories = await prisma.inventorySectionSnapshot.createMany({
+                data: dataToInsert
+            }).then(() => prisma.inventorySectionSnapshot.findMany({
+                where: {
+                    uid: {
+                        in: missingInventories.map(inv => inv.uid)
+                    },
+                    inventorySectionId: {
+                        in: missingInventories.map(inv => inv.id)
+                    }
+                },
+                include: {
+                    inventorySection: {
+                        include: {
+                            stock: true
+                        }
+                    },
+                    stockSnapshots: true
+                }
+            }));
+
+            allSnapshots.push(...fetchedMissingInventories);
+        }
+
+        return await this.generateWholesomeCurrentSectionSnapshots(allSnapshots);
+    }
+
+    async fetchMostRecentSnapshot(sectionId: string): Promise<Either<InventorySectionSnapshotWithOptionalExtras, NextResponse>> {
+        const inventorySection = await prisma.inventorySection.findUnique({
+            where: {
+                id: sectionId
+            },
+            include: {
+                stock: true
+            }
+        });
+
+        if (!inventorySection)
+            return new Either<InventorySectionSnapshotWithOptionalExtras, NextResponse>(undefined, respondWithInit({
+                message: `There was so inventory section found with the id: ${sectionId}`,
+                status: 404
+            }));
+
+        const snapshot = await this.fetchMostRecentSnapshotRaw(inventorySection);
+        if (!snapshot)
+            return new Either<InventorySectionSnapshotWithOptionalExtras, NextResponse>(undefined, respondWithInit({
+                message: `There is no earlier snapshots for section with ID: ${sectionId}`,
+                status: 404
+            }));
+        return new Either<InventorySectionSnapshotWithOptionalExtras, NextResponse>(snapshot);
+    }
+
+    async fetchMostRecentSnapshots({ sectionIds, inventoryName }: {
+        sectionIds?: string[],
+        inventoryName?: string
+    }): Promise<Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>> {
+        let validInventoryName = inventoryService.generateValidInventoryName(inventoryName ?? "");
+        if (inventoryName && validInventoryName.error)
+            return new Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>(undefined, validInventoryName.error);
+
+        const inventorySections = await prisma.inventorySection.findMany({
+            where: {
+                id: sectionIds ? {
+                    in: sectionIds
+                } : undefined,
+                inventory: inventoryName ? {
+                    name: validInventoryName.success
+                } : undefined
+            },
+            include: {
+                stock: true
+            }
+        });
+
+        if (!inventorySections || !inventorySections.length)
+            return new Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>(undefined, respondWithInit({
+                message: `There was so inventory section found with the ids: ${sectionIds}`,
+                status: 404
+            }));
+
+        const snapshots = await this.fetchMostRecentSnapshotsRaw(inventorySections);
+        if (!snapshots)
+            return new Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>(undefined, respondWithInit({
+                message: `There is no earlier snapshots for section with IDs: ${sectionIds}`,
+                status: 404
+            }));
+        return new Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>(snapshots);
+    }
+
+    private async fetchCurrentSnapshotRaw(inventorySection: InventorySection): Promise<InventorySectionSnapshotWithOptionalExtras | null> {
         const todaysDate = new Date();
         todaysDate.setHours(0, 0, 0, 0);
         const tommorowsDate = new Date();
         tommorowsDate.setHours(24, 0, 0, 0);
 
-        const snapshot = await prisma.inventorySectionSnapshot.findFirst({
+        return prisma.inventorySectionSnapshot.findFirst({
             where: {
                 AND: [
                     {
@@ -185,25 +331,106 @@ class BarService {
                 }
             }
         });
+    }
 
-        if (!snapshot) {
-            const newSnapshot = await prisma.inventorySectionSnapshot.create({
-                data: {
-                    uid: inventorySection.uid,
-                    inventorySectionId: inventorySection.id
-                },
-                include: {
-                    stockSnapshots: true,
-                    inventorySection: {
-                        include: {
-                            stock: true,
-                            inventory: true
+    private async fetchCurrentSnapshotsRaw(inventorySections: InventorySection[]): Promise<InventorySectionSnapshotWithOptionalExtras[]> {
+        const todaysDate = new Date();
+        todaysDate.setHours(0, 0, 0, 0);
+        const tommorowsDate = new Date();
+        tommorowsDate.setHours(24, 0, 0, 0);
+
+        return prisma.inventorySectionSnapshot.findMany({
+            where: {
+                AND: [
+                    {
+                        uid: {
+                            in: inventorySections.map(section => section.uid)
+                        }
+                    },
+                    {
+                        createdAt: {
+                            lte: tommorowsDate,
+                            gte: todaysDate
                         }
                     }
+                ]
+            },
+            include: {
+                stockSnapshots: true,
+                inventorySection: {
+                    include: {
+                        stock: true,
+                        inventory: true
+                    }
                 }
-            });
-            return await this.generateWholesomeCurrentSectionSnapshot(inventorySection, newSnapshot);
-        } else return await this.generateWholesomeCurrentSectionSnapshot(inventorySection, snapshot);
+            }
+        });
+    }
+
+    private async fetchMostRecentSnapshotRaw(inventorySection: InventorySection): Promise<InventorySectionSnapshotWithOptionalExtras | null> {
+        const todaysDate = new Date();
+        todaysDate.setHours(0, 0, 0, 0);
+
+        return prisma.inventorySectionSnapshot.findFirst({
+            where: {
+                AND: [
+                    {
+                        uid: inventorySection.uid
+                    },
+                    {
+                        createdAt: {
+                            lt: todaysDate
+                        }
+                    }
+                ]
+            },
+            include: {
+                stockSnapshots: true,
+                inventorySection: {
+                    include: {
+                        stock: true,
+                        inventory: true
+                    }
+                }
+            }
+        });
+    }
+
+    private async fetchMostRecentSnapshotsRaw(inventorySections: InventorySection[]): Promise<InventorySectionSnapshotWithOptionalExtras[]> {
+        const todaysDate = new Date();
+        todaysDate.setHours(0, 0, 0, 0);
+
+        return prisma.inventorySectionSnapshot.findMany({
+            where: {
+                AND: [
+                    {
+                        uid: {
+                            in: inventorySections.map(section => section.uid)
+                        }
+                    },
+                    {
+                        createdAt: {
+                            lte: todaysDate
+                        }
+                    }
+                ]
+            },
+            orderBy: [
+                {
+                    createdAt: "desc"
+                }
+            ],
+            distinct: "uid",
+            include: {
+                stockSnapshots: true,
+                inventorySection: {
+                    include: {
+                        stock: true,
+                        inventory: true
+                    }
+                }
+            }
+        });
     }
 
     private async generateWholesomeCurrentSectionSnapshot(
@@ -276,6 +503,80 @@ class BarService {
         }
 
         return new Either<InventorySectionSnapshotWithOptionalExtras, NextResponse>(snapshot);
+    }
+
+    private async generateWholesomeCurrentSectionSnapshots(snapshots: InventorySectionSnapshotWithOptionalExtras[]): Promise<Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>> {
+        const todaysDate = new Date();
+        todaysDate.setHours(0, 0, 0, 0);
+
+        let emptyStockSnapshots = snapshots.filter(snapshot => snapshot.stockSnapshots?.length === 0);
+        const nonEmptyStockSnapshots = snapshots.filter(snapshot => snapshot.stockSnapshots?.length);
+
+        const previousSnapshots = await prisma.inventorySectionSnapshot.findMany({
+            where: {
+                uid: {
+                    in: emptyStockSnapshots.map(snapshot => snapshot.inventorySection!.uid)
+                },
+                createdAt: {
+                    lt: todaysDate
+                }
+            },
+            include: {
+                stockSnapshots: true
+            },
+            orderBy: {
+                createdAt: "desc"
+            },
+            distinct: "uid"
+        });
+
+        const latestPreviousSnapshots: InventorySectionSnapshotWithOptionalExtras[] = [];
+        emptyStockSnapshots.forEach(emptySnapshot => {
+            const snap = previousSnapshots.find(snap => snap.uid === emptySnapshot.uid && snap.stockSnapshots.length);
+            if (snap)
+                latestPreviousSnapshots.push(snap);
+        });
+
+        const newStockSnapshots: Omit<StockSnapshot, "id">[] = [];
+        latestPreviousSnapshots.forEach(snapshot => {
+            if (snapshot.stockSnapshots)
+                newStockSnapshots.push(
+                    ...snapshot.stockSnapshots.map(stockSnapshot => {
+                        const { id, createdAt, updatedAt, inventorySnapshotId, ...validSnapshot } = stockSnapshot;
+                        return ({
+                            ...validSnapshot,
+                            createdAt: todaysDate,
+                            updatedAt: todaysDate,
+                            inventorySectionSnapshotId: snapshot.id,
+                            inventorySnapshotId: null
+                        });
+                    })
+                );
+
+        });
+
+        const createdStockSnapshots = newStockSnapshots.length ?
+            await prisma.stockSnapshot.createMany({
+                data: newStockSnapshots
+            }).then(() => prisma.stockSnapshot.findMany({
+                where: {
+                    createdAt: {
+                        gte: todaysDate
+                    }
+                }
+            })) : [];
+
+        emptyStockSnapshots = emptyStockSnapshots.map(snapshot => ({
+            ...snapshot,
+            stockSnapshots: createdStockSnapshots.filter(stockSnapshot => stockSnapshot.inventorySnapshotId === snapshot.id)
+        }));
+
+        return new Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>(
+            [
+                ...nonEmptyStockSnapshots,
+                ...emptyStockSnapshots
+            ]
+        );
     }
 
     private updateStockItemDtoSchema = z.object({

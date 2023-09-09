@@ -13,6 +13,7 @@ import TableSkeleton from "../../../_components/skeletons/TableSkeleton";
 import useBarInfo from "./components/hooks/useBarInfo";
 import GenericButton from "../../../_components/inputs/GenericButton";
 import ToggleMutationOverrideButton from "./components/ToggleMutationOverrideButton";
+import ChecksAndBalancesButton from "./components/checks-and-balances/ChecksAndBalancesButton";
 
 export default function BarPage() {
     const { data: userData } = useUserData([Permission.MUTATE_BAR_INVENTORY, Permission.VIEW_BAR_INVENTORY, Permission.CREATE_INVENTORY]);
@@ -79,14 +80,16 @@ export default function BarPage() {
                     </div>
                     :
                     <Fragment>
-                        <Fragment>
+                        <div className="flex gap-4">
                             {
                                 mutationAllowed ?
-                                    <AddSectionButton
-                                        barName="bar"
-                                        addSection={addSection}
-                                        disabled={!mutationAllowed}
-                                    />
+                                    <Fragment>
+                                        <AddSectionButton
+                                            barName="bar"
+                                            addSection={addSection}
+                                        />
+                                        <ChecksAndBalancesButton />
+                                    </Fragment>
                                     :
                                     (mutationOverridable &&
                                         <ToggleMutationOverrideButton
@@ -95,8 +98,8 @@ export default function BarPage() {
 
                                     )
                             }
-                            <Spacer y={6} />
-                        </Fragment>
+                        </div>
+                        <Spacer y={6} />
                         {
                             (sections?.length === 0 ?
                                     <SubTitle>{`There are no sections. Click on the "Add Section" button to create a
