@@ -2,10 +2,11 @@
 
 import { FC } from "react";
 import GenericTabs from "../../../../../_components/GenericTabs";
-import { Tab } from "@nextui-org/react";
+import { Spacer, Tab } from "@nextui-org/react";
 import UserInventoryRequestsTab from "./user/UserInventoryRequestsTab";
 import AllInventoryRequestsTab from "./all/AllInventoryRequestsTab";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
+import { GoBackButton } from "../../../invoices/[id]/components/control-bar/InvoiceCustomerControlBar";
 
 interface Props {
     userPermissions?: number;
@@ -14,6 +15,16 @@ interface Props {
 const InventoryRequestsContainer: FC<Props> = ({ userPermissions }) => {
     return (
         <div className="default-container p-12 phone:px-4 w-5/6 tablet:w-full">
+            {
+                hasAnyPermission(userPermissions, [
+                    Permission.CREATE_INVENTORY,
+                    Permission.VIEW_INVENTORY,
+                    Permission.MUTATE_STOCK
+                ])
+                &&
+                <GoBackButton label="View All Inventories" href="/inventory" />
+            }
+            <Spacer y={6} />
             <GenericTabs>
                 <Tab key="my_requests" title="My Requests">
                     <UserInventoryRequestsTab />

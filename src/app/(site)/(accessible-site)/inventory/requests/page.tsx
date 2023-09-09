@@ -23,16 +23,6 @@ export default function InventoryRequestsPage() {
             <SubTitle>Create and manage inventory requests</SubTitle>
             <Spacer y={12} />
             {
-                hasAnyPermission(userData?.permissions, [
-                    Permission.CREATE_INVENTORY,
-                    Permission.VIEW_INVENTORY,
-                    Permission.MUTATE_STOCK
-                ])
-                &&
-                <GoBackButton label="View All Inventories" href="/inventory" />
-            }
-            <Spacer y={6} />
-            {
                 !userDataIsLoading &&
                 <Fragment>
                     {
