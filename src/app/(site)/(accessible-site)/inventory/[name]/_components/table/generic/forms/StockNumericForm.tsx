@@ -5,7 +5,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../../../../../_components/inputs/GenericInput";
 import { Spacer } from "@nextui-org/react";
 import GenericButton from "../../../../../../../../_components/inputs/GenericButton";
-import { StockSnapshot, StockType } from "@prisma/client";
+import { StockSnapshot } from "@prisma/client";
 import StockQuantityDropdown, { QuantityUnit } from "./StockQuantityDropdown";
 import useStockQuantityDropdownUtils from "./useStockQuantityDropdownUtils";
 
@@ -18,6 +18,7 @@ type Props = {
     item?: StockSnapshot,
     min?: number,
     isCurrency?: boolean,
+    defaultValue?: keyof Pick<StockSnapshot, "quantity">
 }
 
 const StockNumericForm: FC<Props> = ({
@@ -28,9 +29,10 @@ const StockNumericForm: FC<Props> = ({
                                          buttonLabel,
                                          item,
                                          min,
-                                         isCurrency
+                                         isCurrency,
+                                         defaultValue
                                      }) => {
-    const [quantity, setQuantity] = useState(item?.quantity ?? 0);
+    const [quantity, setQuantity] = useState(item && defaultValue ? item[defaultValue] ?? 0 : 0);
     const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item });
     const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
     const {

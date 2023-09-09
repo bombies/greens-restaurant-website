@@ -1,10 +1,9 @@
 "use client";
 
-import GenericModal from "../../../../../../../_components/GenericModal";
+import GenericModal from "../../../../../../../../../_components/GenericModal";
 import { Dispatch, SetStateAction } from "react";
-import StockNumericForm from "./forms/StockNumericForm";
-import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
-import { StockSnapshot } from "@prisma/client";
+import { StockSnapshot, StockType } from "@prisma/client";
+import EditStockTypeForm from "../../forms/EditStockTypeForm";
 
 type Props = {
     disabled?: boolean,
@@ -12,11 +11,12 @@ type Props = {
     setOpen: Dispatch<SetStateAction<boolean>>
     onClose?: () => void
     item?: StockSnapshot,
-    onAdd: (amountAdded: number) => Promise<void>,
+    onEdit: (newType: StockType) => Promise<void>,
     isUpdating?: boolean
 }
 
-export default function AddStockModal({ isOpen, setOpen, onClose, item, onAdd, isUpdating, disabled }: Props) {
+export default function EditStockTypeModal({ isOpen, setOpen, onClose, item, onEdit, isUpdating, disabled }: Props) {
+
     return (
         <GenericModal
             isOpen={isOpen}
@@ -25,21 +25,18 @@ export default function AddStockModal({ isOpen, setOpen, onClose, item, onAdd, i
                     onClose();
                 setOpen(false);
             }}
-            title={`Add ${item?.name
+            title={`Edit ${item?.name
                 ?.replace(
                     /(\w)(\w*)/g,
                     (_g0, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
                 )
                 .replace("-", " ")
-            } Stock`}
+            } Stock Type`}
         >
-            <StockNumericForm
-                onQuantitySubmit={onAdd}
-                buttonLabel={"Add Stock"}
-                buttonIcon={<PlusIcon />}
-                isWorking={isUpdating}
+            <EditStockTypeForm
+                currentType={item?.type ?? StockType.DEFAULT}
+                onEdit={onEdit}
                 disabled={disabled}
-                item={item}
             />
         </GenericModal>
     );

@@ -337,7 +337,7 @@ class BarService {
                 status: 400
             }));
 
-        if (dto.quantity === undefined && !dto.name && dto.price === undefined)
+        if (dto.quantity === undefined && !dto.name && dto.price === undefined && dto.type === undefined)
             return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
                 message: "You must provide some data to update!",
                 status: 400

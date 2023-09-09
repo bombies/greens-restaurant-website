@@ -11,10 +11,11 @@ type Props = {
     selectedStockType: StockType,
     setSelectedStockType: Dispatch<SetStateAction<StockType>>,
     isCreating?: boolean,
-    register: UseFormRegister<FieldValues>
+    register: UseFormRegister<FieldValues>,
+    disabled?: boolean,
 }
 
-const ItemTypeSelectMenu: FC<Props> = ({ selectedStockType, setSelectedStockType, isCreating, register }) => {
+const ItemTypeSelectMenu: FC<Props> = ({ selectedStockType, setSelectedStockType, isCreating, register, disabled }) => {
     const selectItems = useMemo(() => Object.keys(StockType).map(type => ({
         key: type,
         label: type.replaceAll("_", " ")
@@ -22,7 +23,7 @@ const ItemTypeSelectMenu: FC<Props> = ({ selectedStockType, setSelectedStockType
 
     return (
         <GenericSelectMenu
-            isDisabled={isCreating}
+            isDisabled={isCreating || disabled}
             selectionMode="single"
             isRequired
             label="Item Type"

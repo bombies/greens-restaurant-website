@@ -110,6 +110,9 @@ const BarStockTable: FC<Props> = ({
                 onItemAddButtonPress={() => {
                     setAddItemModalOpen(true);
                 }}
+                onItemTypeEdit={async (itemUID, newType) => {
+                    await updateOptimisticStockSnapshot({ uid: itemUID, type: newType });
+                }}
             />
         </Fragment>
     );

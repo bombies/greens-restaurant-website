@@ -121,6 +121,9 @@ export default function InventoryStockTable({
                 onItemAddButtonPress={() => {
                     setAddItemModalOpen(true);
                 }}
+                onItemTypeEdit={async (itemUID, newType) => {
+                    await updateOptimisticStockSnapshot({ uid: itemUID, type: newType });
+                }}
             />
         </Fragment>
     );

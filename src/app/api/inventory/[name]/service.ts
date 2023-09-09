@@ -675,7 +675,7 @@ class InventoryService {
                 status: 400
             }));
 
-        if (!dto.name && dto.quantity === undefined && dto.price === undefined)
+        if (!dto.name && dto.quantity === undefined && dto.price === undefined && dto.type === undefined)
             return new Either<StockSnapshot, NextResponse>(undefined, respondWithInit({
                 message: "You must provide some data to update!",
                 status: 400

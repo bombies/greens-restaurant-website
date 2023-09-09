@@ -9,7 +9,7 @@ import { Spacer, TableCell, TableRow } from "@nextui-org/react";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import AddInventoryItemButton from "./AddInventoryItemButton";
 import SearchIcon from "../../../../../../../_components/icons/SearchIcon";
-import { StockSnapshot } from "@prisma/client";
+import { StockSnapshot, StockType } from "@prisma/client";
 import ItemsSelectedBar from "./ItemsSelectedBar";
 
 interface Props {
@@ -20,6 +20,7 @@ interface Props {
     onQuantityIncrement: (item: StockSnapshot, incrementedBy: number) => Promise<void>;
     onQuantityDecrement: (item: StockSnapshot, decrementedBy: number) => Promise<void>;
     onStockDelete: (deletedIds: string[]) => Promise<void>;
+    onItemTypeEdit: (itemUID: string, newType: StockType) => Promise<void>
     onItemAddButtonPress: () => void,
     priceIsCost?: boolean,
 }
@@ -40,7 +41,8 @@ const GenericStockTable: FC<Props> = ({
                                           onQuantityDecrement,
                                           onStockDelete,
                                           onItemAddButtonPress,
-                                          priceIsCost
+                                          priceIsCost,
+                                          onItemTypeEdit
                                       }) => {
     const {
         stockState,
@@ -57,7 +59,8 @@ const GenericStockTable: FC<Props> = ({
         mutationAllowed,
         onQuantityDecrement,
         onQuantityIncrement,
-        onStockDelete,
+        onItemTypeEdit,
+        onStockDelete
     });
 
     const columns: Column[] = useMemo(() => {

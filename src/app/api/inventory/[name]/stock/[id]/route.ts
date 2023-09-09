@@ -2,6 +2,7 @@ import { authenticatedAny } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
 import { NextResponse } from "next/server";
 import inventoryService from "../../service";
+import { StockType } from "@prisma/client";
 
 type RouteContext = {
     params: {
@@ -21,6 +22,7 @@ export type UpdateStockDto = Partial<{
     name: string,
     price: number,
     quantity: number,
+    type: StockType,
 }>
 
 export function PATCH(req: Request, { params }: RouteContext) {

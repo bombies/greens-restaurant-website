@@ -1,29 +1,40 @@
 "use client";
 
 import { FC, Fragment, useState } from "react";
-import AddStockModal from "./AddStockModal";
-import IconButton from "../../../../../../../_components/inputs/IconButton";
-import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
-import MinusIcon from "../../../../../../../_components/icons/MinusIcon";
-import GenericDropdown from "../../../../../../../_components/GenericDropdown";
+import PlusIcon from "../../../../../../../../_components/icons/PlusIcon";
+import MinusIcon from "../../../../../../../../_components/icons/MinusIcon";
+import GenericDropdown from "../../../../../../../../_components/GenericDropdown";
 import { Button, DropdownItem, DropdownSection } from "@nextui-org/react";
-import VerticalDotsIcon from "../../../../../../../_components/icons/VerticalDotsIcon";
-import TrashIcon from "../../../../../../../_components/icons/TrashIcon";
-import RemoveStockModal from "./RemoveStockModal";
-import ConfirmationModal from "../../../../../../../_components/ConfirmationModal";
-import { StockSnapshot } from "@prisma/client";
+import VerticalDotsIcon from "../../../../../../../../_components/icons/VerticalDotsIcon";
+import TrashIcon from "../../../../../../../../_components/icons/TrashIcon";
+import ConfirmationModal from "../../../../../../../../_components/ConfirmationModal";
+import { StockSnapshot, StockType } from "@prisma/client";
+import AddStockButton from "./AddStockButton";
+import RemoveStockButton from "./RemoveStockButton";
+import EditIcon from "../../../../../../../../_components/icons/EditIcon";
+import AddStockModal from "./modals/AddStockModal";
+import RemoveStockModal from "./modals/RemoveStockModal";
+import EditStockTypeModal from "./modals/EditStockTypeModal";
 
 type Props = {
     item: StockSnapshot,
     onQuantityIncrement: (item: StockSnapshot, incrementedBy: number) => Promise<void>,
     onQuantityDecrement: (item: StockSnapshot, decrementedBy: number) => Promise<void>,
     onStockDelete: (deletedIds: string[]) => void;
+    onItemTypeEdit: (itemUID: string, newType: StockType) => Promise<void>
 }
 
-const StockTableActions: FC<Props> = ({ item, onQuantityDecrement, onQuantityIncrement, onStockDelete }) => {
+const StockTableActions: FC<Props> = ({
+                                          item,
+                                          onQuantityDecrement,
+                                          onQuantityIncrement,
+                                          onStockDelete,
+                                          onItemTypeEdit
+                                      }) => {
     const [addStockModalOpen, setAddStockModalOpen] = useState(false);
     const [removeStockModalOpen, setRemoveStockModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
 
     return (
         <Fragment>
@@ -45,6 +56,15 @@ const StockTableActions: FC<Props> = ({ item, onQuantityDecrement, onQuantityInc
                     setRemoveStockModalOpen(false);
                 }}
             />
+            <EditStockTypeModal
+                item={item}
+                isOpen={editModalOpen}
+                setOpen={setEditModalOpen}
+                onEdit={async (type) => {
+                    onItemTypeEdit(item.uid, type);
+                    setEditModalOpen(false);
+                }}
+            />
             <ConfirmationModal
                 isOpen={deleteModalOpen}
                 setOpen={setDeleteModalOpen}
@@ -57,29 +77,14 @@ const StockTableActions: FC<Props> = ({ item, onQuantityDecrement, onQuantityInc
             />
             <div className="flex gap-3">
                 <div className="flex gap-4 p-3 w-fit">
-                    <IconButton
-                        size="sm"
-                        variant="flat"
-                        toolTip="Increment"
-                        cooldown={1}
-                        onPress={async () => {
-                            await onQuantityIncrement(item, 1);
-                        }}
-                    >
-                        <PlusIcon width={16} />
-                    </IconButton>
-                    <IconButton
-                        size="sm"
-                        variant="flat"
-                        color="danger"
-                        toolTip="Decrement"
-                        cooldown={1}
-                        onPress={async () => {
-                            await onQuantityDecrement(item, 1);
-                        }}
-                    >
-                        <MinusIcon width={16} />
-                    </IconButton>
+                    <AddStockButton
+                        item={item}
+                        onQuantityIncrement={onQuantityIncrement}
+                    />
+                    <RemoveStockButton
+                        item={item}
+                        onQuantityDecrement={onQuantityDecrement}
+                    />
                     <GenericDropdown
                         placement="bottom"
                         trigger={<Button
@@ -104,6 +109,10 @@ const StockTableActions: FC<Props> = ({ item, onQuantityDecrement, onQuantityInc
                                     setDeleteModalOpen(true);
                                     break;
                                 }
+                                case "edit_type": {
+                                    setEditModalOpen(true);
+                                    break;
+                                }
                             }
                         }}
                     >
@@ -121,6 +130,13 @@ const StockTableActions: FC<Props> = ({ item, onQuantityDecrement, onQuantityInc
                                 startContent={<MinusIcon />}
                             >
                                 Remove Multiple
+                            </DropdownItem>
+                            <DropdownItem
+                                key="edit_type"
+                                description="Edit the type of item this is"
+                                startContent={<EditIcon />}
+                            >
+                                Edit Item Type
                             </DropdownItem>
                         </DropdownSection>
                         <DropdownSection title="Danger Zone">
