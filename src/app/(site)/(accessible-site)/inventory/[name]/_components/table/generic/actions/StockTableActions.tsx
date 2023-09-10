@@ -11,10 +11,8 @@ import ConfirmationModal from "../../../../../../../../_components/ConfirmationM
 import { StockSnapshot, StockType } from "@prisma/client";
 import AddStockButton from "./AddStockButton";
 import RemoveStockButton from "./RemoveStockButton";
-import EditIcon from "../../../../../../../../_components/icons/EditIcon";
 import AddStockModal from "./modals/AddStockModal";
 import RemoveStockModal from "./modals/RemoveStockModal";
-import EditStockTypeModal from "./modals/EditStockTypeModal";
 
 type Props = {
     item: StockSnapshot,
@@ -34,7 +32,6 @@ const StockTableActions: FC<Props> = ({
     const [addStockModalOpen, setAddStockModalOpen] = useState(false);
     const [removeStockModalOpen, setRemoveStockModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [editModalOpen, setEditModalOpen] = useState(false);
 
     return (
         <Fragment>
@@ -54,15 +51,6 @@ const StockTableActions: FC<Props> = ({
                 onRemove={async (removed) => {
                     onQuantityDecrement(item, removed);
                     setRemoveStockModalOpen(false);
-                }}
-            />
-            <EditStockTypeModal
-                item={item}
-                isOpen={editModalOpen}
-                setOpen={setEditModalOpen}
-                onEdit={async (type) => {
-                    onItemTypeEdit(item.uid, type);
-                    setEditModalOpen(false);
                 }}
             />
             <ConfirmationModal
@@ -109,10 +97,6 @@ const StockTableActions: FC<Props> = ({
                                     setDeleteModalOpen(true);
                                     break;
                                 }
-                                case "edit_type": {
-                                    setEditModalOpen(true);
-                                    break;
-                                }
                             }
                         }}
                     >
@@ -130,13 +114,6 @@ const StockTableActions: FC<Props> = ({
                                 startContent={<MinusIcon />}
                             >
                                 Remove Multiple
-                            </DropdownItem>
-                            <DropdownItem
-                                key="edit_type"
-                                description="Edit the type of item this is"
-                                startContent={<EditIcon />}
-                            >
-                                Edit Item Type
                             </DropdownItem>
                         </DropdownSection>
                         <DropdownSection title="Danger Zone">
