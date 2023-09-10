@@ -14,7 +14,9 @@ export const getFetchStockRequestsSearchParams = (url: string) => {
     const withItems = searchParams.get("with_items")?.toLowerCase() === "true" || false;
     const withUsers = searchParams.get("with_users")?.toLowerCase() === "true" || false;
     const withAssignees = searchParams.get("with_assignees")?.toLowerCase() === "true" || false;
-    return { status, withItems, withUsers, withAssignees };
+    const from: number | undefined = searchParams.get("from") ? Number(searchParams.get("from")) : undefined;
+    const to: number | undefined = searchParams.get("to") ? Number(searchParams.get("to")) : undefined;
+    return { status, withItems, withUsers, withAssignees, from, to };
 };
 
 export async function GET(req: Request) {
@@ -49,14 +51,15 @@ export async function GET(req: Request) {
 }
 
 export type CreateStockRequestDto = Pick<StockRequest, "assignedToUsersId"> & {
-    items: Pick<RequestedStockItem, "amountRequested" | "stockId">[]
+    items: Pick<RequestedStockItem, "amountRequested" | "stockId" | "stockUID">[]
 }
 
 export const createStockRequestSchemaDto = z.object({
     assignedToUsersId: z.array(z.string()).optional(),
     items: z.array(z.object({
         amountRequested: z.number(),
-        stockId: z.string()
+        stockId: z.string(),
+        stockUID: z.string()
     }))
 }).strict();
 

@@ -60,8 +60,9 @@ model RequestedStockItem {
   stockRequest   StockRequest? @relation(fields: [stockRequestId], references: [id], onDelete: Cascade)
   stockRequestId String?       @db.ObjectId
 
-  stock   Stock  @relation(fields: [stockId], references: [id], onDelete: Cascade)
-  stockId String @db.ObjectId
+  stock    Stock  @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  stockId  String @db.ObjectId
+  stockUID String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

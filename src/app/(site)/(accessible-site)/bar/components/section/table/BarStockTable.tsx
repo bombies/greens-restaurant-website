@@ -5,7 +5,7 @@ import GenericStockTable, {
     StockTableColumnKey
 } from "../../../../inventory/[name]/_components/table/generic/GenericStockTable";
 import useSWR, { KeyedMutator } from "swr";
-import { InventorySection, Stock, StockSnapshot } from "@prisma/client";
+import { InventorySection, RequestedStockItem, Stock, StockSnapshot } from "@prisma/client";
 import AddBarSectionStockItemModal from "../AddBarSectionStockItemModal";
 import { toast } from "react-hot-toast";
 import "../../../../../../../utils/GeneralUtils";
@@ -21,6 +21,7 @@ type Props = {
     mutateCurrentSnapshot?: KeyedMutator<InventorySectionSnapshotWithOptionalExtras | undefined>
     stockIsLoading: boolean,
     mutationAllowed: boolean,
+    requestedItems: RequestedStockItem[],
 }
 
 export type PartialStockSnapshotWithStock = Partial<Omit<StockSnapshot, "id">>
@@ -35,7 +36,8 @@ const BarStockTable: FC<Props> = ({
                                       currentSnapshot,
                                       mutateCurrentSnapshot,
                                       stockIsLoading,
-                                      mutationAllowed
+                                      mutationAllowed,
+                                      requestedItems
                                   }) => {
 
     const [addItemModelOpen, setAddItemModalOpen] = useState(false);
@@ -60,8 +62,12 @@ const BarStockTable: FC<Props> = ({
                 stock={currentSnapshot?.stockSnapshots ?? []}
                 stockLoading={stockIsLoading}
                 mutationAllowed={mutationAllowed && !allStocksLoading}
+                showGoodsReceived
                 getKeyValue={(item, key) => {
                     const correspondingStock = allStock?.find(stock => stock.uid === item.uid);
+                    const requestedStockItems = requestedItems.filter(reqItem => reqItem.stockId === correspondingStock?.id);
+                    const goodsReceived = requestedStockItems.reduce((acc, next) => acc + (next.amountProvided ?? 0), 0);
+
                     switch (key) {
                         case StockTableColumnKey.STOCK_NAME: {
                             return correspondingStock ? correspondingStock.name.capitalize().replaceAll("-", " ") : item.name.capitalize().replaceAll("-", " ");
@@ -76,6 +82,9 @@ const BarStockTable: FC<Props> = ({
                                     }}
                                 />
                             );
+                        }
+                        case StockTableColumnKey.GOODS_PROVIDED: {
+                            return goodsReceived;
                         }
                         case StockTableColumnKey.STOCK_PRICE: {
                             return (

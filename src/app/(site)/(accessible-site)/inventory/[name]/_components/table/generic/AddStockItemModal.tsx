@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, FC, SetStateAction, useCallback, useMemo, useState } from "react";
+import { Dispatch, FC, SetStateAction, useCallback, useState } from "react";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
@@ -64,6 +64,7 @@ const AddStockItemModal: FC<Props> = ({
                 id: "",
                 uid: createdItem.uid,
                 quantity: 0,
+                sellingPrice: 0,
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 name: createdItem.name,

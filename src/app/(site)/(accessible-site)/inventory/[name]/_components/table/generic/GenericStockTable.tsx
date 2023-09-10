@@ -23,12 +23,14 @@ interface Props {
     onItemTypeEdit: (itemUID: string, newType: StockType) => Promise<void>
     onItemAddButtonPress: () => void,
     priceIsCost?: boolean,
+    showGoodsReceived?: boolean,
 }
 
 export enum StockTableColumnKey {
     STOCK_NAME = "stock_name",
     STOCK_QUANTITY = "stock_quantity",
-    STOCK_PRICE = "stock_price"
+    STOCK_PRICE = "stock_price",
+    GOODS_PROVIDED = "goods_provided"
 }
 
 
@@ -42,7 +44,8 @@ const GenericStockTable: FC<Props> = ({
                                           onStockDelete,
                                           onItemAddButtonPress,
                                           priceIsCost,
-                                          onItemTypeEdit
+                                          onItemTypeEdit,
+                                          showGoodsReceived
                                       }) => {
     const {
         stockState,
@@ -72,12 +75,19 @@ const GenericStockTable: FC<Props> = ({
             {
                 key: "stock_quantity",
                 value: "Quantity"
-            },
-            {
-                key: "stock_price",
-                value: priceIsCost ? "Cost" : "Selling Price"
             }
         ];
+
+        if (showGoodsReceived)
+            cols.push({
+                key: "goods_provided",
+                value: "Goods Provided"
+            });
+
+        cols.push({
+            key: "stock_price",
+            value: priceIsCost ? "Cost" : "Selling Price"
+        });
 
         if (mutationAllowed)
             cols.push({

@@ -25,7 +25,7 @@ interface Props {
     dispatchProposedRequests: Dispatch<{
         type: ProposedStockRequestsAction,
         payload: { id: string }
-            | Pick<RequestedStockItem, "amountRequested" | "stockId">
+            | Pick<RequestedStockItem, "amountRequested" | "stockId" | "stockUID">
             | { id: string } & Pick<RequestedStockItem, "amountRequested" | "stockId">
     }>;
     stock: Stock[];
@@ -52,7 +52,8 @@ const AddRequestedItemsButton: FC<Props> = ({
             type: ProposedStockRequestsAction.ADD_ITEM,
             payload: {
                 amountRequested,
-                stockId: selectedItemIds[0]
+                stockId: selectedItemIds[0],
+                stockUID: stock.find(item => item.id === selectedItemIds[0])!.uid
             }
         });
 

@@ -2,17 +2,18 @@
 
 import { Key, useCallback, useMemo } from "react";
 import { Column } from "../../../../invoices/[id]/[invoiceId]/components/table/InvoiceTable";
-import { StockSnapshot } from "@prisma/client";
+import { RequestedStockItem, StockSnapshot } from "@prisma/client";
 import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../../api/inventory/bar/[name]/types";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 import "../../../../../../../utils/GeneralUtils";
 
 type Props = {
     currentSnapshot?: InventorySectionSnapshotWithOptionalExtras,
-    previousSnapshot: InventorySectionSnapshotWithOptionalExtras
+    previousSnapshot: InventorySectionSnapshotWithOptionalExtras,
+    requestedStockItems: RequestedStockItem[]
 }
 
-const useChecksAndBalancesTableParams = ({ previousSnapshot, currentSnapshot }: Props) => {
+const useChecksAndBalancesTableParams = ({ previousSnapshot, currentSnapshot, requestedStockItems }: Props) => {
     const columns: Column[] = useMemo(() => [
         {
             key: "item_name",
@@ -27,6 +28,10 @@ const useChecksAndBalancesTableParams = ({ previousSnapshot, currentSnapshot }: 
             value: "Opening Quantity"
         },
         {
+            key: "goods_received",
+            value: "Goods Received"
+        },
+        {
             key: "sale_quantity",
             value: "Quantity Sold"
         },
@@ -37,7 +42,10 @@ const useChecksAndBalancesTableParams = ({ previousSnapshot, currentSnapshot }: 
     ], []);
 
     const getKeyValue = useCallback((item: StockSnapshot, key: Key) => {
-        const correspondingItem = previousSnapshot.stockSnapshots?.find(prevItem => prevItem?.uid === item.uid);
+        const correspondingItem = previousSnapshot.stockSnapshots?.find(prevItem => prevItem?.name === item.name);
+        const requestedItems = requestedStockItems.filter(reqItem => reqItem.stockUID === correspondingItem?.uid);
+        const goodsReceived = requestedItems.reduce((acc, next) => acc + (next.amountProvided ?? 0), 0);
+        const saleOfGoods = ((correspondingItem?.quantity ?? 0) + goodsReceived) - item.quantity;
 
         switch (key) {
             case "item_name": {
@@ -50,13 +58,16 @@ const useChecksAndBalancesTableParams = ({ previousSnapshot, currentSnapshot }: 
                 return correspondingItem?.quantity ?? "N/A";
             }
             case "sale_quantity": {
-                return correspondingItem ? Math.abs(correspondingItem.quantity - item.quantity) : "N/A";
+                return correspondingItem ? saleOfGoods : "N/A";
             }
             case "stock_sale": {
-                return correspondingItem ? dollarFormat.format(Math.abs(correspondingItem.quantity - item.quantity) * item.price) : "N/A";
+                return correspondingItem ? dollarFormat.format(saleOfGoods * item.price) : "N/A";
+            }
+            case "goods_received": {
+                return goodsReceived;
             }
         }
-    }, [previousSnapshot.stockSnapshots]);
+    }, [previousSnapshot.stockSnapshots, requestedStockItems]);
 
     const sortedItems = useMemo(() => (
         currentSnapshot?.stockSnapshots ?? []

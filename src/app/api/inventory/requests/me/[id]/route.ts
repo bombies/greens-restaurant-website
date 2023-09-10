@@ -40,10 +40,11 @@ export async function GET(req: Request, { params }: Context) {
     ]);
 }
 
-export type CreateRequestedStockItemsDto = Pick<RequestedStockItem, "amountRequested" | "stockId">[]
+export type CreateRequestedStockItemsDto = Pick<RequestedStockItem, "amountRequested" | "stockId" | "stockUID">[]
 const createRequestedStockItemsDto = z.array(z.object({
     amountRequested: z.number(),
-    stockId: z.string()
+    stockId: z.string(),
+    stockUID: z.string()
 }));
 
 export async function POST(req: Request, { params }: Context) {
@@ -52,7 +53,7 @@ export async function POST(req: Request, { params }: Context) {
         const bodyValidated = createRequestedStockItemsDto.safeParse(body);
         if (!bodyValidated.success)
             return respondWithInit({
-                message: "Invalid paylod!",
+                message: "Invalid payload!",
                 validationErrors: bodyValidated,
                 status: 400
             });

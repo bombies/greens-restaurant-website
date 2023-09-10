@@ -11,7 +11,7 @@ type Props = {
     stockSnapshot: StockSnapshot,
     disabled?: boolean,
     onSet: (quantity: number) => Promise<void>,
-    currency?: "selling" | "cost"
+    currency?: "selling" | "cost",
 }
 
 export default function StockNumericField({ stockSnapshot, onSet, disabled, currency }: Props) {

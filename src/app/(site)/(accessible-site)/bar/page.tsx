@@ -11,13 +11,27 @@ import { Skeleton, Spacer } from "@nextui-org/react";
 import { InventorySectionWithOptionalExtras } from "../../../api/inventory/bar/[name]/types";
 import TableSkeleton from "../../../_components/skeletons/TableSkeleton";
 import useBarInfo from "./components/hooks/useBarInfo";
-import GenericButton from "../../../_components/inputs/GenericButton";
 import ToggleMutationOverrideButton from "./components/ToggleMutationOverrideButton";
 import ChecksAndBalancesButton from "./components/checks-and-balances/ChecksAndBalancesButton";
+import useSWR from "swr";
+import { fetcher } from "../employees/_components/EmployeeGrid";
+import { RequestedStockItem } from "@prisma/client";
+
+const useCurrentWeekInventoryRequestInfo = (stockIds?: (string | undefined)[]) => {
+    const previousSunday = new Date();
+    previousSunday.setHours(0, 0, 0, 0);
+    if (previousSunday.getDate() !== 0)
+        previousSunday.setDate(previousSunday.getDate() - (previousSunday.getDay() || 7));
+    return useSWR(stockIds ? `/api/inventory/requests/items?ids=${stockIds?.filter(id => id).toString()}&from=${previousSunday.getTime()}` : [], fetcher<RequestedStockItem[]>);
+};
 
 export default function BarPage() {
     const { data: userData } = useUserData([Permission.MUTATE_BAR_INVENTORY, Permission.VIEW_BAR_INVENTORY, Permission.CREATE_INVENTORY]);
     const { data: barInfo, isLoading: barInfoLoading, mutate: mutateBarInfo } = useBarInfo();
+    const {
+        data: currentWeekRequestedItems,
+        isLoading: loadingCurrentWeekendRequestedItems
+    } = useCurrentWeekInventoryRequestInfo(barInfo?.inventorySections?.map(section => section.assignedStock?.map(stock => stock.id)).flat());
     const [mutationOverridden, setMutationOverridden] = useState(false);
 
     const mutationAllowed = useMemo(() => (
@@ -40,10 +54,11 @@ export default function BarPage() {
                 section={section}
                 userData={userData}
                 mutationAllowed={mutationAllowed}
+                requestedItems={currentWeekRequestedItems ?? []}
             />
             <Divider className="my-6" />
         </Fragment>
-    )) ?? [], [barInfo, mutateBarInfo, mutationAllowed, userData]);
+    )) ?? [], [barInfo, mutateBarInfo, userData, mutationAllowed, currentWeekRequestedItems]);
 
     const addSection = useCallback(async (newSection: InventorySectionWithOptionalExtras) => {
         if (!barInfo)
@@ -88,7 +103,9 @@ export default function BarPage() {
                                             barName="bar"
                                             addSection={addSection}
                                         />
-                                        <ChecksAndBalancesButton />
+                                        <ChecksAndBalancesButton
+                                            barInfo={barInfo}
+                                        />
                                     </Fragment>
                                     :
                                     (mutationOverridable &&

@@ -12,13 +12,33 @@ export async function GET(req: Request) {
             status,
             withUsers,
             withItems,
-            withAssignees
+            withAssignees,
+            from, to
         } = getFetchStockRequestsSearchParams(req.url);
         let whereQuery: StockRequestWhereInput = {};
 
         if (status)
             whereQuery = {
                 status
+            };
+
+        if (from)
+            whereQuery = {
+                ...whereQuery,
+                createdAt: {
+                    gte: new Date(from)
+                }
+            };
+
+        if (to)
+            whereQuery = {
+                ...whereQuery,
+                createdAt: whereQuery.createdAt && typeof whereQuery.createdAt !== "string" && "gte" in whereQuery.createdAt ? {
+                    ...whereQuery.createdAt,
+                    lte: new Date(to)
+                } : {
+                    lte: new Date(to)
+                }
             };
 
         const requests = await prisma.stockRequest.findMany({

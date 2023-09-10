@@ -82,7 +82,6 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
         isAdmin: isAdmin,
         request,
         requestIsLoading
-
     });
 
     useEffect(() => {
@@ -141,7 +140,7 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                 <GoBackButton label="View All Requests" href="/inventory/requests" />
                 <Spacer y={6} />
                 <InventoryRequestedItemsTable
-                    items={optimisticRequest.items.length ? optimisticRequest.items : (request?.requestedItems || [])}
+                    items={optimisticRequest.items.length && !isLoadingSnapshots ? optimisticRequest.items : (request?.requestedItems || [])}
                     inventorySnapshots={snapshots}
                     showItemStatus
                     requestStatus={request?.status}

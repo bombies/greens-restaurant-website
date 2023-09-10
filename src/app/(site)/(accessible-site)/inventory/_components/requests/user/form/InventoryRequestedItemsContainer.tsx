@@ -45,7 +45,7 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
     type: ProposedStockRequestsAction,
     payload: { id: string }
         | { ids: string[] }
-        | Pick<RequestedStockItem, "amountRequested" | "stockId">
+        | Pick<RequestedStockItem, "amountRequested" | "stockId" | "stockUID">
         | { id: string } & Pick<RequestedStockItem, "amountRequested">
 }) => {
     let newState = { ...state };
@@ -88,7 +88,7 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
             break;
         }
         case ProposedStockRequestsAction.ADD_ITEM: {
-            newState.items.push(payload as Pick<RequestedStockItem, "amountRequested" | "stockId">);
+            newState.items.push(payload as Pick<RequestedStockItem, "amountRequested" | "stockId" | "stockUID">);
             break;
         }
         case ProposedStockRequestsAction.REMOVE_ITEM: {
@@ -138,7 +138,7 @@ const InventoryRequestedItemsContainer: FC<Props> = ({
                                                          mutator,
                                                          visibleData
                                                      }) => {
-    const { trigger: triggerRequestionCreation, isMutating: isCreatingRequest } = useRequestCreationTrigger();
+    const { trigger: triggerRequestCreation, isMutating: isCreatingRequest } = useRequestCreationTrigger();
     const { isLoading, data } = FetchInventories(selectedIds, true);
     const [proposedRequestedItems, dispatchProposedRequestedItems] = useReducer(reducer, {
         assignedToUsersId: selectedAssigneeIds,
@@ -216,7 +216,7 @@ const InventoryRequestedItemsContainer: FC<Props> = ({
                 isDisabled={isCreatingRequest || !proposedRequestedItems.items.length}
                 isLoading={isCreatingRequest}
                 onPress={() => {
-                    triggerRequestionCreation({
+                    triggerRequestCreation({
                         dto: proposedRequestedItems
                     })
                         .then((res) => {

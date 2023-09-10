@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, useCallback } from "react";
-import { InventorySection, User } from "@prisma/client";
+import { InventorySection, RequestedStockItem, User } from "@prisma/client";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
 import BarStockTable from "./table/BarStockTable";
@@ -17,6 +17,7 @@ type Props = {
     section?: InventorySection,
     userData?: User,
     mutationAllowed: boolean,
+    requestedItems: RequestedStockItem[],
 }
 
 const useCurrentBarSectionSnapshot = (name?: string, sectionId?: string) => {
@@ -25,7 +26,7 @@ const useCurrentBarSectionSnapshot = (name?: string, sectionId?: string) => {
 
 export type PartialInventorySection = Partial<Omit<InventorySection, "id">>
 
-const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData, mutationAllowed }) => {
+const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData, mutationAllowed, requestedItems }) => {
     const {
         data: currentSnapshot,
         isLoading: currentSnapshotLoading,
@@ -94,6 +95,7 @@ const BarSection: FC<Props> = ({ barInfo, mutateBarInfo, section, userData, muta
                 mutateCurrentSnapshot={mutateCurrentSnapshot}
                 stockIsLoading={currentSnapshotLoading}
                 mutationAllowed={mutationAllowed}
+                requestedItems={requestedItems}
             />
         </div>
     );

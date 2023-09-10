@@ -5,14 +5,20 @@ import GenericTable from "../../../../../../_components/table/GenericTable";
 import { TableCell, TableRow } from "@nextui-org/react";
 import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../../api/inventory/bar/[name]/types";
 import useChecksAndBalancesTableParams from "./useChecksAndBalancesTableParams";
+import { RequestedStockItem } from "@prisma/client";
 
 type Props = {
     currentSnapshot?: InventorySectionSnapshotWithOptionalExtras,
     previousSnapshot: InventorySectionSnapshotWithOptionalExtras,
+    requestedStockItems: RequestedStockItem[]
 }
 
-const ChecksAndBalancesTable: FC<Props> = ({ previousSnapshot, currentSnapshot }) => {
-    const { columns, getKeyValue, items } = useChecksAndBalancesTableParams({ previousSnapshot, currentSnapshot });
+const ChecksAndBalancesTable: FC<Props> = ({ previousSnapshot, currentSnapshot, requestedStockItems }) => {
+    const { columns, getKeyValue, items } = useChecksAndBalancesTableParams({
+        previousSnapshot,
+        currentSnapshot,
+        requestedStockItems
+    });
 
     return (
         <Fragment>

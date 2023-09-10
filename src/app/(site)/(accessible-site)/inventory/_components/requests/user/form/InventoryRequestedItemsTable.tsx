@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, Fragment, Key, useMemo } from "react";
+import { FC, Fragment, Key, useCallback, useMemo } from "react";
 import GenericTable from "../../../../../../../_components/table/GenericTable";
 import { CircularProgress, TableCell, TableRow, Tooltip } from "@nextui-org/react";
 import { Column } from "../../../../../invoices/[id]/[invoiceId]/components/table/InvoiceTable";
@@ -19,6 +19,7 @@ import RemoveRequestedItemButton from "./self-actions/RemoveRequestedItemButton"
 import { StockSnapshot } from "@prisma/client";
 import { StockRequestStatus } from ".prisma/client";
 import { InventorySnapshotWithOptionalExtras } from "../../../../../../../api/inventory/[name]/types";
+import { Spinner } from "@nextui-org/spinner";
 
 interface Props {
     items: Partial<RequestedStockItemWithOptionalStock>[];
@@ -49,144 +50,6 @@ type OnSelfAction = {
     }
 }
 
-const getValueForKey = (
-    item: Partial<RequestedStockItemWithOptionalStockAndRequest>,
-    key: Key, adminActions?: boolean,
-    onAdminAction?: OnAdminAction,
-    onSelfAction?: OnSelfAction,
-    snapshots?: StockSnapshot[]
-) => {
-    const findItemSnapshot = (): StockSnapshot | undefined => snapshots?.find(snapshot => snapshot.uid === item.stock?.uid);
-
-    switch (key) {
-        case "item_name": {
-            return <p className="capitalize">{item.stock?.name.replaceAll("-", " ")}</p>;
-        }
-        case "amount_requested": {
-            return item.amountRequested;
-        }
-        case "actions": {
-            const itemSnapshot = findItemSnapshot();
-
-            return (
-                <div className="flex gap-4">
-                    {adminActions ?
-                        <Fragment>
-                            <IconButton
-                                isDisabled={(itemSnapshot?.quantity ?? 0) < (item.amountRequested ?? 0)}
-                                variant="flat"
-                                color="success"
-                                toolTip="Approve"
-                                onPress={() => {
-                                    if (onAdminAction && onAdminAction.onApprove)
-                                        onAdminAction.onApprove(item);
-                                }}
-                            >
-                                <CheckIcon width={16} />
-                            </IconButton>
-                            <PartialApproveButton
-                                item={item}
-                                max={(itemSnapshot?.quantity ?? 0) < (item.amountRequested ?? 0) ? itemSnapshot?.quantity : undefined}
-                                onPartialApprove={onAdminAction?.onPartialApprove}
-                            />
-                            <IconButton
-                                variant="flat"
-                                color="danger"
-                                toolTip="Reject"
-                                onPress={() => {
-                                    if (onAdminAction?.onReject)
-                                        onAdminAction.onReject(item);
-                                }}
-                            >
-                                <DeniedIcon width={16} />
-                            </IconButton>
-                        </Fragment>
-                        :
-                        <Fragment>
-                            <EditAmountRequestedButton
-                                item={item}
-                                onAmountChange={onSelfAction?.onAmountChange?.action}
-                                editing={onSelfAction?.onAmountChange?.editing}
-                            />
-                            <RemoveRequestedItemButton
-                                item={item}
-                                onRemove={onSelfAction?.onRemove.action}
-                                removing={onSelfAction?.onRemove.removing}
-                            />
-                        </Fragment>
-                    }
-                </div>
-            );
-        }
-        case "status": {
-            if (item.amountRequested === item.amountProvided)
-                return (
-                    <Chip
-                        variant="flat"
-                        color="success"
-                        classNames={{
-                            content: "font-semibold"
-                        }}
-                        startContent={<CheckIcon width={16} />}
-                    >
-                        APPROVED
-                    </Chip>
-                );
-            else if (item.amountProvided === 0)
-                return (
-                    <Chip
-                        variant="flat"
-                        color="danger"
-                        classNames={{
-                            content: "font-semibold"
-                        }}
-                        startContent={<DeniedIcon width={16} />}
-                    >
-                        REJECTED
-                    </Chip>
-                );
-            else if (item.amountProvided === -1 || item.amountProvided === null || item.amountProvided === undefined)
-                return (
-                    <Chip
-                        variant="flat"
-                        classNames={{
-                            content: "font-semibold"
-                        }}
-                        startContent={<PendingIcon width={16} />}
-                    >
-                        PENDING
-                    </Chip>
-                );
-            else return (
-                    <div className="flex gap-4">
-                        <Tooltip
-                            color="warning"
-                            content={`${item.amountProvided} PROVIDED`}
-                        >
-                            <Chip
-                                variant="flat"
-                                color="warning"
-                                classNames={{
-                                    content: "font-semibold"
-                                }}
-                                startContent={<CheckIcon width={16} />}
-                            >
-                                PARTIALLY APPROVED
-                            </Chip>
-                        </Tooltip>
-                        <CircularProgress
-                            color="warning"
-                            size="sm"
-                            value={item.amountProvided && item.amountRequested ? (item.amountProvided / item.amountRequested) * 100 : 0}
-                        />
-                    </div>
-                );
-        }
-        case "amount_available": {
-            return findItemSnapshot()?.quantity ?? "Unknown";
-        }
-    }
-};
 
 const InventoryRequestedItemsTable: FC<Props> = ({
                                                      items,
@@ -219,11 +82,150 @@ const InventoryRequestedItemsTable: FC<Props> = ({
         return inventorySnapshots?.map(invSnapshot => invSnapshot.stockSnapshots!).flat();
     }, [inventorySnapshots]);
 
+    const getValueForKey = useCallback((
+        item: Partial<RequestedStockItemWithOptionalStockAndRequest>,
+        key: Key, adminActions?: boolean,
+        onAdminAction?: OnAdminAction,
+        onSelfAction?: OnSelfAction
+    ) => {
+        const findItemSnapshot = (): StockSnapshot | undefined => stockSnapshots?.find(snapshot => snapshot.uid === item.stock?.uid);
+
+        switch (key) {
+            case "item_name": {
+                return <p className="capitalize">{item.stock?.name.replaceAll("-", " ")}</p>;
+            }
+            case "amount_requested": {
+                return item.amountRequested;
+            }
+            case "actions": {
+                const itemSnapshot = findItemSnapshot();
+
+                return (
+                    <div className="flex gap-4">
+                        {adminActions ?
+                            <Fragment>
+                                <IconButton
+                                    isDisabled={(itemSnapshot?.quantity ?? 0) < (item.amountRequested ?? 0)}
+                                    variant="flat"
+                                    color="success"
+                                    toolTip="Approve"
+                                    onPress={() => {
+                                        if (onAdminAction && onAdminAction.onApprove)
+                                            onAdminAction.onApprove(item);
+                                    }}
+                                >
+                                    <CheckIcon width={16} />
+                                </IconButton>
+                                <PartialApproveButton
+                                    item={item}
+                                    max={(itemSnapshot?.quantity ?? 0) < (item.amountRequested ?? 0) ? itemSnapshot?.quantity : undefined}
+                                    onPartialApprove={onAdminAction?.onPartialApprove}
+                                />
+                                <IconButton
+                                    variant="flat"
+                                    color="danger"
+                                    toolTip="Reject"
+                                    onPress={() => {
+                                        if (onAdminAction?.onReject)
+                                            onAdminAction.onReject(item);
+                                    }}
+                                >
+                                    <DeniedIcon width={16} />
+                                </IconButton>
+                            </Fragment>
+                            :
+                            <Fragment>
+                                <EditAmountRequestedButton
+                                    item={item}
+                                    onAmountChange={onSelfAction?.onAmountChange?.action}
+                                    editing={onSelfAction?.onAmountChange?.editing}
+                                />
+                                <RemoveRequestedItemButton
+                                    item={item}
+                                    onRemove={onSelfAction?.onRemove.action}
+                                    removing={onSelfAction?.onRemove.removing}
+                                />
+                            </Fragment>
+                        }
+                    </div>
+                );
+            }
+            case "status": {
+                if (item.amountRequested === item.amountProvided)
+                    return (
+                        <Chip
+                            variant="flat"
+                            color="success"
+                            classNames={{
+                                content: "font-semibold"
+                            }}
+                            startContent={<CheckIcon width={16} />}
+                        >
+                            APPROVED
+                        </Chip>
+                    );
+                else if (item.amountProvided === 0)
+                    return (
+                        <Chip
+                            variant="flat"
+                            color="danger"
+                            classNames={{
+                                content: "font-semibold"
+                            }}
+                            startContent={<DeniedIcon width={16} />}
+                        >
+                            REJECTED
+                        </Chip>
+                    );
+                else if (item.amountProvided === -1 || item.amountProvided === null || item.amountProvided === undefined)
+                    return (
+                        <Chip
+                            variant="flat"
+                            classNames={{
+                                content: "font-semibold"
+                            }}
+                            startContent={<PendingIcon width={16} />}
+                        >
+                            PENDING
+                        </Chip>
+                    );
+                else return (
+                        <div className="flex gap-4">
+                            <Tooltip
+                                color="warning"
+                                content={`${item.amountProvided} PROVIDED`}
+                            >
+                                <Chip
+                                    variant="flat"
+                                    color="warning"
+                                    classNames={{
+                                        content: "font-semibold"
+                                    }}
+                                    startContent={<CheckIcon width={16} />}
+                                >
+                                    PARTIALLY APPROVED
+                                </Chip>
+                            </Tooltip>
+                            <CircularProgress
+                                color="warning"
+                                size="sm"
+                                value={item.amountProvided && item.amountRequested ? (item.amountProvided / item.amountRequested) * 100 : 0}
+                            />
+                        </div>
+                    );
+            }
+            case "amount_available": {
+                return findItemSnapshot()?.quantity ?? "Unknown";
+            }
+        }
+    }, [stockSnapshots]);
+
     return (
         <GenericTable
             columns={columns}
             items={items}
             isLoading={isLoading}
+            loadingContent={<Spinner />}
             emptyContent="Select an inventory then click on the button below to start requesting items."
         >
             {(item) => (
@@ -234,8 +236,7 @@ const InventoryRequestedItemsTable: FC<Props> = ({
                             colKey,
                             adminActions,
                             onAdminAction,
-                            onSelfAction,
-                            stockSnapshots
+                            onSelfAction
                         )}</TableCell>
                     )}
                 </TableRow>

@@ -13,29 +13,58 @@ import ChecksAndBalancesTable from "./table/ChecksAndBalancesTable";
 import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
 import SubTitle from "../../../../../_components/text/SubTitle";
+import { RequestedStockItem } from "@prisma/client";
+import { InventoryWithOptionalExtras } from "../../../../../api/inventory/[name]/types";
 
 const useMostRecentSnapshot = (barName: string) => {
     const mutator = (url: string) => axios.get(url);
     return useSWRMutation(`/api/inventory/bar/${barName}/snapshots/mostrecent`, mutator);
 };
 
+
 const useCurrentSectionSnapshots = (barName: string) => {
-    return useSWR(`/api/inventory/bar/${barName}/snapshots/current`, fetcher<InventorySectionSnapshotWithOptionalExtras[]>);
+    const mutator = (url: string) => fetcher<InventorySectionSnapshotWithOptionalExtras[]>(url);
+    return useSWRMutation(`/api/inventory/bar/${barName}/snapshots/current`, mutator);
 };
 
-const ChecksAndBalancesButton: FC = () => {
+const usePreviousWeekInventoryRequestInfo = (stockIds?: (string | undefined)[]) => {
+    const previousSunday = new Date();
+    previousSunday.setHours(0, 0, 0, 0);
+    previousSunday.setDate(previousSunday.getDate() - (previousSunday.getDay() || 7));
+
+    const latestDate = new Date();
+    latestDate.setHours(11, 59, 59, 999);
+    if (latestDate.getDay() === 0)
+        latestDate.setDate(latestDate.getDate() - 1);
+    return useSWR(stockIds ? `/api/inventory/requests/items?ids=${stockIds?.filter(id => id).toString()}&from=${previousSunday.getTime()}$to=${latestDate.getTime()}` : [], fetcher<RequestedStockItem[]>);
+};
+
+type Props = {
+    barInfo?: InventoryWithOptionalExtras
+}
+
+const ChecksAndBalancesButton: FC<Props> = ({ barInfo }) => {
+    const {
+        data: previousWeekRequestedItems,
+        isLoading: loadingPreviousWeekRequestedItems
+    } = usePreviousWeekInventoryRequestInfo(barInfo?.inventorySections?.map(section => section.assignedStock?.map(stock => stock.id)).flat());
     const [modalOpen, setModalOpen] = useState(false);
     const { trigger: fetchMostRecentSnapshot, isMutating: isFetching, data: response } = useMostRecentSnapshot("bar");
-    const { data: currentSectionSnapshots, isLoading: currentSnapshotsLoading } = useCurrentSectionSnapshots("bar");
+    const {
+        trigger: fetchCurrentSectionSnapshots,
+        data: currentSectionSnapshots,
+        isMutating: currentSnapshotsLoading
+    } = useCurrentSectionSnapshots("bar");
     const sectionTables = useMemo(() => (
         (response?.data as InventorySectionSnapshotWithOptionalExtras[] | undefined)?.map(section => (
             <ChecksAndBalancesTable
                 key={section.id}
                 previousSnapshot={section}
                 currentSnapshot={currentSectionSnapshots?.find(currentSection => currentSection.uid === section.uid)}
+                requestedStockItems={previousWeekRequestedItems ?? []}
             />
         )) ?? []
-    ), [currentSectionSnapshots, response?.data]);
+    ), [currentSectionSnapshots, previousWeekRequestedItems, response?.data]);
 
     return (
         <Fragment>
@@ -47,7 +76,7 @@ const ChecksAndBalancesButton: FC = () => {
                 onClose={() => setModalOpen(false)}
             >
                 {
-                    isFetching || currentSnapshotsLoading ?
+                    isFetching || currentSnapshotsLoading || loadingPreviousWeekRequestedItems ?
                         <div className="flex justify-center">
                             <Spinner
                                 label="Loading data..."
@@ -67,7 +96,8 @@ const ChecksAndBalancesButton: FC = () => {
                 startContent={<DollarIcon />}
                 onPress={() => {
                     setModalOpen(true);
-                    fetchMostRecentSnapshot()
+                    fetchCurrentSectionSnapshots()
+                        .then(() => fetchMostRecentSnapshot())
                         .catch((e) => {
                             console.error(e);
                             errorToast(e, "There was an error generating checks & balances.");
