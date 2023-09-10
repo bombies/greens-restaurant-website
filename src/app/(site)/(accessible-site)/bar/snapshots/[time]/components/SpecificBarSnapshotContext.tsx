@@ -12,13 +12,29 @@ import { Divider } from "@nextui-org/divider";
 import BarStockTable from "../../../components/section/table/BarStockTable";
 import { InventorySectionSnapshotWithExtras } from "../../../../../../api/inventory/[name]/types";
 import SubTitle from "../../../../../../_components/text/SubTitle";
+import useSWR from "swr";
+import { fetcher } from "../../../../employees/_components/EmployeeGrid";
+import { RequestedStockItem } from "@prisma/client";
 
 type Props = {
     time: string
 }
 
+const useCurrentWeekInventoryRequestInfo = (stockIds?: (string | undefined)[], from?: number) => {
+    const previousSunday = new Date(from ?? 0);
+    previousSunday.setHours(0, 0, 0, 0);
+    if (previousSunday.getDate() !== 0)
+        previousSunday.setDate(previousSunday.getDate() - (previousSunday.getDay() || 7));
+
+    const nextSaturday = new Date(from ?? 0);
+    nextSaturday.setHours(11, 59, 59, 999);
+    nextSaturday.setDate(nextSaturday.getDate() + (7 + 6 - nextSaturday.getDay()) % 7);
+    return useSWR(from && stockIds ? `/api/inventory/requests/items?ids=${stockIds?.filter(id => id).toString()}&from=${previousSunday.getTime()}&to${nextSaturday.getTime()}` : [], fetcher<RequestedStockItem[]>);
+};
+
+
 const SpecificBarSnapshotContext: FC<Props> = ({ time }) => {
-    const { data: userData } = useUserData([
+    useUserData([
         Permission.MUTATE_BAR_INVENTORY,
         Permission.MUTATE_STOCK,
         Permission.CREATE_INVENTORY
@@ -26,6 +42,10 @@ const SpecificBarSnapshotContext: FC<Props> = ({ time }) => {
     const { data: snapshot, isLoading } = useBarSnapshot(Number(time));
     const router = useRouter();
     const { data: barInfo, isLoading: barInfoLoading } = useBarInfo();
+    const {
+        data: requestedItems,
+        isLoading: requestedItemsLoading
+    } = useCurrentWeekInventoryRequestInfo(barInfo?.inventorySections?.map(section => section.assignedStock?.map(stock => stock.id)).flat(), Number(time));
 
     useEffect(() => {
         if (!isLoading && !snapshot)
@@ -39,13 +59,14 @@ const SpecificBarSnapshotContext: FC<Props> = ({ time }) => {
                     barName={barInfo?.name}
                     section={sectionSnapshot.inventorySection}
                     currentSnapshot={sectionSnapshot as InventorySectionSnapshotWithExtras}
-                    stockIsLoading={isLoading}
+                    stockIsLoading={isLoading || requestedItemsLoading}
                     mutationAllowed={false}
+                    requestedItems={requestedItems ?? []}
                 />
             </div>
             <Divider className="my-6" />
         </Fragment>
-    )), [barInfo?.name, isLoading, snapshot?.data]);
+    )), [barInfo?.name, isLoading, requestedItems, requestedItemsLoading, snapshot?.data]);
 
     return (
         <div className="default-container p-12 phone:px-4">
