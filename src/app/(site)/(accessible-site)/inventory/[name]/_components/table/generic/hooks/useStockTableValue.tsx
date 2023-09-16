@@ -40,7 +40,7 @@ const useStockTableValue = ({
                 return getKeyValue(item, key as StockTableColumnKey);
             }
         }
-    }, [getKeyValue, onQuantityDecrement, onQuantityIncrement, onStockDelete]);
+    }, [getKeyValue, onItemTypeEdit, onQuantityDecrement, onQuantityIncrement, onStockDelete]);
 };
 
 export default useStockTableValue;
