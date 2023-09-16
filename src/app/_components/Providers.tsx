@@ -17,7 +17,6 @@ interface Props extends React.PropsWithChildren {
 export default function Providers(props: Props) {
 
     return (
-        <body>
         <SWRConfig
             value={{
                 refreshInterval: 60 * 1000,
@@ -60,6 +59,5 @@ export default function Providers(props: Props) {
                 </NextUIProvider>
             </ReduxProvider>
         </SWRConfig>
-        </body>
     );
 }

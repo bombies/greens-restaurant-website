@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Inter, Montserrat, Poppins } from "next/font/google";
 import React from "react";
 import Providers from "./_components/Providers";
 import "./globals.scss";
@@ -11,8 +11,9 @@ export const metadata = {
     description: "The Management Platform"
 };
 
-const inter = Inter({
-    subsets: ["latin"]
+const poppins = Poppins({
+    subsets: ["latin"],
+    weight: ["100", "300", "400", "500", "600", "700", "900"]
 });
 
 
@@ -24,7 +25,7 @@ export default async function HomeLayout(props: Props) {
     return (
         <html
             className={clsx(
-                inter.className
+                poppins.className
             )}
             style={{
                 backgroundImage: "url(\"/images/mesh-bg-2.png\")",
@@ -33,9 +34,11 @@ export default async function HomeLayout(props: Props) {
                 backgroundSize: "cover"
             }}
         >
+        <body>
         <Providers session={session}>
             {props.children}
         </Providers>
+        </body>
         </html>
     );
 }
