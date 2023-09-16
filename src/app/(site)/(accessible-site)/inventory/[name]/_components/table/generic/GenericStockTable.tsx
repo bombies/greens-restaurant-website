@@ -95,7 +95,7 @@ const GenericStockTable: FC<Props> = ({
                 value: "Actions"
             });
         return cols;
-    }, [mutationAllowed, priceIsCost]);
+    }, [mutationAllowed, priceIsCost, showGoodsReceived]);
 
     return (
         <Fragment>
