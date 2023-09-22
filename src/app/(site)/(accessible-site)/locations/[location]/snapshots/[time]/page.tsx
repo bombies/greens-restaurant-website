@@ -2,10 +2,11 @@ import SpecificLocationSnapshotContext from "./components/SpecificLocationSnapsh
 
 type Context = {
     params: {
-        time: string
+        time: string,
+        location: string
     }
 }
 
 export default function BarSnapshotPage({ params }: Context) {
-    return (<SpecificLocationSnapshotContext time={params.time} />);
+    return (<SpecificLocationSnapshotContext time={params.time} locationName={params.location} />);
 }
