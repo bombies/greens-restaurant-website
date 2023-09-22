@@ -5,7 +5,7 @@ import useInventoryStockUpdate from "./useInventoryStockUpdate";
 import useInventoryStockDelete from "./useInventoryStockDelete";
 import { useCallback } from "react";
 import { errorToast } from "../../../../../../../../utils/Hooks";
-import { PartialStockSnapshotWithStock } from "../../../../../bar/components/section/table/BarStockTable";
+import { PartialStockSnapshotWithStock } from "../../../../../locations/[location]/components/section/table/LocationStockTable";
 import { StockSnapshot } from "@prisma/client";
 import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
 

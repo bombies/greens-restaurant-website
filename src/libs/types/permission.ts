@@ -48,18 +48,18 @@ export enum Permission {
     MANAGE_STOCK_REQUESTS = 1 << 9,
 
     /**
-     * This allows the user to view all bar inventories.
+     * This allows the user to view all locations.
      * They will also be allowed to view all snapshots and
      * insights.
      */
-    VIEW_BAR_INVENTORY = 1 << 10,
+    VIEW_LOCATIONS = 1 << 10,
 
     /**
-     * This allows the user to mutate bar inventories.
+     * This allows the user to mutate locations.
      * Meaning they will be allowed to update the inventory information
      * and update stock information.
      */
-    MUTATE_BAR_INVENTORY = 1 << 11,
+    MUTATE_LOCATIONS = 1 << 11,
 
     // INVOICES
     /**
@@ -126,11 +126,11 @@ export const Permissions: PermissionObject[] = [
     },
     {
         label: "View Bar Inventory",
-        value: Permission.VIEW_BAR_INVENTORY
+        value: Permission.VIEW_LOCATIONS
     },
     {
         label: "Mutate Bar Stock",
-        value: Permission.MUTATE_BAR_INVENTORY
+        value: Permission.MUTATE_LOCATIONS
     },
     {
         label: "Create Stock Request",

@@ -7,6 +7,13 @@ import {
     Stock,
     StockSnapshot
 } from "@prisma/client";
+import { InventoryType } from ".prisma/client";
+
+export type CreateInventoryDto = {
+    name: string,
+    type?: InventoryType
+    createdBy?: string,
+}
 
 export type InventoryWithSections = Inventory & {
     inventorySections: InventorySection[]
@@ -47,6 +54,12 @@ export type StockWithOptionalExtras = Stock & {
     inventory?: Inventory,
     inventorySection?: InventorySection
 }
+
+export const createInventoryDtoSchema = z.object({
+    name: z.string(),
+    createdBy: z.string().optional(),
+    type: z.nativeEnum(InventoryType).optional()
+}).strict();
 
 export const updateStockItemDtoSchema = z.object({
     name: z.string(),

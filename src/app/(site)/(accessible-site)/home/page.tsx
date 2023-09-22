@@ -38,8 +38,8 @@ export default function HomePage() {
                         Permission.MANAGE_STOCK_REQUESTS,
                         Permission.VIEW_STOCK_REQUESTS,
                         Permission.VIEW_STOCK_REQUESTS,
-                        Permission.VIEW_BAR_INVENTORY,
-                        Permission.MUTATE_BAR_INVENTORY
+                        Permission.VIEW_LOCATIONS,
+                        Permission.MUTATE_LOCATIONS
                     ]) &&
                     <div className={"w-[90%] mx-auto tablet:w-full mt-12 p-12 phone:p-6 default-container"}>
                         <h4 className="font-light text-xl phone:text-lg tracking-widest uppercase mb-12 phone:mb-6 phone:text-center">Quick
@@ -58,8 +58,8 @@ export default function HomePage() {
                             {
                                 hasAnyPermission(user?.permissions, [
                                     Permission.CREATE_INVENTORY,
-                                    Permission.VIEW_BAR_INVENTORY,
-                                    Permission.MUTATE_BAR_INVENTORY
+                                    Permission.VIEW_LOCATIONS,
+                                    Permission.MUTATE_LOCATIONS
                                 ])
                                 &&
                                 <ManageBarQuickAction />

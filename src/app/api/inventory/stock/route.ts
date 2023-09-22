@@ -11,7 +11,7 @@ export async function GET(req: Request) {
         Permission.VIEW_INVENTORY,
         Permission.MUTATE_STOCK,
         Permission.CREATE_INVENTORY,
-        Permission.VIEW_BAR_INVENTORY,
-        Permission.MUTATE_BAR_INVENTORY
+        Permission.VIEW_LOCATIONS,
+        Permission.MUTATE_LOCATIONS
     ]);
 }
