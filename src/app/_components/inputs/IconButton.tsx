@@ -1,4 +1,12 @@
-import { Button, ButtonProps, Dropdown, DropdownMenuProps, DropdownTrigger, Tooltip } from "@nextui-org/react";
+import {
+    Button,
+    ButtonProps,
+    Dropdown,
+    DropdownMenuProps,
+    DropdownTrigger,
+    Tooltip,
+    TooltipProps
+} from "@nextui-org/react";
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
 import React, { ReactElement, useCallback, useMemo, useState } from "react";
@@ -9,6 +17,7 @@ import { toast } from "react-hot-toast";
 
 type Props = {
     toolTip?: string,
+    toolTipProps?: TooltipProps,
     icon?: string | StaticImageData;
     width?: number
     withDropdown?: ReactElement<DropdownMenuProps> | ReactElement<DropdownInputProps>
@@ -18,6 +27,7 @@ type Props = {
 
 export default function IconButton({
                                        toolTip,
+                                       toolTipProps,
                                        icon,
                                        color,
                                        width,
@@ -82,6 +92,7 @@ export default function IconButton({
                         content={toolTip}
                         color={color}
                         closeDelay={100}
+                        {...toolTipProps}
                     >
                         {button}
                     </Tooltip>
