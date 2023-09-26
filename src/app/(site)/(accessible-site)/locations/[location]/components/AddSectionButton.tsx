@@ -21,21 +21,21 @@ type CreateSectionArgs = {
     }
 }
 
-const CreateSection = (barName: string) => {
+const CreateSection = (locationName: string) => {
     const mutator = (url: string, { arg }: CreateSectionArgs) => axios.post(url, arg.dto);
-    return useSWRMutation(`/api/inventory/location/${barName}`, mutator);
+    return useSWRMutation(`/api/inventory/location/${locationName}`, mutator);
 };
 
 type Props = {
-    barName: string
+    locationName: string
     disabled?: boolean,
     addSection: (newSection: InventorySectionWithOptionalExtras) => Promise<void>
 }
 
-const AddSectionButton: FC<Props> = ({ barName, disabled, addSection }) => {
+const AddSectionButton: FC<Props> = ({ locationName, disabled, addSection }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { trigger: createSection, isMutating: isCreating } = CreateSection(barName);
+    const { trigger: createSection, isMutating: isCreating } = CreateSection(locationName);
     const onSubmit: SubmitHandler<FieldValues> = useCallback((data) => {
         const name: string = data.sectionName;
         createSection({

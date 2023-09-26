@@ -31,19 +31,19 @@ type CreateStockItemArgs = {
     }
 }
 
-const CreateStockItem = (barName?: string, sectionId?: string) => {
+const CreateStockItem = (locationName?: string, sectionId?: string) => {
     const mutator = (url: string, { arg }: CreateStockItemArgs) => axios.post(url, arg.dto);
-    return useSWRMutation(`/api/inventory/location/${barName}/${sectionId}/stock`, mutator);
+    return useSWRMutation(`/api/inventory/location/${locationName}/${sectionId}/stock`, mutator);
 };
 
 const AddLocationSectionStockItemModal: FC<Props> = ({
-                                                    locationName,
-                                                    sectionSnapshot,
-                                                    isOpen,
-                                                    setOpen,
-                                                    addOptimisticStockItem,
-                                                    items
-                                                }) => {
+                                                         locationName,
+                                                         sectionSnapshot,
+                                                         isOpen,
+                                                         setOpen,
+                                                         addOptimisticStockItem,
+                                                         items
+                                                     }) => {
     const sectionedItems = useMemo(() => {
         const sectionIds = Array.from(new Set(items.map(item => {
             if (item.inventoryId)
@@ -103,7 +103,7 @@ const AddLocationSectionStockItemModal: FC<Props> = ({
 
     return (
         <GenericModal
-            title={`Add New Item To ${locationName}`}
+            title={`Add New Item To ${locationName?.replaceAll("-", " ")}`}
             isOpen={isOpen}
             onClose={() => setOpen(false)}
         >

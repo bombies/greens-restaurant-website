@@ -12,9 +12,9 @@ class InventoryRequestsService {
         to?: number,
     }): Promise<Either<RequestedStockItem[], NextResponse>> {
         let whereQuery: RequestedStockItemWhereInput = {
-            stockId: {
+            stockId: stockIds.length ? {
                 in: stockIds
-            }
+            } : undefined
         };
 
         if (from)
@@ -28,12 +28,15 @@ class InventoryRequestsService {
         if (to)
             whereQuery = {
                 ...whereQuery,
-                createdAt: whereQuery.createdAt && typeof whereQuery.createdAt !== "string" && "gte" in whereQuery.createdAt ? {
-                    ...whereQuery.createdAt,
-                    lte: new Date(to)
-                } : {
-                    lte: new Date(to)
-                }
+                createdAt: whereQuery.createdAt
+                && typeof whereQuery.createdAt !== "string"
+                && "gte" in whereQuery.createdAt ?
+                    {
+                        ...whereQuery.createdAt,
+                        lte: new Date(to)
+                    } : {
+                        lte: new Date(to)
+                    }
             };
 
         const items = await prisma.requestedStockItem.findMany({

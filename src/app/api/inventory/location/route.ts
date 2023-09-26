@@ -3,9 +3,8 @@ import Permission from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { InventoryType } from ".prisma/client";
 import { NextResponse } from "next/server";
-import { v4 } from "uuid";
 import inventoryService from "../[name]/service";
-import { CreateLocationDto, CreateLocationDtoSchema } from "./types";
+import { CreateLocationDto, createLocationDtoSchema } from "./types";
 
 export async function GET(req: Request) {
     return authenticatedAny(req, async (session) => {
@@ -33,7 +32,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     return authenticatedAny(req, async (session) => {
         const body: CreateLocationDto = await req.json();
-        const bodyValidated = CreateLocationDtoSchema.safeParse(body);
+        const bodyValidated = createLocationDtoSchema.safeParse(body);
         if (!bodyValidated.success)
             return respondWithInit({
                 validationErrors: bodyValidated,

@@ -16,15 +16,15 @@ import SubTitle from "../../../../../../_components/text/SubTitle";
 import { RequestedStockItem } from "@prisma/client";
 import { InventoryWithOptionalExtras } from "../../../../../../api/inventory/[name]/types";
 
-const useMostRecentSnapshot = (barName?: string) => {
+const useMostRecentSnapshot = (locationName?: string) => {
     const mutator = (url: string) => axios.get(url);
-    return useSWRMutation(barName && `/api/inventory/location/${barName}/snapshots/mostrecent`, mutator);
+    return useSWRMutation(locationName && `/api/inventory/location/${locationName}/snapshots/mostrecent`, mutator);
 };
 
 
-const useCurrentSectionSnapshots = (barName?: string) => {
+const useCurrentSectionSnapshots = (locationName?: string) => {
     const mutator = (url: string) => fetcher<InventorySectionSnapshotWithOptionalExtras[]>(url);
-    return useSWRMutation(barName && `/api/inventory/location/${barName}/snapshots/current`, mutator);
+    return useSWRMutation(locationName && `/api/inventory/location/${locationName}/snapshots/current`, mutator);
 };
 
 const usePreviousWeekInventoryRequestInfo = (stockIds?: (string | undefined)[]) => {
@@ -36,7 +36,7 @@ const usePreviousWeekInventoryRequestInfo = (stockIds?: (string | undefined)[]) 
     latestDate.setHours(11, 59, 59, 999);
     if (latestDate.getDay() === 0)
         latestDate.setDate(latestDate.getDate() - 1);
-    return useSWR(stockIds ? `/api/inventory/requests/items?ids=${stockIds?.filter(id => id).toString()}&from=${previousSunday.getTime()}$to=${latestDate.getTime()}` : [], fetcher<RequestedStockItem[]>);
+    return useSWR(stockIds ? `/api/inventory/requests/items?${stockIds && stockIds.length ? `ids=${stockIds.filter(id => id).toString()}` : ""}&from=${previousSunday.getTime()}&to=${latestDate.getTime()}` : [], fetcher<RequestedStockItem[]>);
 };
 
 type Props = {
@@ -49,7 +49,7 @@ const ChecksAndBalancesButton: FC<Props> = ({ locationInfo }) => {
         isLoading: loadingPreviousWeekRequestedItems
     } = usePreviousWeekInventoryRequestInfo(locationInfo?.inventorySections?.map(section => section.assignedStock?.map(stock => stock.id)).flat());
     const [modalOpen, setModalOpen] = useState(false);
-    const { trigger: fetchMostRecentSnapshot, isMutating: isFetching, data: response } = useMostRecentSnapshot("bar");
+    const { trigger: fetchMostRecentSnapshot, isMutating: isFetching, data: response } = useMostRecentSnapshot(locationInfo?.name);
     const {
         trigger: fetchCurrentSectionSnapshots,
         data: currentSectionSnapshots,

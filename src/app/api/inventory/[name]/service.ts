@@ -807,9 +807,10 @@ class InventoryService {
         }));
     };
 
-    async fetchInsightsData(inventoryName: string): Promise<Either<StockTimeSeries[], NextResponse>> {
+    async fetchInsightsData(inventoryName: string, location: boolean = false): Promise<Either<StockTimeSeries[], NextResponse>> {
         const inventory = await inventoryService.fetchInventory(inventoryName, {
-            inventorySections: true
+            inventorySections: true,
+            location
         });
         if (inventory.error)
             return new Either<StockTimeSeries[], NextResponse>(undefined, inventory.error);
@@ -823,6 +824,11 @@ class InventoryService {
                     {
                         inventorySectionId: {
                             in: inventory.success!.inventorySections?.map(section => section.id)
+                        }
+                    },
+                    {
+                        assignedInventorySectionIds: {
+                            hasSome: inventory.success!.inventorySections?.map(section => section.id)
                         }
                     }
                 ]
@@ -1040,7 +1046,7 @@ class InventoryService {
 
         if (!inventorySections || !inventorySections.length)
             return new Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>(undefined, respondWithInit({
-                message: `There was so inventory sections found with the ids: ${sectionIds}`,
+                message: `There was no inventory sections found with the ids: ${sectionIds}`,
                 status: 404
             }));
 
@@ -1141,7 +1147,7 @@ class InventoryService {
 
         if (!inventorySections || !inventorySections.length)
             return new Either<InventorySectionSnapshotWithOptionalExtras[], NextResponse>(undefined, respondWithInit({
-                message: `There was so inventory section found with the ids: ${sectionIds}`,
+                message: `There was no inventory section found with the ids: ${sectionIds}`,
                 status: 404
             }));
 
@@ -1575,9 +1581,9 @@ class InventoryService {
                 status: 500
             }));
 
-        const createdSnapshot = await this.createStockSnapshot(sectionId, {
+        const createdSnapshot = await this.createSectionStockSnapshot(sectionId, {
             name: fetchedStock.name,
-            type: fetchedStock.type ?? undefined,
+            type: fetchedStock.type,
             price: fetchedStock.price
         });
         if (createdSnapshot.error)

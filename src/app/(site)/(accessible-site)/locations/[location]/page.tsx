@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import SpecificLocationContext from "./components/SpecificLocationContext";
 
 type Context = {
     params: {
@@ -6,11 +6,9 @@ type Context = {
     }
 }
 
-const SpecificLocationPage = ({ params }: Context) => {
+const SpecificLocationPage = ({ params: { location } }: Context) => {
     return (
-        <Fragment>
-
-        </Fragment>
+        <SpecificLocationContext locationName={location} />
     );
 };
 

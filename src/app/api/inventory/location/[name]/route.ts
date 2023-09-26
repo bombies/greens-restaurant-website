@@ -13,7 +13,10 @@ type Context = {
 
 export async function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const sections = await inventoryService.fetchInventorySections(params.name, InventoryType.LOCATION);
+        const sections = await inventoryService.fetchInventory(params.name, {
+            location: true,
+            inventorySections: true
+        });
         return sections.error ?? NextResponse.json(sections.success);
     }, [
         Permission.CREATE_INVENTORY,

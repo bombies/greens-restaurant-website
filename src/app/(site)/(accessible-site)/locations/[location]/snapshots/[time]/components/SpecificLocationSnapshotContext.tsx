@@ -30,7 +30,7 @@ const useCurrentWeekInventoryRequestInfo = (stockIds?: (string | undefined)[], f
     const nextSaturday = new Date(from ?? 0);
     nextSaturday.setHours(11, 59, 59, 999);
     nextSaturday.setDate(nextSaturday.getDate() + (7 + 6 - nextSaturday.getDay()) % 7);
-    return useSWR(from && stockIds ? `/api/inventory/requests/items?ids=${stockIds?.filter(id => id).toString()}&from=${previousSunday.getTime()}&to${nextSaturday.getTime()}` : [], fetcher<RequestedStockItem[]>);
+    return useSWR(from && stockIds ? `/api/inventory/requests/items?${stockIds && stockIds.length ? `ids=${stockIds.filter(id => id).toString()}` : ""}&from=${previousSunday.getTime()}&to${nextSaturday.getTime()}` : [], fetcher<RequestedStockItem[]>);
 };
 
 

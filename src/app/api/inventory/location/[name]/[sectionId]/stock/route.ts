@@ -22,13 +22,13 @@ export async function GET(req: Request, { params }: Context) {
 }
 
 export interface AddLocationStockDto {
-    stockId: string
+    stockId: string;
 }
 
-export async function POST(req: Request, { params }: Context) {
+export async function POST(req: Request, { params: { name: inventoryName, sectionId } }: Context) {
     return authenticatedAny(req, async () => {
         const body: AddLocationStockDto = await req.json();
-        const createdStock = await inventoryService.createSectionStock(params.sectionId, body);
+        const createdStock = await inventoryService.createSectionStock(sectionId, body);
         return createdStock.error ?? NextResponse.json(createdStock.success!);
     }, [
         Permission.CREATE_INVENTORY,

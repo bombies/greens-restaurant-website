@@ -26,7 +26,7 @@ const useCurrentWeekInventoryRequestInfo = (stockIds?: (string | undefined)[]) =
     previousSunday.setHours(0, 0, 0, 0);
     if (previousSunday.getDate() !== 0)
         previousSunday.setDate(previousSunday.getDate() - (previousSunday.getDay() || 7));
-    return useSWR(stockIds ? `/api/inventory/requests/items?ids=${stockIds?.filter(id => id).toString()}&from=${previousSunday.getTime()}` : [], fetcher<RequestedStockItem[]>);
+    return useSWR(stockIds ? `/api/inventory/requests/items?${stockIds && stockIds.length ? `ids=${stockIds.filter(id => id).toString()}` : ""}&from=${previousSunday.getTime()}` : [], fetcher<RequestedStockItem[]>);
 };
 
 const SpecificLocationContext: FC<Props> = ({ locationName }) => {
@@ -104,7 +104,7 @@ const SpecificLocationContext: FC<Props> = ({ locationName }) => {
                                 mutationAllowed ?
                                     <Fragment>
                                         <AddSectionButton
-                                            barName="bar"
+                                            locationName={locationName}
                                             addSection={addSection}
                                         />
                                         <ChecksAndBalancesButton
@@ -133,3 +133,5 @@ const SpecificLocationContext: FC<Props> = ({ locationName }) => {
         </div>
     );
 };
+
+export default SpecificLocationContext;
