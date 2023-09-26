@@ -19,6 +19,7 @@ import { toast } from "react-hot-toast";
 import { useUserData } from "../../../../utils/Hooks";
 import BarIcon from "../../../_components/icons/BarIcon";
 import RequestIcon from "../../../_components/icons/RequestIcon";
+import LocationIcon from "../../../_components/icons/LocationIcon";
 
 export default function Sidebar() {
     const { data: user } = useUserData();
@@ -41,7 +42,7 @@ export default function Sidebar() {
                             Permission.MUTATE_LOCATIONS
                         ])
                         &&
-                        <TheBarSidebarItem />
+                        <LocationsSidebarItem />
                     }
                     {
                         hasAnyPermission(user?.permissions, [
@@ -186,15 +187,15 @@ function InventoryRequestsSidebarItem() {
     />);
 }
 
-function TheBarSidebarItem() {
+function LocationsSidebarItem() {
     const [iconColor, setIconColor] = useState("#ffffff");
     const setActiveColor = () => setIconColor("#00D615");
     const setDefaultColor = () => setIconColor("#ffffff");
 
-    const icon = <BarIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
+    const icon = <LocationIcon width="1.25rem" height="1.25rem" className="transition-fast" fill={iconColor} />;
     return (<SidebarItem
-        label={"The Bar"}
-        href={"/bar"}
+        label={"Locations"}
+        href={"/locations"}
         icon={icon}
         onHoverEnter={setActiveColor}
         onHoverLeave={setDefaultColor}

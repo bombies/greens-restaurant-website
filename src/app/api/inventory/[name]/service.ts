@@ -76,7 +76,7 @@ class InventoryService {
         } : {
             OR: [
                 { type: body.type },
-                { type: null }
+                { type: { isSet: false } }
             ]
         };
         const existingInventory = await prisma.inventory.findUnique({
@@ -1120,7 +1120,7 @@ class InventoryService {
         } : {
             OR: [
                 { type },
-                { type: null }
+                { type: { isSet: false } }
             ]
         };
 

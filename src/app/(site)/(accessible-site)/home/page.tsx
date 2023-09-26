@@ -14,7 +14,7 @@ import { Spacer } from "@nextui-org/react";
 import InvoiceWidget from "./_components/widgets/invoice/InvoiceWidget";
 import CreateInventoryRequestQuickAction from "./_components/quick-actions/CreateInventoryRequestQuickAction";
 import InventoryRequestWidget from "./_components/widgets/InventoryRequestWidget";
-import ManageBarQuickAction from "./_components/quick-actions/ManageBarQuickAction";
+import ManageLocationsQuickAction from "./_components/quick-actions/ManageLocationsQuickAction";
 
 export default function HomePage() {
     const session = useSession();
@@ -62,7 +62,7 @@ export default function HomePage() {
                                     Permission.MUTATE_LOCATIONS
                                 ])
                                 &&
-                                <ManageBarQuickAction />
+                                <ManageLocationsQuickAction />
                             }
                             {
                                 hasAnyPermission(user?.permissions, [

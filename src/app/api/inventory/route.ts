@@ -1,13 +1,10 @@
-import { authenticated, authenticatedAny, respond, respondWithInit } from "../../../utils/api/ApiUtils";
+import { authenticated, authenticatedAny } from "../../../utils/api/ApiUtils";
 import Permission from "../../../libs/types/permission";
 import prisma from "../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { INVENTORY_NAME_REGEX } from "../../../utils/regex";
-import { v4 } from "uuid";
 import { InventoryType, Prisma } from ".prisma/client";
-import { StockType } from "@prisma/client";
 import InventoryWhereInput = Prisma.InventoryWhereInput;
-import { CreateInventoryDto, createInventoryDtoSchema } from "./[name]/types";
+import { CreateInventoryDto } from "./[name]/types";
 import inventoryService from "./[name]/service";
 
 export function GET(req: Request) {
@@ -15,7 +12,12 @@ export function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const ids = searchParams.get("ids")?.replaceAll(/\s/g, "").split(",").filter(id => id.length > 0);
         const withStock = searchParams.get("with_stock") === "true";
-        let whereQuery: InventoryWhereInput = {};
+        let whereQuery: InventoryWhereInput = {
+            OR: [
+                { type: { isSet: false } },
+                { type: InventoryType.LOCATION }
+            ]
+        };
 
         if (ids && ids.length)
             whereQuery = {
@@ -31,7 +33,7 @@ export function GET(req: Request) {
                 stock: withStock
             }
         });
-        return NextResponse.json(inventories.filter(inv => inv.type === null || inv.type === StockType.DEFAULT));
+        return NextResponse.json(inventories);
     }, [
         Permission.CREATE_INVENTORY,
         Permission.CREATE_STOCK_REQUEST,
