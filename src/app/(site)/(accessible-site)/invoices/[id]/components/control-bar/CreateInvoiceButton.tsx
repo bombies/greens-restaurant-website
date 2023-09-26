@@ -34,10 +34,13 @@ export default function CreateInvoiceButton({ customer, disabled, mutator }: Pro
                 icon={invoiceIcon}
                 onPress={() => triggerInvoiceCreation()
                     .then(async (res) => {
+                        if (!customer)
+                            return;
+
                         const createdInvoice: InvoiceWithOptionalItems = res.data;
                         await mutator({
                             ...customer,
-                            invoices: customer?.invoices ? [
+                            invoices: customer.invoices ? [
                                 ...customer.invoices,
                                 createdInvoice
                             ] : [createdInvoice]

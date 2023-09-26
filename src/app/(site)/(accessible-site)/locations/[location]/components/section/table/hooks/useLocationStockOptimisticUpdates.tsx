@@ -58,6 +58,7 @@ const useLocationStockOptimisticUpdates = ({
                     .catch(e => {
                         console.error(e);
                         errorToast(e, "Could not delete items!");
+                        return ({ ...currentSnapshot });
                     }),
                 {
                     optimisticData: {
@@ -98,6 +99,7 @@ const useLocationStockOptimisticUpdates = ({
                     .catch(e => {
                         console.error(e);
                         errorToast(e, "Could not delete items!");
+                        return ({ ...currentSnapshot });
                     }),
                 {
                     optimisticData: {
