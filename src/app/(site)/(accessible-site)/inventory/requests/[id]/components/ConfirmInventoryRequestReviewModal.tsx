@@ -9,10 +9,10 @@ import GenericModal from "../../../../../../_components/GenericModal";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { ReviewInventoryRequestDto } from "../../../../../../api/inventory/requests/[id]/review/route";
 import { StockRequestWithOptionalExtras } from "../../../_components/requests/inventory-requests-utils";
 import { toast } from "react-hot-toast";
 import { KeyedMutator } from "swr";
+import { ReviewInventoryRequestDto } from "../../../../../../api/inventory/requests/types";
 
 type ReviewRequestArgs = {
     arg: {
