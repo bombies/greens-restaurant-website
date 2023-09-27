@@ -27,20 +27,24 @@ export default function Sidebar() {
 
     const sidebar = (
         <Fragment>
-            <DoubleArrowIcon
-                className={clsx(`
-                    absolute
-                    top-10 left-10
-                    hover:scale-110
-                    transition-fastest
-                    cursor-pointer
-                    z-50`,
-                    opened ? "rotate-180" : ""
-                )}
-                onClick={() => setOpened(prev => !prev)}
-                width="2rem"
-                fill={opened ? "#00D615" : "#ffffff"}
-            />
+            <div className={`absolute
+                    top-5 left-5 z-50`}>
+                <IconButton
+                    variant="light"
+                    onPress={() => setOpened(prev => !prev)}
+                >
+                    <DoubleArrowIcon
+                        className={clsx(`
+                            transition-fastest
+                            cursor-pointer
+                            z-50`,
+                            opened ? "rotate-180" : ""
+                        )}
+                        width="1.5rem"
+                        fill={opened ? "#00D615" : "#ffffff"}
+                    />
+                </IconButton>
+            </div>
             <div
                 className={clsx(
                     `h-full w-full default-container !rounded-l-none backdrop-blur-md transition-fast`,
@@ -48,7 +52,10 @@ export default function Sidebar() {
                 )}>
                 <div className="flex justify-center mt-20">
                     <Link href="/home">
-                        <GenericImage src="https://i.imgur.com/HLTQ78m.png" width={opened ? 10 : 6} />
+                        <GenericImage
+                            src="https://i.imgur.com/HLTQ78m.png"
+                            className={clsx(opened ? "w-48 phone:w-24 h-48 phone:h-24" : "w-24 h-24")}
+                        />
                     </Link>
                 </div>
                 <nav className={clsx(
@@ -142,7 +149,7 @@ export default function Sidebar() {
             top-0
             h-screen
             overflow-x-hidden
-            tablet:absolute
+            tablet:fixed
             transition-fast
             z-40`,
             opened ? "w-64" : "w-32"
