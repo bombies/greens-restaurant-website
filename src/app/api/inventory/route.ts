@@ -15,7 +15,7 @@ export function GET(req: Request) {
         let whereQuery: InventoryWhereInput = {
             OR: [
                 { type: { isSet: false } },
-                { type: InventoryType.LOCATION }
+                { type: InventoryType.DEFAULT }
             ]
         };
 
