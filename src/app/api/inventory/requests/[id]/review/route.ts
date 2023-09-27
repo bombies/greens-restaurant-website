@@ -1,13 +1,12 @@
 import { z } from "zod";
 import { authenticatedAny, respondWithInit } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
-import { StockRequestStatus } from ".prisma/client";
-import Prisma from "../../../../../../libs/prisma";
+import { Prisma, StockRequestStatus } from ".prisma/client";
 import prisma from "../../../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import { Inventory, RequestedStockItem, Stock } from "@prisma/client";
 import { arrayCompare } from "../../../../../../utils/GeneralUtils";
-import inventoryService from "../../../[name]/service";
+import inventoryService, { Either } from "../../../[name]/service";
 
 type Context = {
     params: {
@@ -88,7 +87,7 @@ export async function POST(req: Request, { params }: Context) {
         /**
          * Update the respective stock items
          */
-        const items = await Prisma.$transaction(
+        const items = await prisma.$transaction(
             body.items.map(item => prisma.requestedStockItem.update({
                 where: { id: item.id },
                 data: { amountProvided: item.amountProvided },
@@ -128,13 +127,17 @@ type RequestStockItemWithStockAndOptionalInventory = RequestedStockItem & {
     }
 }
 
-const updateSnapshots = async (items: RequestStockItemWithStockAndOptionalInventory[]) => {
+const updateSnapshots = async (items: RequestStockItemWithStockAndOptionalInventory[]): Promise<Either<Prisma.BatchPayload[], NextResponse>> => {
     const transformedItems = transformItems(items);
     const snapshots = await inventoryService.fetchCurrentSnapshots(transformedItems.map(item => item.inventory.id));
+    if (snapshots.error)
+        return new Either<Prisma.BatchPayload[], NextResponse>(undefined, snapshots.error);
+    const fetchedSnapshots = snapshots.success!;
+    const snapshotIds = fetchedSnapshots.map(snapshot => snapshot.id);
+
     const todaysDate = new Date();
     todaysDate.setHours(0, 0, 0, 0);
-
-    return Prisma.$transaction(
+    const transactions = await prisma.$transaction(
         transformedItems.map(item =>
             item.items.map(requestedItem =>
                 prisma.stockSnapshot.updateMany({
@@ -142,6 +145,11 @@ const updateSnapshots = async (items: RequestStockItemWithStockAndOptionalInvent
                         uid: requestedItem.stock.uid,
                         createdAt: {
                             gte: todaysDate
+                        },
+                        inventorySnapshot: {
+                            id: {
+                                in: snapshotIds
+                            }
                         }
                     },
                     data: {
@@ -153,6 +161,8 @@ const updateSnapshots = async (items: RequestStockItemWithStockAndOptionalInvent
             )
         ).flat()
     );
+
+    return new Either<Prisma.BatchPayload[], NextResponse>(transactions);
 };
 
 type InventoryWithRequestedStockItems = {

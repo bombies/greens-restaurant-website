@@ -12,6 +12,7 @@ import { StockRequestWithOptionalCreatorAndAssignees } from "../../inventory-req
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import { User } from "@prisma/client";
 import { FetchAllInventories } from "../../../InventoryGrid";
+import useLocations from "../../../../../locations/components/hooks/useLocations";
 
 type Props = {
     setModalOpen: Dispatch<SetStateAction<boolean>>
@@ -25,8 +26,10 @@ const FetchValidAssignees = () => {
 
 const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData }) => {
     const { data, isLoading } = FetchAllInventories();
+    const { data: locations, isLoading: locationsLoading } = useLocations();
     const [snapshotsLoading, setSnapshotsLoading] = useState(false);
     const [selectedInventoryIds, setSelectedInventoryIds] = useState<string[]>([]);
+    const [selectedLocationId, setSelectedLocationId] = useState<string>();
     const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([]);
     const {
         data: availableAssignees,
@@ -38,6 +41,7 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData
         <div className="space-y-6">
             <div className="flex gap-4 phone:flex-col">
                 <GenericSelectMenu
+                    label="From"
                     isRequired
                     selectionMode="multiple"
                     id="selected_inventories"
@@ -70,9 +74,45 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData
                         </SelectItem>
                     )}
                 </GenericSelectMenu>
+                <GenericSelectMenu
+                    isRequired
+                    label="To"
+                    selectionMode="single"
+                    disallowEmptySelection
+                    id="selected_location"
+                    placeholder="Select location..."
+                    items={locations ?? []}
+                    isDisabled={locationsLoading || snapshotsLoading}
+                    selectedKeys={selectedLocationId ? [selectedLocationId] : []}
+                    onSelectionChange={selection => setSelectedLocationId((Array.from(selection) as string[])[0])}
+                    variant="flat"
+                    renderValue={(items) => {
+                        return (
+                            <div className="flex flex-wrap gap-2">
+                                {items.map((item) => (
+                                    <Chip
+                                        color="primary"
+                                        variant="flat"
+                                        className="capitalize"
+                                        key={item.key}
+                                    >
+                                        {item.data?.name.replaceAll("-", " ")}
+                                    </Chip>
+                                ))}
+                            </div>
+                        );
+                    }}
+                >
+                    {(inventory) => (
+                        <SelectItem key={inventory.id} className="capitalize">
+                            {inventory.name.replaceAll("-", " ")}
+                        </SelectItem>
+                    )}
+                </GenericSelectMenu>
                 {
                     (avatarsLoading || isLoadingAvailableAssignees) ||
                     <GenericSelectMenu
+                        label="Assigned To"
                         selectionMode="multiple"
                         id="selected_assignees"
                         placeholder="Select assignees..."
