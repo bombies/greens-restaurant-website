@@ -17,7 +17,7 @@ export default function SidebarItem(props: SidebarItemProps) {
             "text-white",
             !props.sidebarOpen && "w-fit"
         )}>
-            <div className="w-full flex gap-4 p-4 transition-fast hover:text-primary hover:bg-primary/5"
+            <div className={clsx("w-full flex gap-4 p-4 transition-fast hover:text-primary hover:bg-primary/5", !props.sidebarOpen && "rounded-lg")}
                  onMouseEnter={props.onHoverEnter}
                  onMouseLeave={props.onHoverLeave}
             >
