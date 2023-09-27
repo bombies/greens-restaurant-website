@@ -4,7 +4,7 @@ import { User } from "@prisma/client";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { fetcher } from "../../_components/EmployeeGrid";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { Checkbox, CheckboxGroup, Spacer } from "@nextui-org/react";
 import Link from "next/link";
 import BackIcon from "../../../../../_components/icons/BackIcon";
@@ -25,6 +25,7 @@ import ContainerSkeleton from "../../../../../_components/skeletons/ContainerSke
 import { DataGroupContainer } from "../../../../../_components/DataGroupContainer";
 import { toast } from "react-hot-toast";
 import { UpdateUserDto } from "../../../../../api/users/[username]/route";
+import { AxiosError } from "axios";
 
 type Props = {
     username: string
@@ -43,7 +44,9 @@ export type UpdateUserArgs = {
 export const UpdateUser = (username?: string, nonAdmin?: boolean) => {
     const mutator = (url: string, { arg }: UpdateUserArgs) => {
         // @ts-ignore
-        const { id, createdAt, updatedAt, image, createdInventoryIds, assignedStockRequestsIds, password, ...validDto } = arg.dto;
+        const {id, createdAt, updatedAt, image, createdInventoryIds, assignedStockRequestsIds, password,
+            ...validDto
+        } = arg.dto;
         return axios.patch(url, validDto);
     };
     return useSWRMutation(nonAdmin ? `/api/users/me` : `/api/users/${username}`, mutator);
@@ -69,11 +72,15 @@ export default function Employee({ username }: Props) {
     }, [router, session.data?.user?.username, session.status, username]);
 
     useEffect(() => {
-        if (!isLoading && !user) {
-            if (employeeDataError)
-                console.error("employee data error", employeeDataError);
-            router.push("/employees");
-        } else if (!isLoading && user) {
+        if (employeeDataError && employeeDataError instanceof AxiosError) {
+            const status = employeeDataError.response!.status;
+            if (status === 404)
+                notFound();
+        }
+    }, [employeeDataError, isLoading, user]);
+
+    useEffect(() => {
+        if (!isLoading && user) {
             setCurrentData(user);
             setEditAllowed(
                 permissionCheck(user.permissions, Permission.ADMINISTRATOR) ?
@@ -270,7 +277,8 @@ export default function Employee({ username }: Props) {
                                                     }));
                                                 }}
                                             >
-                                                <div className="grid grid-rows-5 phone:grid-flow-row phone:grid-cols-1 grid-flow-col gap-y-4">
+                                                <div
+                                                    className="grid grid-rows-5 phone:grid-flow-row phone:grid-cols-1 grid-flow-col gap-y-4">
                                                     <Checkbox
                                                         value={Permission.ADMINISTRATOR.toString()}
                                                         isDisabled={
@@ -290,7 +298,8 @@ export default function Employee({ username }: Props) {
                                                         Invoice</Checkbox>
                                                     <Checkbox value={Permission.MANAGE_STOCK_REQUESTS.toString()}>Manage
                                                         Stock Requests</Checkbox>
-                                                    <Checkbox value={Permission.VIEW_STOCK_REQUESTS.toString()}>View Stock
+                                                    <Checkbox value={Permission.VIEW_STOCK_REQUESTS.toString()}>View
+                                                        Stock
                                                         Requests</Checkbox>
                                                     <Checkbox value={Permission.CREATE_STOCK_REQUEST.toString()}>Create
                                                         Stock Request</Checkbox>

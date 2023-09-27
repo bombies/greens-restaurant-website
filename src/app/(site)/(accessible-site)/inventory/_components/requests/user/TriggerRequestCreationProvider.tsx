@@ -1,9 +1,9 @@
 "use client";
 
 import React, { createContext, useContext } from "react";
-import { CreateStockRequestDto } from "../../../../../../api/inventory/requests/me/route";
 import axios, { AxiosResponse } from "axios";
 import useSWRMutation, { SWRMutationResponse } from "swr/mutation";
+import { CreateStockRequestDto } from "../../../../../../api/inventory/requests/types";
 
 type CreateNewRequestArgs = {
     arg: {

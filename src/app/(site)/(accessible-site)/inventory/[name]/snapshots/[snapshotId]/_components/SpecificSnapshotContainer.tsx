@@ -3,12 +3,13 @@
 import useSWR from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import InventoryStockTable, { columns } from "../../../_components/table/InventoryStockTable";
 import TableSkeleton from "../../../../../../../_components/skeletons/TableSkeleton";
 import { Spacer } from "@nextui-org/react";
 import SubTitle from "../../../../../../../_components/text/SubTitle";
 import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
+import { AxiosError } from "axios";
 
 type Props = {
     inventoryName: string,
@@ -20,10 +21,15 @@ const FetchSpecificSnapshot = (inventoryName: string, snapshotId: string) => {
 };
 
 export default function SpecificSnapshotContainer({ inventoryName, snapshotId }: Props) {
-    const { data, isLoading, mutate } = FetchSpecificSnapshot(inventoryName, snapshotId);
+    const { data, isLoading, mutate, error } = FetchSpecificSnapshot(inventoryName, snapshotId);
     const router = useRouter();
-
     useEffect(() => {
+        if (error && error instanceof AxiosError) {
+            const status = error.response!.status;
+            if (status === 404)
+                notFound();
+        }
+
         if (
             ((!isLoading && data)
                 &&
@@ -31,7 +37,7 @@ export default function SpecificSnapshotContainer({ inventoryName, snapshotId }:
             || (!isLoading && !data)
         )
             router.replace(`/inventory/${inventoryName}`);
-    }, [data, inventoryName, isLoading, router]);
+    }, [data, error, inventoryName, isLoading, router]);
 
     return (
         <>

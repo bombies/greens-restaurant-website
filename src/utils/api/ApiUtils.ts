@@ -6,6 +6,7 @@ import { AuthenticatedServerAxiosClient } from "./AuthenticatedServerAxiosClient
 import { getToken } from "next-auth/jwt";
 import prisma from "../../libs/prisma";
 import { z } from "zod";
+import { Either } from "../../app/api/inventory/[name]/service";
 
 export const authenticated = async (
     request: Request,
@@ -90,10 +91,19 @@ export const respondWithInit = ({ data, message, validationErrors, ...init }: {
     message?: string,
     validationErrors?: z.SafeParseReturnType<any, any>
 } & ResponseInit) => {
-    return NextResponse.json((!validationErrors?.success ? {
+    return NextResponse.json<ErrorResponse>((!validationErrors?.success ? {
         message: validationErrors?.error.errors.map(err => err.message).join(". ") || message,
         data: validationErrors?.error.errors
     } : data) || {
         message
     }, init);
+};
+
+export type ErrorResponse = {
+    message?: string,
+    data?: any,
+}
+
+export const handleEitherResult = <T>(result: Either<T, NextResponse<ErrorResponse>>): NextResponse<T | ErrorResponse> => {
+    return result.error ?? NextResponse.json<T>(result.success!);
 };

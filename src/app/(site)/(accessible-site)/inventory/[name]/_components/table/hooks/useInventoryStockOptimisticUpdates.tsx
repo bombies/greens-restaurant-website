@@ -5,7 +5,9 @@ import useInventoryStockUpdate from "./useInventoryStockUpdate";
 import useInventoryStockDelete from "./useInventoryStockDelete";
 import { useCallback } from "react";
 import { errorToast } from "../../../../../../../../utils/Hooks";
-import { PartialStockSnapshotWithStock } from "../../../../../bar/components/section/table/BarStockTable";
+import {
+    PartialStockSnapshotWithStock
+} from "../../../../../locations/[location]/components/section/table/LocationStockTable";
 import { StockSnapshot } from "@prisma/client";
 import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
 
@@ -20,6 +22,9 @@ const useInventoryStockOptimisticUpdates = ({ inventoryName, currentSnapshot, mu
     const { trigger: deleteStock } = useInventoryStockDelete(inventoryName);
 
     const addOptimisticStockItem = useCallback(async (item: StockSnapshot) => {
+        if (!currentSnapshot)
+            return;
+
         await mutateCurrentSnapshot({
             ...currentSnapshot,
             stockSnapshots: currentSnapshot?.stockSnapshots ? [...currentSnapshot.stockSnapshots, item] : [item]
@@ -44,6 +49,10 @@ const useInventoryStockOptimisticUpdates = ({ inventoryName, currentSnapshot, mu
                 .catch(e => {
                     console.error(e);
                     errorToast(e, "Could not delete items!");
+
+                    return ({
+                        ...currentSnapshot,
+                    });
                 }),
             {
                 optimisticData: {
@@ -84,6 +93,10 @@ const useInventoryStockOptimisticUpdates = ({ inventoryName, currentSnapshot, mu
                 .catch(e => {
                     console.error(e);
                     errorToast(e, `Could not update ${item.name?.replaceAll("-", " ")}!`);
+
+                    return ({
+                        ...currentSnapshot
+                    });
                 }),
             {
                 optimisticData: {

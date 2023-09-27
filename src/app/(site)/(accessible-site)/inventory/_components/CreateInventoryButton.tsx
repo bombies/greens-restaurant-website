@@ -9,10 +9,10 @@ import { Spacer } from "@nextui-org/react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { CreateInventoryDto } from "../../../../api/inventory/route";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../utils/Hooks";
+import { CreateInventoryDto } from "../../../../api/inventory/[name]/types";
 
 type Props = {
     disabled?: boolean

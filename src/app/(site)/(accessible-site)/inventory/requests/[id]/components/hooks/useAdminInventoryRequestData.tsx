@@ -1,9 +1,9 @@
 "use client";
 
-import { ReviewInventoryRequestDto } from "../../../../../../../api/inventory/requests/[id]/review/route";
 import { Dispatch, SetStateAction, useEffect, useMemo, useReducer } from "react";
 import { StockRequestWithOptionalExtras } from "../../../../_components/requests/inventory-requests-utils";
 import { compare } from "../../../../../../../../utils/GeneralUtils";
+import { ReviewInventoryRequestDto } from "../../../../../../../api/inventory/requests/types";
 
 export enum OptimisticRequestDataActionType {
     SET,

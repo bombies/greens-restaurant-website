@@ -27,6 +27,14 @@ export function GET(req: Request, { params }: Context) {
 export const fetchCustomerInfo = async (id: string, withInvoices?: boolean, withInvoiceItems?: boolean): Promise<Either<InvoiceCustomer & {
     invoices?: (Invoice & { invoiceItems?: InvoiceItem[] })[]
 }, NextResponse>> => {
+    if (!/^[a-f\d]{24}$/i.test(id))
+        return new Either<InvoiceCustomer & {
+            invoices?: (Invoice & { invoiceItems?: InvoiceItem[] })[]
+        }, NextResponse>(undefined, respondWithInit({
+            message: "That ID isn't a valid ID!",
+            status: 404
+        }));
+
     const existingCustomer = await prisma.invoiceCustomer.findUnique({
         where: { id },
         include: {

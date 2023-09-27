@@ -3,7 +3,7 @@
 import Title from "../../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
 import { errorToast, useUserData } from "../../../../../../../utils/Hooks";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import InvoiceControlBar from "./control-bar/InvoiceControlBar";
 import SubTitle from "../../../../../../_components/text/SubTitle";
@@ -15,11 +15,12 @@ import InvoicePaidStatus, { PaidStatus } from "./InvoicePaidStatus";
 import TableSkeleton from "../../../../../../_components/skeletons/TableSkeleton";
 import { useInvoice } from "./InvoiceProvider";
 import { useInvoiceItems } from "./InvoiceItemsProvider";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import useSWRMutation from "swr/mutation";
 import { useInvoicePaymentStatus } from "./hooks/useInvoicePaymentStatus";
 import { formatInvoiceNumber } from "../../../utils/invoice-utils";
 import { FetchInvoiceCustomer } from "../../../utils/invoice-client-utils";
+import { notFound } from "next/navigation";
 
 type Props = {
     customerId: string
@@ -40,8 +41,13 @@ const ChangePaidStatus = (customerId?: string) => {
 };
 
 export default function InvoiceLayout({ customerId }: Props) {
-    const { data: customer, isLoading: customerIsLoading, mutate } = FetchInvoiceCustomer(customerId);
-    const { data: invoice, isLoading: invoiceIsLoading, mutate: mutateInvoice } = useInvoice();
+    const {
+        data: customer,
+        isLoading: customerIsLoading,
+        mutate,
+        error: customerError
+    } = FetchInvoiceCustomer(customerId);
+    const { data: invoice, isLoading: invoiceIsLoading, mutate: mutateInvoice, error: invoiceError } = useInvoice();
     const { state: invoiceItems } = useInvoiceItems();
     const { data: userData } = useUserData([
         Permission.VIEW_INVOICES,
@@ -49,6 +55,17 @@ export default function InvoiceLayout({ customerId }: Props) {
     ]);
     const { trigger: triggerStatusChange, isMutating: statusIsChanging } = ChangePaidStatus(customerId);
     const { selectedStatus, setSelectedStatus } = useInvoicePaymentStatus({ invoice, invoiceIsLoading });
+
+    useEffect(() => {
+        if ((!customerError || !(customerError instanceof AxiosError)) && (!invoiceError || (!(invoiceError instanceof AxiosError))))
+            return;
+
+        const customerStatus = (customerError as AxiosError | undefined)?.response?.status ?? undefined;
+        const invoiceStatus = (invoiceError as AxiosError | undefined)?.response?.status ?? undefined;
+
+        if (customerStatus === 404 || invoiceStatus === 404)
+            notFound();
+    }, [customerError, invoiceError]);
 
     return (
         <div>

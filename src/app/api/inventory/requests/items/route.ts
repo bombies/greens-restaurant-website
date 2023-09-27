@@ -6,9 +6,10 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request) {
     return authenticatedAny(req, async () => {
         const { searchParams } = new URL(req.url);
-        const ids = searchParams.get("ids")?.split(",");
-        const from: number | undefined = searchParams.get("from") ? Number(searchParams.get("from")) : undefined;
-        const to: number | undefined = searchParams.get("to") ? Number(searchParams.get("to")) : undefined;
+        let ids = searchParams.get("ids")?.split(",");
+        const assignedLocationName = searchParams.get("loc_name") ?? undefined;
+        const from = searchParams.get("from") ? Number(searchParams.get("from")) : undefined;
+        const to = searchParams.get("to") ? Number(searchParams.get("to")) : undefined;
 
         if (!ids)
             return respondWithInit({
@@ -16,16 +17,18 @@ export async function GET(req: Request) {
                 status: 400
             });
 
+        ids = ids.filter(id => id.length);
         const items = await inventoryRequestsService.fetchRequestedItems({
             stockIds: ids,
-            from, to
+            from, to,
+            locationName: assignedLocationName
         });
         return items.error ?? NextResponse.json(items.success!);
     }, [
         Permission.VIEW_STOCK_REQUESTS,
         Permission.MANAGE_STOCK_REQUESTS,
         Permission.CREATE_INVENTORY,
-        Permission.MUTATE_BAR_INVENTORY,
-        Permission.VIEW_BAR_INVENTORY
+        Permission.MUTATE_LOCATIONS,
+        Permission.VIEW_LOCATIONS
     ]);
 }
