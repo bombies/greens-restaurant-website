@@ -4,22 +4,32 @@ import Title from "../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
 import InvoiceCustomerControlBar from "./control-bar/InvoiceCustomerControlBar";
 import { useUserData } from "../../../../../../utils/Hooks";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import InvoiceGrid from "./InvoiceGrid";
 import { InvoiceCustomerInformation } from "./InvoiceCustomerInformation";
 import { FetchInvoiceCustomer } from "../../utils/invoice-client-utils";
+import { AxiosError } from "axios";
+import { notFound } from "next/navigation";
 
 type Props = {
     id: string,
 }
 
 export default function InvoiceCustomerLayout({ id }: Props) {
-    const { data: customer, isLoading: customerIsLoading, mutate } = FetchInvoiceCustomer(id, true, true);
+    const { data: customer, isLoading: customerIsLoading, mutate, error } = FetchInvoiceCustomer(id, true, true);
     const { data: userData } = useUserData([
         Permission.VIEW_INVOICES,
         Permission.CREATE_INVOICE
     ]);
+
+    useEffect(() => {
+        if (!error || !(error instanceof AxiosError))
+            return;
+        const status = error.response!.status
+        if (status === 404)
+            notFound()
+    }, [error]);
 
     return (
         <div>

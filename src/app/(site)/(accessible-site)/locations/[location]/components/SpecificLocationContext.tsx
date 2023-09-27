@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, Fragment, useCallback, useMemo, useState } from "react";
+import { FC, Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
 import { RequestedStockItem } from "@prisma/client";
@@ -16,6 +16,8 @@ import AddSectionButton from "./AddSectionButton";
 import ChecksAndBalancesButton from "./checks-and-balances/ChecksAndBalancesButton";
 import ToggleMutationOverrideButton from "./ToggleMutationOverrideButton";
 import SubTitle from "../../../../../_components/text/SubTitle";
+import { AxiosError } from "axios";
+import { notFound, useRouter } from "next/navigation";
 
 type Props = {
     locationName: string
@@ -33,13 +35,32 @@ const useCurrentWeekInventoryRequestInfo = (locationName: string, stockIds?: (st
 };
 
 const SpecificLocationContext: FC<Props> = ({ locationName }) => {
-    const { data: userData, isLoading: userDataLoading } = useUserData([Permission.MUTATE_LOCATIONS, Permission.VIEW_LOCATIONS, Permission.CREATE_INVENTORY]);
-    const { data: locationInfo, isLoading: locationInfoLoading, mutate: mutateBarInfo } = useLocationInfo(locationName);
+    const router = useRouter()
+    const {
+        data: userData,
+        isLoading: userDataLoading
+    } = useUserData([Permission.MUTATE_LOCATIONS, Permission.VIEW_LOCATIONS, Permission.CREATE_INVENTORY]);
+    const {
+        data: locationInfo,
+        isLoading: locationInfoLoading,
+        mutate: mutateBarInfo,
+        error
+    } = useLocationInfo(locationName);
+
+    useEffect(() => {
+        if (!error || !(error instanceof AxiosError))
+            return;
+        const status = error.response!.status
+        if (status === 404)
+            notFound()
+    }, [error]);
+
     const {
         data: currentWeekRequestedItems,
         isLoading: loadingCurrentWeekendRequestedItems
     } = useCurrentWeekInventoryRequestInfo(locationName, locationInfo?.inventorySections?.map(section => section.assignedStock?.map(stock => stock.id)).flat());
     const [mutationOverridden, setMutationOverridden] = useState(false);
+
 
     const mutationAllowed = useMemo(() => (
         mutationOverridden || hasAnyPermission(userData?.permissions, [

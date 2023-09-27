@@ -6,10 +6,11 @@ import { Inventory, InventorySnapshot } from "@prisma/client";
 import { useEffect } from "react";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { useUserData } from "../../../../../../../utils/Hooks";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import SnapshotCard from "./SnapshotCard";
 import CardSkeleton from "../../../../../../_components/skeletons/CardSkeleton";
 import SubTitle from "../../../../../../_components/text/SubTitle";
+import { AxiosError } from "axios";
 
 type Props = {
     inventoryName: string,
@@ -20,7 +21,7 @@ const FetchSnapshots = (inventoryName: string) => {
 };
 
 export default function SnapshotsContainer({ inventoryName }: Props) {
-    const { data, isLoading } = FetchSnapshots(inventoryName);
+    const { data, isLoading, error } = FetchSnapshots(inventoryName);
     const { isLoading: userDataIsLoading, data: userData } = useUserData();
     const router = useRouter();
 
@@ -34,6 +35,14 @@ export default function SnapshotsContainer({ inventoryName }: Props) {
         )
             router.replace("/home");
     }, [router, userData, userDataIsLoading]);
+
+    useEffect(() => {
+        if (!error || !(error instanceof AxiosError))
+            return;
+        const status = error.response!.status;
+        if (status === 404)
+            notFound();
+    }, [error]);
 
     const cards = data?.snapshots
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
