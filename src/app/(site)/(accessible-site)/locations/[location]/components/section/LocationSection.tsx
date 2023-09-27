@@ -12,6 +12,7 @@ import { InventoryWithOptionalExtras } from "../../../../../../api/inventory/[na
 import { InventorySectionSnapshotWithOptionalExtras } from "../../../../../../api/inventory/location/[name]/types";
 
 type Props = {
+    isLoading: boolean,
     locationInfo?: InventoryWithOptionalExtras,
     mutateLocationInfo?: KeyedMutator<InventoryWithOptionalExtras | undefined>
     section?: InventorySection,
@@ -20,18 +21,18 @@ type Props = {
     requestedItems: RequestedStockItem[],
 }
 
-const useCurrentBarSectionSnapshot = (name?: string, sectionId?: string) => {
+const useCurrentLocationSectionSnapshot = (name?: string, sectionId?: string) => {
     return useSWR(`/api/inventory/location/${name}/${sectionId}/currentsnapshot`, fetcher<InventorySectionSnapshotWithOptionalExtras>);
 };
 
 export type PartialInventorySection = Partial<Omit<InventorySection, "id">>
 
-const LocationSection: FC<Props> = ({ locationInfo, mutateLocationInfo, section, userData, mutationAllowed, requestedItems }) => {
+const LocationSection: FC<Props> = ({ isLoading, locationInfo, mutateLocationInfo, section, userData, mutationAllowed, requestedItems }) => {
     const {
         data: currentSnapshot,
         isLoading: currentSnapshotLoading,
         mutate: mutateCurrentSnapshot
-    } = useCurrentBarSectionSnapshot(locationInfo?.name, section?.id);
+    } = useCurrentLocationSectionSnapshot(locationInfo?.name, section?.id);
 
     const mutateSection = useCallback(async (newInfo: PartialInventorySection) => {
         if (!locationInfo)
@@ -93,7 +94,7 @@ const LocationSection: FC<Props> = ({ locationInfo, mutateLocationInfo, section,
                 section={section}
                 currentSnapshot={currentSnapshot}
                 mutateCurrentSnapshot={mutateCurrentSnapshot}
-                stockIsLoading={currentSnapshotLoading}
+                stockIsLoading={isLoading || currentSnapshotLoading}
                 mutationAllowed={mutationAllowed}
                 requestedItems={requestedItems}
             />

@@ -5,12 +5,8 @@ import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import InventoryRequestedItemsTable from "./InventoryRequestedItemsTable";
 import AddRequestedItemsButton from "./AddRequestedItemsButton";
-import { CreateStockRequestDto } from "../../../../../../../api/inventory/requests/me/route";
 import { RequestedStockItem } from "@prisma/client";
-import {
-    RequestedStockItemWithOptionalStock,
-    StockRequestWithOptionalCreatorAndAssignees
-} from "../../inventory-requests-utils";
+import { StockRequestWithOptionalCreatorAndAssignees } from "../../inventory-requests-utils";
 import { v4 } from "uuid";
 import { Divider } from "@nextui-org/divider";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
@@ -18,9 +14,14 @@ import { useRequestCreationTrigger } from "../TriggerRequestCreationProvider";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../../../../utils/Hooks";
 import { InventoryWithOptionalExtras } from "../../../../../../../api/inventory/[name]/types";
+import {
+    CreateStockRequestDto,
+    RequestedStockItemWithOptionalExtras
+} from "../../../../../../../api/inventory/requests/types";
 
 interface Props {
     selectedIds: string[];
+    selectedLocationId?: string;
     selectedAssigneeIds: string[];
     setSnapshotsLoading: Dispatch<SetStateAction<boolean>>;
     setModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -36,6 +37,7 @@ export enum ProposedStockRequestsAction {
     ADD_ASSIGNEE,
     REMOVE_ASSIGNEE,
     SET_ASSIGNEES,
+    SET_LOCATION,
     ADD_ITEM,
     REMOVE_ITEM,
     UPDATE_ITEM,
@@ -43,16 +45,28 @@ export enum ProposedStockRequestsAction {
 
 const reducer = (state: CreateStockRequestDto, { type, payload }: {
     type: ProposedStockRequestsAction,
-    payload: { id: string }
-        | { ids: string[] }
+    payload:
+        {
+            id: string
+        }
+        | {
+        locationId: string
+    }
+        | {
+        ids: string[]
+    }
         | Pick<RequestedStockItem, "amountRequested" | "stockId" | "stockUID">
-        | { id: string } & Pick<RequestedStockItem, "amountRequested">
+        | {
+        id: string
+    } & Pick<RequestedStockItem, "amountRequested">
 }) => {
     let newState = { ...state };
 
     switch (type) {
         case ProposedStockRequestsAction.ADD_ASSIGNEE: {
-            const id = (payload as { id: string }).id;
+            const id = (payload as {
+                id: string
+            }).id;
             if (!id) {
                 console.warn("Tried adding a request assignee with an invalid payload!");
                 break;
@@ -62,7 +76,9 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
             break;
         }
         case ProposedStockRequestsAction.REMOVE_ASSIGNEE: {
-            const id = (payload as { id: string }).id;
+            const id = (payload as {
+                id: string
+            }).id;
             if (!id) {
                 console.warn("Tried removing a request assignee with an invalid payload!");
                 break;
@@ -79,12 +95,20 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
             break;
         }
         case ProposedStockRequestsAction.SET_ASSIGNEES: {
-            const ids = (payload as { ids: string[] }).ids;
+            const ids = (payload as {
+                ids: string[]
+            }).ids;
             if (!ids) {
                 console.warn("Tried setting request assignees with an invalid payload!");
                 break;
             }
             newState.assignedToUsersId = ids;
+            break;
+        }
+        case ProposedStockRequestsAction.SET_LOCATION: {
+            newState.assignedLocationId = (payload as {
+                locationId: string
+            }).locationId;
             break;
         }
         case ProposedStockRequestsAction.ADD_ITEM: {
@@ -132,6 +156,7 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
 
 const InventoryRequestedItemsContainer: FC<Props> = ({
                                                          selectedIds,
+                                                         selectedLocationId,
                                                          selectedAssigneeIds,
                                                          setSnapshotsLoading,
                                                          setModalOpen,
@@ -142,6 +167,7 @@ const InventoryRequestedItemsContainer: FC<Props> = ({
     const { isLoading, data } = FetchInventories(selectedIds, true);
     const [proposedRequestedItems, dispatchProposedRequestedItems] = useReducer(reducer, {
         assignedToUsersId: selectedAssigneeIds,
+        assignedLocationId: selectedLocationId ?? "",
         items: []
     });
     const stock = useMemo(() => {
@@ -160,10 +186,22 @@ const InventoryRequestedItemsContainer: FC<Props> = ({
     }, [selectedAssigneeIds]);
 
     useEffect(() => {
+        if (!selectedLocationId)
+            return;
+
+        dispatchProposedRequestedItems({
+            type: ProposedStockRequestsAction.SET_LOCATION,
+            payload: {
+                locationId: selectedLocationId
+            }
+        });
+    }, [selectedLocationId]);
+
+    useEffect(() => {
         setSnapshotsLoading(isLoading);
     }, [isLoading, setSnapshotsLoading]);
 
-    const optimisticRequestedItems = useMemo<RequestedStockItemWithOptionalStock[]>(() => {
+    const optimisticRequestedItems = useMemo<RequestedStockItemWithOptionalExtras[]>(() => {
         return proposedRequestedItems.items.map(item => ({
             ...item,
             stock: stock.find(snapshot => snapshot.id === item.stockId)!,
@@ -171,7 +209,8 @@ const InventoryRequestedItemsContainer: FC<Props> = ({
             updatedAt: new Date(),
             id: v4(),
             stockRequestId: "",
-            amountProvided: null
+            amountProvided: null,
+            assignedLocationId: ""
         }));
     }, [proposedRequestedItems, stock]);
 
@@ -216,6 +255,11 @@ const InventoryRequestedItemsContainer: FC<Props> = ({
                 isDisabled={isCreatingRequest || !proposedRequestedItems.items.length}
                 isLoading={isCreatingRequest}
                 onPress={() => {
+                    if (!selectedLocationId || !selectedLocationId.length) {
+                        toast.error("There was no location selected! Please select a location to create this request.");
+                        return;
+                    }
+
                     triggerRequestCreation({
                         dto: proposedRequestedItems
                     })

@@ -148,6 +148,7 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData
                 visibleData={visibleData}
                 setSnapshotsLoading={setSnapshotsLoading}
                 selectedIds={selectedInventoryIds}
+                selectedLocationId={selectedLocationId}
                 selectedAssigneeIds={selectedAssigneeIds}
                 setModalOpen={setModalOpen}
             />

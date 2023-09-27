@@ -34,8 +34,10 @@ model StockRequest {
   status        StockRequestStatus
   reviewedNotes String?
 
-  assignedToUsersId String[] @db.ObjectId
-  assignedToUsers   User[]   @relation(name: "assignedStocks", fields: [assignedToUsersId], references: [id])
+  assignedToUsersId  String[]  @db.ObjectId
+  assignedToUsers    User[]    @relation(name: "assignedStocks", fields: [assignedToUsersId], references: [id])
+  assignedLocationId String    @db.ObjectId
+  assignedLocation   Inventory @relation(name: "assignedStockRequests", fields: [assignedLocationId], references: [id], onDelete: Cascade)
 
   requestedByUserId String               @db.ObjectId
   requestedByUser   User                 @relation(name: "openStocks", fields: [requestedByUserId], references: [id])
@@ -104,8 +106,9 @@ model Inventory {
 
   inventorySections InventorySection[]
 
-  assignedStock    Stock[]  @relation(name: "assignedInventories", fields: [stockIds], references: [id])
-  assignedStockIds String[] @default([]) @db.ObjectId
+  assignedStock         Stock[]        @relation(name: "assignedInventories", fields: [stockIds], references: [id])
+  assignedStockIds      String[]       @default([]) @db.ObjectId
+  locationStockRequests StockRequest[] @relation(name: "assignedStockRequests")
 }
 
 model InventorySnapshot {

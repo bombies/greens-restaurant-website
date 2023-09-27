@@ -8,6 +8,7 @@ import {
     StockSnapshot
 } from "@prisma/client";
 import { InventoryType } from ".prisma/client";
+import { InventorySectionWithOptionalExtras } from "../location/[name]/types";
 
 export type CreateInventoryDto = {
     name: string,
@@ -51,8 +52,8 @@ export type InventorySnapshotWithStockSnapshots = InventorySnapshot & {
 }
 
 export type StockWithOptionalExtras = Stock & {
-    inventory?: Inventory,
-    inventorySection?: InventorySection
+    inventory?: InventoryWithOptionalExtras,
+    inventorySection?: InventorySectionWithOptionalExtras
 }
 
 export const createInventoryDtoSchema = z.object({

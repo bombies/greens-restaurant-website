@@ -1,4 +1,4 @@
-import { authenticatedAny, respondWithInit } from "../../../../../utils/api/ApiUtils";
+import { authenticatedAny, handleEitherResult, respondWithInit } from "../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../libs/types/permission";
 import prisma from "../../../../../libs/prisma";
 import { NextResponse } from "next/server";
@@ -7,6 +7,8 @@ import { z } from "zod";
 import StockRequestWhereInput = Prisma.StockRequestWhereInput;
 import { StockRequestStatus } from ".prisma/client";
 import { Mailer } from "../../../../../utils/api/Mailer";
+import inventoryRequestsService from "../service";
+import { CreateStockRequestDto } from "../types";
 
 export const getFetchStockRequestsSearchParams = (url: string) => {
     const { searchParams } = new URL(url);
@@ -20,28 +22,12 @@ export const getFetchStockRequestsSearchParams = (url: string) => {
 };
 
 export async function GET(req: Request) {
-    return authenticatedAny(req, async (session) => {
+    return authenticatedAny(req, async (session, _, userPermissions) => {
         const { status, withItems, withUsers, withAssignees } = getFetchStockRequestsSearchParams(req.url);
-
-        let whereQuery: StockRequestWhereInput = {
-            requestedByUserId: session.user!.id
-        };
-
-        if (status !== undefined)
-            whereQuery = {
-                ...whereQuery,
-                status
-            };
-
-        const requests = await prisma.stockRequest.findMany({
-            where: whereQuery,
-            include: {
-                requestedItems: withItems,
-                requestedByUser: withUsers,
-                assignedToUsers: withAssignees
-            }
+        const fetchResults = await inventoryRequestsService.fetchRequests(session.user!.id, userPermissions, {
+            withUsers, withAssignees, withItems, status
         });
-        return NextResponse.json(requests);
+        return NextResponse.json(fetchResults);
     }, [
         Permission.CREATE_INVENTORY,
         Permission.CREATE_STOCK_REQUEST,
@@ -50,89 +36,11 @@ export async function GET(req: Request) {
     ]);
 }
 
-export type CreateStockRequestDto = Pick<StockRequest, "assignedToUsersId"> & {
-    items: Pick<RequestedStockItem, "amountRequested" | "stockId" | "stockUID">[]
-}
-
-export const createStockRequestSchemaDto = z.object({
-    assignedToUsersId: z.array(z.string()).optional(),
-    items: z.array(z.object({
-        amountRequested: z.number(),
-        stockId: z.string(),
-        stockUID: z.string()
-    }))
-}).strict();
-
 export async function POST(req: Request) {
     return authenticatedAny(req, async (session) => {
-        if (!session.user)
-            return respondWithInit({
-                message: "Could not find an authenticated user for this session! Please try logging in again.",
-                status: 403
-            });
-
         const body: CreateStockRequestDto = (await req.json());
-        const bodyValidated = createStockRequestSchemaDto.safeParse(body);
-        if (!body || !bodyValidated)
-            return respondWithInit({
-                message: "Invalid payload!",
-                validationErrors: bodyValidated,
-                status: 400
-            });
-
-        const validStockIds = (await prisma.stock.findMany({
-            where: {
-                id: {
-                    in: body.items.map(item => item.stockId)
-                }
-            },
-            select: { id: true }
-        })).map(item => item.id);
-
-        const createdRequest = await prisma.stockRequest.create({
-            data: {
-                status: StockRequestStatus.PENDING,
-                requestedByUserId: session.user.id,
-                assignedToUsersId: body.assignedToUsersId
-            },
-            include: {
-                requestedByUser: true,
-                assignedToUsers: true
-            }
-        });
-
-        const itemsToBeCreated = body.items
-            .filter(item => validStockIds.includes(item.stockId))
-            .map(item => ({ ...item, stockRequestId: createdRequest.id }));
-
-        const createdRequestedStockItems = await prisma.requestedStockItem.createMany({
-            data: itemsToBeCreated
-        }).then(() => prisma.requestedStockItem.findMany({
-            where: {
-                stockRequestId: createdRequest.id
-            },
-            include: {
-                stock: true
-            }
-        }));
-
-        await prisma.user.updateMany({
-            where: {
-                id: { in: body.assignedToUsersId }
-            },
-            data: {
-                assignedStockRequestsIds: {
-                    push: createdRequest.id
-                }
-            }
-        });
-
-        await Mailer.sendInventoryRequestAssignment({
-            assignees: createdRequest.assignedToUsers,
-            request: { ...createdRequest, requestedItems: createdRequestedStockItems }
-        });
-
-        return NextResponse.json({ ...createdRequest, requestedItems: createdRequestedStockItems });
+        const createdResult = await inventoryRequestsService.createRequest(session.user!.id, body);
+        return handleEitherResult(createdResult);
     }, [
         Permission.CREATE_INVENTORY,
         Permission.CREATE_STOCK_REQUEST,

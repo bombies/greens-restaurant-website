@@ -21,21 +21,24 @@ type Props = {
     locationName: string
 }
 
-const useCurrentWeekInventoryRequestInfo = (stockIds?: (string | undefined)[]) => {
+const useCurrentWeekInventoryRequestInfo = (locationName: string, stockIds?: (string | undefined)[]) => {
     const previousSunday = new Date();
     previousSunday.setHours(0, 0, 0, 0);
     if (previousSunday.getDate() !== 0)
         previousSunday.setDate(previousSunday.getDate() - (previousSunday.getDay() || 7));
-    return useSWR(stockIds ? `/api/inventory/requests/items?${stockIds && stockIds.length ? `ids=${stockIds.filter(id => id).toString()}` : ""}&from=${previousSunday.getTime()}` : [], fetcher<RequestedStockItem[]>);
+    return useSWR(
+        stockIds ? `/api/inventory/requests/items?loc_name=${locationName}${stockIds && stockIds.length ? `&ids=${stockIds.filter(id => id).toString()}` : ""}&from=${previousSunday.getTime()}` : [],
+        fetcher<RequestedStockItem[]>
+    );
 };
 
 const SpecificLocationContext: FC<Props> = ({ locationName }) => {
-    const { data: userData } = useUserData([Permission.MUTATE_LOCATIONS, Permission.VIEW_LOCATIONS, Permission.CREATE_INVENTORY]);
+    const { data: userData, isLoading: userDataLoading } = useUserData([Permission.MUTATE_LOCATIONS, Permission.VIEW_LOCATIONS, Permission.CREATE_INVENTORY]);
     const { data: locationInfo, isLoading: locationInfoLoading, mutate: mutateBarInfo } = useLocationInfo(locationName);
     const {
         data: currentWeekRequestedItems,
         isLoading: loadingCurrentWeekendRequestedItems
-    } = useCurrentWeekInventoryRequestInfo(locationInfo?.inventorySections?.map(section => section.assignedStock?.map(stock => stock.id)).flat());
+    } = useCurrentWeekInventoryRequestInfo(locationName, locationInfo?.inventorySections?.map(section => section.assignedStock?.map(stock => stock.id)).flat());
     const [mutationOverridden, setMutationOverridden] = useState(false);
 
     const mutationAllowed = useMemo(() => (
@@ -53,6 +56,7 @@ const SpecificLocationContext: FC<Props> = ({ locationName }) => {
     const sections = useMemo(() => locationInfo?.inventorySections?.map(section => (
         <Fragment key={section.id}>
             <LocationSection
+                isLoading={loadingCurrentWeekendRequestedItems || userDataLoading}
                 locationInfo={locationInfo}
                 mutateLocationInfo={mutateBarInfo}
                 section={section}
