@@ -25,7 +25,10 @@ export async function GET(req: Request) {
     }, [
         Permission.CREATE_INVENTORY,
         Permission.VIEW_LOCATIONS,
-        Permission.MUTATE_LOCATIONS
+        Permission.MUTATE_LOCATIONS,
+        Permission.CREATE_STOCK_REQUEST,
+        Permission.MANAGE_STOCK_REQUESTS,
+        Permission.VIEW_STOCK_REQUESTS
     ]);
 }
 
