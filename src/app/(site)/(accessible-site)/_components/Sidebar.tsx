@@ -48,7 +48,7 @@ export default function Sidebar() {
             <div
                 className={clsx(
                     `h-full w-full default-container !rounded-l-none backdrop-blur-md transition-fast`,
-                    !opened ? "tablet:!opacity-0" : "tablet:!opacity-100"
+                    !opened ? "tablet:!opacity-0 tablet:hidden" : "tablet:!opacity-100"
                 )}>
                 <div className="flex justify-center mt-20">
                     <Link href="/home">
@@ -151,8 +151,8 @@ export default function Sidebar() {
             overflow-x-hidden
             tablet:fixed
             transition-fast
-            z-40`,
-            opened ? "w-64" : "w-32"
+            `,
+            opened ? "w-64 z-40" : "w-32"
         )}>
             {sidebar}
         </header>
