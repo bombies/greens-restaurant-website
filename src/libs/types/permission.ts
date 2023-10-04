@@ -125,11 +125,11 @@ export const Permissions: PermissionObject[] = [
         value: Permission.MUTATE_STOCK
     },
     {
-        label: "View Bar Inventory",
+        label: "View Locations",
         value: Permission.VIEW_LOCATIONS
     },
     {
-        label: "Mutate Bar Stock",
+        label: "Mutate Location Stock",
         value: Permission.MUTATE_LOCATIONS
     },
     {
