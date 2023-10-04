@@ -6,7 +6,7 @@ import { Prisma, RequestedStockItem, StockRequest } from "@prisma/client";
 import { z } from "zod";
 import StockRequestWhereInput = Prisma.StockRequestWhereInput;
 import { StockRequestStatus } from ".prisma/client";
-import { Mailer } from "../../../../../utils/api/Mailer";
+import { Mailer } from "../../../../../utils/api/mail/Mailer";
 import inventoryRequestsService from "../service";
 import { CreateStockRequestDto } from "../types";
 

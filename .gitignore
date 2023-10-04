@@ -37,6 +37,7 @@ yarn-error.log*
 next-env.d.ts
 
 .turbo
+.react-email
 
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend

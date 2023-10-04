@@ -14,7 +14,7 @@ import { InventoryType, StockRequestStatus } from ".prisma/client";
 import { arrayCompare } from "../../../../utils/GeneralUtils";
 import Permission, { hasAnyPermission } from "../../../../libs/types/permission";
 import StockRequestWhereInput = Prisma.StockRequestWhereInput;
-import { Mailer } from "../../../../utils/api/Mailer";
+import { Mailer } from "../../../../utils/api/mail/Mailer";
 
 class InventoryRequestsService {
 

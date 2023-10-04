@@ -6,7 +6,7 @@ import { EMAIL_REGEX, NAME_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "../../.
 import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 import { z } from "zod";
-import { Mailer } from "../../../../utils/api/Mailer";
+import { Mailer } from "../../../../utils/api/mail/Mailer";
 
 type RouteContext = {
     params: {

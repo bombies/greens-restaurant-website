@@ -4,7 +4,7 @@ import prisma from "../../../../libs/prisma";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "../../../../utils/regex";
 import bcrypt from "bcrypt";
 import { z } from "zod";
-import { Mailer } from "../../../../utils/api/Mailer";
+import { Mailer } from "../../../../utils/api/mail/Mailer";
 
 export async function GET(req: Request) {
     return await authenticated(req, async (session) => {

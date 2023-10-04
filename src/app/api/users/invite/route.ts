@@ -4,7 +4,7 @@ import prisma from "../../../../libs/prisma";
 import { v4 } from "uuid";
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-import { Mailer } from "../../../../utils/api/Mailer";
+import { Mailer } from "../../../../utils/api/mail/Mailer";
 
 export type InviteDto = {
     firstName: string,
