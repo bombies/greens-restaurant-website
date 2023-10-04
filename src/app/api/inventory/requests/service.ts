@@ -345,7 +345,8 @@ class InventoryRequestsService {
         /**
          * Update stock snapshots for the approved stock requests.
          */
-        await this.updateSnapshots(items.filter(item => item.amountProvided));
+        const approvedItems = items.filter(item => item.amountProvided);
+        await this.updateSnapshots(approvedItems);
         return new Either<StockRequestWithOptionalExtras, NextResponse<ErrorResponse>>({
             ...request,
             requestedItems: items
