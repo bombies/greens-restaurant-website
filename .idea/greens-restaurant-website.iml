@@ -10,6 +10,7 @@
       <excludeFolder url="file://$MODULE_DIR$/amplify/backend/auth/greensrestaurantwebsaf37f0ae/build" />
       <excludeFolder url="file://$MODULE_DIR$/amplify/backend/awscloudformation/build" />
       <excludeFolder url="file://$MODULE_DIR$/amplify/backend/storage/s36f6942a7/build" />
+      <excludeFolder url="file://$MODULE_DIR$/.react-email/public" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
