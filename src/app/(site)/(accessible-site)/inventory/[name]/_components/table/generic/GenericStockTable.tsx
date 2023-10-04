@@ -24,6 +24,7 @@ interface Props {
     onItemAddButtonPress: () => void,
     priceIsCost?: boolean,
     showGoodsReceived?: boolean,
+    showItemTypeEditAction?: boolean,
 }
 
 export enum StockTableColumnKey {
@@ -45,7 +46,8 @@ const GenericStockTable: FC<Props> = ({
                                           onItemAddButtonPress,
                                           priceIsCost,
                                           onItemTypeEdit,
-                                          showGoodsReceived
+                                          showGoodsReceived,
+                                          showItemTypeEditAction
                                       }) => {
     const {
         stockState,
@@ -63,7 +65,8 @@ const GenericStockTable: FC<Props> = ({
         onQuantityDecrement,
         onQuantityIncrement,
         onItemTypeEdit,
-        onStockDelete
+        onStockDelete,
+        showItemTypeEditAction
     });
 
     const columns: Column[] = useMemo(() => {

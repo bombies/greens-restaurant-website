@@ -239,11 +239,12 @@ class InventoryService {
             },
             data: {
                 name: dto.name,
-                price: dto.price
+                price: dto.price,
+                type: dto.type
             }
         });
 
-        if (dto.quantity !== undefined || dto.price !== undefined || dto.name) {
+        if (dto.quantity !== undefined || dto.price !== undefined || dto.name || dto.type) {
             const updatedSnapshot = await this.updateCurrentStockSnapshot(
                 inventoryName,
                 itemId,

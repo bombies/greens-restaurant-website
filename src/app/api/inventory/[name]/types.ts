@@ -5,7 +5,7 @@ import {
     InventorySectionSnapshot,
     InventorySnapshot,
     Stock,
-    StockSnapshot
+    StockSnapshot, StockType
 } from "@prisma/client";
 import { InventoryType } from ".prisma/client";
 import { InventorySectionWithOptionalExtras } from "../location/[name]/types";
@@ -65,7 +65,8 @@ export const createInventoryDtoSchema = z.object({
 export const updateStockItemDtoSchema = z.object({
     name: z.string(),
     quantity: z.number(),
-    price: z.number()
+    price: z.number(),
+    type: z.nativeEnum(StockType)
 }).partial().strict();
 
 export const updateCurrentStockSnapshotSchema = z.object({

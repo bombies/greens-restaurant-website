@@ -11,7 +11,8 @@ type Props = {
     onQuantityIncrement: (item: StockSnapshot, incrementedBy: number) => Promise<void>,
     onQuantityDecrement: (item: StockSnapshot, decrementedBy: number) => Promise<void>,
     onStockDelete: (deletedIds: string[]) => Promise<void>,
-    onItemTypeEdit: (itemUID: string, newType: StockType) => Promise<void>
+    onItemTypeEdit?: (itemUID: string, newType: StockType) => Promise<void>,
+    showItemTypeEditAction?: boolean,
 }
 
 const useStockTableValue = ({
@@ -20,7 +21,8 @@ const useStockTableValue = ({
                                 onQuantityDecrement,
                                 onQuantityIncrement,
                                 onStockDelete,
-                                onItemTypeEdit
+                                onItemTypeEdit,
+                                showItemTypeEditAction
                             }: Props) => {
 
     return useCallback((item: StockSnapshot, key: Key) => {
@@ -33,6 +35,7 @@ const useStockTableValue = ({
                         onQuantityIncrement={onQuantityIncrement}
                         onStockDelete={onStockDelete}
                         onItemTypeEdit={onItemTypeEdit}
+                        showItemTypeEditAction={showItemTypeEditAction}
                     />
                 );
             }
@@ -40,7 +43,7 @@ const useStockTableValue = ({
                 return getKeyValue(item, key as StockTableColumnKey);
             }
         }
-    }, [getKeyValue, onItemTypeEdit, onQuantityDecrement, onQuantityIncrement, onStockDelete]);
+    }, [getKeyValue, onItemTypeEdit, onQuantityDecrement, onQuantityIncrement, onStockDelete, showItemTypeEditAction]);
 };
 
 export default useStockTableValue;

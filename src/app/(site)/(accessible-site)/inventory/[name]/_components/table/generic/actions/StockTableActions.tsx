@@ -13,13 +13,17 @@ import AddStockButton from "./AddStockButton";
 import RemoveStockButton from "./RemoveStockButton";
 import AddStockModal from "./modals/AddStockModal";
 import RemoveStockModal from "./modals/RemoveStockModal";
+import EditIcon from "../../../../../../../../_components/icons/EditIcon";
+import EditStockTypeModal from "./modals/EditStockTypeModal";
+import { toast } from "react-hot-toast";
 
 type Props = {
     item: StockSnapshot,
     onQuantityIncrement: (item: StockSnapshot, incrementedBy: number) => Promise<void>,
     onQuantityDecrement: (item: StockSnapshot, decrementedBy: number) => Promise<void>,
     onStockDelete: (deletedIds: string[]) => void;
-    onItemTypeEdit: (itemUID: string, newType: StockType) => Promise<void>
+    onItemTypeEdit?: (itemUID: string, newType: StockType) => Promise<void>,
+    showItemTypeEditAction?: boolean
 }
 
 const StockTableActions: FC<Props> = ({
@@ -27,10 +31,12 @@ const StockTableActions: FC<Props> = ({
                                           onQuantityDecrement,
                                           onQuantityIncrement,
                                           onStockDelete,
-                                          onItemTypeEdit
+                                          onItemTypeEdit,
+                                          showItemTypeEditAction
                                       }) => {
     const [addStockModalOpen, setAddStockModalOpen] = useState(false);
     const [removeStockModalOpen, setRemoveStockModalOpen] = useState(false);
+    const [editStockTypeModalOpen, setEditStockTypeStockModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
     return (
@@ -53,6 +59,20 @@ const StockTableActions: FC<Props> = ({
                     setRemoveStockModalOpen(false);
                 }}
             />
+            {showItemTypeEditAction &&
+                <EditStockTypeModal
+                    item={item}
+                    isOpen={editStockTypeModalOpen}
+                    setOpen={setEditStockTypeStockModalOpen}
+                    onEdit={async (newType) => {
+                        if (onItemTypeEdit) {
+                            onItemTypeEdit(item.uid, newType);
+                            setEditStockTypeStockModalOpen(false);
+                        } else toast.error("There was no action defined for editing the stock type!");
+                    }}
+                />
+            }
+
             <ConfirmationModal
                 isOpen={deleteModalOpen}
                 setOpen={setDeleteModalOpen}
@@ -97,9 +117,14 @@ const StockTableActions: FC<Props> = ({
                                     setDeleteModalOpen(true);
                                     break;
                                 }
+                                case "edit_type": {
+                                    setEditStockTypeStockModalOpen(true);
+                                    break;
+                                }
                             }
                         }}
                     >
+                        {/*@ts-ignore*/}
                         <DropdownSection title="Actions" showDivider>
                             <DropdownItem
                                 key="add"
@@ -115,6 +140,15 @@ const StockTableActions: FC<Props> = ({
                             >
                                 Remove Multiple
                             </DropdownItem>
+                            {showItemTypeEditAction &&
+                                <DropdownItem
+                                    key="edit_type"
+                                    description="Edit the stock type of this item"
+                                    startContent={<EditIcon />}
+                                >
+                                    Edit Stock Type
+                                </DropdownItem>
+                            }
                         </DropdownSection>
                         <DropdownSection title="Danger Zone">
                             <DropdownItem
@@ -130,7 +164,8 @@ const StockTableActions: FC<Props> = ({
                 </div>
             </div>
         </Fragment>
-    );
+    )
+        ;
 };
 
 export default StockTableActions;
