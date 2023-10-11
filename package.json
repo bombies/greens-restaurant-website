@@ -22,7 +22,7 @@
     "@react-email/head": "0.0.5",
     "@react-email/html": "0.0.4",
     "@react-email/tailwind": "0.0.9",
-    "@react-pdf/renderer": "^3.1.12",
+    "@react-pdf/renderer": "^3.1.13",
     "@react-stately/data": "^3.10.3",
     "@reduxjs/toolkit": "^1.9.6",
     "@types/nodemailer": "^6.4.11",
