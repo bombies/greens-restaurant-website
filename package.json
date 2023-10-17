@@ -27,7 +27,7 @@
     "@reduxjs/toolkit": "^1.9.6",
     "@types/nodemailer": "^6.4.11",
     "@types/uuid": "^9.0.4",
-    "@vercel/og": "^0.5.17",
+    "@vercel/og": "^0.5.19",
     "apexcharts": "^3.43.0",
     "axios": "^1.5.1",
     "bcrypt": "^5.1.1",
