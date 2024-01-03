@@ -29,7 +29,7 @@ export default function InventoryGrid() {
     ));
 
     return (
-        <div className="default-container p-12 phone:px-4 w-5/6 tablet:w-full">
+        <div className="default-container p-6 phone:px-4 w-5/6 tablet:w-full">
             <SubTitle>Inventories</SubTitle>
             <Spacer y={6} />
             <div className="grid grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1 gap-6">

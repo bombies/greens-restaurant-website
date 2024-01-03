@@ -14,7 +14,7 @@ interface Props {
 
 const InventoryRequestsContainer: FC<Props> = ({ userPermissions }) => {
     return (
-        <div className="default-container p-12 phone:px-4 w-5/6 tablet:w-full">
+        <div className="default-container p-6 phone:px-4 w-5/6 tablet:w-full">
             {
                 hasAnyPermission(userPermissions, [
                     Permission.CREATE_INVENTORY,

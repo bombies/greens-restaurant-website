@@ -17,7 +17,7 @@ type Props = {
 
 export default function InvoiceControlBar({ mutationAllowed, fetchingAllowed, mutateData, customers }: Props) {
     return (
-        <div className="default-container p-12 gap-6 grid grid-cols-4 tablet:grid-cols-2 phone:grid-cols-1">
+        <div className="default-container p-6 gap-6 grid grid-cols-4 tablet:grid-cols-2 phone:grid-cols-1">
             <CreateInvoiceCustomerButton
                 disabled={!mutationAllowed}
                 mutateData={mutateData}

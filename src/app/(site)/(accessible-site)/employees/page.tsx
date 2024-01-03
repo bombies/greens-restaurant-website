@@ -27,7 +27,7 @@ export default function EmployeesPage() {
         <div>
             <Title>Manage Employees</Title>
             <SubTitle>Invite an employee to or remove an employee from the website.</SubTitle>
-            <div className={"my-12 default-container p-12 w-fit"}>
+            <div className={"my-12 default-container p-6 w-fit"}>
                 <GenericButton
                     disabled={!userHasPermission}
                     icon={inviteIcon}
@@ -49,7 +49,7 @@ export default function EmployeesPage() {
                     />
                 </GenericModal>
             </div>
-            <div className="p-12 default-container w-5/6">
+            <div className="p-6 default-container w-5/6">
                 <SubTitle>Employees</SubTitle>
                 <EmployeeGrid employees={employeeInfo} />
             </div>

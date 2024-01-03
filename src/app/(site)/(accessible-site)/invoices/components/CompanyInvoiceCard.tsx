@@ -83,7 +83,7 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                 }}
                 onReject={() => setProposedCompanyInfo(data)}
             />
-            <div className="default-container p-12 phone:px-3 w-[30%] tablet:w-full h-fit">
+            <div className="default-container p-6 phone:px-3 w-[30%] tablet:w-full h-fit">
                 {
                     <>
                         <SubTitle>Company Information</SubTitle>

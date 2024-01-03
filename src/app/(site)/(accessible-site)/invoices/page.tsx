@@ -48,7 +48,7 @@ export default function InvoicesPage() {
             }
             <Spacer y={6} />
             <div className="flex gap-6 tablet:flex-col">
-                <div className="default-container p-12 phone:p-2 w-[70%] tablet:w-full">
+                <div className="default-container p-6 phone:p-2 w-[70%] tablet:w-full">
                     <GenericTabs>
                         <Tab title="All Invoices">
                             <AllInvoicesTab />

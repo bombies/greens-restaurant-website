@@ -27,24 +27,24 @@ export default function Sidebar() {
 
     const sidebar = (
         <Fragment>
-            <div className={`absolute
-                    top-5 left-5 z-50`}>
-                <IconButton
-                    variant="light"
-                    onPress={() => setOpened(prev => !prev)}
-                >
-                    <DoubleArrowIcon
-                        className={clsx(`
-                            transition-fastest
-                            cursor-pointer
-                            z-50`,
-                            opened ? "rotate-180" : ""
-                        )}
-                        width="1.5rem"
-                        fill={opened ? "#00D615" : "#ffffff"}
-                    />
-                </IconButton>
-            </div>
+            {/*<div className={`absolute*/}
+            {/*        top-5 left-5 z-50`}>*/}
+            {/*    <IconButton*/}
+            {/*        variant="light"*/}
+            {/*        onPress={() => setOpened(prev => !prev)}*/}
+            {/*    >*/}
+            {/*        <DoubleArrowIcon*/}
+            {/*            className={clsx(`*/}
+            {/*                transition-fastest*/}
+            {/*                cursor-pointer*/}
+            {/*                z-50`,*/}
+            {/*                opened ? "rotate-180" : ""*/}
+            {/*            )}*/}
+            {/*            width="1.5rem"*/}
+            {/*            fill={opened ? "#00D615" : "#ffffff"}*/}
+            {/*        />*/}
+            {/*    </IconButton>*/}
+            {/*</div>*/}
             <div
                 className={clsx(
                     `h-full w-full default-container !rounded-l-none backdrop-blur-md transition-fast`,
