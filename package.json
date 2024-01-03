@@ -19,7 +19,7 @@
     "@react-email/button": "0.0.10",
     "@react-email/components": "^0.0.7",
     "@react-email/container": "0.0.8",
-    "@react-email/head": "0.0.5",
+    "@react-email/head": "0.0.7",
     "@react-email/html": "0.0.4",
     "@react-email/tailwind": "0.0.9",
     "@react-pdf/renderer": "^3.1.14",
