@@ -21,7 +21,7 @@
     "@react-email/container": "0.0.11",
     "@react-email/head": "0.0.7",
     "@react-email/html": "0.0.4",
-    "@react-email/tailwind": "0.0.9",
+    "@react-email/tailwind": "0.0.13",
     "@react-pdf/renderer": "^3.1.14",
     "@react-stately/data": "^3.11.0",
     "@reduxjs/toolkit": "^2.0.1",
