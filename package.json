@@ -26,7 +26,7 @@
     "@react-stately/data": "^3.10.3",
     "@reduxjs/toolkit": "^2.0.1",
     "@types/nodemailer": "^6.4.13",
-    "@types/uuid": "^9.0.4",
+    "@types/uuid": "^9.0.7",
     "@vercel/og": "^0.6.1",
     "apexcharts": "^3.43.0",
     "axios": "^1.5.1",
