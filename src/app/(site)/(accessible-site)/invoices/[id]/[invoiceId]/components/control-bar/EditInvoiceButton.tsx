@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Invoice } from "@prisma/client";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { UpdateInvoiceDto } from "../../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/route";
+import { UpdateInvoiceDto } from "../../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/types";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import ChangesMadeBar from "../../../../../employees/[username]/_components/ChangesMadeBar";

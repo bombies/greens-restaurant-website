@@ -3,9 +3,8 @@ import { CUSTOMER_NAME_REGEX, EMAIL_REGEX } from "../../../../../utils/regex";
 import prisma from "../../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import Permission from "../../../../../libs/types/permission";
-import { CreateInvoiceCustomerDto } from "../route";
-import { Either } from "../../../inventory/[name]/service";
-import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
+import { UpdateCustomerDto } from "./types";
+import specificCustomerService from "./service";
 
 type Context = {
     params: {
@@ -13,47 +12,15 @@ type Context = {
     }
 }
 
-export type UpdateCustomerDto = Partial<CreateInvoiceCustomerDto>
 
 export function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const customer = await fetchCustomerInfo(params.id);
+        const customer = await specificCustomerService(params.id).fetchCustomerInfo();
         if (customer.error)
             return customer.error;
         return NextResponse.json(customer.success);
     }, [Permission.VIEW_INVOICES, Permission.CREATE_INVOICE]);
 }
-
-export const fetchCustomerInfo = async (id: string, withInvoices?: boolean, withInvoiceItems?: boolean): Promise<Either<InvoiceCustomer & {
-    invoices?: (Invoice & { invoiceItems?: InvoiceItem[] })[]
-}, NextResponse>> => {
-    if (!/^[a-f\d]{24}$/i.test(id))
-        return new Either<InvoiceCustomer & {
-            invoices?: (Invoice & { invoiceItems?: InvoiceItem[] })[]
-        }, NextResponse>(undefined, respondWithInit({
-            message: "That ID isn't a valid ID!",
-            status: 404
-        }));
-
-    const existingCustomer = await prisma.invoiceCustomer.findUnique({
-        where: { id },
-        include: {
-            invoices: withInvoices && {
-                include: {
-                    invoiceItems: withInvoiceItems
-                }
-            }
-        }
-    });
-
-    if (!existingCustomer)
-        return new Either<InvoiceCustomer, NextResponse>(undefined, respondWithInit({
-            message: `There is no customer with the id: ${id}`,
-            status: 404
-        }));
-
-    return new Either<InvoiceCustomer, NextResponse>(existingCustomer);
-};
 
 export function PATCH(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
@@ -139,7 +106,7 @@ export function PATCH(req: Request, { params }: Context) {
 
 export function DELETE(req: Request, { params }: Context) {
     return authenticated(req, async () => {
-        const customer = await fetchCustomerInfo(params.id);
+        const customer = await specificCustomerService(params.id).fetchCustomerInfo();
         if (customer.error)
             return customer.error;
 

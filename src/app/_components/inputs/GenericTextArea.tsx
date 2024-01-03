@@ -3,11 +3,11 @@
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
 import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
-import { InputProps, Textarea } from "@nextui-org/input";
+import { Textarea, TextAreaProps } from "@nextui-org/input";
 import clsx from "clsx";
 import { SlotsToClasses } from "@nextui-org/react";
 
-interface Props extends InputProps {
+interface Props extends TextAreaProps {
     id: string;
     register?: UseFormRegister<FieldValues>;
     errors?: FieldErrors,

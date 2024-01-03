@@ -62,7 +62,7 @@ type Props = {
 export default function InvoiceTable({ customer, mutationAllowed }: Props) {
     const { data: invoice, isLoading } = useInvoice();
     const { state: items, dispatch: dispatchItems, mutate: mutateItems } = useInvoiceItems();
-    const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
+    const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
 
     const getKeyValue = useCallback((invoice: InvoiceItem, key: Key) => {
@@ -204,12 +204,12 @@ export default function InvoiceTable({ customer, mutationAllowed }: Props) {
                     onSelectionChange={(keys: Selection) => {
                         if (keys === "all")
                             setSelectedKeys(sortedItems.map(item => `${item.id}/${item.name}`));
-                        else setSelectedKeys(Array.from(keys));
+                        else setSelectedKeys(Array.from(keys) as string[]);
                     }}
                 >
                     {(item) => (
                         <TableRow key={`${item.id}/${item.name}`}>
-                            {(columnKey: Key) => <TableCell
+                            {(columnKey) => <TableCell
                                 className={clsx(columnKey !== "invoice_desc" && "capitalize")}>{getKeyValue(item, columnKey)}</TableCell>}
                         </TableRow>
                     )}

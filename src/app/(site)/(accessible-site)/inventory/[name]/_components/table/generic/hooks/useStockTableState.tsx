@@ -1,7 +1,7 @@
 "use client";
 
 import { StockSnapshot } from "@prisma/client";
-import { Key, useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { SortDescriptor } from "@nextui-org/react";
 
 enum StockAction {
@@ -54,7 +54,7 @@ const useStockTableState = (stock: StockSnapshot[]) => {
     const [visibleStockState, setVisibleStockState] = useState<StockSnapshot[]>(stockState);
     const [stockSearch, setStockSearch] = useState<string>();
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
-    const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
+    const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 
     useEffect(() => {
         if (!stock)

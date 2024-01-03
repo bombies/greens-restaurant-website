@@ -3,7 +3,7 @@
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import { InvoiceItem } from "@prisma/client";
 import ConfirmationModal from "../../../../../../../_components/ConfirmationModal";
-import { Dispatch, Key, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { InvoiceItemChangeAction } from "../InvoiceItemsProvider";
@@ -19,7 +19,7 @@ type Props = {
         type: InvoiceItemChangeAction,
         payload?: { id: string } | undefined
     }>,
-    setSelectedKeys: Dispatch<SetStateAction<Key[]>>
+    setSelectedKeys: Dispatch<SetStateAction<string[]>>
 }
 
 const DeleteItem = (customerId?: string, invoiceId?: string, invoiceItemId?: string) => {

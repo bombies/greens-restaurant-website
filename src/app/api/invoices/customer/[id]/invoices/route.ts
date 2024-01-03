@@ -1,8 +1,8 @@
 import { authenticated, authenticatedAny } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
-import { fetchCustomerInfo } from "../route";
 import { NextResponse } from "next/server";
 import prisma from "../../../../../../libs/prisma";
+import specificCustomerService from "../service";
 
 type Context = {
     params: {
@@ -15,7 +15,7 @@ export function GET(req: Request, { params }: Context) {
         const { searchParams } = new URL(req.url);
         const withInvoices = searchParams.get("with_invoices")?.toLowerCase() === "true";
         const withItems = searchParams.get("with_items")?.toLowerCase() === "true";
-        const customer = await fetchCustomerInfo(params.id, withInvoices, withItems);
+        const customer = await specificCustomerService(params.id).fetchCustomerInfo(withInvoices, withItems);
         if (customer.error)
             return customer.error;
         return NextResponse.json(customer.success);
@@ -24,7 +24,7 @@ export function GET(req: Request, { params }: Context) {
 
 export function POST(req: Request, { params }: Context) {
     return authenticated(req, async () => {
-        const { success: customerInfo, error } = await fetchCustomerInfo(params.id, true);
+        const { success: customerInfo, error } = await specificCustomerService(params.id).fetchCustomerInfo(true);
         if (error)
             return error;
 

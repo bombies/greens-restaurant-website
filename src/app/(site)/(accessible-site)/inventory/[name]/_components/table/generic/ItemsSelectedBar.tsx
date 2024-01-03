@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, FC, Fragment, Key, SetStateAction, useState } from "react";
+import { Dispatch, FC, Fragment, SetStateAction, useState } from "react";
 import SlidingBar from "../../../../../../../_components/SlidingBar";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import ConfirmationModal from "../../../../../../../_components/ConfirmationModal";
@@ -8,8 +8,8 @@ import TrashIcon from "../../../../../../../_components/icons/TrashIcon";
 import DeniedIcon from "../../../../../../../_components/icons/DeniedIcon";
 
 type Props = {
-    selectedIds: Key[]
-    setSelectedIds: Dispatch<SetStateAction<Key[]>>
+    selectedIds: string[]
+    setSelectedIds: Dispatch<SetStateAction<string[]>>
     onDelete: (deletedIds: string[]) => Promise<void>
 }
 

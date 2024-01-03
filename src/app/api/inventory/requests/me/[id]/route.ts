@@ -2,10 +2,10 @@ import { authenticatedAny, respondWithInit } from "../../../../../../utils/api/A
 import Permission from "../../../../../../libs/types/permission";
 import prisma from "../../../../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { getFetchStockRequestsSearchParams } from "../route";
 import { RequestedStockItem, StockRequest } from "@prisma/client";
 import { z } from "zod";
 import { StockRequestStatus } from ".prisma/client";
+import selfUserService from "../service";
 
 type Context = {
     params: {
@@ -15,7 +15,7 @@ type Context = {
 
 export async function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async (session) => {
-        const { withItems } = getFetchStockRequestsSearchParams(req.url);
+        const { withItems } = selfUserService.getFetchStockRequestsSearchParams(req.url);
         const request = await prisma.stockRequest.findFirst({
             where: {
                 AND: [

@@ -66,7 +66,7 @@ export default function GenericSelectMenu<T>({
                     ]
                 }
             }}
-            validationState={(errors && errors[id]) && "invalid"}
+            isInvalid={!!(errors && errors[id])}
         >
             {children}
         </Select>

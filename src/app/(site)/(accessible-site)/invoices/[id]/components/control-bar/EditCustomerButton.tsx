@@ -5,7 +5,7 @@ import GenericModal from "../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import { InvoiceCustomer } from "@prisma/client";
 import axios from "axios";
-import { UpdateCustomerDto } from "../../../../../../api/invoices/customer/[id]/route";
+import { UpdateCustomerDto } from "../../../../../../api/invoices/customer/[id]/types";
 import useSWRMutation from "swr/mutation";
 import ChangesMadeBar from "../../../../employees/[username]/_components/ChangesMadeBar";
 import EditableField from "../../../../employees/[username]/_components/EditableField";

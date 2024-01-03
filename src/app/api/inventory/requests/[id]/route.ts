@@ -1,12 +1,9 @@
-import { authenticatedAny, handleEitherResult, respondWithInit } from "../../../../../utils/api/ApiUtils";
-import Permission, { hasAnyPermission } from "../../../../../libs/types/permission";
-import prisma from "../../../../../libs/prisma";
-import { StockRequest } from "@prisma/client";
-import { z } from "zod";
+import { authenticatedAny, handleEitherResult } from "../../../../../utils/api/ApiUtils";
+import Permission from "../../../../../libs/types/permission";
 import { NextResponse } from "next/server";
-import { getFetchStockRequestsSearchParams } from "../me/route";
 import inventoryRequestsService from "../service";
 import { AdminUpdateStockRequestDto } from "../types";
+import selfUserService from "../me/service";
 
 type Context = {
     params: {
@@ -16,7 +13,7 @@ type Context = {
 
 export async function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async (session, _, userPermissions) => {
-        const { withItems, withUsers, withAssignees } = getFetchStockRequestsSearchParams(req.url);
+        const { withItems, withUsers, withAssignees } = selfUserService.getFetchStockRequestsSearchParams(req.url);
         const fetchResult = await inventoryRequestsService.fetchRequest(params.id, session.user!.id, userPermissions, {
             withItems, withAssignees, withUsers
         });

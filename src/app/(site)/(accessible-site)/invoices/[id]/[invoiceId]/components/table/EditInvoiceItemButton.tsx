@@ -4,8 +4,8 @@ import GenericButton from "../../../../../../../_components/inputs/GenericButton
 import { InvoiceItem } from "@prisma/client";
 import {
     UpdateInvoiceItemDto
-} from "../../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/[itemId]/route";
-import { Dispatch, Key, SetStateAction, useReducer, useState } from "react";
+} from "../../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/[itemId]/types";
+import { Dispatch, SetStateAction, useReducer, useState } from "react";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { SWRArgs } from "../../../../../employees/_components/EmployeeGrid";
@@ -25,7 +25,7 @@ type Props = {
         type: InvoiceItemChangeAction,
         payload?: ({ id: string } & UpdateInvoiceItemDto) | undefined
     }>,
-    setSelectedKeys: Dispatch<SetStateAction<Key[]>>
+    setSelectedKeys: Dispatch<SetStateAction<string[]>>
 }
 
 enum EditItemAction {

@@ -2,9 +2,9 @@ import { authenticatedAny } from "../../../../utils/api/ApiUtils";
 import Permission from "../../../../libs/types/permission";
 import prisma from "../../../../libs/prisma";
 import { NextResponse } from "next/server";
-import { getFetchStockRequestsSearchParams } from "./me/route";
 import { Prisma } from ".prisma/client";
 import StockRequestWhereInput = Prisma.StockRequestWhereInput;
+import selfUserService from "./me/service";
 
 export async function GET(req: Request) {
     return authenticatedAny(req, async () => {
@@ -14,7 +14,7 @@ export async function GET(req: Request) {
             withItems,
             withAssignees,
             from, to
-        } = getFetchStockRequestsSearchParams(req.url);
+        } = selfUserService.getFetchStockRequestsSearchParams(req.url);
         let whereQuery: StockRequestWhereInput = {};
 
         if (status)

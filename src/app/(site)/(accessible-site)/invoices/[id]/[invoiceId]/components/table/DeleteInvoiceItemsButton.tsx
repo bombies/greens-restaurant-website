@@ -1,7 +1,7 @@
 "use client";
 
 import { InvoiceItem } from "@prisma/client";
-import { Dispatch, Key, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { InvoiceItemChangeAction } from "../InvoiceItemsProvider";
 import useSWRMutation from "swr/mutation";
 import {
@@ -22,7 +22,7 @@ type Props = {
         type: InvoiceItemChangeAction,
         payload?: string[] | undefined
     }>,
-    setSelectedKeys: Dispatch<SetStateAction<Key[]>>
+    setSelectedKeys: Dispatch<SetStateAction<string[]>>
 }
 
 interface DeleteItemArgs {

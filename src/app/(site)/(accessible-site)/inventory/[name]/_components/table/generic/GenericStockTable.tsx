@@ -132,7 +132,7 @@ const GenericStockTable: FC<Props> = ({
                 onSelectionChange={(keys) => {
                     if (keys === "all")
                         setSelectedKeys(stockState.map(stock => stock.uid));
-                    else setSelectedKeys(Array.from(keys));
+                    else setSelectedKeys(Array.from(keys) as string[]);
                 }}
             >
                 {item => (

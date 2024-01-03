@@ -7,7 +7,7 @@ import GenericModal from "../../../../../../../_components/GenericModal";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
-import { CreateInvoiceItemsDto } from "../../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/route";
+import { CreateInvoiceItemsDto } from "../../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/types";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import GenericTextArea from "../../../../../../../_components/inputs/GenericTextArea";

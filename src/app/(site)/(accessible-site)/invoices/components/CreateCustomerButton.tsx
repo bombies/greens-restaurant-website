@@ -93,7 +93,6 @@ export default function CreateCustomerButton({ disabled, mutateData, customers }
                         register={register}
                         label="Address"
                         isDisabled={customerIsCreating || disabled}
-                        isClearable
                         placeholder="Enter the address of the customer"
                     />
                     <Spacer y={6} />
@@ -102,7 +101,6 @@ export default function CreateCustomerButton({ disabled, mutateData, customers }
                         register={register}
                         label="Description"
                         isDisabled={customerIsCreating || disabled}
-                        isClearable
                         placeholder="Enter a description of the customer"
                     />
                     <Spacer y={6} />
