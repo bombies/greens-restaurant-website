@@ -14,7 +14,7 @@
     "@aws-sdk/s3-request-presigner": "^3.484.0",
     "@aws-sdk/signature-v4-crt": "^3.484.0",
     "@next-auth/prisma-adapter": "^1.0.7",
-    "@nextui-org/react": "^2.1.13",
+    "@nextui-org/react": "^2.2.9",
     "@prisma/client": "^5.7.1",
     "@react-email/button": "0.0.13",
     "@react-email/components": "^0.0.12",
