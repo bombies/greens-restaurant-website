@@ -2,7 +2,7 @@
 const nextConfig = {
     swcMinify: true,
     images: {
-        domains: [
+        remotePatterns: [
             "i.imgur.com",
             "res.cloudinary.com"
         ]
