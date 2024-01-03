@@ -75,7 +75,7 @@
     "@typescript-eslint/parser": "^6.17.0",
     "autoprefixer": "^10.4.16",
     "encoding": "^0.1.13",
-    "eslint": "8.50.0",
+    "eslint": "8.56.0",
     "eslint-config-next": "14.0.4",
     "postcss": "^8.4.30",
     "prettier": "^3.0.3",
