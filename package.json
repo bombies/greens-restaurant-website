@@ -32,7 +32,7 @@
     "axios": "^1.5.1",
     "bcrypt": "^5.1.1",
     "clsx": "^2.0.0",
-    "exceljs": "^4.3.0",
+    "exceljs": "^4.4.0",
     "framer-motion": "^10.16.4",
     "generate-password-ts": "^1.6.5",
     "loader-utils": "^3.2.1",
