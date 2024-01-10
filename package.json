@@ -33,7 +33,7 @@
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.0",
     "exceljs": "^4.4.0",
-    "framer-motion": "^10.17.4",
+    "framer-motion": "^10.17.12",
     "generate-password-ts": "^1.6.5",
     "loader-utils": "^3.2.1",
     "next": "^14.0.4",
