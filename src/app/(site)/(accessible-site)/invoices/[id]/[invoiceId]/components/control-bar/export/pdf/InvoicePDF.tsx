@@ -1,11 +1,9 @@
 "use client";
 import { Invoice, InvoiceCustomer, InvoiceInformation, InvoiceItem } from "@prisma/client";
-import ReactPDF, { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View, Font, Image } from "@react-pdf/renderer";
 import InvoicePDFHeader from "./InvoicePDFHeader";
 import InvoicePDFRecipient from "./InvoicePDFRecipient";
 import InvoicePDFTable from "./table/InvoicePDFTable";
-import Font = ReactPDF.Font;
-import { Fragment } from "react";
 
 type PDFProps = {
     companyInfo?: InvoiceInformation,
@@ -104,6 +102,23 @@ export default function InvoicePDF({ companyInfo, customerInfo, invoice, invoice
                         </Text>
                     </View>
                 }
+                {/*<View*/}
+                {/*    style={{*/}
+                {/*        position: 'absolute',*/}
+                {/*        zIndex: -1*/}
+                {/*    }}*/}
+                {/*>*/}
+                {/*    <Image*/}
+                {/*        src='/images/mesh-bg-2.png'*/}
+                {/*        fixed={true}*/}
+                {/*        style={{*/}
+                {/*            width: "612px",*/}
+                {/*            height: "650px",*/}
+                {/*            objectFit: "cover",*/}
+                {/*            opacity: 0.2*/}
+                {/*        }}*/}
+                {/*    />*/}
+                {/*</View>*/}
             </Page>
         </Document>
     );

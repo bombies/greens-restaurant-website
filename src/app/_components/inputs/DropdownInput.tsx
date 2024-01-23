@@ -2,8 +2,6 @@
 
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Selection } from "@nextui-org/react";
 import { ReactNode, useMemo } from "react";
-import { StaticImageData } from "next/image";
-import GenericImage from "../GenericImage";
 import clsx from "clsx";
 
 export type DropdownInputProps = {
@@ -67,9 +65,7 @@ export default function DropdownInput({
                 <label
                     className="default-container px-8 py-2 w-fit mx-auto uppercase text-[.75rem] tracking-tight font-semibold">{label}</label>}
             <Dropdown
-                classNames={{
-                    base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6"
-                }}
+                className="bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6"
             >
                 <DropdownTrigger>
                     <Button

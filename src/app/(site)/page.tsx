@@ -52,10 +52,6 @@ export default function HomePage() {
     return (
         <div
             className="p-12 phone:p-6 flex justify-center min-h-screen"
-            style={{
-                backgroundImage: "url(\"/images/mesh-bg.png\")",
-                backgroundRepeat: "no-repeat"
-            }}
         >
             <div
                 className="w-96 h-fit bg-neutral-900/50 border-2 border-primary/50 p-16 phone:px-6 rounded-xl tablet:w-3/4 phone:w-full">

@@ -8,6 +8,7 @@ import ExportInvoiceButton from "./export/ExportInvoiceButton";
 import DeleteInvoiceButton from "./DeleteInvoiceButton";
 import { KeyedMutator } from "swr";
 import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+import PreviewInvoiceButton from "./PreviewInvoiceButton";
 
 type Props = {
     customer?: InvoiceCustomer,
@@ -22,12 +23,18 @@ export default function InvoiceControlBar({ customer, invoice, invoiceItems, con
         <div className="default-container p-12">
             <GoBackButton customerId={customer?.id} />
             <Spacer y={6} />
-            <div className="grid grid-cols-3 tablet:grid-cols-1 gap-4">
+            <div className="grid grid-cols-4 tablet:grid-cols-1 gap-4">
                 <EditInvoiceButton
                     customerId={customer?.id}
                     invoice={invoice}
                     disabled={!controlsEnabled}
                     mutateInvoice={mutateInvoice}
+                />
+                <PreviewInvoiceButton
+                    customer={customer}
+                    invoice={invoice}
+                    invoiceItems={invoiceItems}
+                    disabled={!controlsEnabled}
                 />
                 <ExportInvoiceButton
                     customer={customer}

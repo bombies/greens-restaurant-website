@@ -70,10 +70,9 @@ export default function InvoiceLayout({ customerId }: Props) {
     return (
         <div>
             <div className="flex tablet:flex-col gap-x-6">
-                <Title className="self-center">Invoices -
-                    <span className="text-primary capitalize">
-                        {customerIsLoading ? "Unknown" : customer?.customerName}
-                    </span>
+                <Title className="self-center">
+                    Invoices - <span
+                    className="text-primary capitalize">{customerIsLoading ? "Unknown" : customer?.customerName}</span>
                 </Title>
                 <div className="default-container max-w-[40%] min-w-[25%] tablet:max-w-full tablet:mt-6 p-6">
                     {

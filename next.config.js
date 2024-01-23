@@ -14,6 +14,12 @@ const nextConfig = {
         ]
     },
     webpack: (config, { isServer, nextRuntime, webpack }) => {
+        // config.resolve.fallback = {
+        //     fs: false,
+        //     os: false,
+        //     path: false
+        // };
+
         // Avoid AWS SDK Node.js require issue
         if (isServer && nextRuntime === "nodejs")
             config.plugins.push(
