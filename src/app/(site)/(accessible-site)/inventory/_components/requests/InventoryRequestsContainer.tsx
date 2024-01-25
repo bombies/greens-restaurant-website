@@ -7,12 +7,15 @@ import UserInventoryRequestsTab from "./user/UserInventoryRequestsTab";
 import AllInventoryRequestsTab from "./all/AllInventoryRequestsTab";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import { GoBackButton } from "../../../invoices/[id]/components/control-bar/InvoiceCustomerControlBar";
+import useSelectedRequestsTab from "./useSelectedRequestsTab";
 
 interface Props {
     userPermissions?: number;
 }
 
 const InventoryRequestsContainer: FC<Props> = ({ userPermissions }) => {
+    const {selectedTabKey, updateTabKey} = useSelectedRequestsTab()
+
     return (
         <div className="default-container p-6 phone:px-4 w-5/6 tablet:w-full">
             {
@@ -25,7 +28,11 @@ const InventoryRequestsContainer: FC<Props> = ({ userPermissions }) => {
                 <GoBackButton label="View All Inventories" href="/inventory" />
             }
             <Spacer y={6} />
-            <GenericTabs>
+            <GenericTabs
+                aria-label={"Inventory Requests"}
+                selectedKey={selectedTabKey}
+                onSelectionChange={key => updateTabKey(key.toString() as any)}
+            >
                 <Tab key="my_requests" title="My Requests">
                     <UserInventoryRequestsTab />
                 </Tab>
