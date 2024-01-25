@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, FC, Fragment, useState } from "react";
+import { Dispatch, FC, Fragment, useCallback, useState } from "react";
 import { RequestedStockItem, Stock } from "@prisma/client";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
@@ -10,7 +10,7 @@ import { Button, SelectItem } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import "../../../../../../../../utils/GeneralUtils";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { ProposedStockRequestsAction } from "./InventoryRequestedItemsContainer";
 import useStockQuantityDropdownUtils
     from "../../../../[name]/_components/table/generic/forms/useStockQuantityDropdownUtils";
@@ -31,6 +31,11 @@ interface Props {
     stock: Stock[];
 }
 
+type FormProps = {
+    amount_requested: string,
+    selected_item: string,
+}
+
 const AddRequestedItemsButton: FC<Props> = ({
                                                 disabled,
                                                 snapshotsLoading,
@@ -39,29 +44,26 @@ const AddRequestedItemsButton: FC<Props> = ({
                                                 dispatchProposedRequests
                                             }) => {
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
     const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
     const [currentItem, setCurrentItem] = useState<Stock>();
-    const { register, handleSubmit } = useForm<FieldValues>();
+    const { register, handleSubmit } = useForm<FormProps>();
     const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item: currentItem });
 
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    const onSubmit = useCallback<SubmitHandler<FormProps>>((data) => {
         const amountRequested = mutateQuantity(Number(data.amount_requested), quantityUnit);
 
         dispatchProposedRequests({
             type: ProposedStockRequestsAction.ADD_ITEM,
             payload: {
                 amountRequested,
-                stockId: selectedItemIds[0],
-                stockUID: stock.find(item => item.id === selectedItemIds[0])!.uid
+                stockId: data.selected_item,
+                stockUID: stock.find(item => item.id === data.selected_item)!.uid
             }
         });
 
-        setSelectedItemIds([]);
         setCurrentItem(undefined);
         setModalOpen(false);
-    };
-
+    }, [dispatchProposedRequests, mutateQuantity, quantityUnit, stock]);
 
     return (
         <Fragment>
@@ -73,17 +75,15 @@ const AddRequestedItemsButton: FC<Props> = ({
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="space-y-6">
                         <GenericSelectMenu
+                            register={register}
                             id="selected_item"
                             placeholder="Select an item..."
                             variant="flat"
                             items={stock.sort((a, b) => a.name.localeCompare(b.name))}
                             disabled={snapshotsLoading}
-                            selectedKeys={selectedItemIds}
                             disabledKeys={proposedSnapshotIds}
                             onSelectionChange={keys => {
                                 const keyArr = Array.from(keys) as string[];
-                                setSelectedItemIds(keyArr);
-
                                 if (!keyArr.length)
                                     setCurrentItem(undefined);
                                 else {
@@ -104,7 +104,6 @@ const AddRequestedItemsButton: FC<Props> = ({
                         <GenericInput
                             register={register}
                             isRequired
-                            disabled={!selectedItemIds.length}
                             id="amount_requested"
                             label="Amount Needed"
                             labelPlacement="outside"
@@ -121,7 +120,6 @@ const AddRequestedItemsButton: FC<Props> = ({
                         />
                         <Divider className="my-6" />
                         <GenericButton
-                            disabled={!selectedItemIds.length}
                             variant="flat"
                             type="submit"
                             startContent={<PlusIcon fill="currentColor" />}

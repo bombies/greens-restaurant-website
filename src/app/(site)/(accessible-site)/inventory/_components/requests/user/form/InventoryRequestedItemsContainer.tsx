@@ -112,7 +112,9 @@ const reducer = (state: CreateStockRequestDto, { type, payload }: {
             break;
         }
         case ProposedStockRequestsAction.ADD_ITEM: {
-            newState.items.push(payload as Pick<RequestedStockItem, "amountRequested" | "stockId" | "stockUID">);
+            const payloadTyped = payload as Pick<RequestedStockItem, "amountRequested" | "stockId" | "stockUID">;
+            if (!newState.items.find(item => item.stockId === payloadTyped.stockId))
+                newState.items.push(payloadTyped);
             break;
         }
         case ProposedStockRequestsAction.REMOVE_ITEM: {

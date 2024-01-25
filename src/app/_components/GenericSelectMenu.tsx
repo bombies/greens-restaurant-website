@@ -3,7 +3,7 @@ import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
 
 type Props<T> = Omit<SelectProps<T>, "id"> & {
     id: string,
-    register?: UseFormRegister<FieldValues>;
+    register?: UseFormRegister<any>;
     errors?: FieldErrors,
 }
 
@@ -34,11 +34,7 @@ export default function GenericSelectMenu<T>({
                 }
             }}
             popoverProps={{
-                classNames: {
-                    base: [
-                        "!default-container backdrop-blur-md"
-                    ]
-                }
+                className: "!default-container backdrop-blur-md"
             }}
         >
             {children}
@@ -60,11 +56,7 @@ export default function GenericSelectMenu<T>({
                 }
             }}
             popoverProps={{
-                classNames: {
-                    base: [
-                        "!default-container backdrop-blur-md"
-                    ]
-                }
+                className: "!default-container backdrop-blur-md"
             }}
             isInvalid={!!(errors && errors[id])}
         >

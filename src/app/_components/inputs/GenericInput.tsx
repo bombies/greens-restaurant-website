@@ -2,7 +2,7 @@
 
 import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
-import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 import { Input, InputProps } from "@nextui-org/input";
 import clsx from "clsx";
 import { useState } from "react";
@@ -12,7 +12,7 @@ import { SlotsToClasses } from "@nextui-org/react";
 
 interface Props extends InputProps {
     id: string;
-    register?: UseFormRegister<FieldValues>;
+    register?: UseFormRegister<any>;
     errors?: FieldErrors,
     iconLeft?: string | StaticImageData;
     iconRight?: string | StaticImageData;
