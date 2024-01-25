@@ -37,7 +37,7 @@
     "framer-motion": "^10.18.0",
     "generate-password-ts": "^1.6.5",
     "loader-utils": "^3.2.1",
-    "next": "^14.0.4",
+    "next": "^14.1.0",
     "next-auth": "^4.24.5",
     "next-cloudinary": "5.20.0",
     "next-nprogress-bar": "^2.1.2",
