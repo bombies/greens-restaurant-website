@@ -31,6 +31,7 @@ export default function SidebarItem(props: SidebarItemProps) {
     
     return props.sidebarOpen ? item : (
         <Tooltip
+            className="default-container p-4 font-semibold text-lg bg-neutral-900/80 backdrop-blur-md"
             content={props.label}
             placement="right"
         >

@@ -107,9 +107,9 @@ const GenericStockTable: FC<Props> = ({
                 setSelectedIds={setSelectedKeys}
                 onDelete={(ids) => onStockDelete(ids)}
             />
-            <div className="w-1/4 tablet:w-1/2 phone:w-full">
+            <div className="w-1/2 phone:w-full">
                 <GenericInput
-                    startContent={<SearchIcon />}
+                    startContent={<SearchIcon width={18} />}
                     id="stock_search"
                     label="Search for an item"
                     placeholder="Search..."

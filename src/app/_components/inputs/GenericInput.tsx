@@ -25,12 +25,12 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
     const className: SlotsToClasses<"description" | "errorMessage" | "label" | "base" | "mainWrapper" | "inputWrapper" | "innerWrapper" | "input" | "clearButton" | "helperWrapper"> | undefined
         = {
         inputWrapper: clsx(
-            "transition-fast ring-2 !default-container !h-fit py-6 pr-3 pl-6 ring-neutral-800 hover:ring-primary hover:-translate-y-[0.15rem]",
+            "transition-fast ring-2 !default-container !h-fit pt-8 pb-4 pr-3 pl-6 ring-neutral-800 hover:ring-primary hover:-translate-y-[0.15rem]",
             "group-data-[focused=true]:ring-primary",
             errors && (errors[id] && "ring-danger")
         ),
         input: "placeholder:text-neutral-600",
-        label: "text-neutral-100 mb-4 text-sm font-semibold",
+        label: "text-neutral-100 text-sm mb-4 font-semibold",
     };
 
     return register ?
@@ -54,7 +54,7 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
                     iconRight && <GenericImage src={iconRight} width={1.25} />)
             }
             classNames={className}
-            validationState={(errors && errors[id]) && "invalid"}
+            isInvalid={errors !== undefined && errors[id] != undefined}
         />
         :
         <Input
@@ -76,6 +76,6 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
                     iconRight && <GenericImage src={iconRight} width={1.25} />)
             }
             classNames={className}
-            validationState={(errors && errors[id]) && "invalid"}
+            isInvalid={errors !== undefined && errors[id] != undefined}
         />;
 }
