@@ -30,7 +30,7 @@ const InventoryRequestWidget: FC = () => {
                         }
                     </SubTitle>
                     <Divider className="my-2" />
-                    {getStatusChip(request)}
+                    {getStatusChip(request.status)}
                 </div>
             </LinkCard>
         )), [visibleRequests]);

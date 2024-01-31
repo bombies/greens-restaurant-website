@@ -83,5 +83,29 @@ module.exports = {
         }
     },
     darkMode: "class",
-    plugins: [nextui()]
+    plugins: [nextui({
+        defaultTheme: "dark",
+        themes: {
+            dark: {
+                colors: {
+                    focus: "#00D615",
+                    divider: "rgb(255 255 255 / 0.05)",
+                    background: "#100f1090",
+                    foreground: "#effff0",
+                    primary: {
+                        foreground: "#effff0",
+                        DEFAULT: "#00D615"
+                    },
+                    secondary: {
+                        foreground: "#effff0",
+                        DEFAULT: "#007d0d"
+                    },
+                    danger: {
+                        foreground: "#EAE0FF",
+                        DEFAULT: "#FF4A4A"
+                    }
+                }
+            }
+        }
+    })]
 };

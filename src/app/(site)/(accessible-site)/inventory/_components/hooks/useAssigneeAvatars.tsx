@@ -21,7 +21,11 @@ const useAssigneeAvatars = (request?: StockRequestWithOptionalCreatorAndAssignee
                 return (
                     <Tooltip
                         key={assignee.id}
-                        content={<p className="capitalize">{assignee.firstName} {assignee.lastName}</p>}
+                        classNames={{
+                            base: "!default-container",
+                            content: "capitalize"
+                        }}
+                        content={`${assignee.firstName} ${assignee.lastName}`}
                         closeDelay={10}
                     >
                         <Avatar

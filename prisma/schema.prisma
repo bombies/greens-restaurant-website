@@ -27,12 +27,17 @@ model User {
 
   assignedStockRequestsIds String[]       @db.ObjectId
   assignedStockRequests    StockRequest[] @relation(name: "assignedStocks", fields: [assignedStockRequestsIds], references: [id])
+
+  reviewedStockRequests StockRequest[] @relation(name: "stockReviewer")
 }
 
 model StockRequest {
   id            String             @id @default(auto()) @map("_id") @db.ObjectId
   status        StockRequestStatus
   reviewedNotes String?
+
+  reviewedByUserId String? @db.ObjectId
+  reviewedByUser   User?   @relation(name: "stockReviewer", fields: [reviewedByUserId], references: [id])
 
   assignedToUsersId  String[]  @db.ObjectId
   assignedToUsers    User[]    @relation(name: "assignedStocks", fields: [assignedToUsersId], references: [id])

@@ -76,3 +76,13 @@ export const dollarFormat = new Intl.NumberFormat("en-JM", {
     style: "currency",
     currency: "JMD",
 });
+
+export const dateInputToDateObject = (date?: string): Date | undefined => {
+    if (!date)
+        return undefined
+
+    const [year, month, day] = date.split("-");
+    const parsedDate: Date | undefined = year ? new Date() : undefined;
+    parsedDate?.setFullYear(Number(year), Number(month) - 1, Number(day));
+    return parsedDate
+}

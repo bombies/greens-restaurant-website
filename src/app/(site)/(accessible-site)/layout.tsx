@@ -3,11 +3,14 @@ import Sidebar from "./_components/Sidebar";
 
 export default function AccessibleSiteLayout(props: React.PropsWithChildren) {
     return (
-        <main className="flex w-full">
-            <Sidebar />
-            <div className="p-12 phone:px-6 grow tablet:py-20">
+        <div className="flex min-h-screen">
+            <aside>
+                <Sidebar />
+            </aside>
+            <main className="w-[90%] tablet:w-full px-6 phone:px-2 pt-12 phone:pt-16">
                 {props.children}
-            </div>
-        </main>
+            </main>
+        </div>
+
     );
 }

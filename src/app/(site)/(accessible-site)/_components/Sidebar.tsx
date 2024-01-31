@@ -28,9 +28,9 @@ export default function Sidebar() {
     const [opened, setOpened] = useState(false);
     const screenSize = useScreenSize();
 
-    const sidebar = (
-        <Fragment>
-            <div className={`absolute top-5 left-5 z-50 tablet-min:hidden`}>
+    return (
+        <>
+            <div className={`tablet:absolute top-5 left-5 phone:left-1 z-[51] tablet-min:hidden`}>
                 <IconButton
                     variant="light"
                     onPress={() => setOpened(prev => !prev)}
@@ -63,7 +63,7 @@ export default function Sidebar() {
                             x: -100
                         }}
                         className={clsx(
-                            `h-full w-full default-container !rounded-l-none backdrop-blur-md`
+                            `tablet:fixed h-full tablet:h-screen w-28 tablet:w-64 default-container !rounded-l-none backdrop-blur-md z-50`
                         )}>
                         <div className="flex justify-center mt-20">
                             <Link href="/home">
@@ -156,23 +156,7 @@ export default function Sidebar() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </Fragment>
-    );
-
-    return (
-        <header className={clsx(`
-            grow-0
-            sticky
-            top-0
-            h-screen
-            overflow-x-hidden
-            tablet:fixed
-            transition-fast
-            `,
-            opened ? "w-64 z-40" : "w-32"
-        )}>
-            {sidebar}
-        </header>
+        </>
     );
 }
 

@@ -5,7 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { useUserData } from "../../../../../../utils/Hooks";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 
-type SelectedRequestsTabKey = "my_requests" | "all_requests";
+const validKeys = ["my_requests", "all_requests", "request_reports"] as const;
+type SelectedRequestsTabKey = typeof validKeys[number];
 const URL_QUERY_KEY = "requests_tab";
 
 const useSelectedRequestsTab = () => {
@@ -16,7 +17,7 @@ const useSelectedRequestsTab = () => {
     const updateTabKey = useCallback((key: SelectedRequestsTabKey | null) => {
         const params = new URLSearchParams(searchParams.toString());
         setSelectedTabKey(() => {
-            params.set(URL_QUERY_KEY, !key ? "my_requests" : (key.toLowerCase() !== "my_requests" && key.toLowerCase() !== "all_requests" ? "my_requests" : key.toLowerCase()));
+            params.set(URL_QUERY_KEY, !key ? "my_requests" : (!validKeys.includes(key.toLowerCase() as SelectedRequestsTabKey) ? "my_requests" : key.toLowerCase()));
             window.history.pushState(null, "", `?${params.toString()}`);
             return !key ? "my_requests" : key.toLowerCase() as SelectedRequestsTabKey;
         });

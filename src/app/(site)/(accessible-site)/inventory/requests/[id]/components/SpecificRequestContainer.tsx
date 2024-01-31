@@ -137,7 +137,7 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
             />
             <Spacer y={12} />
             <div className="default-container max-w-[80%] tablet:w-full p-12 phone:px-4">
-                <GoBackButton label="View All Requests" href="/inventory/requests" />
+                <GoBackButton label="View All Requests" href="/inventory/requests?requests_tab=all_requests" />
                 <Spacer y={6} />
                 <InventoryRequestedItemsTable
                     items={optimisticRequest.items.length && !isLoadingSnapshots ? optimisticRequest.items : (request?.requestedItems || [])}

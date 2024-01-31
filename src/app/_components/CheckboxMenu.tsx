@@ -9,6 +9,7 @@ import {
     PopoverProps,
     PopoverTrigger
 } from "@nextui-org/react";
+import clsx from "clsx";
 
 type Props = Omit<PopoverProps, "children"> & {
     buttonProps?: ButtonProps,
@@ -20,10 +21,7 @@ const CheckboxMenu: FC<Props> = ({ buttonProps, checkboxGroupProps, children, ..
     return (
         <Popover
             {...popoverProps}
-            classNames={{
-                base: "bg-neutral-900/80 backdrop-blur-md border-1 border-white/20 p-6",
-                ...popoverProps.classNames
-            }}
+            className={clsx("bg-neutral-950/0", popoverProps.className)}
             placement={popoverProps.placement ?? "bottom"}
         >
             <PopoverTrigger>
@@ -36,7 +34,9 @@ const CheckboxMenu: FC<Props> = ({ buttonProps, checkboxGroupProps, children, ..
                     {buttonProps?.children}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent
+                className={clsx("!default-container backdrop-blur-lg p-6")}
+            >
                 <CheckboxGroup
                     {...checkboxGroupProps}
                     color={checkboxGroupProps?.color ?? "secondary"}

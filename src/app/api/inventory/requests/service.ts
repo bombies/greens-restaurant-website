@@ -15,6 +15,7 @@ import { arrayCompare } from "../../../../utils/GeneralUtils";
 import Permission, { hasAnyPermission } from "../../../../libs/types/permission";
 import StockRequestWhereInput = Prisma.StockRequestWhereInput;
 import { Mailer } from "../../../../utils/api/mail/Mailer";
+import { Session } from "next-auth";
 
 class InventoryRequestsService {
 
@@ -268,7 +269,7 @@ class InventoryRequestsService {
         return new Either<StockRequestWithOptionalExtras, NextResponse<ErrorResponse>>(updatedRequest);
     };
 
-    public review = async (requestId: string, dto: ReviewInventoryRequestDto): Promise<Either<StockRequestWithOptionalExtras, NextResponse<ErrorResponse>>> => {
+    public review = async (session: Session, requestId: string, dto: ReviewInventoryRequestDto): Promise<Either<StockRequestWithOptionalExtras, NextResponse<ErrorResponse>>> => {
         const bodyValidated = reviewInventoryRequestDtoSchema.safeParse(dto);
         if (!bodyValidated.success)
             return new Either<StockRequestWithOptionalExtras, NextResponse<ErrorResponse>>(undefined, respondWithInit({
@@ -339,7 +340,7 @@ class InventoryRequestsService {
          */
         const request = await prisma.stockRequest.update({
             where: { id: requestId },
-            data: { status, reviewedNotes: dto.reviewedNotes }
+            data: { status, reviewedNotes: dto.reviewedNotes, reviewedByUserId: session.user?.id }
         });
 
         /**

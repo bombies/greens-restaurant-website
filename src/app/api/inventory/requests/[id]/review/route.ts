@@ -11,9 +11,9 @@ type Context = {
 }
 
 export async function POST(req: Request, { params }: Context) {
-    return authenticatedAny(req, async () => {
+    return authenticatedAny(req, async (session) => {
         const body: ReviewInventoryRequestDto = (await req.json());
-        const reviewResult = await inventoryRequestsService.review(params.id, body);
+        const reviewResult = await inventoryRequestsService.review(session, params.id, body);
         return handleEitherResult(reviewResult);
     }, [
         Permission.CREATE_INVENTORY,

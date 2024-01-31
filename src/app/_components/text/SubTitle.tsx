@@ -8,7 +8,7 @@ interface Props extends React.PropsWithChildren {
 
 export default function SubTitle({ thick, className, children }: Props) {
     return <h3 className={clsx(
-        "text-2xl text-neutral-300 tracking-wider phone:text-xl",
+        "text-2xl text-neutral-300 tracking-wider phone:text-xl w-fit",
         thick ? "font-semibold" : "font-light",
         className
     )}>{children}</h3>;

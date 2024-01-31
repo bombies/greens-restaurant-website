@@ -8,6 +8,7 @@ import AllInventoryRequestsTab from "./all/AllInventoryRequestsTab";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import { GoBackButton } from "../../../invoices/[id]/components/control-bar/InvoiceCustomerControlBar";
 import useSelectedRequestsTab from "./useSelectedRequestsTab";
+import InventoryRequestsReportsTab from "./reports/InventoryRequestsReportsTab";
 
 interface Props {
     userPermissions?: number;
@@ -17,7 +18,7 @@ const InventoryRequestsContainer: FC<Props> = ({ userPermissions }) => {
     const {selectedTabKey, updateTabKey} = useSelectedRequestsTab()
 
     return (
-        <div className="default-container p-6 phone:px-4 w-5/6 tablet:w-full">
+        <div className="default-container p-6 phone:px-4">
             {
                 hasAnyPermission(userPermissions, [
                     Permission.CREATE_INVENTORY,
@@ -33,7 +34,7 @@ const InventoryRequestsContainer: FC<Props> = ({ userPermissions }) => {
                 selectedKey={selectedTabKey}
                 onSelectionChange={key => updateTabKey(key.toString() as any)}
             >
-                <Tab key="my_requests" title="My Requests">
+                <Tab key="my_requests" title="Mine">
                     <UserInventoryRequestsTab />
                 </Tab>
                 {
@@ -43,9 +44,19 @@ const InventoryRequestsContainer: FC<Props> = ({ userPermissions }) => {
                         Permission.VIEW_STOCK_REQUESTS
                     ])
                     &&
-                    <Tab key="all_requests" title="All Requests">
+                    <Tab key="all_requests" title="All">
                         <AllInventoryRequestsTab />
                     </Tab>
+                }
+                {
+                    hasAnyPermission(userPermissions, [
+                        Permission.MANAGE_STOCK_REQUESTS,
+                        Permission.VIEW_STOCK_REQUESTS
+                    ]) && (
+                        <Tab key="request_reports" title="Reports">
+                            <InventoryRequestsReportsTab />
+                        </Tab>
+                    )
                 }
             </GenericTabs>
         </div>

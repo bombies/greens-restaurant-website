@@ -18,7 +18,7 @@ export default function InventoryRequestsPage() {
     ]);
 
     return (
-        <div>
+        <>
             <Title>Inventory Requests</Title>
             <SubTitle>Create and manage inventory requests</SubTitle>
             <Spacer y={12} />
@@ -39,6 +39,6 @@ export default function InventoryRequestsPage() {
                     }
                 </Fragment>
             }
-        </div>
+        </>
     );
 }

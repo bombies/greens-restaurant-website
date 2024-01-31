@@ -1,4 +1,4 @@
-import React, { FC, Fragment, useMemo } from "react";
+import React, { FC, Fragment, useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 import { StockRequestWithOptionalCreator } from "../inventory-requests-utils";
@@ -8,13 +8,22 @@ import GenericCard from "../../../../../../_components/GenericCard";
 import SubTitle from "../../../../../../_components/text/SubTitle";
 import useMutableRequests from "../hooks/useMutableRequests";
 import CardSkeleton from "../../../../../../_components/skeletons/CardSkeleton";
+import { useUserData } from "../../../../../../../utils/Hooks";
+import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
+import { useRouter } from "next/navigation";
 
-export const FetchAllRequests = (withAssignees?: boolean) => {
-    return useSWR(`/api/inventory/requests?with_users=true&with_assignees=${withAssignees ?? false}`, fetcher<StockRequestWithOptionalCreator[]>);
+export const FetchAllRequests = (withAssignees?: boolean, doFetch: boolean = true) => {
+    return useSWR(doFetch && `/api/inventory/requests?with_users=true&with_assignees=${withAssignees ?? false}`, fetcher<StockRequestWithOptionalCreator[]>);
 };
 
 const AllInventoryRequestsTab: FC = () => {
-    const { data, isLoading } = FetchAllRequests(true);
+    const router = useRouter()
+    const { data: userData, isLoading: userDataLoading } = useUserData();
+    const canView = !userDataLoading && hasAnyPermission(userData?.permissions, [
+        Permission.MANAGE_STOCK_REQUESTS, Permission.VIEW_STOCK_REQUESTS
+    ]);
+
+    const { data, isLoading } = FetchAllRequests(true, canView);
     const { visibleRequests, sortButton, filterButton } = useMutableRequests({
         data, dataIsLoading: isLoading
     });
@@ -30,34 +39,42 @@ const AllInventoryRequestsTab: FC = () => {
             )) ?? [];
     }, [visibleRequests]);
 
+    useEffect(() => {
+        if (!userDataLoading && !canView)
+            router.replace("/inventory/requests?requests_tab=my_requests")
+    }, [canView, router, userDataLoading]);
+
     return (
-        <Fragment>
-            <div className="flex items-center gap-4">
-                {sortButton}
-                {filterButton}
-            </div>
-            <Divider className="my-6" />
-            {
-                isLoading ?
-                    <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
-                        <CardSkeleton contentRepeat={3} />
-                        <CardSkeleton contentRepeat={3} />
-                        <CardSkeleton contentRepeat={3} />
-                        <CardSkeleton contentRepeat={3} />
-                        <CardSkeleton contentRepeat={3} />
-                        <CardSkeleton contentRepeat={3} />
-                    </div>
-                    :
-                    requestCards.length ?
+        canView && (
+            <Fragment>
+
+                <div className="flex items-center gap-4">
+                    {sortButton}
+                    {filterButton}
+                </div>
+                <Divider className="my-6" />
+                {
+                    isLoading ?
                         <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
-                            {requestCards}
+                            <CardSkeleton contentRepeat={3} />
+                            <CardSkeleton contentRepeat={3} />
+                            <CardSkeleton contentRepeat={3} />
+                            <CardSkeleton contentRepeat={3} />
+                            <CardSkeleton contentRepeat={3} />
+                            <CardSkeleton contentRepeat={3} />
                         </div>
                         :
-                        <GenericCard>
-                            <SubTitle>There are no requests</SubTitle>
-                        </GenericCard>
-            }
-        </Fragment>
+                        requestCards.length ?
+                            <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
+                                {requestCards}
+                            </div>
+                            :
+                            <GenericCard>
+                                <SubTitle>There are no requests</SubTitle>
+                            </GenericCard>
+                }
+            </Fragment>
+        )
     );
 };
 

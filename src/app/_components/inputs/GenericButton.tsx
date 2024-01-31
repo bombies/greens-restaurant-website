@@ -13,7 +13,7 @@ type Props =
     cooldown?: number
 }
 
-export default function GenericButton({ icon, cooldown, children, ...props }: Props) {
+export default function GenericButton({ icon, cooldown, children, className, ...props }: Props) {
     const [lastClick, setLastClick] = useState<number>();
 
     const isOnCoolDown = useCallback((): boolean => {
@@ -34,7 +34,8 @@ export default function GenericButton({ icon, cooldown, children, ...props }: Pr
                 size={props.size || "lg"}
                 startContent={icon ? <GenericImage src={icon} width={1.35} /> : props.startContent}
                 className={clsx(
-                    "z-0 rounded-xl self-center cursor-pointer transition-fast hover:-translate-y-[.25rem] disabled:opacity-50 disabled:cursor-not-allowed p-6"
+                    "z-0 rounded-xl self-center cursor-pointer transition-fast hover:-translate-y-[.25rem] disabled:opacity-50 disabled:cursor-not-allowed p-6",
+                    className
                 )}
                 onPress={(e: PressEvent) => {
                     if (!isOnCoolDown()) {
@@ -52,7 +53,7 @@ export default function GenericButton({ icon, cooldown, children, ...props }: Pr
             >
                 {children}
             </Button>
-        , [children, cooldown, icon, isOnCoolDown, lastClick, props]);
+        , [children, className, cooldown, icon, isOnCoolDown, lastClick, props]);
 
     return (button);
 }

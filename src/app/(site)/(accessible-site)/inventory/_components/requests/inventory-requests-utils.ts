@@ -27,6 +27,7 @@ export type StockRequestWithOptionalCreatorAndItems =
 export type StockRequestWithOptionalExtras =
     StockRequestWithOptionalCreatorAndItems
     & Pick<StockRequestWithOptionalAssignees, "assignedToUsers">
+    & { reviewedByUser?: User }
 
 export type RequestedStockItemWithOptionalStock = RequestedStockItem & {
     stock?: Stock

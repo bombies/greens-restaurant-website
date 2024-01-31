@@ -8,7 +8,7 @@ import { JSX } from "react";
 
 interface Props<T> extends Omit<TableProps, "children"> {
     columns: Column[],
-    children: RowElement<T> | RowElement<T>[] | ((item: T) => RowElement<T>),
+    children: RowElement<T> | RowElement<T>[] | ((item: T) => (RowElement<T>)),
     items: T[],
     sortableColumns?: string[],
     emptyContent?: string,

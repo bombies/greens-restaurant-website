@@ -13,7 +13,9 @@ export async function GET(req: Request) {
             withUsers,
             withItems,
             withAssignees,
-            from, to
+            from, to,
+            withStock,
+            withReviewer,
         } = selfUserService.getFetchStockRequestsSearchParams(req.url);
         let whereQuery: StockRequestWhereInput = {};
 
@@ -44,9 +46,14 @@ export async function GET(req: Request) {
         const requests = await prisma.stockRequest.findMany({
             where: whereQuery,
             include: {
-                requestedItems: withItems,
+                requestedItems: withItems && (withStock ? {
+                    include: {
+                        stock: true
+                    }
+                } : true),
                 requestedByUser: withUsers,
-                assignedToUsers: withAssignees
+                assignedToUsers: withAssignees,
+                reviewedByUser: withReviewer
             }
         });
         return NextResponse.json(requests);

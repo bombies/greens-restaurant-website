@@ -12,14 +12,13 @@ import SubTitle from "../../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 import clsx from "clsx";
 
-export const getStatusChip = (request?: StockRequestWithOptionalCreatorAndAssignees) => {
-    switch (request?.status) {
+export const getStatusChip = (status?: StockRequestStatus) => {
+    switch (status) {
         case StockRequestStatus.DELIVERED: {
             return (
                 <Chip
                     variant="flat"
                     color="success"
-                    className={clsx(request.reviewedNotes && "cursor-pointer")}
                     classNames={{
                         content: "font-semibold"
                     }}
@@ -34,7 +33,6 @@ export const getStatusChip = (request?: StockRequestWithOptionalCreatorAndAssign
                 <Chip
                     variant="flat"
                     color="warning"
-                    className={clsx(request.reviewedNotes && "cursor-pointer")}
                     classNames={{
                         content: "font-semibold"
                     }}
@@ -49,7 +47,6 @@ export const getStatusChip = (request?: StockRequestWithOptionalCreatorAndAssign
                 <Chip
                     variant="flat"
                     color="danger"
-                    className={clsx(request.reviewedNotes && "cursor-pointer")}
                     classNames={{
                         content: "font-semibold"
                     }}
@@ -63,7 +60,6 @@ export const getStatusChip = (request?: StockRequestWithOptionalCreatorAndAssign
             return (
                 <Chip
                     variant="flat"
-                    className={clsx(request.reviewedNotes && "cursor-pointer")}
                     classNames={{
                         content: "font-semibold"
                     }}
@@ -78,7 +74,7 @@ export const getStatusChip = (request?: StockRequestWithOptionalCreatorAndAssign
 
 const useRequestStatus = (request?: StockRequestWithOptionalCreatorAndAssignees) => {
     const chip = useMemo(() => {
-        return getStatusChip(request);
+        return getStatusChip(request?.status);
     }, [request]);
 
     return request?.reviewedNotes ? (

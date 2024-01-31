@@ -6,5 +6,5 @@ interface Props extends React.PropsWithChildren {
 }
 
 export default function Title({ children, className }: Props) {
-    return <h1 className={clsx(className, "phone:text-3xl")}>{children}</h1>;
+    return <h1 className={clsx(className, "phone:text-3xl w-fit")}>{children}</h1>;
 }
