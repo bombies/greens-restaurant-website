@@ -1,29 +1,28 @@
 "use client";
 
 import { FC, Fragment, useState } from "react";
-import IconButton from "../../../../../../../../_components/inputs/IconButton";
-import CheckIcon from "../../../../../../../../_components/icons/CheckIcon";
-import GenericModal from "../../../../../../../../_components/GenericModal";
 import { RequestedStockItemWithOptionalStockAndRequest } from "../../../inventory-requests-utils";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import GenericModal from "../../../../../../../../_components/GenericModal";
 import GenericInput from "../../../../../../../../_components/inputs/GenericInput";
 import { Divider } from "@nextui-org/divider";
 import GenericButton from "../../../../../../../../_components/inputs/GenericButton";
+import IconButton from "../../../../../../../../_components/inputs/IconButton";
+import DoubleCheckIcon from "../../../../../../../../_components/icons/DoubleCheckIcon";
 
 type Props = {
     item: Partial<RequestedStockItemWithOptionalStockAndRequest>,
-    disabled?: boolean,
-    max?: number,
-    onPartialApprove?: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>, approvedAmount: number) => void
+    amountAvailable: number,
+    onExtraApprove?: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>, approvedAmount: number) => void
 }
 
-const PartialApproveButton: FC<Props> = ({ item, onPartialApprove, disabled, max }) => {
+const ExtraApproveButton: FC<Props> = ({ item, amountAvailable, onExtraApprove }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const { handleSubmit, register, formState: { errors } } = useForm();
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        if (onPartialApprove)
-            onPartialApprove(item, Number(data.amount_approved));
+        if (onExtraApprove)
+            onExtraApprove(item, Number(data.amount_approved));
         setModalOpen(false);
     };
 
@@ -42,8 +41,8 @@ const PartialApproveButton: FC<Props> = ({ item, onPartialApprove, disabled, max
                         label="How much stock would you like to approve?"
                         placeholder="Enter a number..."
                         type="number"
-                        max={max ?? (item.amountRequested ? item.amountRequested - 1 : undefined)}
-                        min={1}
+                        min={item.amountRequested}
+                        max={amountAvailable}
                     />
                     <Divider className="my-6" />
                     <GenericButton
@@ -55,16 +54,16 @@ const PartialApproveButton: FC<Props> = ({ item, onPartialApprove, disabled, max
                 </form>
             </GenericModal>
             <IconButton
-                isDisabled={disabled}
+                isDisabled={item.amountRequested !== undefined ? amountAvailable <= item.amountRequested : false}
                 variant="flat"
-                color="warning"
+                color="primary"
                 onPress={() => setModalOpen(true)}
-                toolTip="Partially Approve"
+                toolTip="Give Extra"
             >
-                <CheckIcon width={16} />
+                <DoubleCheckIcon width={16} />
             </IconButton>
         </Fragment>
     );
 };
 
-export default PartialApproveButton;
+export default ExtraApproveButton

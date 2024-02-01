@@ -296,7 +296,7 @@ class InventoryRequestsService {
         // If the status isn't rejected, check if there were any
         // items that weren't provided. If any are found, the request
         // is partially-delivered.
-        if (status !== StockRequestStatus.REJECTED && dto.items.find(item => item.amountProvided !== item.amountRequested))
+        if (status !== StockRequestStatus.REJECTED && dto.items.find(item => item.amountProvided < item.amountRequested))
             status = StockRequestStatus.PARTIALLY_DELIVERED;
 
         // If the status is still delivered, check

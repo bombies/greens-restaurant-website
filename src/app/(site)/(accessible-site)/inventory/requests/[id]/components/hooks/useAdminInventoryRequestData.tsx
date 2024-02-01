@@ -116,7 +116,7 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, ch
             amountRequested: item.amountRequested,
             amountProvided: item.amountProvided ?? -1
         })) ?? []
-    }), [request?.requestedItems, optimisticRequest]);
+    }), [request?.requestedItems]);
 
     useEffect(() => {
         if (!isEnabled)

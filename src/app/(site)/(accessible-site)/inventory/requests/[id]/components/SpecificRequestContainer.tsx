@@ -158,6 +158,18 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
 
                             toast.success(`Successfully approved ${item?.stock?.name.replaceAll("-", " ").capitalize()}`);
                         },
+                        onExtraApprove(item, amountApproved) {
+                            if (!item.id)
+                                return;
+
+                            dispatchOptimisticRequest({
+                                type: OptimisticRequestDataActionType.PARTIALLY_APPROVE,
+                                payload: { id: item.id, amountApproved: amountApproved }
+                            });
+
+                            toast.success(`Successfully extra approved ${item?.stock?.name.replaceAll("-", " ").capitalize()}`);
+
+                        },
                         onPartialApprove(item, amountApproved) {
                             if (!item.id)
                                 return;

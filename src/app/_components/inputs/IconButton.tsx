@@ -88,7 +88,7 @@ export default function IconButton({
             (
                 toolTip ?
                     <Tooltip
-                        className="p-4 font-semibold text-medium bg-opacity-80 backdrop-blur-md !default-container"
+                        className="p-4 font-semibold text-medium bg-opacity-80 backdrop-blur-md"
                         as="button"
                         content={toolTip}
                         color={color}

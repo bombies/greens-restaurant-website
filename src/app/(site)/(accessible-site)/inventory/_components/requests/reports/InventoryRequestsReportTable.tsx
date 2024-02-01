@@ -63,7 +63,7 @@ const fetchValueForKey = (key: Key, item: RequestedStockItemWithExtrasAndRequest
         case "status":
             return getStatusChip(
                 item.amountProvided === null ? StockRequestStatus.PENDING : (
-                    item.amountProvided === item.amountRequested ? StockRequestStatus.DELIVERED : (
+                    item.amountProvided >= item.amountRequested ? StockRequestStatus.DELIVERED : (
                         item.amountProvided > 0 ? StockRequestStatus.PARTIALLY_DELIVERED : StockRequestStatus.REJECTED
                     )
                 )

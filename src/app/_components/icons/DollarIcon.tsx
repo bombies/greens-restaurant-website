@@ -8,9 +8,9 @@ const DollarIcon = ({ className, fill, width, height }: IconProps) => (
         height={height ?? width ?? 24}
         fill="none"
         viewBox="0 0 24 24"
+        className={clsx("self-center", className)}
     >
         <g
-            className={clsx("self-center", className)}
             fill={clsx(fill ?? "currentColor")}
         >
             <path

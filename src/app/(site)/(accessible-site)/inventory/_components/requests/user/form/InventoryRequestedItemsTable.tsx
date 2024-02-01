@@ -20,6 +20,7 @@ import { StockSnapshot } from "@prisma/client";
 import { StockRequestStatus } from ".prisma/client";
 import { InventorySnapshotWithOptionalExtras } from "../../../../../../../api/inventory/[name]/types";
 import { Spinner } from "@nextui-org/spinner";
+import ExtraApproveButton from "./admin-actions/ExtraApproveButton";
 
 interface Props {
     items: Partial<RequestedStockItemWithOptionalStock>[];
@@ -35,6 +36,7 @@ interface Props {
 
 type OnAdminAction = {
     onApprove: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>) => void,
+    onExtraApprove: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>, amountApproved: number) => void,
     onPartialApprove: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>, amountApproved: number) => void,
     onReject: (item: Partial<RequestedStockItemWithOptionalStockAndRequest>) => void,
 }
@@ -116,8 +118,14 @@ const InventoryRequestedItemsTable: FC<Props> = ({
                                 >
                                     <CheckIcon width={16} />
                                 </IconButton>
+                                <ExtraApproveButton
+                                    item={item}
+                                    amountAvailable={itemSnapshot?.quantity ?? 0}
+                                    onExtraApprove={onAdminAction?.onExtraApprove}
+                                />
                                 <PartialApproveButton
                                     item={item}
+                                    disabled={(itemSnapshot?.quantity ?? 0) <= 0}
                                     max={(itemSnapshot?.quantity ?? 0) < (item.amountRequested ?? 0) ? itemSnapshot?.quantity : undefined}
                                     onPartialApprove={onAdminAction?.onPartialApprove}
                                 />
@@ -151,18 +159,23 @@ const InventoryRequestedItemsTable: FC<Props> = ({
                 );
             }
             case "status": {
-                if (item.amountRequested === item.amountProvided)
+                if ((item?.amountProvided ?? 0) >= (item?.amountRequested ?? 0))
                     return (
-                        <Chip
-                            variant="flat"
+                        <Tooltip
                             color="success"
-                            classNames={{
-                                content: "font-semibold"
-                            }}
-                            startContent={<CheckIcon width={16} />}
+                            content={`${item.amountProvided} PROVIDED`}
                         >
-                            APPROVED
-                        </Chip>
+                            <Chip
+                                variant="flat"
+                                color="success"
+                                classNames={{
+                                    content: "font-semibold"
+                                }}
+                                startContent={<CheckIcon width={16} />}
+                            >
+                                APPROVED
+                            </Chip>
+                        </Tooltip>
                     );
                 else if (item.amountProvided === 0)
                     return (
@@ -215,7 +228,7 @@ const InventoryRequestedItemsTable: FC<Props> = ({
                     );
             }
             case "amount_available": {
-                return findItemSnapshot()?.quantity ?? "Unknown";
+                return findItemSnapshot()?.quantity ?? 0;
             }
         }
     }, [stockSnapshots]);
@@ -223,10 +236,10 @@ const InventoryRequestedItemsTable: FC<Props> = ({
     return (
         <GenericTable
             columns={columns}
-            items={items}
+            items={isLoading ? [] : items}
             isLoading={isLoading}
             loadingContent={<Spinner />}
-            emptyContent="Select an inventory then click on the button below to start requesting items."
+            emptyContent={!isLoading ? "Select an inventory then click on the button below to start requesting items." : ''}
         >
             {(item) => (
                 <TableRow key={item.id}>
