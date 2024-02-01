@@ -31,7 +31,7 @@ type Props = {
 }
 
 const FetchRequest = (id: string) => {
-    return useSWR(`/api/inventory/requests/${id}?with_items=true&with_users=true&with_assignees=true`, fetcher<StockRequestWithOptionalExtras>);
+    return useSWR(`/api/inventory/requests/${id}?with_items=true&with_users=true&with_assignees=true&with_reviewer=true`, fetcher<StockRequestWithOptionalExtras>);
 };
 
 type UpdateItemArgs = {

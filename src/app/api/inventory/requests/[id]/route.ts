@@ -13,9 +13,9 @@ type Context = {
 
 export async function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async (session, _, userPermissions) => {
-        const { withItems, withUsers, withAssignees } = selfUserService.getFetchStockRequestsSearchParams(req.url);
+        const { withItems, withUsers, withAssignees, withReviewer } = selfUserService.getFetchStockRequestsSearchParams(req.url);
         const fetchResult = await inventoryRequestsService.fetchRequest(params.id, session.user!.id, userPermissions, {
-            withItems, withAssignees, withUsers
+            withItems, withAssignees, withUsers, withReviewer
         });
         return NextResponse.json(fetchResult);
     }, [

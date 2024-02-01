@@ -80,11 +80,13 @@ class InventoryRequestsService {
     public fetchRequest = async (requestId: string, userId: string, userPermissions: number, {
         withUsers,
         withAssignees,
-        withItems
+        withItems,
+        withReviewer = false
     }: {
         withItems: boolean,
         withUsers: boolean,
         withAssignees: boolean,
+        withReviewer: boolean
     }): Promise<StockRequestWithOptionalExtras | null> => {
         const andArr: any[] = [{ id: requestId }];
         if (!hasAnyPermission(userPermissions, [
@@ -108,6 +110,7 @@ class InventoryRequestsService {
                         }
                     }
                 },
+                reviewedByUser: withReviewer,
                 requestedByUser: withUsers,
                 assignedToUsers: withAssignees
             }

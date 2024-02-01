@@ -93,12 +93,12 @@ const InventoryRequestsReportTable: FC = () => {
 
     return (
         <>
-            {(allData && allData.length) && (
+            {(allData && allData.length) ? (
                 <>
                     <InventoryRequestsReportFilters />
                     <Divider className="my-6" />
                 </>
-            )}
+            ) : <></>}
             {isFetching ? (
                 <Spinner size="lg" />
             ) : (

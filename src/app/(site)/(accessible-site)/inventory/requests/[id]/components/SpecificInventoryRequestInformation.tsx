@@ -7,6 +7,7 @@ import { Divider } from "@nextui-org/divider";
 import useAssigneeAvatars from "../../../_components/hooks/useAssigneeAvatars";
 import { AvatarGroup, Spacer, User } from "@nextui-org/react";
 import useRequestStatus from "../../../_components/hooks/useRequestStatus";
+import UserAvatar from "../../../../../../_components/UserAvatar";
 
 type Props = {
     request?: StockRequestWithOptionalExtras,
@@ -61,6 +62,18 @@ const SpecificInventoryRequestInformation: FC<Props> = ({ request, requestIsLoad
                                             <AvatarGroup isBordered>
                                                 {assigneeAvatars}
                                             </AvatarGroup>
+                                        </div>
+                                    </Fragment>
+                                    : undefined
+                            }
+                            {
+                                request?.reviewedByUser ?
+                                    <Fragment>
+                                        <Divider orientation="vertical" />
+                                        <div className="self-center">
+                                            <p className="uppercase self-center font-semibold text-xs mb-3">Reviewed
+                                                By</p>
+                                            <UserAvatar user={request?.reviewedByUser} isBordered showToolTip />
                                         </div>
                                     </Fragment>
                                     : undefined
