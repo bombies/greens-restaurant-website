@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { errorToast } from "../../../../../../../../utils/Hooks";
 import { toast } from "react-hot-toast";
 import TrashIcon from "../../../../../../../_components/icons/TrashIcon";
+import { invoiceTypeAsString } from "../../../../utils";
 
 type Props = {
     customerId?: string
@@ -33,17 +34,17 @@ export default function DeleteInvoiceButton({ customerId, invoice, disabled }: P
                 isOpen={modalOpen}
                 setOpen={setModalOpen}
                 accepting={isDeleting}
-                title="Delete Invoice"
-                message="Are you sure you want to delete this invoice?"
+                title={`Delete ${invoiceTypeAsString(invoice)}`}
+                message={`Are you sure you want to delete this ${invoiceTypeAsString(invoice).toLowerCase()}?`}
                 onAccept={() => {
                     triggerDeletion()
                         .then(() => {
-                            toast.success("You have successfully deleted that invoice!");
+                            toast.success(`You have successfully deleted that ${invoiceTypeAsString(invoice).toLowerCase()}!`);
                             router.push(`/invoices/${customerId}`);
                         })
                         .catch(e => {
                             console.error(e);
-                            errorToast(e, "There was an error deleting this invoice!");
+                            errorToast(e, `There was an error deleting this ${invoiceTypeAsString(invoice).toLowerCase()}!`);
                         });
                 }}
             />
@@ -54,7 +55,7 @@ export default function DeleteInvoiceButton({ customerId, invoice, disabled }: P
                 onPress={() => setModalOpen(true)}
                 startContent={<TrashIcon />}
             >
-                Delete Invoice
+                Delete {invoiceTypeAsString(invoice)}
             </GenericButton>
         </>
     );

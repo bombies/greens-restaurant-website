@@ -57,7 +57,7 @@ export default function Inventory({ name }: Props) {
     }, [inventoryDataError]);
 
     return (
-        <div className="default-container p-12 phone:px-4">
+        <div className="default-container p-12 tablet:px-2">
             {
                 inventoryDataLoading || currentSnapshotDataLoading ?
                     <TableSkeleton columns={columns} contentRepeat={20} />

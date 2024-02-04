@@ -7,6 +7,7 @@ import { Divider } from "@nextui-org/divider";
 import { dollarFormat } from "../../../../../../utils/GeneralUtils";
 import { generateInvoiceTotal } from "../../utils/invoice-utils";
 import { FetchInvoiceCustomer } from "../../utils/invoice-client-utils";
+import { InvoiceType } from "@prisma/client";
 
 interface Props {
     id: string;
@@ -17,6 +18,7 @@ export const InvoiceCustomerInformation: React.FC<Props> = ({ id }) => {
 
     const invoiceTotal = useMemo(() => (
         Number(customer?.invoices
+            ?.filter(invoice => !invoice.type || invoice.type === InvoiceType.DEFAULT)
             ?.map(invoice => generateInvoiceTotal(invoice))
             .reduce((prev, acc) => prev + acc, 0)
         )
@@ -24,7 +26,7 @@ export const InvoiceCustomerInformation: React.FC<Props> = ({ id }) => {
 
     const invoicePaidTotal = useMemo(() => (
         Number(customer?.invoices
-            ?.filter(invoice => invoice.paid)
+            ?.filter(invoice => (!invoice.type || invoice.type === InvoiceType.DEFAULT) && invoice.paid)
             .map(invoice => generateInvoiceTotal(invoice))
             .reduce((prev, acc) => prev + acc, 0)
         )
@@ -32,7 +34,7 @@ export const InvoiceCustomerInformation: React.FC<Props> = ({ id }) => {
 
     const invoiceUnpaidTotal = useMemo(() => (
         Number(customer?.invoices
-            ?.filter(invoice => !invoice.paid)
+            ?.filter(invoice => (!invoice.type || invoice.type === InvoiceType.DEFAULT) && !invoice.paid)
             .map(invoice => generateInvoiceTotal(invoice))
             .reduce((prev, acc) => prev + acc, 0)
         )

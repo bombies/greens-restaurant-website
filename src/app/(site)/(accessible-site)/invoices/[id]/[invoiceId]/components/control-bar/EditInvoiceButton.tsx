@@ -17,6 +17,7 @@ import { fetchDueAt } from "../../../../utils/invoice-utils";
 import { toast } from "react-hot-toast";
 import { KeyedMutator } from "swr";
 import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { invoiceTypeAsString } from "../../../../utils";
 
 type Props = {
     customerId?: string,
@@ -52,7 +53,7 @@ export default function EditInvoiceButton({ customerId, invoice, disabled, mutat
     return (
         <>
             <GenericModal
-                title="Update Invoice Information"
+                title={`Update ${invoiceTypeAsString(invoice)} Information`}
                 size="3xl"
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
@@ -74,11 +75,11 @@ export default function EditInvoiceButton({ customerId, invoice, disabled, mutat
 
                                 setProposedChanges(undefined);
                                 setModalOpen(false);
-                                toast.success("Successfully updated this invoice!");
+                                toast.success(`Successfully updated this ${invoiceTypeAsString(invoice).toLowerCase()}!`);
                             })
                             .catch(e => {
                                 console.error(e);
-                                errorToast(e, "There was an error updating this invoice!");
+                                errorToast(e, `There was an error updating this ${invoiceTypeAsString(invoice).toLowerCase()}!`);
                             });
                     }}
                     onReject={() => setProposedChanges(undefined)}
@@ -86,7 +87,7 @@ export default function EditInvoiceButton({ customerId, invoice, disabled, mutat
                 <div className="space-y-6">
                     <EditableField
                         textArea
-                        label="Invoice Description"
+                        label={`${invoiceTypeAsString(invoice)} Description`}
                         field={(proposedChanges?.description || invoice?.description) || undefined}
                         editAllowed={!disabled}
                         onValueChange={value => setProposedChanges(prev => ({
@@ -94,7 +95,7 @@ export default function EditInvoiceButton({ customerId, invoice, disabled, mutat
                             description: value
                         }))}
                     />
-                    <DataContainer label="Invoice Due At" editAllowed={false}>
+                    <DataContainer label={`${invoiceTypeAsString(invoice)} Due At`} editAllowed={false}>
                         <GenericDatePicker
                             id="invoice_due_at"
                             value={proposedChanges?.dueAt ?? fetchDueAt(invoice)}
@@ -113,7 +114,7 @@ export default function EditInvoiceButton({ customerId, invoice, disabled, mutat
                 onPress={() => setModalOpen(true)}
                 icon={editIcon}
             >
-                Edit Invoice Information
+                Edit {invoiceTypeAsString(invoice)} Information
             </GenericButton>
         </>
     );

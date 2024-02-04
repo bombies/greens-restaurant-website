@@ -1,10 +1,11 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import useInvoicePDF from "./export/useInvoicePDF";
-import { PDFViewer, usePDF } from "@react-pdf/renderer";
+import { PDFViewer } from "@react-pdf/renderer";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import EyeIcon from "../../../../../../../_components/icons/EyeIcon";
+import { invoiceTypeAsString } from "../../../../utils";
 
 type Props = {
     customer?: InvoiceCustomer
@@ -23,7 +24,7 @@ const PreviewInvoiceButton: FC<Props> = ({ customer, invoice, invoiceItems, disa
                 size="5xl"
                 scrollBehavior="outside"
                 placement="center"
-                title="Invoice Preview"
+                title={`${invoiceTypeAsString(invoice)} Preview`}
                 isOpen={previewVisible}
                 onClose={() => setPreviewVisible(false)}
 
@@ -44,7 +45,7 @@ const PreviewInvoiceButton: FC<Props> = ({ customer, invoice, invoiceItems, disa
                 variant="flat"
                 onPress={() => setPreviewVisible(true)}
             >
-                <EyeIcon /> Preview Invoice
+                <EyeIcon /> Preview {invoiceTypeAsString(invoice)}
             </GenericButton>
         </>
 

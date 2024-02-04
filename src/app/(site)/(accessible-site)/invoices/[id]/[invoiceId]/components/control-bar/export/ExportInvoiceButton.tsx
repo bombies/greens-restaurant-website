@@ -7,6 +7,7 @@ import { usePDF } from "@react-pdf/renderer";
 import { useEffect } from "react";
 import { formatInvoiceNumber } from "../../../../../utils/invoice-utils";
 import useInvoicePDF from "./useInvoicePDF";
+import { invoiceTypeAsString } from "../../../../../utils";
 
 type Props = {
     customer?: InvoiceCustomer
@@ -44,7 +45,7 @@ export default function ExportInvoiceButton({ customer, invoice, invoiceItems, d
                     aTag.remove();
                 }}
             >
-                {pdfInstance.loading ? "Generating PDF" : "Export Invoice"}
+                {pdfInstance.loading ? "Generating PDF" : `Export ${invoiceTypeAsString(invoice)}`}
             </GenericButton>
         </>
     );

@@ -1,4 +1,5 @@
 "use client";
+
 import { Invoice, InvoiceCustomer, InvoiceInformation, InvoiceItem } from "@prisma/client";
 import { Document, Page, StyleSheet, Text, View, Font, Image } from "@react-pdf/renderer";
 import InvoicePDFHeader from "./InvoicePDFHeader";
@@ -71,6 +72,7 @@ export default function InvoicePDF({ companyInfo, customerInfo, invoice, invoice
                 <InvoicePDFRecipient
                     companyInfo={companyInfo}
                     customerInfo={customerInfo}
+                    invoiceType={invoice?.type}
                     invoiceCreationDate={new Date(invoice?.createdAt ?? 0)}
                 />
                 <InvoicePDFTable

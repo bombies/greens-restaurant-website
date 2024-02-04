@@ -226,11 +226,18 @@ model InvoiceCustomer {
   invoices Invoice[]
 }
 
+enum InvoiceType {
+  QUOTE
+  DEFAULT
+  CASH_RECEIPT
+}
+
 model Invoice {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  number      Int      @unique
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  number      Int          @unique
   description String?
   paid        Boolean?
+  type        InvoiceType?
 
   customerId String          @db.ObjectId
   customer   InvoiceCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)

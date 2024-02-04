@@ -4,15 +4,13 @@ import { Invoice } from "@prisma/client";
 import LinkCard from "../../../../../_components/LinkCard";
 import { Divider } from "@nextui-org/divider";
 import SubTitle from "../../../../../_components/text/SubTitle";
-import { Button, Checkbox, CheckboxGroup, Popover, PopoverContent, PopoverTrigger, Spacer } from "@nextui-org/react";
-import filterIcon from "/public/icons/filter-green.svg";
+import { Checkbox, Spacer } from "@nextui-org/react";
 import DropdownInput from "../../../../../_components/inputs/DropdownInput";
 import React, { useMemo, useState } from "react";
 import "../../../../../../utils/GeneralUtils";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
 import CardSkeleton from "../../../../../_components/skeletons/CardSkeleton";
 import { Chip } from "@nextui-org/chip";
-import GenericImage from "../../../../../_components/GenericImage";
 import GenericCard from "../../../../../_components/GenericCard";
 import { dollarFormat } from "../../../../../../utils/GeneralUtils";
 import {
@@ -28,6 +26,7 @@ import {
 import SortIcon from "../../../../../_components/icons/SortIcon";
 import CheckboxMenu from "../../../../../_components/CheckboxMenu";
 import FilterIcon from "../../../../../_components/icons/FilterIcon";
+import { invoiceTypeAsString } from "../../utils";
 
 type Props = {
     customerIsLoading: boolean,
@@ -85,6 +84,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
     const [filterModes, setFilterModes] = useState<FilterMode[]>([]);
     const [search, setSearch] = useState<string>();
 
+
     const invoiceCards = useMemo(() => {
         return customer?.invoices
             ?.filter(invoice => getFilterPredicate(invoice, filterModes))
@@ -107,8 +107,42 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                             <div className="p-6">
                                 <div className="flex gap-4">
                                     <p className="text-primary text-xl break-words font-bold drop-shadow self-center">
-                                        Invoice #{formatInvoiceNumber(invoice.number)}
+                                        {invoiceTypeAsString(invoice)} #{formatInvoiceNumber(invoice.number)}
                                     </p>
+                                    {(!invoice.type || invoice.type === "DEFAULT") && (
+                                        <Chip
+                                            variant="flat"
+                                            color={invoice?.paid ? "success" : "danger"}
+                                            classNames={{
+                                                content: "font-semibold"
+                                            }}
+                                        >
+                                            {invoice?.paid ? "PAID" : (!invoiceIsOverdue(invoice) ? "UNPAID" : "OVERDUE")}
+                                        </Chip>
+                                    )}
+                                </div>
+                                <Spacer y={3} />
+                                <p className="max-w-lg break-words">
+                                    {invoice.description}
+                                </p>
+                                <Divider className="my-3" />
+                                <p className="text-neutral-500 text-sm">Created
+                                    on {new Date(invoice.createdAt).toDateString()}</p>
+                                {(!invoice.type || invoice.type === "DEFAULT") && (
+                                    <p className="text-sm text-neutral-500">Due
+                                        By: {fetchDueAt(invoice).toDateString()}</p>
+                                )}
+                                <p className="text-neutral-500 text-sm">Last updated
+                                    at {new Date(invoice.updatedAt).toLocaleTimeString()} on {new Date(invoice.updatedAt).toDateString()}</p>
+                            </div>
+                        }
+                    >
+                        <div className="flex flex-col gap-2 w-full">
+                            <div className="flex gap-4">
+                                <p className="h-full overflow-hidden whitespace-nowrap overflow-ellipsis self-center max-w-1/2">
+                                    {invoiceTypeAsString(invoice)} #{formatInvoiceNumber(invoice.number)}
+                                </p>
+                                {(!invoice.type || invoice.type === "DEFAULT") && (
                                     <Chip
                                         variant="flat"
                                         color={invoice?.paid ? "success" : "danger"}
@@ -118,34 +152,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                                     >
                                         {invoice?.paid ? "PAID" : (!invoiceIsOverdue(invoice) ? "UNPAID" : "OVERDUE")}
                                     </Chip>
-                                </div>
-                                <Spacer y={3} />
-                                <p className="max-w-lg break-words">
-                                    {invoice.description}
-                                </p>
-                                <Divider className="my-3" />
-                                <p className="text-neutral-500 text-sm">Created
-                                    on {new Date(invoice.createdAt).toDateString()}</p>
-                                <p className="text-sm text-neutral-500">Due By: {fetchDueAt(invoice).toDateString()}</p>
-                                <p className="text-neutral-500 text-sm">Last updated
-                                    at {new Date(invoice.updatedAt).toLocaleTimeString()} on {new Date(invoice.updatedAt).toDateString()}</p>
-                            </div>
-                        }
-                    >
-                        <div className="flex flex-col gap-2 w-full">
-                            <div className="flex gap-4">
-                                <p className="h-full overflow-hidden whitespace-nowrap overflow-ellipsis self-center max-w-1/2">
-                                    Invoice #{formatInvoiceNumber(invoice.number)}
-                                </p>
-                                <Chip
-                                    variant="flat"
-                                    color={invoice?.paid ? "success" : "danger"}
-                                    classNames={{
-                                        content: "font-semibold"
-                                    }}
-                                >
-                                    {invoice?.paid ? "PAID" : (!invoiceIsOverdue(invoice) ? "UNPAID" : "OVERDUE")}
-                                </Chip>
+                                )}
                             </div>
                             <Divider className="mb-4" />
                             <p className="text-primary w-fit font-bold default-container py-2 px-4 rounded-xl">
@@ -155,7 +162,9 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                                 <p className="text-sm text-neutral-500 max-w-[17rem] tablet:max-w-[10rem] whitespace-nowrap overflow-hidden overflow-ellipsis">{invoice.description}</p>}
                             <Divider className="my-4" />
                             <p className="text-xs text-neutral-500">Created: {new Date(invoice.createdAt).toDateString()}</p>
-                            <p className="text-xs text-neutral-500">Due By: {fetchDueAt(invoice).toDateString()}</p>
+                            {(!invoice.type || invoice.type === "DEFAULT") && (
+                                <p className="text-xs text-neutral-500">Due By: {fetchDueAt(invoice).toDateString()}</p>
+                            )}
                         </div>
                     </LinkCard>
                 );
@@ -165,7 +174,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
     return (
         <div className="default-container p-12">
             <div className="flex gap-4">
-                <SubTitle className="self-center">All Invoices</SubTitle>
+                <SubTitle className="self-center">All Documents</SubTitle>
                 <DropdownInput
                     labelIsIcon
                     icon={<SortIcon />}
@@ -201,7 +210,7 @@ export default function InvoiceGrid({ customerIsLoading, customer }: Props) {
                     value={search}
                     onValueChange={(value: string | undefined) => setSearch(value)}
                     label="Search"
-                    placeholder="Search for an invoice..."
+                    placeholder="Search for a document..."
                     startContent="#"
                     width={24}
                 />

@@ -22,8 +22,8 @@ export default function InvoicesPage() {
 
     return (
         <div>
-            <Title>Invoices</Title>
-            <SubTitle>Create, delete and edit your invoices and invoice recipients</SubTitle>
+            <Title>Invoice Documents</Title>
+            <SubTitle>Create, delete and edit your invoices documents and invoice recipients</SubTitle>
             {
                 hasAnyPermission(
                     userData?.permissions,
@@ -50,7 +50,7 @@ export default function InvoicesPage() {
             <div className="flex gap-6 tablet:flex-col">
                 <div className="default-container p-6 phone:p-2 w-[70%] tablet:w-full">
                     <GenericTabs>
-                        <Tab title="All Invoices">
+                        <Tab title="All Documents">
                             <AllInvoicesTab />
                         </Tab>
                         <Tab title="Customers">

@@ -1,9 +1,10 @@
 "use client";
 
 import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
-import { Invoice, InvoiceInformation } from "@prisma/client";
+import { Invoice, InvoiceInformation, InvoiceType } from "@prisma/client";
 import { formatInvoiceNumber } from "../../../../../../utils/invoice-utils";
 import { useS3Base64String } from "../../../../../../../../../_components/hooks/useS3Base64String";
+import { invoiceTypeAsString } from "../../../../../../utils";
 
 const styles = StyleSheet.create({
     companyImage: {
@@ -31,6 +32,7 @@ type Props = {
 
 export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
     const { avatar } = useS3Base64String(companyInfo?.companyAvatar && `images/company/${companyInfo.companyAvatar}`);
+    const typeAsString = invoiceTypeAsString(invoice)
 
     return (
         <View style={{
@@ -40,7 +42,9 @@ export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
         }}>
             <View>
                 <View style={{ display: "flex", flexDirection: "row", gap: 16 }}>
-                    <Text style={styles.header}>INVOICE</Text>
+                    <Text style={styles.header}>
+                        {typeAsString.toUpperCase()}
+                    </Text>
                     {
                         invoice?.paid &&
                         <View style={{
@@ -75,7 +79,7 @@ export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
                     fontSize: 24,
                     textTransform: "capitalize",
                     maxWidth: "200"
-                }}>Invoice #{formatInvoiceNumber(invoice?.number ?? 0)}</Text>
+                }}>{typeAsString} #{formatInvoiceNumber(invoice?.number ?? 0)}</Text>
                 <Text style={{
                     fontFamily: "Inter",
                     fontSize: 14,

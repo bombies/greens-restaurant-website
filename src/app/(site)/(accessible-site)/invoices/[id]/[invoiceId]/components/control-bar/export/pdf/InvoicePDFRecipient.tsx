@@ -1,12 +1,14 @@
 "use client";
 
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
-import { InvoiceCustomer, InvoiceInformation } from "@prisma/client";
+import { InvoiceCustomer, InvoiceInformation, InvoiceType } from "@prisma/client";
 import { formatDateDDMMYYYY } from "../../../../../../utils/invoice-utils";
+import { invoiceTypeAsString } from "../../../../../../utils";
 
 type Props = {
     customerInfo?: InvoiceCustomer
     companyInfo?: InvoiceInformation
+    invoiceType?: InvoiceType | null
     invoiceCreationDate?: Date
 }
 
@@ -22,7 +24,7 @@ const styles = StyleSheet.create({
     }
 });
 
-export default function InvoicePDFRecipient({ customerInfo, companyInfo, invoiceCreationDate }: Props) {
+export default function InvoicePDFRecipient({ customerInfo, companyInfo, invoiceCreationDate, invoiceType }: Props) {
     return (
         <View style={styles.headerView}>
             <View>
@@ -67,7 +69,7 @@ export default function InvoicePDFRecipient({ customerInfo, companyInfo, invoice
                     fontWeight: "bold",
                     marginBottom: 6,
                     color: "#007d0d"
-                }}>INVOICE DATE</Text>
+                }}>{invoiceTypeAsString(invoiceType).toUpperCase()} DATE</Text>
                 <Text style={{
                     fontFamily: "Inter",
                     fontSize: 12,

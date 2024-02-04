@@ -1,39 +1,38 @@
-import { Either } from "../../../../../inventory/[name]/service";
-import { Invoice, InvoiceItem } from "@prisma/client";
-import { NextResponse } from "next/server";
-import { respondWithInit } from "../../../../../../../utils/api/ApiUtils";
 import specificCustomerService from "../../service";
+import {
+    InvoiceCustomerWithOptionalInvoices
+} from "../../../../../../(site)/(accessible-site)/home/_components/widgets/invoice/InvoiceWidget";
+import { buildResponse } from "../../../../../utils/utils";
 
 class SpecificInvoiceService {
     constructor() {
     }
 
-    fetchInvoice = async (customerId: string, invoiceId: string, withItems?: boolean): Promise<Either<Invoice & {
-        invoiceItems?: InvoiceItem[]
-    }, NextResponse>> => {
+    fetchInvoice = async (customerId: string, invoiceId: string, withItems?: boolean) => {
         if (!/^[a-f\d]{24}$/i.test(customerId))
-            return new Either<Invoice & { invoiceItems?: InvoiceItem[] }, NextResponse>(undefined, respondWithInit({
+            return buildResponse({
                 message: "The customer ID is an invalid ID!",
                 status: 404
-            }));
+            });
         if (!/^[a-f\d]{24}$/i.test(invoiceId))
-            return new Either<Invoice & { invoiceItems?: InvoiceItem[] }, NextResponse>(undefined, respondWithInit({
-                message: "The customer ID is an invalid ID!",
+            return buildResponse({
+                message: "The invoice ID is an invalid ID!",
                 status: 404
-            }));
+            });
 
-        const customerInfo = await specificCustomerService(customerId).fetchCustomerInfo(true, withItems);
-        if (customerInfo.error)
-            return new Either<Invoice & { invoiceItems?: InvoiceItem[] }, NextResponse>(undefined, customerInfo.error);
+        const customerInfoResponse = await specificCustomerService(customerId).fetchCustomerInfo(true, withItems);
+        if (customerInfoResponse.status !== 200)
+            return customerInfoResponse;
+        const customerInfo = (await customerInfoResponse.json()) as InvoiceCustomerWithOptionalInvoices
 
-        const invoices = customerInfo.success!.invoices!;
+        const invoices = customerInfo.invoices!;
         const thisInvoice = invoices.find(invoice => invoice.id === invoiceId);
         if (!thisInvoice)
-            return new Either<Invoice & { invoiceItems?: InvoiceItem[] }, NextResponse>(undefined, respondWithInit({
-                message: `There is no invoice for ${customerInfo.success!.customerName} with the id: ${invoiceId}`,
+            return buildResponse({
+                message: `There is no invoice for ${customerInfo.customerName} with the id: ${invoiceId}`,
                 status: 404
-            }));
-        return new Either<Invoice & { invoiceItems?: InvoiceItem[] }, NextResponse>(thisInvoice);
+            });
+        return buildResponse({data: thisInvoice});
     };
 }
 

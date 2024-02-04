@@ -68,7 +68,7 @@ function GoBackButton({ customerId }: { customerId?: string }) {
                 onMouseLeave={() => setDefaultColor()}
             >
                 {icon}
-                <p className="font-light">View all invoices</p>
+                <p className="font-light">View all documents</p>
             </div>
         </Link>
     );

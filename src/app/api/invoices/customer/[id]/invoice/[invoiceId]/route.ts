@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 import prisma from "../../../../../../../libs/prisma";
 import { INVOICE_ITEM_NAME_REGEX } from "../../../../../../../utils/regex";
 import specificInvoiceService from "./service";
-import { createInvoiceDtoSchema, CreateInvoiceItemsDto, UpdateInvoiceDto, updateInvoiceDtoSchema } from "./types";
+import { createInvoiceItemDtoSchema, CreateInvoiceItemsDto, UpdateInvoiceDto, updateInvoiceItemDtoSchema } from "./types";
+import { Invoice } from "@prisma/client";
 
 type Context = {
     params: {
@@ -17,21 +18,19 @@ export function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
         const { searchParams } = new URL(req.url);
         const withItems = searchParams.get("with_items")?.toLowerCase() === "true";
-        const invoice = await specificInvoiceService.fetchInvoice(params.id, params.invoiceId, withItems);
-        if (invoice.error)
-            return invoice.error;
-        return NextResponse.json(invoice.success);
+        return await specificInvoiceService.fetchInvoice(params.id, params.invoiceId, withItems);
     }, [Permission.VIEW_INVOICES, Permission.CREATE_INVOICE]);
 }
 
 export function POST(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const invoice = await specificInvoiceService.fetchInvoice(params.id, params.invoiceId);
-        if (invoice.error)
-            return invoice.error;
+        const invoiceResponse = await specificInvoiceService.fetchInvoice(params.id, params.invoiceId);
+        if (invoiceResponse.status !== 200)
+            return invoiceResponse;
+        const invoice = (await invoiceResponse.json()) as Invoice;
 
         const body = (await req.json()) as CreateInvoiceItemsDto;
-        const bodyValidated = createInvoiceDtoSchema.safeParse(body);
+        const bodyValidated = createInvoiceItemDtoSchema.safeParse(body);
         if (!body || !bodyValidated.success)
             return respondWithInit({
                 message: "Invalid payload!",
@@ -55,7 +54,7 @@ export function POST(req: Request, { params }: Context) {
 
         const items = body.map(info => ({
             ...info,
-            invoiceId: invoice.success!.id
+            invoiceId: invoice.id
         }));
 
         const createdItems = await prisma.invoiceItem.createMany({
@@ -68,12 +67,12 @@ export function POST(req: Request, { params }: Context) {
 
 export function PATCH(req: Request, { params }: Context) {
     return authenticated(req, async () => {
-        const invoice = await specificInvoiceService.fetchInvoice(params.id, params.invoiceId);
-        if (invoice.error)
-            return invoice.error;
+        const invoiceResponse = await specificInvoiceService.fetchInvoice(params.id, params.invoiceId);
+        if (invoiceResponse.status !== 200)
+            return invoiceResponse;
 
         const body = (await req.json()) as UpdateInvoiceDto;
-        const bodyValidated = updateInvoiceDtoSchema.safeParse(body);
+        const bodyValidated = updateInvoiceItemDtoSchema.safeParse(body);
 
         if (!body || !bodyValidated.success)
             return respondWithInit({
@@ -98,9 +97,9 @@ export function PATCH(req: Request, { params }: Context) {
 
 export function DELETE(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const invoice = await specificInvoiceService.fetchInvoice(params.id, params.invoiceId);
-        if (invoice.error)
-            return invoice.error;
+        const invoiceResponse = await specificInvoiceService.fetchInvoice(params.id, params.invoiceId);
+        if (invoiceResponse.status !== 200)
+            return invoiceResponse;
 
         const deletedInvoice = await prisma.invoice.delete({
             where: {

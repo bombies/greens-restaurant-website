@@ -64,9 +64,9 @@ export default function StockTextField({ stockSnapshot, field, onSet, disabled }
                         return;
                     setEditModalOpen(true);
                 }}
-                className="capitalize"
+                className="capitalize tablet:p-2"
             >
-                <p className="capitalize">{stockSnapshot[field].replaceAll("-", " ")}</p>
+                <span className="capitalize tablet:text-sm">{stockSnapshot[field].replaceAll("-", " ")}</span>
             </GenericButton>
         </Fragment>
     );

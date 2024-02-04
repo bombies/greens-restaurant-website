@@ -1,6 +1,5 @@
-import { Invoice, InvoiceItem } from "@prisma/client";
+import { Invoice, InvoiceType } from "@prisma/client";
 import {
-    InvoiceCustomerWithOptionalItems,
     InvoiceWithOptionalItems
 } from "../../home/_components/widgets/invoice/InvoiceWidget";
 
@@ -10,9 +9,11 @@ export const generateInvoiceTotal = (invoice?: InvoiceWithOptionalItems): number
         .reduce((prev, acc) => prev + acc, 0) ?? 0;
 };
 
-export const generateInvoicesTotal = (invoices?: InvoiceWithOptionalItems[]): number => {
-    return invoices?.reduce((prev, invoice) =>
-        prev + generateInvoiceTotal(invoice), 0) ?? 0;
+export const generateInvoicesTotal = (invoices?: InvoiceWithOptionalItems[], invoiceOnly?: boolean): number => {
+    return invoices
+        ?.filter(invoice => invoiceOnly ? !invoice.type || invoice.type === InvoiceType.DEFAULT : true)
+        ?.reduce((prev, invoice) =>
+            prev + generateInvoiceTotal(invoice), 0) ?? 0;
 };
 
 export const fetchDueAt = (invoice?: Invoice): Date => {

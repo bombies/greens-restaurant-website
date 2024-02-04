@@ -25,7 +25,7 @@ export default function InvoiceReportsContext({ id }: Props) {
     return (
         <div>
             <div className="flex tablet:flex-col gap-12 tablet:gap-6">
-                <Title className="self-center">Invoices - <span
+                <Title className="self-center">Documents - <span
                     className="text-primary capitalize">{customerIsLoading ? "Unknown" : customer?.customerName}</span>
                 </Title>
                 <InvoiceCustomerInformation id={id} />

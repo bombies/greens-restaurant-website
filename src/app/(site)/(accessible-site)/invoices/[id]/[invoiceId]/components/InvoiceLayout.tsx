@@ -21,6 +21,8 @@ import { useInvoicePaymentStatus } from "./hooks/useInvoicePaymentStatus";
 import { formatInvoiceNumber } from "../../../utils/invoice-utils";
 import { FetchInvoiceCustomer } from "../../../utils/invoice-client-utils";
 import { notFound } from "next/navigation";
+import { InvoiceType } from "@prisma/client";
+import { invoiceTypeAsString } from "../../../utils";
 
 type Props = {
     customerId: string
@@ -67,11 +69,13 @@ export default function InvoiceLayout({ customerId }: Props) {
             notFound();
     }, [customerError, invoiceError]);
 
+    const typeAsString = invoiceTypeAsString(invoice);
+
     return (
         <div>
             <div className="flex tablet:flex-col gap-x-6">
                 <Title className="self-center">
-                    Invoices - <span
+                    {typeAsString} - <span
                     className="text-primary capitalize">{customerIsLoading ? "Unknown" : customer?.customerName}</span>
                 </Title>
                 <div className="default-container max-w-[40%] min-w-[25%] tablet:max-w-full tablet:mt-6 p-6">
@@ -84,27 +88,28 @@ export default function InvoiceLayout({ customerId }: Props) {
                             <>
                                 <div className="flex gap-4">
                                     <SubTitle className="self-center capitalize break-words">
-                                        Invoice #{formatInvoiceNumber(invoice?.number || 0)}
+                                        {typeAsString} #{formatInvoiceNumber(invoice?.number || 0)}
                                     </SubTitle>
-                                    <InvoicePaidStatus
-                                        selectedStatus={selectedStatus}
-                                        statusIsChanging={statusIsChanging}
-                                        onStatusChange={(status) => {
-                                            triggerStatusChange({
-                                                invoiceId: invoice?.id ?? "",
-                                                status: status === PaidStatus.PAID
-                                            })
-                                                .then(() => {
-                                                    setSelectedStatus(status as PaidStatus);
+                                    {(!invoice?.type || invoice.type === InvoiceType.DEFAULT) && (
+                                        <InvoicePaidStatus
+                                            selectedStatus={selectedStatus}
+                                            statusIsChanging={statusIsChanging}
+                                            onStatusChange={(status) => {
+                                                triggerStatusChange({
+                                                    invoiceId: invoice?.id ?? "",
+                                                    status: status === PaidStatus.PAID
                                                 })
-                                                .catch(e => {
-                                                    console.error(e);
-                                                    errorToast(e, "There was an error updating the paid status!");
-                                                });
-                                        }}
-                                    />
+                                                    .then(() => {
+                                                        setSelectedStatus(status as PaidStatus);
+                                                    })
+                                                    .catch(e => {
+                                                        console.error(e);
+                                                        errorToast(e, "There was an error updating the paid status!");
+                                                    });
+                                            }}
+                                        />
+                                    )}
                                 </div>
-
                                 <p className="text-neutral-500 max-w-fit break-words">{invoice?.description}</p>
                                 <Divider className="my-3" />
                                 {

@@ -8,6 +8,7 @@ import { dollarFormat } from "../../../../../../utils/GeneralUtils";
 import EyeIcon from "../../../../../_components/icons/EyeIcon";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { InvoiceCustomerWithOptionalItems } from "../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceType } from "@prisma/client";
 
 const columns: Column[] = [
     { key: "customer_name", value: "Customer Name" },
@@ -35,6 +36,7 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
             case "total_invoiced": {
                 return dollarFormat.format(
                     customer.invoices
+                        ?.filter(invoice => !invoice.type || invoice.type === InvoiceType.DEFAULT)
                         ?.reduce((prev, invoice) =>
                             prev + generateInvoiceTotal(invoice), 0) ?? 0
                 );
@@ -42,7 +44,7 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
             case "total_paid": {
                 return dollarFormat.format(
                     customer.invoices
-                        ?.filter(invoice => invoice.paid)
+                        ?.filter(invoice => (!invoice.type || invoice.type === InvoiceType.DEFAULT) && invoice.paid)
                         .reduce((prev, invoice) =>
                             prev + generateInvoiceTotal(invoice), 0) ?? 0
                 );
@@ -50,7 +52,7 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
             case "total_outstanding": {
                 return dollarFormat.format(
                     customer.invoices
-                        ?.filter(invoice => !invoice.paid)
+                        ?.filter(invoice => (!invoice.type || invoice.type === InvoiceType.DEFAULT) && !invoice.paid)
                         .reduce((prev, invoice) =>
                             prev + generateInvoiceTotal(invoice), 0) ?? 0
                 );
@@ -59,13 +61,13 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
                 return customer.invoices?.length;
             }
             case "paid_invoice_count": {
-                return customer.invoices?.filter(invoice => invoice.paid).length;
+                return customer.invoices?.filter(invoice =>  (!invoice.type || invoice.type === InvoiceType.DEFAULT) && invoice.paid).length;
             }
             case "unpaid_invoice_count": {
-                return customer.invoices?.filter(invoice => !invoice.paid).length;
+                return customer.invoices?.filter(invoice => (!invoice.type || invoice.type === InvoiceType.DEFAULT) && !invoice.paid).length;
             }
             case "overdue_invoice_count": {
-                return customer.invoices?.filter(invoice => invoiceIsOverdue(invoice)).length;
+                return customer.invoices?.filter(invoice => (!invoice.type || invoice.type === InvoiceType.DEFAULT) && invoiceIsOverdue(invoice)).length;
             }
             case "actions": {
                 return (
@@ -101,7 +103,7 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
                             <p className="self-center text-right px-6 phone:px-1 py-4 text-primary font-semibold text-xl phone:text-lg">
                                 {dollarFormat.format(
                                     customers ?
-                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices), 0)
+                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices, true), 0)
                                         : 0
                                 )}
                             </p>
@@ -109,7 +111,7 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
                             <p className="self-center text-right px-6 phone:px-1 py-4 text-primary font-semibold text-xl phone:text-lg">
                                 {dollarFormat.format(
                                     customers ?
-                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices?.filter(invoice => invoice.paid)), 0)
+                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices?.filter(invoice => invoice.paid), true), 0)
                                         : 0
                                 )}
                             </p>
@@ -117,7 +119,7 @@ export const CustomerInvoiceReportTable: FC<Props> = ({ customers, customersAreL
                             <p className="self-center text-right px-6 phone:px-1 py-4 text-primary font-semibold text-xl phone:text-lg">
                                 {dollarFormat.format(
                                     customers ?
-                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices?.filter(invoice => !invoice.paid)), 0)
+                                        customers.reduce((prev, customer) => prev + generateInvoicesTotal(customer.invoices?.filter(invoice => !invoice.paid), true), 0)
                                         : 0
                                 )}
                             </p>

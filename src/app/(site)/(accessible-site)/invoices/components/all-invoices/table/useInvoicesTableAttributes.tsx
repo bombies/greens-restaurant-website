@@ -8,6 +8,7 @@ import { Column } from "../../../[id]/[invoiceId]/components/table/InvoiceTable"
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 import IconButton from "../../../../../../_components/inputs/IconButton";
 import EyeIcon from "../../../../../../_components/icons/EyeIcon";
+import { InvoiceType } from "@prisma/client";
 
 type Props = {
     invoices?: InvoiceWithExtras[]
@@ -15,45 +16,48 @@ type Props = {
 
 const useInvoicesTableAttributes = ({ invoices }: Props) => {
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
+    const [currentTypeFilter, setCurrentTypeFilter] = useState<InvoiceType[] | null>(null);
 
-    const sortedItems = useMemo(() => invoices?.sort((a, b) => {
-        if (!sortDescriptor)
-            return 0;
+    const visibleItems = useMemo(() => invoices
+        ?.filter(invoice => (currentTypeFilter && currentTypeFilter.length) ? currentTypeFilter.includes(invoice.type ?? InvoiceType.DEFAULT) : true)
+        ?.sort((a, b) => {
+            if (!sortDescriptor)
+                return 0;
 
-        let cmp: number;
-        const aTotal = generateInvoiceTotal(a);
-        const bTotal = generateInvoiceTotal(b);
+            let cmp: number;
+            const aTotal = generateInvoiceTotal(a);
+            const bTotal = generateInvoiceTotal(b);
 
-        switch (sortDescriptor?.column) {
-            case "invoice_number": {
-                cmp = a.number - b.number;
-                break;
+            switch (sortDescriptor?.column) {
+                case "invoice_number": {
+                    cmp = a.number - b.number;
+                    break;
+                }
+                case "invoice_total": {
+                    cmp = aTotal - bTotal;
+                    break;
+                }
+                case "total_paid": {
+                    cmp = (a.paid ? aTotal : 0) - (b.paid ? bTotal : 0);
+                    break;
+                }
+                case "total_outstanding": {
+                    cmp = (a.paid ? 0 : aTotal) - (b.paid ? 0 : bTotal);
+                    break;
+                }
+                case "invoice_customer": {
+                    cmp = a.customer.customerName.localeCompare(b.customer.customerName);
+                    break;
+                }
+                default: {
+                    cmp = 0;
+                    break;
+                }
             }
-            case "invoice_total": {
-                cmp = aTotal - bTotal;
-                break;
-            }
-            case "total_paid": {
-                cmp = (a.paid ? aTotal : 0) - (b.paid ? bTotal : 0);
-                break;
-            }
-            case "total_outstanding": {
-                cmp = (a.paid ? 0 : aTotal) - (b.paid ? 0 : bTotal);
-                break;
-            }
-            case "invoice_customer": {
-                cmp = a.customer.customerName.localeCompare(b.customer.customerName);
-                break;
-            }
-            default: {
-                cmp = 0;
-                break;
-            }
-        }
 
-        cmp *= sortDescriptor?.direction === "descending" ? -1 : 1;
-        return cmp;
-    }) ?? [], [invoices, sortDescriptor]);
+            cmp *= sortDescriptor?.direction === "descending" ? -1 : 1;
+            return cmp;
+        }) ?? [], [currentTypeFilter, invoices, sortDescriptor]);
 
     const columns = useMemo<Column[]>(() => ([
         {
@@ -63,6 +67,10 @@ const useInvoicesTableAttributes = ({ invoices }: Props) => {
         {
             key: "invoice_customer",
             value: "Customer"
+        },
+        {
+            key: "invoice_type",
+            value: "Type"
         },
         {
             key: "invoice_desc",
@@ -90,25 +98,21 @@ const useInvoicesTableAttributes = ({ invoices }: Props) => {
         const invoiceTotal = generateInvoiceTotal(item);
 
         switch (key) {
-            case "invoice_number": {
+            case "invoice_number":
                 return formatInvoiceNumber(item.number);
-            }
-            case "invoice_customer": {
+            case "invoice_customer":
                 return item.customer.customerName;
-            }
-            case "invoice_desc": {
+            case "invoice_desc":
                 return item.description;
-            }
-            case "invoice_total": {
+            case "invoice_type":
+                return item.type === InvoiceType.QUOTE ? "Quote" : (item.type === InvoiceType.CASH_RECEIPT ? "Cash Receipt" : "Invoice");
+            case "invoice_total":
                 return dollarFormat.format(generateInvoiceTotal(item));
-            }
-            case "total_paid": {
+            case "total_paid":
                 return dollarFormat.format(item.paid ? invoiceTotal : 0);
-            }
-            case "total_outstanding": {
+            case "total_outstanding":
                 return dollarFormat.format(item.paid ? 0 : invoiceTotal);
-            }
-            case "actions": {
+            case "actions":
                 return (
                     <div className="flex gap-4">
                         <IconButton
@@ -122,11 +126,10 @@ const useInvoicesTableAttributes = ({ invoices }: Props) => {
                         </IconButton>
                     </div>
                 );
-            }
         }
     }, []);
 
-    return { visibleItems: sortedItems, sortDescriptor, setSortDescriptor, columns, getKeyValue };
+    return { visibleItems, sortDescriptor, setSortDescriptor, columns, getKeyValue, currentTypeFilter, setCurrentTypeFilter };
 };
 
 export default useInvoicesTableAttributes;

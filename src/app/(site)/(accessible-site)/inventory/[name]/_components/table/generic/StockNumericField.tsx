@@ -39,6 +39,7 @@ export default function StockNumericField({ stockSnapshot, onSet, disabled, curr
                 />
             </GenericModal>
             <GenericButton
+                className="tablet:!p-2"
                 color="default"
                 variant="light"
                 onPress={() => {
@@ -47,7 +48,9 @@ export default function StockNumericField({ stockSnapshot, onSet, disabled, curr
                     setEditModalOpen(true);
                 }}
             >
-                {currency ? dollarFormat.format(currency === "cost" ? stockSnapshot.price : stockSnapshot.sellingPrice) : stockSnapshot.quantity}
+              <span className="text-sm">
+                  {currency ? dollarFormat.format(currency === "cost" ? stockSnapshot.price : stockSnapshot.sellingPrice) : stockSnapshot.quantity}
+              </span>
             </GenericButton>
         </Fragment>
     );

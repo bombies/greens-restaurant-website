@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FC, Key, useCallback, useMemo, useState } from "react";
-import { Invoice, InvoiceItem } from "@prisma/client";
+import { Invoice, InvoiceItem, InvoiceType } from "@prisma/client";
 import GenericTable from "../../../../../../_components/table/GenericTable";
 import { Column } from "../../[invoiceId]/components/table/InvoiceTable";
 import { SortDescriptor, TableCell, TableRow } from "@nextui-org/react";
@@ -126,7 +126,7 @@ export const InvoiceReportsTable: FC<Props> = ({ invoices, customerIsLoading }) 
                 bottomContent={
                     <div className="flex default-container p-6 gap-6 phone:justify-center phone:gap-1 justify-end">
                         <SubTitle className="self-center text-lg phone:text-sm" thick>TOTAL</SubTitle>
-                        <p className="self-center px-6 phone:px-1 py-4 text-primary font-semibold text-xl phone:text-lg">{dollarFormat.format(sortedItems ? sortedItems.reduce((prev, invoice) => prev + generateInvoiceTotal(invoice), 0) : 0)}</p>
+                        <p className="self-center px-6 phone:px-1 py-4 text-primary font-semibold text-xl phone:text-lg">{dollarFormat.format(sortedItems ? sortedItems.filter(invoice => !invoice.type || invoice.type === InvoiceType.DEFAULT).reduce((prev, invoice) => prev + generateInvoiceTotal(invoice), 0) : 0)}</p>
                     </div>
                 }
             >
