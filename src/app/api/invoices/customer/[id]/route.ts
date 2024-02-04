@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import Permission from "../../../../../libs/types/permission";
 import { UpdateCustomerDto } from "./types";
 import specificCustomerService from "./service";
+import { InvoiceCustomer } from "@prisma/client";
 
 type Context = {
     params: {
@@ -15,10 +16,7 @@ type Context = {
 
 export function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async () => {
-        const customer = await specificCustomerService(params.id).fetchCustomerInfo();
-        if (customer.error)
-            return customer.error;
-        return NextResponse.json(customer.success);
+        return NextResponse.json(await specificCustomerService(params.id).fetchCustomerInfo());
     }, [Permission.VIEW_INVOICES, Permission.CREATE_INVOICE]);
 }
 
@@ -106,13 +104,14 @@ export function PATCH(req: Request, { params }: Context) {
 
 export function DELETE(req: Request, { params }: Context) {
     return authenticated(req, async () => {
-        const customer = await specificCustomerService(params.id).fetchCustomerInfo();
-        if (customer.error)
-            return customer.error;
+        const customerResponse = await specificCustomerService(params.id).fetchCustomerInfo();
+        if (customerResponse.status !== 200)
+            return customerResponse;
 
+        const customer: InvoiceCustomer = await customerResponse.json();
         const deletedCustomer = await prisma.invoiceCustomer.delete({
             where: {
-                id: customer.success!.id
+                id: customer.id
             }
         });
 
