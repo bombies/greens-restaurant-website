@@ -83,7 +83,7 @@
     "encoding": "^0.1.13",
     "eslint": "8.56.0",
     "eslint-config-next": "14.1.0",
-    "postcss": "^8.4.33",
+    "postcss": "^8.4.34",
     "prettier": "^3.2.4",
     "prisma": "^5.8.1",
     "sass": "^1.70.0",
