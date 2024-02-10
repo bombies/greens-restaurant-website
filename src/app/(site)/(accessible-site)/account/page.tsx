@@ -10,7 +10,7 @@ import { fetcher } from "../employees/_components/EmployeeGrid";
 import { compare } from "../../../../utils/GeneralUtils";
 import { UpdateUser } from "../employees/[username]/_components/Employee";
 import { errorToast } from "../../../../utils/Hooks";
-import ChangesMadeBar from "../employees/[username]/_components/ChangesMadeBar";
+import ChangesMadeBar from "../../../_components/ChangesMadeBar";
 import EditableField, { DataContainer } from "../employees/[username]/_components/EditableField";
 import { EMAIL_REGEX, NAME_REGEX, USERNAME_REGEX } from "../../../../utils/regex";
 import { Divider } from "@nextui-org/divider";

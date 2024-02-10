@@ -7,7 +7,7 @@ import useSWRMutation from "swr/mutation";
 import { UpdateInvoiceDto } from "../../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/types";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
-import ChangesMadeBar from "../../../../../employees/[username]/_components/ChangesMadeBar";
+import ChangesMadeBar from "../../../../../../../_components/ChangesMadeBar";
 import { errorToast } from "../../../../../../../../utils/Hooks";
 import EditableField, { DataContainer } from "../../../../../employees/[username]/_components/EditableField";
 import { Spacer } from "@nextui-org/react";

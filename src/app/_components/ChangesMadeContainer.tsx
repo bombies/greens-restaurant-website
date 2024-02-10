@@ -1,13 +1,11 @@
 "use client";
 
-import GenericButton from "../../../../../_components/inputs/GenericButton";
-import SlidingBar from "../../../../../_components/SlidingBar";
-import { JSX } from "react";
-import TrashIcon from "../../../../../_components/icons/TrashIcon";
-import CheckIcon from "../../../../../_components/icons/CheckIcon";
-import clsx from "clsx";
+import { FC, JSX } from "react";
+import GenericButton from "./inputs/GenericButton";
+import CheckIcon from "./icons/CheckIcon";
+import TrashIcon from "./icons/TrashIcon";
 
-type Props = {
+export type ChangesMadeContainerProps = {
     changesMade: boolean,
     isChanging: boolean,
     onAccept: () => void,
@@ -21,21 +19,19 @@ type Props = {
         icon?: JSX.Element,
         label?: string
     },
-    className?: string
 }
 
-export default function ChangesMadeBar({
-                                           changesMade,
-                                           onAccept,
-                                           onReject,
-                                           isChanging,
-                                           label,
-                                           saveButtonConfig,
-                                           rejectButtonConfig,
-                                           className
-                                       }: Props) {
+const ChangesMadeContainer: FC<ChangesMadeContainerProps> = ({
+                                                                 changesMade,
+                                                                 isChanging,
+                                                                 onReject,
+                                                                 rejectButtonConfig,
+                                                                 saveButtonConfig,
+                                                                 label,
+                                                                 onAccept
+                                                             }) => {
     return (
-        <SlidingBar visible={changesMade} className={clsx(className, "justify-between")}>
+        <>
             <p className="text-xl phone:text-lg self-center">{label || "Careful - You have unsaved changes!"}</p>
             <div className="flex tablet:flex-col gap-4">
                 <GenericButton
@@ -55,6 +51,8 @@ export default function ChangesMadeBar({
                     {rejectButtonConfig?.label ?? "Discard"}
                 </GenericButton>
             </div>
-        </SlidingBar>
+        </>
     );
-}
+};
+
+export default ChangesMadeContainer

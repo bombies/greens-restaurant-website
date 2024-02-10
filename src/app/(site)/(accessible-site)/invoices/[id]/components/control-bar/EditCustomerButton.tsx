@@ -7,7 +7,7 @@ import { InvoiceCustomer } from "@prisma/client";
 import axios from "axios";
 import { UpdateCustomerDto } from "../../../../../../api/invoices/customer/[id]/types";
 import useSWRMutation from "swr/mutation";
-import ChangesMadeBar from "../../../../employees/[username]/_components/ChangesMadeBar";
+import ChangesMadeBar from "../../../../../../_components/ChangesMadeBar";
 import EditableField from "../../../../employees/[username]/_components/EditableField";
 import { Spacer } from "@nextui-org/react";
 import { CUSTOMER_NAME_REGEX, EMAIL_REGEX } from "../../../../../../../utils/regex";

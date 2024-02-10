@@ -13,8 +13,6 @@ import Permission, { hasAnyPermission } from "../../../../../../../libs/types/pe
 import InventoryRequestedItemsTable from "../../../_components/requests/user/form/InventoryRequestedItemsTable";
 import { toast } from "react-hot-toast";
 import "../../../../../../../utils/GeneralUtils";
-import ChangesMadeBar from "../../../../employees/[username]/_components/ChangesMadeBar";
-import CheckIcon from "../../../../../../_components/icons/CheckIcon";
 import { StockRequestStatus } from ".prisma/client";
 import SpecificInventoryRequestInformation from "./SpecificInventoryRequestInformation";
 import ConfirmInventoryRequestReviewModal from "./ConfirmInventoryRequestReviewModal";
@@ -25,6 +23,8 @@ import { UpdateRequestedStockItemDto } from "../../../../../../api/inventory/req
 import { RequestedStockItem } from "@prisma/client";
 import "../../../../../../../utils/GeneralUtils";
 import useCurrentInventoryRequestSnapshots from "./hooks/useCurrentInventoryRequestSnapshots";
+import { AnimatePresence, motion } from "framer-motion";
+import ChangesMadeContainer from "../../../../../../_components/ChangesMadeContainer";
 
 type Props = {
     id: string,
@@ -69,11 +69,10 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
     const { trigger: deleteItem, isMutating: itemIsDeleting } = DeleteItem(id);
     const [changesMade, setChangesMade] = useState(false);
     const isAdmin = hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MANAGE_STOCK_REQUESTS]);
-    const { optimisticRequest, dispatchOptimisticRequest, startingRequest } = useAdminInventoryRequestData({
+    const { optimisticRequest, dispatchOptimisticRequest, resetOptimisticData } = useAdminInventoryRequestData({
         isEnabled: isAdmin,
         request,
         requestIsLoading,
-        changesMade,
         setChangesMade
     });
     const [confirmReviewModalOpen, setConfirmReviewModalOpen] = useState(false);
@@ -101,34 +100,9 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                 isOpen={confirmReviewModalOpen}
                 setOpen={setConfirmReviewModalOpen}
                 id={id}
+                onReview={resetOptimisticData}
                 mutate={mutate}
                 optimisticRequest={optimisticRequest}
-            />
-            <ChangesMadeBar
-                className="!py-5"
-                changesMade={changesMade}
-                isChanging={false}
-                onAccept={() => {
-                    const pendingItem = optimisticRequest.items.find(item => item.amountProvided === -1 || item.amountProvided === null || item.amountProvided === undefined);
-                    if (pendingItem)
-                        toast.error("You must review all items before finishing your review!");
-                    else
-                        setConfirmReviewModalOpen(true);
-                }}
-                onReject={() => {
-                    dispatchOptimisticRequest({
-                        type: OptimisticRequestDataActionType.SET,
-                        payload: { ...startingRequest }
-                    });
-                }}
-                label="You have started reviewing this inventory request!"
-                saveButtonConfig={{
-                    icon: <CheckIcon />,
-                    label: "Finish Review"
-                }}
-                rejectButtonConfig={{
-                    label: "Cancel Review"
-                }}
             />
             <Title>Inventory Request</Title>
             <SpecificInventoryRequestInformation
@@ -136,7 +110,7 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                 requestIsLoading={requestIsLoading}
             />
             <Spacer y={12} />
-            <div className="default-container max-w-[80%] tablet:w-full p-12 phone:px-4">
+            <div className="default-container max-w-fit tablet:max-w-full p-12 phone:px-4">
                 <GoBackButton label="View All Requests" href="/inventory/requests?requests_tab=all_requests" />
                 <Spacer y={6} />
                 <InventoryRequestedItemsTable
@@ -148,7 +122,7 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                     adminActions={request?.status === StockRequestStatus.PENDING && isAdmin}
                     onAdminAction={{
                         onApprove(item) {
-                            if (!item.id)
+                            if (!item.id || item.amountRequested === item.amountProvided)
                                 return;
 
                             dispatchOptimisticRequest({
@@ -182,7 +156,7 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                             toast.success(`Successfully partially approved ${item?.stock?.name.replaceAll("-", " ").capitalize()}`);
                         },
                         onReject(item) {
-                            if (!item.id)
+                            if (!item.id || item.amountProvided === 0)
                                 return;
 
                             dispatchOptimisticRequest({
@@ -270,6 +244,32 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                     } : undefined}
                     editAllowed={userData?.id === request?.requestedByUser?.id}
                 />
+                <Spacer y={6} />
+                <AnimatePresence>
+                    {changesMade && (
+                        <motion.div
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 100, opacity: 0 }}
+                            className="flex justify-between gap-12 w-full tablet:gap-4 default-container p-6"
+                        >
+                            <ChangesMadeContainer
+                                changesMade={changesMade}
+                                isChanging={false}
+                                onAccept={() => {
+                                    const pendingItem = optimisticRequest.items.find(item => item.amountProvided === -1 || item.amountProvided === null || item.amountProvided === undefined);
+                                    if (pendingItem)
+                                        toast.error("You must review all items before finishing your review!");
+                                    else
+                                        setConfirmReviewModalOpen(true);
+                                }}
+                                onReject={() => {
+                                    resetOptimisticData();
+                                }}
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );

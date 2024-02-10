@@ -11,7 +11,7 @@ import BackIcon from "../../../../../_components/icons/BackIcon";
 import { Divider } from "@nextui-org/divider";
 import Permission, { permissionCheck } from "../../../../../../libs/types/permission";
 import { compare } from "../../../../../../utils/GeneralUtils";
-import ChangesMadeBar from "./ChangesMadeBar";
+import ChangesMadeBar from "../../../../../_components/ChangesMadeBar";
 import { errorToast } from "../../../../../../utils/Hooks";
 import EditableField from "./EditableField";
 import { EMAIL_REGEX, NAME_REGEX, USERNAME_REGEX } from "../../../../../../utils/regex";

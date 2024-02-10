@@ -12,7 +12,7 @@ import { UpdateCompanyInformationDto } from "../../../../api/invoices/company/ro
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
 import { useEffect, useState } from "react";
-import ChangesMadeBar from "../../employees/[username]/_components/ChangesMadeBar";
+import ChangesMadeBar from "../../../../_components/ChangesMadeBar";
 import SubTitle from "../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 import clsx from "clsx";

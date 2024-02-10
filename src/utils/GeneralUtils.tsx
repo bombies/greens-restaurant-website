@@ -59,6 +59,37 @@ export function compare(object1: any, object2: any) {
     return true;
 }
 
+export interface Predicate<T> {
+    (item: T): boolean;
+}
+
+export function mergeArrays<T>(arr1: T[], arr2: T[], replacerPredicate: Predicate<T>): T[] {
+    const mergedArray: T[] = [];
+
+    const mergeObjects = (obj1: T, obj2: T): T => {
+        for (const key in obj2)
+            if (typeof obj2[key] === "object" && obj2[key] !== null && !Array.isArray(obj2[key]))
+                // @ts-ignore
+                obj1[key] = mergeObjects(obj1[key], obj2[key]);
+            else
+                obj1[key] = obj2[key];
+        return obj1;
+    };
+
+    for (const item of arr1) {
+        const index = arr2.findIndex(replacerPredicate);
+        if (index !== -1) {
+            mergedArray.push(mergeObjects(item, arr2[index]));
+            arr2.splice(index, 1);
+        } else mergedArray.push(item);
+    }
+
+    for (const item of arr2)
+        mergedArray.push(item);
+
+    return mergedArray;
+}
+
 declare global {
     interface String {
         capitalize(): string;
@@ -74,15 +105,15 @@ String.prototype.capitalize = function() {
 
 export const dollarFormat = new Intl.NumberFormat("en-JM", {
     style: "currency",
-    currency: "JMD",
+    currency: "JMD"
 });
 
 export const dateInputToDateObject = (date?: string): Date | undefined => {
     if (!date)
-        return undefined
+        return undefined;
 
     const [year, month, day] = date.split("-");
     const parsedDate: Date | undefined = year ? new Date() : undefined;
     parsedDate?.setFullYear(Number(year), Number(month) - 1, Number(day));
-    return parsedDate
-}
+    return parsedDate;
+};

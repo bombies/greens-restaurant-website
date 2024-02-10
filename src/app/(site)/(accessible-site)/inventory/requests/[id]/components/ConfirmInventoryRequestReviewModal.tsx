@@ -29,11 +29,12 @@ type Props = {
     id: string,
     optimisticRequest: ReviewInventoryRequestDto,
     mutate: KeyedMutator<StockRequestWithOptionalExtras | undefined>,
+    onReview?: () => void,
     isOpen: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>
 }
 
-const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, mutate, isOpen, setOpen }) => {
+const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, mutate, onReview, isOpen, setOpen }) => {
     const { register, handleSubmit } = useForm();
     const { trigger: triggerRequestReview, isMutating: isReviewing } = ReviewRequest(id);
 
@@ -47,6 +48,7 @@ const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, 
                 .then(res => {
                     const responseData: StockRequestWithOptionalExtras = res.data;
                     mutate(responseData);
+                    onReview?.();
                     setOpen(false);
                 })
                 .catch((e) => {
