@@ -1,4 +1,5 @@
 import { Inventory, RequestedStockItem, Stock, StockRequest, StockSnapshot, User } from "@prisma/client";
+import { InventoryWithOptionalExtras } from "../../../../../api/inventory/[name]/types";
 
 export type StockSnapshotWithOptionalInventory = StockSnapshot & {
     inventory?: Inventory
@@ -27,7 +28,7 @@ export type StockRequestWithOptionalCreatorAndItems =
 export type StockRequestWithOptionalExtras =
     StockRequestWithOptionalCreatorAndItems
     & Pick<StockRequestWithOptionalAssignees, "assignedToUsers">
-    & { reviewedByUser?: User }
+    & { reviewedByUser?: User, assignedLocation?: InventoryWithOptionalExtras }
 
 export type RequestedStockItemWithOptionalStock = RequestedStockItem & {
     stock?: Stock

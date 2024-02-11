@@ -26,6 +26,7 @@ type InventoryRequestsReportsContextProps = {
 }
 
 export type RequestedStockItemWithExtrasAndRequestExtras = RequestedStockItemWithOptionalExtras & {
+    assignedLocation: StockRequestWithOptionalExtras["assignedLocation"],
     requestedBy: StockRequestWithOptionalExtras["requestedByUser"],
     assignedTo: StockRequestWithOptionalExtras["assignedToUsers"],
     reviewedBy: StockRequestWithOptionalExtras["reviewedByUser"]
@@ -38,8 +39,14 @@ export enum InventoryRequestsReportActions {
 }
 
 type InventoryRequestsReportAction = {
-    type: InventoryRequestsReportActions,
-    payload: Partial<InventoryRequestsReportsContextProps["query" | "data" | "filters"]>
+    type: InventoryRequestsReportActions.UPDATE_FILTERS,
+    payload: Partial<InventoryRequestsReportsContextProps["filters"]>
+} | {
+    type: InventoryRequestsReportActions.UPDATE_DATA,
+    payload: Partial<InventoryRequestsReportsContextProps["data"]>
+} | {
+    type: InventoryRequestsReportActions.UPDATE_QUERY,
+    payload: Partial<InventoryRequestsReportsContextProps["query"]>
 }
 
 const [InventoryRequestsReportContext, useHook] =
@@ -51,26 +58,17 @@ const inventoryRequestsReportReducer = (state: InventoryRequestsReportsContextPr
         case InventoryRequestsReportActions.UPDATE_QUERY:
             return {
                 ...state,
-                query: {
-                    ...state.query,
-                    ...(action.payload as InventoryRequestsReportsContextProps["query"])
-                }
+                query: { ...state.query, ...action.payload }
             };
         case InventoryRequestsReportActions.UPDATE_DATA:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    ...(action.payload as InventoryRequestsReportsContextProps["data"])
-                }
+                data: { ...state.data, ...action.payload }
             };
         case InventoryRequestsReportActions.UPDATE_FILTERS:
             return {
                 ...state,
-                filters: {
-                    ...state.filters,
-                    ...(action.payload as InventoryRequestsReportsContextProps["filters"])
-                }
+                filters: { ...state.filters, ...action.payload }
             };
         default:
             return state;

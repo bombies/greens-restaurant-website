@@ -1,6 +1,10 @@
-import { Inventory, RequestedStockItem, Stock, StockRequest } from "@prisma/client";
+import { Inventory, RequestedStockItem, Stock, StockRequest, User } from "@prisma/client";
 import { z } from "zod";
 import { InventoryWithOptionalExtras, StockWithOptionalExtras } from "../[name]/types";
+import {
+    StockRequestWithOptionalAssignees,
+    StockRequestWithOptionalCreatorAndItems
+} from "../../../(site)/(accessible-site)/inventory/_components/requests/inventory-requests-utils";
 
 export type RequestStockItemWithStockAndOptionalInventory = RequestedStockItem & {
     stock: Stock & {
@@ -13,13 +17,17 @@ export type InventoryWithRequestedStockItems = {
     items: (RequestedStockItem & { stock: Stock })[]
 }
 
-export type StockRequestWithOptionalExtras = StockRequest & {
-    requestedItems?: RequestedStockItemWithOptionalExtras[]
+export type StockRequestWithOptionalExtras = StockRequestWithOptionalCreatorAndItems
+    & Pick<StockRequestWithOptionalAssignees, "assignedToUsers">
+    & {
+    reviewedByUser?: User,
+    assignedLocation?: InventoryWithOptionalExtras,
+    requestedItems: RequestedStockItemWithOptionalExtras[]
 }
 
 export type RequestedStockItemWithOptionalExtras = RequestedStockItem & {
     stock?: Omit<StockWithOptionalExtras, "inventory"> & { inventory?: InventoryWithOptionalExtras | null },
-    stockRequest?: StockRequest
+    stockRequest?: StockRequestWithOptionalExtras
 }
 
 export type ReviewInventoryRequestItem = {

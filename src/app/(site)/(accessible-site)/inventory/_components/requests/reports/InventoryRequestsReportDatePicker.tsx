@@ -69,6 +69,7 @@ const InventoryRequestsReportDatePicker: FC = () => {
                 (request.requestedItems ?? [])
                     .map(requestedItem => ({
                         ...requestedItem,
+                        assignedLocation: request.assignedLocation,
                         requestedBy: request.requestedByUser,
                         assignedTo: request.assignedToUsers,
                         reviewedBy: request.reviewedByUser

@@ -51,6 +51,7 @@ export async function GET(req: Request) {
                         stock: true
                     }
                 } : true),
+                assignedLocation: true,
                 requestedByUser: withUsers,
                 assignedToUsers: withAssignees,
                 reviewedByUser: withReviewer

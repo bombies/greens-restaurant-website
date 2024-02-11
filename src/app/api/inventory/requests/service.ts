@@ -110,6 +110,7 @@ class InventoryRequestsService {
                         }
                     }
                 },
+                assignedLocation: true,
                 reviewedByUser: withReviewer,
                 requestedByUser: withUsers,
                 assignedToUsers: withAssignees

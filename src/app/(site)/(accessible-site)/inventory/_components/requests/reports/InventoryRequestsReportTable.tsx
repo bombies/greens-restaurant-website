@@ -8,13 +8,16 @@ import {
 import { Column } from "../../../../invoices/[id]/[invoiceId]/components/table/InvoiceTable";
 import { getStatusChip } from "../../hooks/useRequestStatus";
 import { StockRequestStatus } from ".prisma/client";
-import { AvatarGroup, TableCell, TableRow } from "@nextui-org/react";
+import { AvatarGroup, Checkbox, Spacer, TableCell, TableRow } from "@nextui-org/react";
 import UserAvatar from "../../../../../../_components/UserAvatar";
 import { Spinner } from "@nextui-org/spinner";
 import SubTitle from "../../../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 import GenericTable from "../../../../../../_components/table/GenericTable";
 import InventoryRequestsReportFilters from "./InventoryRequestsReportFilters";
+import useToggleableColumns from "../../../../../../hooks/table/useToggleableColumns";
+import CheckboxMenu from "../../../../../../_components/CheckboxMenu";
+import FilterIcon from "../../../../../../_components/icons/FilterIcon";
 
 const columns: Column[] = [
     {
@@ -32,6 +35,10 @@ const columns: Column[] = [
     {
         key: "status",
         value: "Status"
+    },
+    {
+        key: "location",
+        value: "Location"
     },
     {
         key: "requested_by",
@@ -77,6 +84,13 @@ const fetchValueForKey = (key: Key, item: RequestedStockItemWithExtrasAndRequest
                 </AvatarGroup>
             );
         }
+        case "location": {
+            return (
+                <span className="capitalize">
+                    {item?.assignedLocation?.name.replaceAll("-", " ")}
+                </span>
+            );
+        }
         case "reviewed_by": {
             return item.reviewedBy && <UserAvatar showToolTip user={item.reviewedBy} />;
         }
@@ -90,6 +104,11 @@ const fetchValueForKey = (key: Key, item: RequestedStockItemWithExtrasAndRequest
 
 const InventoryRequestsReportTable: FC = () => {
     const [{ data: { isFetching, visibleData: requests, data: allData } }] = useInventoryRequestsReport();
+    const { columns: visibleColumns, toggleColumn, setColumnVisible } = useToggleableColumns(columns, [
+        "reviewed_by",
+        "requested_by",
+        "assigned_to"
+    ]);
 
     return (
         <>
@@ -104,8 +123,35 @@ const InventoryRequestsReportTable: FC = () => {
             ) : (
                 requests ? (requests.length > 0 ? (
                     <>
+                        {/*<CheckboxMenu*/}
+                        {/*    buttonProps={{*/}
+                        {/*        startContent: <FilterIcon />,*/}
+                        {/*        isIconOnly: false,*/}
+                        {/*        children: "Filter Columns"*/}
+                        {/*    }}*/}
+                        {/*    checkboxGroupProps={{*/}
+                        {/*        label: "Filter",*/}
+                        {/*        value: visibleColumns.map(column => column.key),*/}
+                        {/*        onValueChange(value) {*/}
+                        {/*            const removedColumns = visibleColumns.filter(column => !value.includes(column.key));*/}
+                        {/*            const addedColumns = columns.filter(column => value.includes(column.key));*/}
+                        {/*            removedColumns.forEach(column => setColumnVisible(column.key, false));*/}
+                        {/*            addedColumns.forEach(column => setColumnVisible(column.key, true));*/}
+                        {/*        }*/}
+                        {/*    }}*/}
+                        {/*>*/}
+                        {/*    {columns.map(column => (*/}
+                        {/*        <Checkbox*/}
+                        {/*            key={column.key}*/}
+                        {/*            value={column.key}*/}
+                        {/*        >*/}
+                        {/*            {column.value}*/}
+                        {/*        </Checkbox>*/}
+                        {/*    ))}*/}
+                        {/*</CheckboxMenu>*/}
+                        {/*<Spacer y={6} />*/}
                         <GenericTable
-                            columns={columns} items={requests}>
+                            columns={visibleColumns} items={requests}>
                             {request => (
                                 <TableRow key={`${request.id}#${request.stockId}`}>
                                     {key => (
