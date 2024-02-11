@@ -115,7 +115,7 @@ class InventoryRequestsService {
                 requestedByUser: withUsers,
                 assignedToUsers: withAssignees
             }
-        });
+        }) as any;
     };
 
     public fetchRequests = async (userId: string, userPermissions: number, {
@@ -270,7 +270,7 @@ class InventoryRequestsService {
             data: dto
         });
 
-        return new Either<StockRequestWithOptionalExtras, NextResponse<ErrorResponse>>(updatedRequest);
+        return new Either<StockRequestWithOptionalExtras, NextResponse<ErrorResponse>>(updatedRequest as any);
     };
 
     public review = async (session: Session, requestId: string, dto: ReviewInventoryRequestDto): Promise<Either<StockRequestWithOptionalExtras, NextResponse<ErrorResponse>>> => {
@@ -354,7 +354,7 @@ class InventoryRequestsService {
         await this.updateSnapshots(approvedItems);
         return new Either<StockRequestWithOptionalExtras, NextResponse<ErrorResponse>>({
             ...request,
-            requestedItems: items
+            requestedItems: items as any
         });
     };
 
