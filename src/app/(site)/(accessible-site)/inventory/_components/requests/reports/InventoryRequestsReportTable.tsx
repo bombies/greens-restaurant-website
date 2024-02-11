@@ -12,7 +12,7 @@ import { AvatarGroup, Checkbox, Spacer, TableCell, TableRow } from "@nextui-org/
 import UserAvatar from "../../../../../../_components/UserAvatar";
 import { Spinner } from "@nextui-org/spinner";
 import SubTitle from "../../../../../../_components/text/SubTitle";
-import { Divider } from "@nextui-org/divider";gg
+import { Divider } from "@nextui-org/divider";
 import GenericTable from "../../../../../../_components/table/GenericTable";
 import InventoryRequestsReportFilters from "./InventoryRequestsReportFilters";
 import useToggleableColumns from "../../../../../../hooks/table/useToggleableColumns";
