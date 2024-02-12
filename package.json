@@ -12,7 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.499.0",
     "@aws-sdk/s3-request-presigner": "^3.499.0",
-    "@aws-sdk/signature-v4-crt": "^3.499.0",
+    "@aws-sdk/signature-v4-crt": "^3.511.0",
     "@next-auth/prisma-adapter": "^1.0.7",
     "@nextui-org/react": "^2.2.9",
     "@prisma/client": "^5.8.1",
