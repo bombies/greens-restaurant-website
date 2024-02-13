@@ -31,7 +31,8 @@ interface Props {
     onSelfAction?: OnSelfAction,
     inventorySnapshots?: InventorySnapshotWithOptionalExtras[],
     requestStatus?: StockRequestStatus,
-    editAllowed: boolean
+    editAllowed: boolean,
+    limitHeight?: boolean,
 }
 
 type OnAdminAction = {
@@ -62,7 +63,8 @@ const InventoryRequestedItemsTable: FC<Props> = ({
                                                      showItemStatus,
                                                      inventorySnapshots,
                                                      requestStatus,
-                                                     editAllowed
+                                                     editAllowed,
+                                                     limitHeight
                                                  }) => {
     const columns: Column[] = useMemo(() => {
         const ret = [
@@ -235,14 +237,14 @@ const InventoryRequestedItemsTable: FC<Props> = ({
 
     return (
         <GenericTable
-            isHeaderSticky
+            isHeaderSticky={limitHeight}
             columns={columns}
             items={isLoading ? [] : items}
             isLoading={isLoading}
             loadingContent={<Spinner />}
-            emptyContent={!isLoading ? "Select an inventory then click on the button below to start requesting items." : ''}
+            emptyContent={!isLoading ? "Select an inventory then click on the button below to start requesting items." : ""}
             classNames={{
-                base: "max-h-64 overflow-y-auto",
+                base: limitHeight ? "max-h-64 overflow-y-auto" : undefined
             }}
         >
             {(item) => (
