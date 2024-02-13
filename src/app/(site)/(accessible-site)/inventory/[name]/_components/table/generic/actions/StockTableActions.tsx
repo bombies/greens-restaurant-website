@@ -16,6 +16,7 @@ import RemoveStockModal from "./modals/RemoveStockModal";
 import EditIcon from "../../../../../../../../_components/icons/EditIcon";
 import EditStockTypeModal from "./modals/EditStockTypeModal";
 import { toast } from "react-hot-toast";
+import { ArrowBigDownDashIcon, ArrowBigUpDashIcon } from "lucide-react";
 
 type Props = {
     item: StockSnapshot,
@@ -87,11 +88,19 @@ const StockTableActions: FC<Props> = ({
                 <div className="flex gap-4 p-3 w-fit">
                     <AddStockButton
                         item={item}
-                        onQuantityIncrement={onQuantityIncrement}
+                        onQuantityIncrement={async () => {
+                            setAddStockModalOpen(true);
+                        }}
+                        icon={<ArrowBigUpDashIcon width={16} />}
+                        toolTipContent="Add Multiple"
                     />
                     <RemoveStockButton
                         item={item}
-                        onQuantityDecrement={onQuantityDecrement}
+                        onQuantityDecrement={async () => {
+                            setRemoveStockModalOpen(true);
+                        }}
+                        icon={<ArrowBigDownDashIcon width={16} />}
+                        toolTipContent="Remove Multiple"
                     />
                     <GenericDropdown
                         placement="bottom"
@@ -103,14 +112,14 @@ const StockTableActions: FC<Props> = ({
                         >
                             <VerticalDotsIcon width={16} />
                         </Button>}
-                        onAction={(key) => {
+                        onAction={async (key) => {
                             switch (key) {
                                 case "add": {
-                                    setAddStockModalOpen(true);
+                                    await onQuantityIncrement(item, 1);
                                     break;
                                 }
                                 case "remove": {
-                                    setRemoveStockModalOpen(true);
+                                    await onQuantityDecrement(item, 1);
                                     break;
                                 }
                                 case "delete": {
@@ -128,17 +137,17 @@ const StockTableActions: FC<Props> = ({
                         <DropdownSection title="Actions" showDivider>
                             <DropdownItem
                                 key="add"
-                                description="Add a custom amount of stock to this item"
+                                description="Add a to this item"
                                 startContent={<PlusIcon />}
                             >
-                                Add Multiple
+                                Increment
                             </DropdownItem>
                             <DropdownItem
                                 key="remove"
-                                description="Remove a custom amount of stock from this item"
+                                description="Remove a stock from this item"
                                 startContent={<MinusIcon />}
                             >
-                                Remove Multiple
+                                Decrement
                             </DropdownItem>
                             {showItemTypeEditAction &&
                                 <DropdownItem

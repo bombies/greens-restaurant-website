@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from "react";
+import { FC, ReactElement } from "react";
 import { StockSnapshot } from "@prisma/client";
 import IconButton from "../../../../../../../../_components/inputs/IconButton";
 import MinusIcon from "../../../../../../../../_components/icons/MinusIcon";
@@ -8,21 +8,24 @@ import MinusIcon from "../../../../../../../../_components/icons/MinusIcon";
 type Props = {
     item: StockSnapshot,
     onQuantityDecrement: (item: StockSnapshot, decrementedBy: number) => Promise<void>,
+    step?: number,
+    icon?: ReactElement,
+    toolTipContent?: string
 }
 
-const RemoveStockButton: FC<Props> = ({ item, onQuantityDecrement }) => {
+const RemoveStockButton: FC<Props> = ({ item, onQuantityDecrement, step, icon, toolTipContent }) => {
     return (
         <IconButton
             size="sm"
             variant="flat"
             color="danger"
-            toolTip="Decrement"
+            toolTip={toolTipContent || "Decrement"}
             cooldown={1}
             onPress={async () => {
-                await onQuantityDecrement(item, 1);
+                await onQuantityDecrement(item, step ?? 1);
             }}
         >
-            <MinusIcon width={16} />
+            {icon ?? <MinusIcon width={16} />}
         </IconButton>
     );
 };
