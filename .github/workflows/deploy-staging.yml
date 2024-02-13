@@ -1,4 +1,4 @@
-name: Build & Deploy
+name: Build & Deploy Staging
 
 on:
   push:
@@ -8,18 +8,26 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 20.x ]
+    env:
+      SSH_KEY: ${{ secrets.HOST_KEY }}
+      SSH_HOST: ${{ secrets.HOST }}
+      SSH_USER: ${{ secrets.HOST_USERNAME }}
+      SSH_PORT: ${{ secrets.HOST_PORT }}
+      SSH_BUILD_DIR: ${{ secrets.STAGING_HOST_BUILD_DIR }}
+      PATH_TO_PM2: ${{ secrets.PATH_TO_PM2 }}
     steps:
       - name: Clone Repository
         uses: actions/checkout@v3
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 20
-          cache: npm
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
       - name: Install Dependencies
-        run: |
-          echo "Installing node dependencies..."
-          npm i
+        run: npm i
       - name: "Setup Build Cache"
         uses: actions/cache@v3
         with:
@@ -30,30 +38,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
       - name: Building Project
+        run: npm run build
+      - name: Deploy
         run: |
-          echo "Building project..."
-          npm run build
-  deploy:
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - name: Deploy using SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.HOST_USERNAME }}
-          key: ${{ secrets.HOST_KEY }}
-          passphrase: ${{ secrets.HOST_KEY_PASSPHRASE }}
-          port: ${{ secrets.HOST_PORT }}
-          script_stop: true
-          script: |
-            export NVM_DIR=~/.nvm
-            source ~/.nvm/nvm.sh
-            cd ~/bombies/greens-restaurant-website-staging
-            git stash
-            git pull
-            npm i
-            npx prisma generate
-            npm run build
-            pm2 restart GreensRestaurantStaging
+          mkdir ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/github-actions
+          chmod 400 ~/.ssh/github-actions
+          echo -e "Host vps\n\tUser $SSH_USER\n\tHostname $SSH_HOST\n\tPort $SSH_PORT\n\tIdentityFile ~/.ssh/github-actions\n\tStrictHostKeyChecking No" >> ~/.ssh/config
+          ssh vps "cd bombies/greens-restaurant-website-staging && git stash && git pull && npm i && npx prisma generate"
+          rsync -re ssh ./.next/ vps:$SSH_BUILD_DIR
+          ssh vps "export PATH='$PATH_TO_PM2'; pm2 restart GreensRestaurantStaging"
