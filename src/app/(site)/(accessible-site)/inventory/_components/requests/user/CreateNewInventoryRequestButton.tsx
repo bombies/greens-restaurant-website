@@ -23,6 +23,7 @@ const CreateNewInventoryRequestButton: FC<Props> = ({mutator, visibleData}) => {
                 title="Create A New Inventory Request"
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
+                isDismissable={false}
             >
                 <NewInventoryRequestForm
                     mutator={mutator}

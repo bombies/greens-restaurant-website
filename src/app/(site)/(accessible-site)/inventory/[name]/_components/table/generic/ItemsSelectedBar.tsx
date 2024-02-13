@@ -36,30 +36,34 @@ const ItemsSelectedBar: FC<Props> = ({ onDelete, selectedIds, setSelectedIds }) 
             />
             <SlidingBar
                 visible={selectedIds.length > 0}
+                className="justify-between gap-4 phone:flex-col"
             >
-                <p className="self-center max-w-[50%] break-words">You have <span
+                <p className="self-center break-words tablet:text-sm">You have <span
                     className="text-warning">{selectedIds.length} item{selectedIds.length > 1 ? "s" : ""}</span> selected.
                 </p>
-                <GenericButton
-                    color="danger"
-                    variant="flat"
-                    startContent={<TrashIcon />}
-                    onPress={() => {
-                        setConfirmationVisible(true);
-                    }}
-                >
-                    Delete
-                </GenericButton>
-                <GenericButton
-                    color="warning"
-                    variant="flat"
-                    startContent={<DeniedIcon />}
-                    onPress={() => {
-                        setSelectedIds([]);
-                    }}
-                >
-                    Clear Selection
-                </GenericButton>
+                <div className="flex phone:flex-col gap-4">
+                    <GenericButton
+                        color="danger"
+                        variant="flat"
+                        startContent={<TrashIcon />}
+                        onPress={() => {
+                            setConfirmationVisible(true);
+                        }}
+                    >
+                        Delete
+                    </GenericButton>
+                    <GenericButton
+                        color="warning"
+                        variant="flat"
+                        startContent={<DeniedIcon />}
+                        onPress={() => {
+                            setSelectedIds([]);
+                        }}
+                    >
+                        Clear Selection
+                    </GenericButton>
+                </div>
+
             </SlidingBar>
         </Fragment>
     );

@@ -84,6 +84,7 @@ const AddStockItemModal: FC<Props> = ({
 
     return (
         <GenericModal
+            isDismissable={false}
             title={`Add New Item To ${inventoryName.replaceAll("-", " ")}`}
             isOpen={isOpen}
             onClose={() => setOpen(false)}

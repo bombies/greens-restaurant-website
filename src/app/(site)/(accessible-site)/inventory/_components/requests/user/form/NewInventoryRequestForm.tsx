@@ -2,7 +2,7 @@
 
 import { Dispatch, FC, SetStateAction, useState } from "react";
 import { SelectItem } from "@nextui-org/react";
-import GenericSelectMenu from "../../../../../../../_components/GenericSelectMenu";
+import GenericSelectMenu from "../../../../../../../_components/inputs/GenericSelectMenu";
 import { Chip } from "@nextui-org/chip";
 import InventoryRequestedItemsContainer from "./InventoryRequestedItemsContainer";
 import { Avatar } from "@nextui-org/avatar";

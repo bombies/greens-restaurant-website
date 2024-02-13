@@ -7,7 +7,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
 import { AddLocationStockDto } from "../../../../../../api/inventory/location/[name]/[sectionId]/stock/route";
 import useSWRMutation from "swr/mutation";
-import GenericSelectMenu from "../../../../../../_components/GenericSelectMenu";
+import GenericSelectMenu from "../../../../../../_components/inputs/GenericSelectMenu";
 import { SelectItem, SelectSection } from "@nextui-org/react";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import PlusIcon from "../../../../../../_components/icons/PlusIcon";
@@ -103,6 +103,7 @@ const AddLocationSectionStockItemModal: FC<Props> = ({
 
     return (
         <GenericModal
+            isDismissable={false}
             title={`Add New Item To ${locationName?.replaceAll("-", " ")}`}
             isOpen={isOpen}
             onClose={() => setOpen(false)}

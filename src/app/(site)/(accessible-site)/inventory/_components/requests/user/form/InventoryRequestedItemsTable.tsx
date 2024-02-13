@@ -235,11 +235,15 @@ const InventoryRequestedItemsTable: FC<Props> = ({
 
     return (
         <GenericTable
+            isHeaderSticky
             columns={columns}
             items={isLoading ? [] : items}
             isLoading={isLoading}
             loadingContent={<Spinner />}
             emptyContent={!isLoading ? "Select an inventory then click on the button below to start requesting items." : ''}
+            classNames={{
+                base: "max-h-64 overflow-y-auto",
+            }}
         >
             {(item) => (
                 <TableRow key={item.id}>

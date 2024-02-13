@@ -4,7 +4,7 @@ import { Dispatch, FC, SetStateAction, useMemo } from "react";
 import { StockType } from "@prisma/client";
 import { Chip } from "@nextui-org/chip";
 import { SelectItem } from "@nextui-org/react";
-import GenericSelectMenu from "../../../../../../../_components/GenericSelectMenu";
+import GenericSelectMenu from "../../../../../../../_components/inputs/GenericSelectMenu";
 import { FieldValues, UseFormRegister } from "react-hook-form";
 
 type Props = {

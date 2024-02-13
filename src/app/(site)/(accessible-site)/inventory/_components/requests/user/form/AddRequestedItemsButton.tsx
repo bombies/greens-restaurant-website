@@ -5,8 +5,7 @@ import { RequestedStockItem, Stock } from "@prisma/client";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import GenericButton from "../../../../../../../_components/inputs/GenericButton";
 import PlusIcon from "../../../../../../../_components/icons/PlusIcon";
-import GenericSelectMenu from "../../../../../../../_components/GenericSelectMenu";
-import { Button, SelectItem } from "@nextui-org/react";
+import { AutocompleteItem, Button } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import "../../../../../../../../utils/GeneralUtils";
 import GenericInput from "../../../../../../../_components/inputs/GenericInput";
@@ -17,6 +16,7 @@ import useStockQuantityDropdownUtils
 import StockQuantityDropdown, {
     QuantityUnit
 } from "../../../../[name]/_components/table/generic/forms/StockQuantityDropdown";
+import GenericAutoComplete from "../../../../../../../_components/inputs/GenericAutoComplete";
 
 interface Props {
     disabled?: boolean,
@@ -50,20 +50,23 @@ const AddRequestedItemsButton: FC<Props> = ({
     const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item: currentItem });
 
     const onSubmit = useCallback<SubmitHandler<FormProps>>((data) => {
+        if (!currentItem)
+            return
+        
         const amountRequested = mutateQuantity(Number(data.amount_requested), quantityUnit);
 
         dispatchProposedRequests({
             type: ProposedStockRequestsAction.ADD_ITEM,
             payload: {
                 amountRequested,
-                stockId: data.selected_item,
-                stockUID: stock.find(item => item.id === data.selected_item)!.uid
+                stockId: currentItem.id,
+                stockUID: stock.find(item => item.id === currentItem.id)!.uid
             }
         });
 
         setCurrentItem(undefined);
         setModalOpen(false);
-    }, [dispatchProposedRequests, mutateQuantity, quantityUnit, stock]);
+    }, [currentItem, dispatchProposedRequests, mutateQuantity, quantityUnit, stock]);
 
     return (
         <Fragment>
@@ -74,39 +77,33 @@ const AddRequestedItemsButton: FC<Props> = ({
             >
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="space-y-6">
-                        <GenericSelectMenu
+                        <GenericAutoComplete
                             register={register}
+                            isRequired
                             id="selected_item"
                             placeholder="Select an item..."
+                            aria-label="Select an item"
                             variant="flat"
-                            items={stock.sort((a, b) => a.name.localeCompare(b.name))}
+                            defaultItems={stock.sort((a, b) => a.name.localeCompare(b.name))}
                             disabled={snapshotsLoading}
                             disabledKeys={proposedSnapshotIds}
-                            onSelectionChange={keys => {
-                                const keyArr = Array.from(keys) as string[];
-                                if (!keyArr.length)
-                                    setCurrentItem(undefined);
-                                else {
-                                    const lastItem = stock.find(item => item.id === keyArr[keyArr.length - 1]);
-                                    if (lastItem)
-                                        setCurrentItem(lastItem);
-                                }
-
+                            onSelectionChange={key => {
+                                const lastItem = stock.find(item => item.id === key);
+                                if (lastItem)
+                                    setCurrentItem(lastItem);
                             }}
-                            renderValue={items => items.map(item => item.data?.name.replaceAll("-", " ").capitalize()).toString()}
                         >
                             {snapshot => (
-                                <SelectItem key={snapshot.id} className="capitalize">
+                                <AutocompleteItem key={snapshot.id} className="capitalize">
                                     {snapshot.name.replaceAll("-", " ")}
-                                </SelectItem>
+                                </AutocompleteItem>
                             )}
-                        </GenericSelectMenu>
+                        </GenericAutoComplete>
                         <GenericInput
                             register={register}
                             isRequired
                             id="amount_requested"
                             label="Amount Needed"
-                            labelPlacement="outside"
                             placeholder="Enter an amount"
                             type="number"
                             min="1"

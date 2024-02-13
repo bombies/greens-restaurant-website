@@ -32,8 +32,8 @@ const ChangesMadeContainer: FC<ChangesMadeContainerProps> = ({
                                                              }) => {
     return (
         <>
-            <p className="text-xl phone:text-lg self-center">{label || "Careful - You have unsaved changes!"}</p>
-            <div className="flex tablet:flex-col gap-4">
+            <p className="text-xl tablet:text-lg self-center">{label || "Careful - You have unsaved changes!"}</p>
+            <div className="flex phone:flex-col gap-4">
                 <GenericButton
                     onPress={() => onAccept()}
                     disabled={!changesMade || isChanging}

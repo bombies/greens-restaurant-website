@@ -22,19 +22,26 @@ export default function GenericSelectMenu<T>({
             {...props}
             classNames={{
                 label: "text-neutral-100 mb-4 text-sm font-semibold",
-                trigger: "!default-container !h-fit py-6 pr-3 pl-6",
+                trigger: "!default-container !h-fit py-6 pr-3 pl-6"
             }}
             listboxProps={{
+                ...listboxProps,
                 itemClasses: {
+                    ...listboxProps?.itemClasses,
                     base: [
-                        "data-[hover=true]:!bg-primary/40",
+                        "data-[hover=true]:!bg-primary/20",
                         "data-[selectable=true]:focus:bg-primary/30",
-                        "p-3"
+                        "p-3",
+                        listboxProps?.itemClasses?.base ?? ""
                     ]
                 }
             }}
             popoverProps={{
-                className: "!default-container backdrop-blur-md"
+                ...popoverProps,
+                classNames: {
+                    content: "!default-container backdrop-blur-md",
+                    ...popoverProps?.classNames
+                }
             }}
         >
             {children}
@@ -44,19 +51,27 @@ export default function GenericSelectMenu<T>({
             {...register(id, { required: props.required || props.isRequired })}
             {...props}
             classNames={{
-                trigger: "!default-container !h-fit py-6 px-3"
+                label: "text-neutral-100 mb-4 text-sm font-semibold",
+                trigger: "!default-container !h-fit py-6 pr-3 pl-6"
             }}
             listboxProps={{
+                ...listboxProps,
                 itemClasses: {
+                    ...listboxProps?.itemClasses,
                     base: [
                         "data-[hover=true]:!bg-primary/40",
                         "data-[selectable=true]:focus:bg-primary/30",
-                        "p-3"
+                        "p-3",
+                        listboxProps?.itemClasses?.base ?? ""
                     ]
                 }
             }}
             popoverProps={{
-                className: "!default-container backdrop-blur-md"
+                ...popoverProps,
+                classNames: {
+                    content: "!default-container backdrop-blur-md",
+                    ...popoverProps?.classNames
+                }
             }}
             isInvalid={!!(errors && errors[id])}
         >

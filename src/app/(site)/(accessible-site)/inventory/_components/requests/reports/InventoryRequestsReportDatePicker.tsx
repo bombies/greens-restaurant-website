@@ -46,6 +46,9 @@ const InventoryRequestsReportDatePicker: FC = () => {
         const startDate = dateInputToDateObject(start_date);
         const endDate = dateInputToDateObject(end_date);
 
+        startDate?.setHours(0, 0, 0, 0);
+        endDate?.setHours(23, 59, 59, 999);
+
         dispatch({
             type: InventoryRequestsReportActions.UPDATE_QUERY,
             payload: {
@@ -74,7 +77,7 @@ const InventoryRequestsReportDatePicker: FC = () => {
                         assignedTo: request.assignedToUsers,
                         reviewedBy: request.reviewedByUser
                     }))
-            ).flat(2)
+            ).flat(2);
 
             dispatch({
                 type: InventoryRequestsReportActions.UPDATE_DATA,

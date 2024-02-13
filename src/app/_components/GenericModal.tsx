@@ -20,8 +20,13 @@ export default function GenericModal({ title, children, footerContent, bodyClass
                 modalProps.className,
                 "!bg-neutral-950/90 backdrop-blur-md"
             )}
-            backdrop="blur"
-            placement="center"
+            backdrop={modalProps.backdrop || "opaque"}
+            placement={modalProps.placement || "center"}
+            scrollBehavior={modalProps.scrollBehavior || "inside"}
+            classNames={{
+                ...modalProps.classNames,
+                backdrop: clsx("bg-neutral-950/90", modalProps.classNames?.backdrop),
+            }}
         >
             <ModalContent>
                 <ModalHeader>

@@ -3,6 +3,7 @@
 import SlidingBar from "./SlidingBar";
 import clsx from "clsx";
 import ChangesMadeContainer, { ChangesMadeContainerProps } from "./ChangesMadeContainer";
+import { cn } from "@nextui-org/react";
 
 type Props = {
     className?: string
@@ -10,7 +11,7 @@ type Props = {
 
 export default function ChangesMadeBar({ className, changesMade, ...props }: Props) {
     return (
-        <SlidingBar visible={changesMade} className={clsx(className, "justify-between")}>
+        <SlidingBar visible={changesMade} className={cn("justify-between gap-4", className)}>
             <ChangesMadeContainer {...props} changesMade={changesMade} />
         </SlidingBar>
     );
