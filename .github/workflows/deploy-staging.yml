@@ -45,7 +45,6 @@ jobs:
           echo "$SSH_KEY" > ~/.ssh/github-actions
           chmod 400 ~/.ssh/github-actions
           echo -e "Host vps\n\tUser $SSH_USER\n\tHostname $SSH_HOST\n\tPort $SSH_PORT\n\tIdentityFile ~/.ssh/github-actions\n\tStrictHostKeyChecking No" >> ~/.ssh/config
-          ssh vps "cd bombies/greens-restaurant-website-staging && git stash && git pull"
-          ssh vps "export PATH=/home/carter/.nvm/versions/node/v20.5.1/bin npm i && npx prisma generate";
+          ssh vps "cd bombies/greens-restaurant-website-staging && git stash && git pull && npm i && npx prisma generate"
           rsync -re ssh ./.next/ vps:$SSH_BUILD_DIR
-          ssh vps "export PATH='$PATH_TO_PM2'; pm2 restart GreensRestaurantStaging"
+          ssh vps "pm2 restart GreensRestaurantStaging"
