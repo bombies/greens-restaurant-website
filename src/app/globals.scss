@@ -129,15 +129,15 @@ html {
 }
 
 ::-webkit-scrollbar {
-  width: 0.5rem;
+  width: 0.25rem;
   height: 0.25rem;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(82, 82, 82);
+  background: #007d0d;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #292929;
+  background: #002103;
 }
