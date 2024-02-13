@@ -53,7 +53,10 @@ const useStockTableState = (stock: StockSnapshot[]) => {
     const [stockState, dispatchStockState] = useReducer(reducer, stock ?? []);
     const [visibleStockState, setVisibleStockState] = useState<StockSnapshot[]>(stockState);
     const [stockSearch, setStockSearch] = useState<string>();
-    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+        column: "stock_name",
+        direction: "ascending"
+    });
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 
     useEffect(() => {
