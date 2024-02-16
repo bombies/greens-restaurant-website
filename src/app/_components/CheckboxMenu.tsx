@@ -12,7 +12,7 @@ import {
 } from "@nextui-org/react";
 import clsx from "clsx";
 
-type Props = Omit<PopoverProps, "children"> & {
+type Props = Omit<PopoverProps, "children" | "maxHeight"> & {
     buttonProps?: ButtonProps,
     checkboxGroupProps?: CheckboxGroupProps,
     children: ReactElement<CheckboxProps> | ReactElement<CheckboxProps>[],

@@ -29,7 +29,7 @@ export default function Sidebar() {
     const screenSize = useScreenSize();
 
     return (
-        <>
+        <aside>
             <div className={`tablet:absolute top-5 left-5 phone:left-1 z-[51] tablet-min:hidden`}>
                 <IconButton
                     variant="light"
@@ -63,100 +63,102 @@ export default function Sidebar() {
                             x: -100
                         }}
                         className={clsx(
-                            `tablet:fixed h-full tablet:h-screen w-28 tablet:w-64 default-container !rounded-l-none backdrop-blur-md z-50`
+                            `tablet:fixed h-full tablet:h-screen w-28 tablet:w-64 default-container !rounded-l-none backdrop-blur-md z-50`,
                         )}>
-                        <div className="flex justify-center mt-20">
-                            <Link href="/home">
-                                <GenericImage
-                                    src="https://i.imgur.com/HLTQ78m.png"
-                                    className={clsx(opened ? "w-48 phone:w-24 h-48 phone:h-24" : "w-24 h-24")}
-                                />
-                            </Link>
-                        </div>
-                        <nav className={clsx(
-                            "max-h-[70%] overflow-y-auto overflow-x-hidden tablet:mx-auto flex flex-col mb-6",
-                            !opened && "items-center"
-                        )}>
-                            {
-                                hasAnyPermission(user?.permissions, [
-                                    Permission.CREATE_INVENTORY,
-                                    Permission.VIEW_LOCATIONS,
-                                    Permission.MUTATE_LOCATIONS
-                                ])
-                                &&
-                                <LocationsSidebarItem sidebarOpened={opened} />
-                            }
-                            {
-                                hasAnyPermission(user?.permissions, [
-                                    Permission.CREATE_INVENTORY,
-                                    Permission.VIEW_INVENTORY,
-                                    Permission.MUTATE_STOCK
-                                ])
-                                &&
-                                <InventorySidebarItem sidebarOpened={opened} />
-                            }
-                            {
-                                hasAnyPermission(user?.permissions, [
-                                    Permission.CREATE_INVENTORY,
-                                    Permission.MANAGE_STOCK_REQUESTS,
-                                    Permission.CREATE_STOCK_REQUEST,
-                                    Permission.VIEW_STOCK_REQUESTS
-                                ])
-                                &&
-                                <InventoryRequestsSidebarItem sidebarOpened={opened} />
-                            }
-                            {
-                                hasPermission(user?.permissions, Permission.ADMINISTRATOR)
-                                &&
-                                <EmployeesSidebarItem sidebarOpened={opened} />
-                            }
-                            {
-                                hasAnyPermission(user?.permissions, [
-                                    Permission.VIEW_INVOICES,
-                                    Permission.CREATE_INVOICE
-                                ])
-                                &&
-                                <InvoicesSidebarItem sidebarOpened={opened} />
-                            }
-                            <AccountSidebarItem sidebarOpened={opened} />
-                            {
-                                hasPermission(user?.permissions, Permission.ADMINISTRATOR)
-                                &&
-                                <ManagementSidebarItem sidebarOpened={opened} />
-                            }
-                        </nav>
-                        <div className="flex justify-center">
-                            {
-                                opened ?
-                                    <GenericButton
-                                        icon={signOutIcon}
-                                        onPress={() => signOut().then(() => {
-                                            toast("See you later!", {
-                                                icon: "👋"
-                                            });
-                                        })}>Sign Out</GenericButton>
-                                    :
+                        <div className="sticky top-10">
+                            <div className="flex justify-center mt-20">
+                                <Link href="/home">
+                                    <GenericImage
+                                        src="https://i.imgur.com/HLTQ78m.png"
+                                        className={clsx(opened ? "w-48 phone:w-24 h-48 phone:h-24" : "w-24 h-24")}
+                                    />
+                                </Link>
+                            </div>
+                            <nav className={clsx(
+                                "overflow-y-auto overflow-x-hidden tablet:mx-auto flex flex-col mb-6",
+                                !opened && "items-center"
+                            )}>
+                                {
+                                    hasAnyPermission(user?.permissions, [
+                                        Permission.CREATE_INVENTORY,
+                                        Permission.VIEW_LOCATIONS,
+                                        Permission.MUTATE_LOCATIONS
+                                    ])
+                                    &&
+                                    <LocationsSidebarItem sidebarOpened={opened} />
+                                }
+                                {
+                                    hasAnyPermission(user?.permissions, [
+                                        Permission.CREATE_INVENTORY,
+                                        Permission.VIEW_INVENTORY,
+                                        Permission.MUTATE_STOCK
+                                    ])
+                                    &&
+                                    <InventorySidebarItem sidebarOpened={opened} />
+                                }
+                                {
+                                    hasAnyPermission(user?.permissions, [
+                                        Permission.CREATE_INVENTORY,
+                                        Permission.MANAGE_STOCK_REQUESTS,
+                                        Permission.CREATE_STOCK_REQUEST,
+                                        Permission.VIEW_STOCK_REQUESTS
+                                    ])
+                                    &&
+                                    <InventoryRequestsSidebarItem sidebarOpened={opened} />
+                                }
+                                {
+                                    hasPermission(user?.permissions, Permission.ADMINISTRATOR)
+                                    &&
+                                    <EmployeesSidebarItem sidebarOpened={opened} />
+                                }
+                                {
+                                    hasAnyPermission(user?.permissions, [
+                                        Permission.VIEW_INVOICES,
+                                        Permission.CREATE_INVOICE
+                                    ])
+                                    &&
+                                    <InvoicesSidebarItem sidebarOpened={opened} />
+                                }
+                                <AccountSidebarItem sidebarOpened={opened} />
+                                {
+                                    hasPermission(user?.permissions, Permission.ADMINISTRATOR)
+                                    &&
+                                    <ManagementSidebarItem sidebarOpened={opened} />
+                                }
+                            </nav>
+                            <div className="flex justify-center">
+                                {
+                                    opened ?
+                                        <GenericButton
+                                            icon={signOutIcon}
+                                            onPress={() => signOut().then(() => {
+                                                toast("See you later!", {
+                                                    icon: "👋"
+                                                });
+                                            })}>Sign Out</GenericButton>
+                                        :
 
-                                    <IconButton
-                                        toolTip="Sign Out"
-                                        toolTipProps={{
-                                            placement: "right"
-                                        }}
-                                        variant="shadow"
-                                        onPress={() => signOut().then(() => {
-                                            toast("See you later!", {
-                                                icon: "👋"
-                                            });
-                                        })}
-                                    >
-                                        <SignOutIcon />
-                                    </IconButton>
-                            }
+                                        <IconButton
+                                            toolTip="Sign Out"
+                                            toolTipProps={{
+                                                placement: "right"
+                                            }}
+                                            variant="shadow"
+                                            onPress={() => signOut().then(() => {
+                                                toast("See you later!", {
+                                                    icon: "👋"
+                                                });
+                                            })}
+                                        >
+                                            <SignOutIcon />
+                                        </IconButton>
+                                }
+                            </div>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </>
+        </aside>
     );
 }
 
