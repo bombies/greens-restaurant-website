@@ -55,17 +55,17 @@ type OnSelfAction = {
 
 
 const InventoryRequestedItemsTable: FC<Props> = ({
-                                                     items,
-                                                     isLoading,
-                                                     adminActions,
-                                                     onAdminAction,
-                                                     onSelfAction,
-                                                     showItemStatus,
-                                                     inventorySnapshots,
-                                                     requestStatus,
-                                                     editAllowed,
-                                                     limitHeight
-                                                 }) => {
+    items,
+    isLoading,
+    adminActions,
+    onAdminAction,
+    onSelfAction,
+    showItemStatus,
+    inventorySnapshots,
+    requestStatus,
+    editAllowed,
+    limitHeight
+}) => {
     const columns: Column[] = useMemo(() => {
         const ret = [
             { key: "item_name", value: "Item Name" },
@@ -161,7 +161,23 @@ const InventoryRequestedItemsTable: FC<Props> = ({
                 );
             }
             case "status": {
-                if ((item?.amountProvided ?? 0) >= (item?.amountRequested ?? 0))
+                if ((item?.amountProvided ?? 0) > (item?.amountRequested ?? 0)) {
+                    return (<Tooltip
+                        color="success"
+                        content={`${item.amountProvided} PROVIDED`}
+                    >
+                        <Chip
+                            variant="flat"
+                            color="success"
+                            classNames={{
+                                content: "font-semibold"
+                            }}
+                            startContent={<CheckIcon width={16} />}
+                        >
+                            APPROVED EXTRA
+                        </Chip>
+                    </Tooltip>)
+                } else if ((item?.amountProvided ?? 0) === (item?.amountRequested ?? 0))
                     return (
                         <Tooltip
                             color="success"
@@ -205,29 +221,29 @@ const InventoryRequestedItemsTable: FC<Props> = ({
                         </Chip>
                     );
                 else return (
-                        <div className="flex gap-4">
-                            <Tooltip
+                    <div className="flex gap-4">
+                        <Tooltip
+                            color="warning"
+                            content={`${item.amountProvided} PROVIDED`}
+                        >
+                            <Chip
+                                variant="flat"
                                 color="warning"
-                                content={`${item.amountProvided} PROVIDED`}
+                                classNames={{
+                                    content: "font-semibold"
+                                }}
+                                startContent={<CheckIcon width={16} />}
                             >
-                                <Chip
-                                    variant="flat"
-                                    color="warning"
-                                    classNames={{
-                                        content: "font-semibold"
-                                    }}
-                                    startContent={<CheckIcon width={16} />}
-                                >
-                                    PARTIALLY APPROVED
-                                </Chip>
-                            </Tooltip>
-                            <CircularProgress
-                                color="warning"
-                                size="sm"
-                                value={item.amountProvided && item.amountRequested ? (item.amountProvided / item.amountRequested) * 100 : 0}
-                            />
-                        </div>
-                    );
+                                PARTIALLY APPROVED
+                            </Chip>
+                        </Tooltip>
+                        <CircularProgress
+                            color="warning"
+                            size="sm"
+                            value={item.amountProvided && item.amountRequested ? (item.amountProvided / item.amountRequested) * 100 : 0}
+                        />
+                    </div>
+                );
             }
             case "amount_available": {
                 return findItemSnapshot()?.quantity ?? 0;

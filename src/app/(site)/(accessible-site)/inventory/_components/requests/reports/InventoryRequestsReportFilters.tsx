@@ -22,7 +22,8 @@ const InventoryRequestsReportFilters: FC = () => {
             requestedBy,
             items,
             reviewedBy,
-            assignedTo
+            assignedTo,
+            locations,
         }
     }, dispatch] = useInventoryRequestsReport();
 
@@ -42,8 +43,9 @@ const InventoryRequestsReportFilters: FC = () => {
                     const itemsFilter = !items || !items.length ? true : items?.includes(item.stockId);
                     const reviewedByFilter = !reviewedBy || !reviewedBy.length ? true : reviewedBy?.includes(item.reviewedBy?.id ?? "");
                     const assignedToFilter = !assignedTo || !assignedTo.length ? true : assignedTo?.some(assignedTo => item.assignedTo?.map(it => it.id).includes(assignedTo));
+                    const locationsFilter = !locations || !locations.length ? true : locations?.includes(item.assignedLocation?.id ?? "");
 
-                    return statusFilter && requestedByFilter && itemsFilter && reviewedByFilter && assignedToFilter;
+                    return statusFilter && requestedByFilter && itemsFilter && reviewedByFilter && assignedToFilter && locationsFilter;
                 })
             }
         });
@@ -75,7 +77,7 @@ const InventoryRequestsReportFilters: FC = () => {
                 >Clear Filters</GenericButton>
             </div>
             <Divider className="my-6" />
-            <div className="grid grid-cols-5 tablet:grid-cols-3 phone:grid-cols-1 gap-4">
+            <div className="grid grid-cols-3 phone:grid-cols-1 gap-4">
                 <CheckboxMenu
                     buttonProps={{
                         fullWidth: true,
@@ -106,6 +108,40 @@ const InventoryRequestsReportFilters: FC = () => {
                     <Checkbox
                         value={StockRequestStatus.REJECTED}>{getStatusChip(StockRequestStatus.REJECTED)}</Checkbox>
                     <Checkbox value={StockRequestStatus.PENDING}>{getStatusChip(StockRequestStatus.PENDING)}</Checkbox>
+                </CheckboxMenu>
+                <CheckboxMenu
+                    buttonProps={{
+                        fullWidth: true,
+                        isIconOnly: false,
+                        children: (
+                            <>
+                                <FilterIcon /> Locations
+                            </>
+                        )
+                    }}
+                    checkboxGroupProps={{
+                        label: "Locations",
+                        value: locations ?? [],
+                        onValueChange: (value) => {
+                            dispatch({
+                                type: InventoryRequestsReportActions.UPDATE_FILTERS,
+                                payload: {
+                                    locations: value
+                                }
+                            });
+                        }
+                    }}
+                >
+                    {
+                        allRequests.map(request => request.assignedLocation)
+                            .filter((item, index, array) => array.findIndex(it => it?.id === item?.id) === index)
+                            .filter(item => item)
+                            .map(location => (
+                                <Checkbox key={location!.id} value={location!.id}>
+                                    <span className="capitalize">{location!.name.replaceAll("-", " ")}</span>
+                                </Checkbox>
+                            ))
+                    }
                 </CheckboxMenu>
                 <CheckboxMenu
                     buttonProps={{
@@ -225,6 +261,7 @@ const InventoryRequestsReportFilters: FC = () => {
                     }
                 </CheckboxMenu>
                 <CheckboxMenu
+                    maxHeight="24rem"
                     buttonProps={{
                         fullWidth: true,
                         isIconOnly: false,

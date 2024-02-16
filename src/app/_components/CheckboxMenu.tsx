@@ -7,17 +7,19 @@ import {
     Popover,
     PopoverContent,
     PopoverProps,
-    PopoverTrigger
+    PopoverTrigger,
+    ScrollShadow
 } from "@nextui-org/react";
 import clsx from "clsx";
 
 type Props = Omit<PopoverProps, "children"> & {
     buttonProps?: ButtonProps,
     checkboxGroupProps?: CheckboxGroupProps,
-    children: ReactElement<CheckboxProps> | ReactElement<CheckboxProps>[]
+    children: ReactElement<CheckboxProps> | ReactElement<CheckboxProps>[],
+    maxHeight?: string
 }
 
-const CheckboxMenu: FC<Props> = ({ buttonProps, checkboxGroupProps, children, ...popoverProps }) => {
+const CheckboxMenu: FC<Props> = ({ buttonProps, checkboxGroupProps, children, maxHeight, ...popoverProps }) => {
     return (
         <Popover
             {...popoverProps}
@@ -37,12 +39,19 @@ const CheckboxMenu: FC<Props> = ({ buttonProps, checkboxGroupProps, children, ..
             <PopoverContent
                 className={clsx("!default-container backdrop-blur-lg p-6")}
             >
-                <CheckboxGroup
-                    {...checkboxGroupProps}
-                    color={checkboxGroupProps?.color ?? "secondary"}
+                <ScrollShadow
+                    hideScrollBar
+                    style={{
+                        maxHeight: maxHeight ?? "fit-content"
+                    }}
                 >
-                    {children}
-                </CheckboxGroup>
+                    <CheckboxGroup
+                        {...checkboxGroupProps}
+                        color={checkboxGroupProps?.color ?? "secondary"}
+                    >
+                        {children}
+                    </CheckboxGroup>
+                </ScrollShadow>
             </PopoverContent>
         </Popover>
     );

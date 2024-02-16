@@ -20,8 +20,9 @@ type InventoryRequestsReportsContextProps = {
         status?: StockRequestStatus[],
         requestedBy?: string[],
         assignedTo?: string[],
-        reviewedBy?: string[]
-        items?: string[]
+        reviewedBy?: string[],
+        items?: string[],
+        locations?: string[]
     }
 }
 
@@ -91,7 +92,8 @@ const InventoryRequestsReportProvider: FC<PropsWithChildren> = ({ children }) =>
             requestedBy: undefined,
             assignedTo: undefined,
             reviewedBy: undefined,
-            items: undefined
+            items: undefined,
+            locations: undefined
         }
     });
 

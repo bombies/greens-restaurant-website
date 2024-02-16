@@ -385,7 +385,7 @@ class InventoryRequestsService {
                         },
                         data: {
                             quantity: {
-                                decrement: requestedItem.amountRequested
+                                decrement: requestedItem.amountProvided ?? 0
                             }
                         }
                     })
