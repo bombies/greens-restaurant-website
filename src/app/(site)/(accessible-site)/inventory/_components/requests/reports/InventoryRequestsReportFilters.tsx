@@ -51,7 +51,7 @@ const InventoryRequestsReportFilters: FC = () => {
                 })
             }
         });
-    }, [allRequests, assignedTo, dispatch, items, requestedBy, reviewedBy, status]);
+    }, [allRequests, assignedTo, dispatch, items, requestedBy, reviewedBy, status, locations]);
 
     return (
         <div className="p-6 bg-primary/20 rounded-2xl">
