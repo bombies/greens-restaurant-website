@@ -291,6 +291,7 @@ const InventoryRequestsReportFilters: FC = () => {
                     {
                         allRequests
                             .filter((item, index, array) => array.findIndex(it => it.stockId === item.stockId) === index)
+                            .sort((a, b) => a.stock!.name.localeCompare(b.stock!.name))
                             .map(req => (
                                 <Checkbox key={req.stockId} value={req.stockId}>
                                     <span className="capitalize">{req.stock?.name.replaceAll("-", " ")}</span>
