@@ -34,7 +34,9 @@ const InventoryRequestsReportFilters: FC = () => {
                 visibleData: allRequests.filter(item => {
                     const reqStatus = item.amountProvided === null ? StockRequestStatus.PENDING : (
                         item.amountProvided === item.amountRequested ? StockRequestStatus.DELIVERED : (
-                            item.amountProvided > 0 ? StockRequestStatus.PARTIALLY_DELIVERED : StockRequestStatus.REJECTED
+                            item.amountProvided > 0 && item.amountProvided < item.amountRequested ? StockRequestStatus.PARTIALLY_DELIVERED : (
+                                item.amountProvided > item.amountRequested ? "EXTRA_DELIVERED" : StockRequestStatus.REJECTED
+                            )
                         )
                     );
 
@@ -101,6 +103,8 @@ const InventoryRequestsReportFilters: FC = () => {
                         }
                     }}
                 >
+                    <Checkbox
+                        value={"EXTRA_DELIVERED"}>{getStatusChip("EXTRA_DELIVERED")}</Checkbox>
                     <Checkbox
                         value={StockRequestStatus.DELIVERED}>{getStatusChip(StockRequestStatus.DELIVERED)}</Checkbox>
                     <Checkbox

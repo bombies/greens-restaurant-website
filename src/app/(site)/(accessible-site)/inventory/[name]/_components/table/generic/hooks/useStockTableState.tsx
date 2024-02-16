@@ -79,7 +79,7 @@ const useStockTableState = (stock: StockSnapshot[]) => {
             stockState.filter(stockSnapshot =>
                 stockSnapshot.name
                     .toLowerCase()
-                    .includes(stockSearch.toLowerCase().trim())
+                    .includes(stockSearch.toLowerCase().trim().replaceAll(" ", "-"))
             )
         );
     }, [stockSearch, stockState]);

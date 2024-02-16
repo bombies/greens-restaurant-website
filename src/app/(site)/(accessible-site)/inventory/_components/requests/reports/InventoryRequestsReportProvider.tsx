@@ -17,7 +17,7 @@ type InventoryRequestsReportsContextProps = {
         visibleData: RequestedStockItemWithExtrasAndRequestExtras[]
     }
     filters: {
-        status?: StockRequestStatus[],
+        status?: (StockRequestStatus | 'EXTRA_DELIVERED')[],
         requestedBy?: string[],
         assignedTo?: string[],
         reviewedBy?: string[],

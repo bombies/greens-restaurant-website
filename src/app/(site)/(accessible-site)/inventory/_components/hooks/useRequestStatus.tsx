@@ -12,8 +12,22 @@ import SubTitle from "../../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
 import clsx from "clsx";
 
-export const getStatusChip = (status?: StockRequestStatus) => {
+export const getStatusChip = (status?: StockRequestStatus | "EXTRA_DELIVERED") => {
     switch (status) {
+        case "EXTRA_DELIVERED": {
+            return (
+                <Chip
+                    variant="flat"
+                    color="success"
+                    classNames={{
+                        content: "font-semibold"
+                    }}
+                    startContent={<DeliveredIcon width={16} />}
+                >
+                    EXTRA DELIVERED
+                </Chip>
+            );
+        }
         case StockRequestStatus.DELIVERED: {
             return (
                 <Chip
