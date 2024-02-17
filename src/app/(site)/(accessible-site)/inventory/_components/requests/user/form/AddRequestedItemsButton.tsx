@@ -47,7 +47,7 @@ const AddRequestedItemsButton: FC<Props> = ({
     const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
     const [currentItem, setCurrentItem] = useState<Stock>();
     const { register, handleSubmit } = useForm<FormProps>();
-    const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item: currentItem });
+    const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ itemType: currentItem?.type });
 
     const onSubmit = useCallback<SubmitHandler<FormProps>>((data) => {
         if (!currentItem)
@@ -109,7 +109,7 @@ const AddRequestedItemsButton: FC<Props> = ({
                             min="1"
                             endContent={(currentItem && (isDrinkBottle() || isCaseItem())) &&
                                 <StockQuantityDropdown
-                                    item={currentItem}
+                                    itemType={currentItem.type}
                                     selectedUnit={quantityUnit}
                                     setSelectedUnit={setQuantityUnit}
                                 />

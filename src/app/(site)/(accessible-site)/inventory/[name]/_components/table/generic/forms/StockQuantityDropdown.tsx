@@ -14,13 +14,13 @@ export enum QuantityUnit {
 }
 
 type Props = {
-    item?: Stock | StockSnapshot,
+    itemType?: StockType | null,
     selectedUnit: QuantityUnit,
     setSelectedUnit: Dispatch<SetStateAction<QuantityUnit>>
 }
 
-const StockQuantityDropdown: FC<Props> = ({ item, selectedUnit, setSelectedUnit }) => {
-    const { isCaseItem } = useStockQuantityDropdownUtils({ item });
+const StockQuantityDropdown: FC<Props> = ({ itemType, selectedUnit, setSelectedUnit }) => {
+    const { isCaseItem } = useStockQuantityDropdownUtils({ itemType });
 
     const validKeys = useMemo(() => (
         isCaseItem() ?

@@ -59,6 +59,55 @@ export function compare(object1: any, object2: any) {
     return true;
 }
 
+export function mergeDeepWithArrayReplace(source: any, target: any): any {
+    // Check if source is an array, replace it with the corresponding array from target
+    if (Array.isArray(source))
+        return Array.isArray(target) ? target : source;
+
+    // Check if source and target are objects
+    if (typeof source === 'object' && typeof target === 'object') {
+        const mergedObject: any = {};
+
+        // Merge keys from both source and target
+        for (const key in target)
+            mergedObject[key] = mergeDeepWithArrayReplace(source[key], target[key]);
+
+        // Add keys from source that are not present in target
+        for (const key in source)
+            if (!(key in target))
+                mergedObject[key] = source[key];
+
+        return mergedObject;
+    }
+
+    // If source is not an object, return the target
+    return target;
+}
+
+export function removeEmptyRecords<T extends Record<string, any>>(obj: T): T {
+    const result: Record<string, any> = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+        if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+            const nonEmptyObject = removeEmptyRecords(value);
+            if (Object.keys(nonEmptyObject).length !== 0) {
+                result[key] = nonEmptyObject;
+            }
+        } else if (value !== undefined && value !== null && value !== '') {
+            result[key] = value;
+        }
+    }
+
+    return result as T;
+}
+
+export function chunk<T>(arr: T[], size: number): T[][] {
+    return Array.from(
+        {length: Math.ceil(arr.length / size)},
+        (_, i) => arr.slice(i * size, i * size + size)
+    )
+}
+
 export interface Predicate<T> {
     (item: T): boolean;
 }

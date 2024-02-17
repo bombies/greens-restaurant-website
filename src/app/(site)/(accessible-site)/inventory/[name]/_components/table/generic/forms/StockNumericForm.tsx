@@ -33,7 +33,7 @@ const StockNumericForm: FC<Props> = ({
                                          defaultValue
                                      }) => {
     const [quantity, setQuantity] = useState(item && defaultValue ? item[defaultValue] ?? 0 : 0);
-    const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item });
+    const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ itemType: item?.type });
     const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
     const {
         register,
@@ -68,7 +68,7 @@ const StockNumericForm: FC<Props> = ({
                     (!isCurrency && (isDrinkBottle() || isCaseItem()))
                     &&
                     <StockQuantityDropdown
-                        item={item}
+                        itemType={item?.type}
                         selectedUnit={quantityUnit}
                         setSelectedUnit={setQuantityUnit}
                     />

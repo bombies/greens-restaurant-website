@@ -36,19 +36,19 @@ export enum StockTableColumnKey {
 
 
 const GenericStockTable: FC<Props> = ({
-                                          stock,
-                                          stockLoading,
-                                          mutationAllowed,
-                                          getKeyValue,
-                                          onQuantityIncrement,
-                                          onQuantityDecrement,
-                                          onStockDelete,
-                                          onItemAddButtonPress,
-                                          priceIsCost,
-                                          onItemTypeEdit,
-                                          showGoodsReceived,
-                                          showItemTypeEditAction
-                                      }) => {
+    stock,
+    stockLoading,
+    mutationAllowed,
+    getKeyValue,
+    onQuantityIncrement,
+    onQuantityDecrement,
+    onStockDelete,
+    onItemAddButtonPress,
+    priceIsCost,
+    onItemTypeEdit,
+    showGoodsReceived,
+    showItemTypeEditAction
+}) => {
     const {
         stockState,
         stockSearch,

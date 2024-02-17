@@ -1,13 +1,14 @@
 "use client";
 
 import { Fragment, useEffect } from "react";
-import Title from "../../../_components/text/Title";
-import SubTitle from "../../../_components/text/SubTitle";
 import { Spacer } from "@nextui-org/react";
-import GenericCard from "../../../_components/GenericCard";
 import { hasPermission, Permission } from "../../../../libs/types/permission";
 import { useUserData } from "../../../../utils/Hooks";
 import { useRouter } from "next/navigation";
+import InventoryManagementSection from "./components/low-stock/LowStockManagementSection";
+import Title from "@/app/_components/text/Title";
+import SubTitle from "@/app/_components/text/SubTitle";
+import ConfigProvider from "./components/ConfigProvider";
 
 export default function ManagementPage() {
     const { data: userData, isLoading: userDataIsLoading } = useUserData();
@@ -25,10 +26,11 @@ export default function ManagementPage() {
             <Title>Management</Title>
             <SubTitle>Manage This Dashboard</SubTitle>
             <Spacer y={6} />
-            <div className="w-fit">
-                <GenericCard className="text-xl p-12 uppercase font-semibold">🚧 This page is under construction
-                    🚧</GenericCard>
-            </div>
+            <ConfigProvider>
+                <section className="space-y-6">
+                    <InventoryManagementSection />
+                </section>
+            </ConfigProvider>
         </Fragment>
     );
 }

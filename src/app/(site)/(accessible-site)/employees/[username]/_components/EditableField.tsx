@@ -1,10 +1,8 @@
 "use client";
 
-import React, { MouseEventHandler, useEffect, useState } from "react";
-import { Skeleton, Spacer, Tooltip } from "@nextui-org/react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Skeleton, Spacer } from "@nextui-org/react";
 import clsx from "clsx";
-import GenericImage from "../../../../../_components/GenericImage";
-import editIcon from "/public/icons/edit.svg";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import GenericInput from "../../../../../_components/inputs/GenericInput";
 import GenericButton from "../../../../../_components/inputs/GenericButton";
@@ -12,34 +10,34 @@ import GenericModal from "../../../../../_components/GenericModal";
 import GenericTextArea from "../../../../../_components/inputs/GenericTextArea";
 import { toast } from "react-hot-toast";
 
-interface Props {
+interface Props<T extends string | number = string> {
     label: string,
-    field?: string | null,
+    field?: T | null,
     fieldIsLoaded?: boolean,
     capitalizeField?: boolean,
-    onValueChange?: (value: string) => void
+    onValueChange?: (value: T) => void
     validate?: {
-        test: (value: string) => boolean,
+        test: (value: T) => boolean,
         message?: string
     }
     successMessage?: string,
     textArea?: boolean,
-    editAllowed: boolean
+    editAllowed?: boolean,
 }
 
-export default function EditableField({
-                                          label,
-                                          field,
-                                          fieldIsLoaded,
-                                          capitalizeField,
-                                          onValueChange,
-                                          validate,
-                                          successMessage,
-                                          editAllowed,
-                                          textArea
-                                      }: Props) {
+export default function EditableField<T extends string | number = string>({
+    label,
+    field,
+    fieldIsLoaded,
+    capitalizeField,
+    onValueChange,
+    validate,
+    successMessage,
+    editAllowed,
+    textArea,
+}: Props<T>) {
     const [modalOpen, setModalOpen] = useState(false);
-    const [value, setValue] = useState<string>();
+    const [value, setValue] = useState<T | undefined | null>(field);
     const {
         register,
         handleSubmit,
@@ -54,6 +52,8 @@ export default function EditableField({
     }, [field, fieldIsLoaded]);
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
+        if (!value) return;
+
         if (validate && !validate.test(data.value.trim())) {
             toast.error(validate.message || "Invalid input!");
             return;
@@ -62,7 +62,7 @@ export default function EditableField({
         toast.success(successMessage || `Field updated! Make sure you save your changes.`);
         setModalOpen(false);
         if (onValueChange) {
-            onValueChange(data.value.trim());
+            onValueChange(value);
         }
     };
 
@@ -70,7 +70,7 @@ export default function EditableField({
         <div>
             <DataContainer
                 label={label}
-                field={field}
+                field={field?.toString()}
                 fieldIsLoaded={fieldIsLoaded}
                 capitalizeField={capitalizeField}
                 onEdit={() => setModalOpen(true)}
@@ -85,21 +85,33 @@ export default function EditableField({
                     {
                         textArea ?
                             <GenericTextArea
+                                type={typeof field === 'number' ? "number" : "text"}
                                 register={register}
                                 errors={errors}
                                 id="value"
-                                value={value}
-                                onValueChange={setValue}
+                                value={value?.toString()}
+                                onValueChange={(value) => {
+                                    if (typeof field === 'number')
+                                        setValue(parseInt(value) as T)
+                                    else
+                                        setValue(value as T)
+                                }}
                                 label={`New ${label}`}
                                 required
                             />
                             :
                             <GenericInput
+                                type={typeof field === 'number' ? "number" : "text"}
                                 register={register}
                                 errors={errors}
                                 id="value"
-                                value={value}
-                                onValueChange={setValue}
+                                value={value?.toString()}
+                                onValueChange={(value) => {
+                                    if (typeof field === 'number')
+                                        setValue(parseInt(value) as T)
+                                    else
+                                        setValue(value as T)
+                                }}
                                 label={`New ${label}`}
                                 required
                             />
@@ -118,76 +130,64 @@ type DataContainerProps = {
     label: string,
     field?: string | null,
     fieldIsLoaded?: boolean,
-    onEdit?: MouseEventHandler<HTMLDivElement>
+    onEdit?: () => void
     capitalizeField?: boolean
-    editAllowed: boolean,
+    editAllowed?: boolean,
 } & React.PropsWithChildren
 
 export function DataContainer({
-                                  label,
-                                  field,
-                                  fieldIsLoaded,
-                                  onEdit,
-                                  capitalizeField,
-                                  editAllowed,
-                                  children
-                              }: DataContainerProps) {
-    const [editButtonShown, setEditButtonShown] = useState(false);
+    label,
+    field,
+    fieldIsLoaded,
+    onEdit,
+    capitalizeField,
+    editAllowed,
+    children
+}: DataContainerProps) {
+
+    const contentElement = useMemo(() => (
+        children ||
+        (!editAllowed ?
+            <p className={clsx(
+                "max-w-fit break-all whitespace-pre-wrap !bg-red",
+                capitalizeField && "capitalize",
+            )}>{field}</p>
+            : (
+                <GenericButton
+                    color="default"
+                    variant="light"
+                    isDisabled={fieldIsLoaded === false}
+                    onPress={() => {
+                        onEdit?.()
+                    }}
+                >
+                    {field}
+                </GenericButton>
+            )
+        )
+    ), [capitalizeField, children, editAllowed, field, fieldIsLoaded, onEdit])
 
     return (
         <div
             className="default-container p-6 bg-secondary/10"
-            onMouseEnter={() => {
-                if (!editAllowed)
-                    return;
-                setEditButtonShown(true);
-            }}
-            onMouseLeave={() => {
-                if (!editAllowed)
-                    return;
-                setEditButtonShown(false);
-            }}
         >
             <div className="flex gap-4">
                 <p className="text-primary text-xl phone:text-lg capitalize">{label}</p>
-                <Tooltip
-                    isDisabled={!editAllowed}
-                    color="secondary"
-                    content="Edit"
-                >
-                    <div
-                        className={clsx(
-                            "transition-fast flex flex-col justify-center",
-                            editButtonShown ? "opacity-100" : "opacity-0",
-                            editAllowed ? "cursor-pointer" : "cursor-default"
-                        )}
-                        onClick={(event) => {
-                            if (!editAllowed)
-                                return;
-
-                            if (onEdit)
-                                onEdit(event);
-                        }}
-                    >
-                        <GenericImage src={editIcon} width={1} />
-                    </div>
-                </Tooltip>
             </div>
             <Spacer y={2} />
-            <Skeleton
-                isLoaded={fieldIsLoaded || fieldIsLoaded === undefined}
-                className={clsx(
-                    "rounded-2xl",
-                    (fieldIsLoaded || fieldIsLoaded === undefined) ? "!bg-transparent" : "w-1/2 h-5 p-4"
-                )}
-            >
-                {
-                    children || <p className={clsx(
-                        "max-w-fit break-all whitespace-pre-wrap !bg-red",
-                        capitalizeField && "capitalize"
-                    )}>{field}</p>
-                }
-            </Skeleton>
+            {fieldIsLoaded === true || fieldIsLoaded === false ? (
+                <Skeleton
+                    isLoaded={fieldIsLoaded}
+                    className={clsx(
+                        "rounded-2xl",
+                        (fieldIsLoaded) ? "!bg-transparent" : "w-1/2 h-5 p-4"
+                    )}
+                >
+                    {contentElement}
+                </Skeleton>
+            ) : (
+                <>{contentElement}</>
+            )}
         </div>
     );
 }

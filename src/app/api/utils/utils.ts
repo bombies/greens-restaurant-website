@@ -2,6 +2,8 @@ import {ZodError} from "zod";
 import {NextRequest, NextResponse} from "next/server";
 import RateLimiter, { RateLimiterGeoLimit } from "./rate-limiter";
 
+export type ApiRoute<Ctx = unknown> = (req: NextRequest, context?: {params: Ctx}) => Promise<NextResponse>
+
 export type RouteResponseType<T> = {
     status?: number,
     message?: string,
@@ -11,14 +13,14 @@ export type RouteResponseType<T> = {
 
 class RouteResponse<T> {
 
-    constructor(private readonly data: RouteResponseType<T>) {
+    constructor(private readonly response: RouteResponseType<T>) {
     }
 
     public toNextResponse(): NextResponse<T | null> {
-        return NextResponse.json(this.data.data ?? null, {
-            status: this.data.status,
-            statusText: this.data.message,
-            headers: this.data.headers,
+        return NextResponse.json(this.response.data ?? null, {
+            status: this.response.status,
+            statusText: this.response.message,
+            headers: this.response.headers,
         })
     }
 }

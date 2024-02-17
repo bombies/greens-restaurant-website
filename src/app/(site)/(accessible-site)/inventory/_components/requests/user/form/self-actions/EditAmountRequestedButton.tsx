@@ -24,7 +24,7 @@ interface Props {
 const EditAmountRequestedButton: FC<Props> = ({ item, onAmountChange, editing }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const { handleSubmit, register, formState: { errors } } = useForm();
-    const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ item: item.stock });
+    const { isCaseItem, isDrinkBottle, mutateQuantity } = useStockQuantityDropdownUtils({ itemType: item.stock?.type });
     const [quantityUnit, setQuantityUnit] = useState<QuantityUnit>(QuantityUnit.DEFAULT);
 
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
@@ -56,7 +56,7 @@ const EditAmountRequestedButton: FC<Props> = ({ item, onAmountChange, editing })
                             (isDrinkBottle() || isCaseItem())
                             &&
                             <StockQuantityDropdown
-                                item={item.stock}
+                                itemType={item.stock?.type}
                                 selectedUnit={quantityUnit}
                                 setSelectedUnit={setQuantityUnit}
                             />
