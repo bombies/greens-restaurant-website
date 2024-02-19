@@ -198,7 +198,8 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
                 id: item.id,
                 amountRequested: item.amountRequested,
                 amountProvided: item.amountProvided ?? -1
-            })) ?? []
+            })) ?? [],
+            deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : new Date().toISOString()
         });
 
         setChangesMade(!compare(optimisticRequest, initialRequestItems));
