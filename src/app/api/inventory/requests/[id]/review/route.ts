@@ -1,6 +1,5 @@
 import { authenticatedAny, handleEitherResult } from "../../../../../../utils/api/ApiUtils";
 import Permission from "../../../../../../libs/types/permission";
-import { NextResponse } from "next/server";
 import { ReviewInventoryRequestDto } from "../../types";
 import inventoryRequestsService from "../../service";
 

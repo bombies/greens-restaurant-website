@@ -60,8 +60,8 @@ class InventoryRequestsService {
             whereQuery = {
                 ...whereQuery,
                 createdAt: whereQuery.createdAt
-                && typeof whereQuery.createdAt !== "string"
-                && "gte" in whereQuery.createdAt ?
+                    && typeof whereQuery.createdAt !== "string"
+                    && "gte" in whereQuery.createdAt ?
                     {
                         ...whereQuery.createdAt,
                         lte: new Date(to)
@@ -156,6 +156,7 @@ class InventoryRequestsService {
                         }
                     }
                 },
+                assignedLocation: true,
                 requestedByUser: withUsers,
                 assignedToUsers: withAssignees
             }
@@ -344,7 +345,12 @@ class InventoryRequestsService {
          */
         const request = await prisma.stockRequest.update({
             where: { id: requestId },
-            data: { status, reviewedNotes: dto.reviewedNotes, reviewedByUserId: session.user?.id }
+            data: {
+                status,
+                reviewedNotes: dto.reviewedNotes,
+                reviewedByUserId: session.user?.id,
+                deliveredAt: new Date(dto.deliveredAt)
+            },
         });
 
         /**

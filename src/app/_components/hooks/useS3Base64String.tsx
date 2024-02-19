@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { FetchS3ObjectBuffer, FetchS3ObjectUrl } from "../../../utils/client-utils";
 import { User } from "@prisma/client";
 
+/**
+ * @deprecated
+ * @param users 
+ * @returns 
+ */
 export const useS3AvatarUrls = (users: Partial<User>[]) => {
     const [avatars, setAvatars] = useState<{ avatar?: string, userId: string }[]>();
     const { trigger: triggerFetch, isMutating: isLoading } = FetchS3ObjectUrl();
@@ -38,6 +43,11 @@ export const useS3AvatarUrls = (users: Partial<User>[]) => {
     return { avatars, isLoading };
 };
 
+/**
+ * @deprecated
+ * @param users 
+ * @returns 
+ */
 export const useS3Base64AvatarStrings = (users: Partial<User>[]) => {
     const [avatars, setAvatars] = useState<{ avatar?: string, userId: string }[]>();
     const { trigger: triggerFetch, isMutating: isLoading } = FetchS3ObjectBuffer();
@@ -72,10 +82,21 @@ export const useS3Base64AvatarStrings = (users: Partial<User>[]) => {
     return { avatars, isLoading };
 };
 
+/**
+ * @deprecated
+ * @param userId 
+ * @param avatar 
+ * @returns 
+ */
 export const useS3Base64AvatarString = (userId: string, avatar?: string | null) => {
     return useS3Base64String(avatar && `images/users/${userId}/${avatar}`);
 };
 
+/**
+ * @deprecated
+ * @param key 
+ * @returns 
+ */
 export const useS3Base64String = (key?: string | null) => {
     const [avatar, setAvatar] = useState<string>();
     const { trigger: triggerFetch, isMutating: isLoading } = FetchS3ObjectBuffer();
@@ -92,10 +113,21 @@ export const useS3Base64String = (key?: string | null) => {
     return { avatar, isLoading };
 };
 
+/**
+ * @deprecated
+ * @param userId 
+ * @param avatar 
+ * @returns 
+ */
 export const useS3UserAvatarUrl = (userId: string, avatar?: string | null) => {
     return useS3ObjectUrl(avatar && `images/users/${userId}/${avatar}`);
 };
 
+/**
+ * @deprecated
+ * @param key 
+ * @returns 
+ */
 export const useS3ObjectUrl = (key?: string | null) => {
     const [url, setUrl] = useState<string>();
     const { trigger: triggerFetch, isMutating: isLoading } = FetchS3ObjectUrl();

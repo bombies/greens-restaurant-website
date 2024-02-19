@@ -1,7 +1,7 @@
 "use client";
 
-import { StockRequestWithOptionalCreatorAndAssignees } from "../inventory-requests-utils";
-import React, { useEffect, useMemo, useState } from "react";
+import { StockRequestWithOptionalCreator, StockRequestWithOptionalCreatorAndAssignees } from "../inventory-requests-utils";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { StockRequestStatus } from ".prisma/client";
 import "../../../../../../../utils/GeneralUtils";
 import SortIcon from "../../../../../../_components/icons/SortIcon";
@@ -12,6 +12,7 @@ import PendingIcon from "../../../../../../_components/icons/PendingIcon";
 import DeliveredIcon from "../../../../../../_components/icons/DeliveredIcon";
 import DeniedIcon from "../../../../../../_components/icons/DeniedIcon";
 import CheckboxMenu from "../../../../../../_components/CheckboxMenu";
+import { getInventoryRequestDisplayDate } from "../../../utils/inventory-utils";
 
 type Props = {
     data?: StockRequestWithOptionalCreatorAndAssignees[],
@@ -40,13 +41,13 @@ const useMutableRequests = ({ data, dataIsLoading }: Props) => {
             data.sort((a, b) => {
                 switch (sortMode?.toLowerCase().replaceAll("_", " ")) {
                     case RequestSortMode.NEWEST_OLDEST.toLowerCase(): {
-                        return new Date(b.createdAt.toString()).getTime() - new Date(a.createdAt.toString()).getTime();
+                        return new Date(getInventoryRequestDisplayDate(b)).getTime() - new Date(getInventoryRequestDisplayDate(a)).getTime();
                     }
                     case RequestSortMode.OLDEST_NEWEST.toLowerCase(): {
-                        return new Date(a.createdAt.toString()).getTime() - new Date(b.createdAt.toString()).getTime();
+                        return new Date(getInventoryRequestDisplayDate(a)).getTime() - new Date(getInventoryRequestDisplayDate(b)).getTime();
                     }
                     default: {
-                        return new Date(b.createdAt.toString()).getTime() - new Date(a.createdAt.toString()).getTime();
+                        return new Date(getInventoryRequestDisplayDate(b)).getTime() - new Date(getInventoryRequestDisplayDate(a)).getTime();
                     }
                 }
             })
@@ -56,7 +57,7 @@ const useMutableRequests = ({ data, dataIsLoading }: Props) => {
                     return filters.includes(request.status);
                 })
         );
-    }, [sortMode, filters, data]);
+    }, [sortMode, filters, data, getInventoryRequestDisplayDate]);
 
     const sortButton = useMemo(() => (
         <DropdownInput

@@ -5,6 +5,7 @@ import { StockRequestStatus } from ".prisma/client";
 import { FC, PropsWithChildren, useReducer } from "react";
 import { StockRequestWithOptionalExtras } from "../inventory-requests-utils";
 import { RequestedStockItemWithOptionalExtras } from "../../../../../../api/inventory/requests/types";
+import { SortDescriptor } from "@nextui-org/react";
 
 type InventoryRequestsReportsContextProps = {
     query: {
@@ -15,6 +16,9 @@ type InventoryRequestsReportsContextProps = {
         isFetching: boolean,
         data: RequestedStockItemWithExtrasAndRequestExtras[],
         visibleData: RequestedStockItemWithExtrasAndRequestExtras[]
+    },
+    table: {
+        sortDescriptor?: SortDescriptor
     }
     filters: {
         status?: (StockRequestStatus | 'EXTRA_DELIVERED')[],
@@ -30,13 +34,15 @@ export type RequestedStockItemWithExtrasAndRequestExtras = RequestedStockItemWit
     assignedLocation: StockRequestWithOptionalExtras["assignedLocation"],
     requestedBy: StockRequestWithOptionalExtras["requestedByUser"],
     assignedTo: StockRequestWithOptionalExtras["assignedToUsers"],
-    reviewedBy: StockRequestWithOptionalExtras["reviewedByUser"]
+    reviewedBy: StockRequestWithOptionalExtras["reviewedByUser"],
+    deliveredAt: StockRequestWithOptionalExtras["deliveredAt"]
 }
 
 export enum InventoryRequestsReportActions {
     UPDATE_QUERY,
     UPDATE_DATA,
-    UPDATE_FILTERS
+    UPDATE_FILTERS,
+    UPDATE_TABLE,
 }
 
 type InventoryRequestsReportAction = {
@@ -48,6 +54,9 @@ type InventoryRequestsReportAction = {
 } | {
     type: InventoryRequestsReportActions.UPDATE_QUERY,
     payload: Partial<InventoryRequestsReportsContextProps["query"]>
+} | {
+    type: InventoryRequestsReportActions.UPDATE_TABLE,
+    payload: Partial<InventoryRequestsReportsContextProps["table"]>
 }
 
 const [InventoryRequestsReportContext, useHook] =
@@ -71,6 +80,11 @@ const inventoryRequestsReportReducer = (state: InventoryRequestsReportsContextPr
                 ...state,
                 filters: { ...state.filters, ...action.payload }
             };
+        case InventoryRequestsReportActions.UPDATE_TABLE:
+            return {
+                ...state,
+                table: { ...state.table, ...action.payload }
+            };
         default:
             return state;
     }
@@ -81,6 +95,9 @@ const InventoryRequestsReportProvider: FC<PropsWithChildren> = ({ children }) =>
         query: {
             startDate: undefined,
             endDate: undefined
+        },
+        table: {
+            sortDescriptor: undefined,
         },
         data: {
             isFetching: false,

@@ -4,16 +4,15 @@ import { User } from "@prisma/client";
 import Link from "next/link";
 import { Avatar } from "@nextui-org/avatar";
 import { useState } from "react";
-import { useS3UserAvatarUrl } from "../../../../_components/hooks/useS3Base64String";
 import clsx from "clsx";
 import { Skeleton } from "@nextui-org/react";
+import { getUserAvatarString } from "../employee-utils";
 
 type Props = {
     user: User
 }
 
 export default function EmployeeCard({ user }: Props) {
-    const { url, isLoading: avatarIsLoading } = useS3UserAvatarUrl(user.id, user.avatar);
     const [avatarColor, setAvatarColor] = useState<"default" | "primary" | "secondary" | "success" | "warning" | "danger">("default");
 
     return (
@@ -28,18 +27,12 @@ export default function EmployeeCard({ user }: Props) {
                 }}
             >
                 <div className="w-fit">
-                    <Skeleton isLoaded={!avatarIsLoading} className={clsx(
-                        "rounded-full p-1",
-                        !avatarIsLoading && "!bg-transparent"
-                    )}>
-                        <Avatar
-                            isBordered
-                            className="transition-fast"
-                            src={url || (user.image || undefined)}
-                            color={avatarColor}
-                        />
-                    </Skeleton>
-
+                    <Avatar
+                        isBordered
+                        className="transition-fast"
+                        src={getUserAvatarString(user)}
+                        color={avatarColor}
+                    />
                 </div>
                 <p className="flex flex-col justify-center overflow-hidden overflow-ellipsis capitalize font-semibold self-center">
                     {user.firstName} {user.lastName}

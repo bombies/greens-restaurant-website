@@ -1,9 +1,8 @@
 "use client";
 
 import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
-import { Invoice, InvoiceInformation, InvoiceType } from "@prisma/client";
+import { Invoice, InvoiceInformation } from "@prisma/client";
 import { formatInvoiceNumber } from "../../../../../../utils/invoice-utils";
-import { useS3Base64String } from "../../../../../../../../../_components/hooks/useS3Base64String";
 import { invoiceTypeAsString } from "../../../../../../utils";
 
 const styles = StyleSheet.create({
@@ -31,7 +30,6 @@ type Props = {
 }
 
 export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
-    const { avatar } = useS3Base64String(companyInfo?.companyAvatar && `images/company/${companyInfo.companyAvatar}`);
     const typeAsString = invoiceTypeAsString(invoice)
 
     return (
@@ -104,7 +102,7 @@ export default function InvoicePDFHeader({ invoice, companyInfo }: Props) {
             {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image
                 style={styles.companyImage}
-                src={avatar || (companyInfo?.companyLogo || "")}
+                src={companyInfo?.companyAvatar ? `/api/s3?key=images/company/${companyInfo.companyAvatar}` : (companyInfo?.companyLogo || "")}
             />
         </View>
     );

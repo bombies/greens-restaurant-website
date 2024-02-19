@@ -33,6 +33,7 @@ interface Props {
     requestStatus?: StockRequestStatus,
     editAllowed: boolean,
     limitHeight?: boolean,
+    stickyHeader?: boolean,
 }
 
 type OnAdminAction = {
@@ -64,7 +65,8 @@ const InventoryRequestedItemsTable: FC<Props> = ({
     inventorySnapshots,
     requestStatus,
     editAllowed,
-    limitHeight
+    limitHeight,
+    stickyHeader
 }) => {
     const columns: Column[] = useMemo(() => {
         const ret = [
@@ -253,7 +255,7 @@ const InventoryRequestedItemsTable: FC<Props> = ({
 
     return (
         <GenericTable
-            isHeaderSticky={limitHeight}
+            isHeaderSticky={limitHeight || stickyHeader}
             columns={columns}
             items={isLoading ? [] : items}
             isLoading={isLoading}

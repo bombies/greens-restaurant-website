@@ -13,6 +13,8 @@ import { StockRequestWithOptionalExtras } from "../../../_components/requests/in
 import { toast } from "react-hot-toast";
 import { KeyedMutator } from "swr";
 import { ReviewInventoryRequestDto } from "../../../../../../api/inventory/requests/types";
+import { GenericDatePicker } from "app/_components/GenericDatePicker";
+import { dateInputToDateObject } from "utils/GeneralUtils";
 
 type ReviewRequestArgs = {
     arg: {
@@ -34,12 +36,19 @@ type Props = {
     setOpen: Dispatch<SetStateAction<boolean>>
 }
 
+type FormProps = {
+    review_notes?: string,
+    date_delivered?: string
+}
+
 const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, mutate, onReview, isOpen, setOpen }) => {
-    const { register, handleSubmit } = useForm();
+    const { register, handleSubmit } = useForm<FormProps>();
     const { trigger: triggerRequestReview, isMutating: isReviewing } = ReviewRequest(id);
 
-    const onSubmit: SubmitHandler<FieldValues> = useCallback(async (data) => {
-        const { review_notes: reviewNotes } = data;
+    const onSubmit: SubmitHandler<FormProps> = useCallback(async (data) => {
+        const { review_notes: reviewNotes, date_delivered } = data;
+        optimisticRequest.deliveredAt = dateInputToDateObject(date_delivered)!.toISOString();
+
         if (reviewNotes)
             optimisticRequest.reviewedNotes = reviewNotes;
 
@@ -66,7 +75,7 @@ const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, 
                     return msg ?? "There was an error reviewing this request!";
                 }
             });
-    }, [mutate, optimisticRequest, setOpen, triggerRequestReview]);
+    }, [mutate, onReview, optimisticRequest, setOpen, triggerRequestReview]);
 
     return (
         <GenericModal
@@ -81,7 +90,16 @@ const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, 
         >
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="space-y-6">
+                    <GenericDatePicker
+                        isDisabled={isReviewing}
+                        id="date_delivered"
+                        inputLabel="Date Delivered"
+                        register={register}
+                        
+                        isRequired
+                    />
                     <GenericTextArea
+                        isDisabled={isReviewing}
                         register={register}
                         id="review_notes"
                         label="Notes"
@@ -92,7 +110,7 @@ const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, 
                         <p>
                             <span className="font-semibold text-warning">⚠️ Are you sure you want to finish this review? ⚠️</span><br /><br />
                             Once you select <span
-                            className="font-semibold text-primary">{"\"I'm sure\""}</span> you will no
+                                className="font-semibold text-primary">{"\"I'm sure\""}</span> you will no
                             longer be able to edit this
                             request!
                         </p>

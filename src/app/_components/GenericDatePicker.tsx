@@ -12,10 +12,11 @@ interface Props {
     value?: Date,
     labelPlacement?: "beside" | "above",
     label?: string,
+    inputLabel?: string,
     onDateChange?: (date?: Date) => void,
     min?: Date,
     max?: Date,
-    disabled?: boolean,
+    isDisabled?: boolean,
     isClearable?: boolean,
 }
 
@@ -25,11 +26,12 @@ export const GenericDatePicker: FC<Props> = ({
                                                  isRequired,
                                                  value,
                                                  label,
+                                                 inputLabel,
                                                  labelPlacement,
                                                  onDateChange,
                                                  min,
                                                  max,
-                                                 disabled,
+                                                 isDisabled: disabled,
                                                  isClearable
                                              }) => {
     return (
@@ -41,8 +43,11 @@ export const GenericDatePicker: FC<Props> = ({
                 register={register}
                 isRequired={isRequired}
                 disabled={disabled}
+                label={inputLabel}
+                labelPlacement={labelPlacement === "beside" ? "outside-left" : "inside"}
                 id={id}
                 type="date"
+                placeholder={formatDate(new Date(), "-")}
                 isClearable={isClearable}
                 value={value ? formatDate(value, "-") : undefined}
                 onValueChange={value => {

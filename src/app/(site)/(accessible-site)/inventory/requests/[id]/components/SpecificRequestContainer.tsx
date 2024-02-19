@@ -114,6 +114,7 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                 <GoBackButton label="View All Requests" href="/inventory/requests?requests_tab=all_requests" />
                 <Spacer y={6} />
                 <InventoryRequestedItemsTable
+                    stickyHeader
                     items={optimisticRequest.items.length && !isLoadingSnapshots ? optimisticRequest.items : (request?.requestedItems || [])}
                     inventorySnapshots={snapshots}
                     showItemStatus

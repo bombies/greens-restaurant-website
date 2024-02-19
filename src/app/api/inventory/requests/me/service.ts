@@ -12,9 +12,10 @@ class SelfUserService {
         const withStock = searchParams.get("with_stock")?.toLowerCase() === "true" || false;
         const withReviewer = searchParams.get("with_reviewer")?.toLowerCase() === "true" || false;
         const withAssignees = searchParams.get("with_assignees")?.toLowerCase() === "true" || false;
+        const withLocation = searchParams.get("with_location")?.toLowerCase() === "true" || false;
         const from: number | undefined = searchParams.get("from") ? Number(searchParams.get("from")) : undefined;
         const to: number | undefined = searchParams.get("to") ? Number(searchParams.get("to")) : undefined;
-        return { status, withItems, withUsers, withAssignees, from, to, withStock, withReviewer };
+        return { status, withItems, withUsers, withAssignees, from, to, withStock, withReviewer, withLocation };
     };
 
 }

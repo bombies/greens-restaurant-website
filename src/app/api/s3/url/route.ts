@@ -4,6 +4,9 @@ import { NextResponse } from "next/server";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 // @ts-ignore
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import axios, { AxiosError } from "axios";
+import { buildResponse } from "app/api/utils/utils";
+import { fileTypeFromBuffer } from "file-type";
 
 export async function GET(req: Request) {
     return authenticated(req, async () => {
@@ -15,11 +18,23 @@ export async function GET(req: Request) {
 
         const command = new GetObjectCommand({
             Bucket: process.env.BUCKET_NAME,
-            Key: key
+            Key: key.trim()
         });
 
         const url = await getSignedUrl(s3Client, command, { expiresIn: 60 * 60 });
-        return NextResponse.json({ url });
 
+        try {
+            const img = Buffer.from((await axios.get<string>(url)).data, "utf-8");
+            const res = new NextResponse(img)
+            res.headers.set("Content-Type", (await fileTypeFromBuffer(img))?.mime ?? "image/png");
+            return res
+        } catch (e) {
+            if (e instanceof AxiosError)
+                return buildResponse({
+                    status: e.response?.status,
+                    data: e.response?.data
+                });
+            else throw e
+        }
     });
 }

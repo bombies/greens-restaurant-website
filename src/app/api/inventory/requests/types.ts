@@ -38,6 +38,7 @@ export type ReviewInventoryRequestItem = {
 
 export type ReviewInventoryRequestDto = {
     reviewedNotes?: string,
+    deliveredAt: string,
     items: ReviewInventoryRequestItem[]
 }
 
@@ -46,7 +47,8 @@ export const reviewInventoryRequestDtoSchema = z.object({
     items: z.array(z.object({
         id: z.string(),
         amountProvided: z.number()
-    }))
+    })),
+    deliveredAt: z.string().datetime()
 }).passthrough();
 
 export type AdminUpdateStockRequestDto = Partial<Pick<StockRequest, "status" | "reviewedNotes">>

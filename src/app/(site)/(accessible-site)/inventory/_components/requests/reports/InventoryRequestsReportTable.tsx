@@ -2,13 +2,14 @@
 
 import { FC, Key } from "react";
 import {
+    InventoryRequestsReportActions,
     RequestedStockItemWithExtrasAndRequestExtras,
     useInventoryRequestsReport
 } from "./InventoryRequestsReportProvider";
 import { Column } from "../../../../invoices/[id]/[invoiceId]/components/table/InvoiceTable";
 import { getStatusChip } from "../../hooks/useRequestStatus";
 import { StockRequestStatus } from ".prisma/client";
-import { AvatarGroup, Checkbox, Spacer, TableCell, TableRow } from "@nextui-org/react";
+import { AvatarGroup, TableCell, TableRow } from "@nextui-org/react";
 import UserAvatar from "../../../../../../_components/UserAvatar";
 import { Spinner } from "@nextui-org/spinner";
 import SubTitle from "../../../../../../_components/text/SubTitle";
@@ -16,8 +17,6 @@ import { Divider } from "@nextui-org/divider";
 import GenericTable from "../../../../../../_components/table/GenericTable";
 import InventoryRequestsReportFilters from "./InventoryRequestsReportFilters";
 import useToggleableColumns from "../../../../../../hooks/table/useToggleableColumns";
-import CheckboxMenu from "../../../../../../_components/CheckboxMenu";
-import FilterIcon from "../../../../../../_components/icons/FilterIcon";
 
 const columns: Column[] = [
     {
@@ -55,7 +54,7 @@ const columns: Column[] = [
     },
     {
         key: "date_requested",
-        value: "Date Requested"
+        value: "Date Delivered"
     }
 ];
 
@@ -98,12 +97,15 @@ const fetchValueForKey = (key: Key, item: RequestedStockItemWithExtrasAndRequest
             return item.requestedBy && <UserAvatar showToolTip user={item.requestedBy} />;
         }
         case "date_requested":
-            return new Date(item.createdAt).toLocaleDateString();
+            return new Date(item.deliveredAt ?? item.createdAt).toLocaleDateString();
     }
 };
 
 const InventoryRequestsReportTable: FC = () => {
-    const [{ data: { isFetching, visibleData: requests, data: allData } }] = useInventoryRequestsReport();
+    const [{
+        data: { isFetching, visibleData: requests, data: allData },
+        table: { sortDescriptor },
+    }, dispatch] = useInventoryRequestsReport();
     const { columns: visibleColumns, toggleColumn, setColumnVisible } = useToggleableColumns(columns, [
         "reviewed_by",
         "requested_by",
@@ -151,7 +153,20 @@ const InventoryRequestsReportTable: FC = () => {
                         {/*</CheckboxMenu>*/}
                         {/*<Spacer y={6} />*/}
                         <GenericTable
-                            columns={visibleColumns} items={requests}>
+                            isHeaderSticky
+                            isCompact
+                            columns={visibleColumns}
+                            items={requests}
+                            sortDescriptor={sortDescriptor}
+                            sortableColumns={["date_requested"]}
+                            onSortChange={sortDescriptor => {
+                                console.log(sortDescriptor)
+                                dispatch({
+                                    type: InventoryRequestsReportActions.UPDATE_TABLE,
+                                    payload: { sortDescriptor }
+                                });
+                            }}
+                        >
                             {request => (
                                 <TableRow key={`${request.id}#${request.stockId}`}>
                                     {key => (

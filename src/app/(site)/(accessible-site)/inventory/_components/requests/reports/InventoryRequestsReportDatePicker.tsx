@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, useCallback, useEffect, useState } from "react";
-import { InventoryRequestsReportActions, useInventoryRequestsReport } from "./InventoryRequestsReportProvider";
+import { InventoryRequestsReportActions, RequestedStockItemWithExtrasAndRequestExtras, useInventoryRequestsReport } from "./InventoryRequestsReportProvider";
 import { GenericDatePicker } from "../../../../../../_components/GenericDatePicker";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import { SearchIcon } from "@nextui-org/shared-icons";
@@ -20,7 +20,8 @@ const FetchRequests = () =>
         with_assignees?: string,
         status?: string,
         with_stock?: string,
-        with_reviewer?: string
+        with_reviewer?: string,
+        with_location?: string,
     }, StockRequestWithOptionalExtras[]>());
 
 type FormProps = {
@@ -29,7 +30,10 @@ type FormProps = {
 }
 
 const InventoryRequestsReportDatePicker: FC = () => {
-    const [, dispatch] = useInventoryRequestsReport();
+    const [
+        { data: { visibleData }, table: { sortDescriptor } },
+        dispatch
+    ] = useInventoryRequestsReport();
     const { trigger: doFetch, isMutating: isFetching } = FetchRequests();
     const { register, handleSubmit } = useForm<FormProps>();
     const [currentStartDate, setCurrentStartDate] = useState<Date>();
@@ -41,6 +45,36 @@ const InventoryRequestsReportDatePicker: FC = () => {
             payload: { isFetching }
         });
     }, [dispatch, isFetching]);
+
+    useEffect(() => {
+        if (!visibleData || !visibleData.length)
+            return
+
+        return dispatch({
+            type: InventoryRequestsReportActions.UPDATE_DATA,
+            payload: {
+                visibleData: visibleData.sort((a, b) => {
+                    if (!sortDescriptor)
+                        return 0
+
+                    let cmp: number
+                    switch (sortDescriptor.column) {
+                        case "date_requested":
+                            cmp = new Date(a.deliveredAt ?? a.createdAt).getTime() - new Date(b.deliveredAt ?? b.createdAt).getTime();
+                            break;
+                        default:
+                            cmp = 0;
+                            break;
+                    }
+
+                    if (sortDescriptor.direction === "descending")
+                        cmp *= -1;
+
+                    return cmp
+                })
+            }
+        });
+    }, [dispatch, sortDescriptor, visibleData])
 
     const onSubmit = useCallback<SubmitHandler<FormProps>>(({ start_date, end_date }) => {
         const startDate = dateInputToDateObject(start_date);
@@ -65,19 +99,22 @@ const InventoryRequestsReportDatePicker: FC = () => {
                 with_users: "true",
                 with_assignees: "true",
                 with_stock: "true",
-                with_reviewer: "true"
+                with_reviewer: "true",
+                with_location: "true"
             }
         }).then(requests => {
             const items = (requests ?? []).map(request =>
                 (request.requestedItems ?? [])
-                    .map(requestedItem => ({
+                    .map<RequestedStockItemWithExtrasAndRequestExtras>(requestedItem => ({
                         ...requestedItem,
                         assignedLocation: request.assignedLocation,
                         requestedBy: request.requestedByUser,
                         assignedTo: request.assignedToUsers,
-                        reviewedBy: request.reviewedByUser
+                        reviewedBy: request.reviewedByUser,
+                        deliveredAt: request.deliveredAt
                     }))
-            ).flat(2);
+            )
+                .flat(2)
 
             dispatch({
                 type: InventoryRequestsReportActions.UPDATE_DATA,
@@ -92,7 +129,7 @@ const InventoryRequestsReportDatePicker: FC = () => {
             onSubmit={handleSubmit(onSubmit)}
         >
             <GenericDatePicker
-                disabled={isFetching}
+                isDisabled={isFetching}
                 register={register}
                 id="start_date"
                 label="Start Date"
@@ -101,7 +138,7 @@ const InventoryRequestsReportDatePicker: FC = () => {
                 max={currentEndDate}
             />
             <GenericDatePicker
-                disabled={isFetching}
+                isDisabled={isFetching}
                 register={register}
                 id="end_date"
                 label="End Date"

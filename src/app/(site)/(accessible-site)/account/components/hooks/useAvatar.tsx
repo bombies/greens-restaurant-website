@@ -60,7 +60,7 @@ export const useAvatar = ({
     const component = useMemo(() =>
             <UploadAvatarComponent
                 data={data}
-                disabled={uploadState === "uploading"}
+                isDisabled={uploadState === "uploading"}
                 onUploadSuccess={(key) => {
                     setUploadState("idle");
                     if (onUploadSuccess)
