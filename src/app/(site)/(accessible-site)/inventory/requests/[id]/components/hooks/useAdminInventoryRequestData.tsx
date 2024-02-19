@@ -47,8 +47,10 @@ const reducer = (state: ReviewInventoryRequestDto, action: OptimisticRequestData
     let newState = { ...state };
     switch (action.type) {
         case OptimisticRequestDataActionType.RESET: {
+            const today = new Date()
+            today.setHours(0, 0, 0, 0);
             newState = {
-                deliveredAt: new Date().toISOString(),
+                deliveredAt: today.toISOString(),
                 items: action.payload.requestedItems?.map(item => ({
                     stock: item.stock,
                     id: item.id,
@@ -153,6 +155,8 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
     });
 
     useEffect(() => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0);
         if (!requestIsLoading && request)
             dispatchOptimisticRequest({
                 type: OptimisticRequestDataActionType.SET,
@@ -163,7 +167,7 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
                         amountRequested: item.amountRequested,
                         amountProvided: item.amountProvided ?? -1
                     })) ?? [],
-                    deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : new Date().toISOString()
+                    deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : today.toISOString()
                 }
             });
     }, [request, request?.requestedItems, requestIsLoading]);
@@ -173,6 +177,8 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
             return;
 
         if (!requestIsLoading && request) {
+            const today = new Date()
+            today.setHours(0, 0, 0, 0);
             dispatchOptimisticRequest({
                 type: OptimisticRequestDataActionType.SET,
                 payload: {
@@ -182,7 +188,7 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
                         amountRequested: item.amountRequested,
                         amountProvided: item.amountProvided ?? -1
                     })) ?? [],
-                    deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : new Date().toISOString()
+                    deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : today.toISOString()
                 }
             });
         }
@@ -192,6 +198,8 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
         if (!isEnabled || requestIsLoading || !request || !optimisticRequest)
             return;
 
+        const today = new Date()
+        today.setHours(0, 0, 0, 0);
         const initialRequestItems = ({
             items: request.requestedItems?.map(item => ({
                 stock: item.stock,
@@ -199,7 +207,7 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
                 amountRequested: item.amountRequested,
                 amountProvided: item.amountProvided ?? -1
             })) ?? [],
-            deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : new Date().toISOString()
+            deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : today.toISOString()
         });
 
         setChangesMade(!compare(optimisticRequest, initialRequestItems));
