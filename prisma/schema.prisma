@@ -48,8 +48,9 @@ model StockRequest {
   requestedByUser   User                 @relation(name: "openStocks", fields: [requestedByUserId], references: [id])
   requestedItems    RequestedStockItem[] @relation()
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deliveredAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 enum StockRequestStatus {
