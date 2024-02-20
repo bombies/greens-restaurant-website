@@ -25,7 +25,7 @@
     "@react-pdf/layout": "^3.10.3",
     "@react-pdf/renderer": "^3.3.8",
     "@react-stately/data": "^3.11.2",
-    "@reduxjs/toolkit": "^2.2.0",
+    "@reduxjs/toolkit": "^2.2.1",
     "@types/nodemailer": "^6.4.14",
     "@types/uuid": "^9.0.8",
     "@vercel/og": "^0.6.2",
