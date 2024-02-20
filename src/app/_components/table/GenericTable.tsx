@@ -4,7 +4,7 @@ import { Spinner, Table, TableBody, TableColumn, TableHeader, TableProps } from 
 import clsx from "clsx";
 import { Column } from "../../(site)/(accessible-site)/invoices/[id]/[invoiceId]/components/table/InvoiceTable";
 import { RowElement } from "@react-types/table";
-import { JSX, useMemo, useState } from "react";
+import { JSX, useEffect, useMemo, useState } from "react";
 import { useAsyncList } from "@react-stately/data";
 import { chunk } from "@/utils/GeneralUtils";
 import GenericButton from "../inputs/GenericButton";
@@ -47,6 +47,10 @@ export default function GenericTable<T>({
             }
         }
     })
+
+    useEffect(() => {
+        loadedItems.reload()
+    }, [items])
 
     // const [loaderRef, scrollerRef] = useInfiniteScroll({
     //     hasMore: hasMoreToLoad,
