@@ -29,7 +29,7 @@
     "@types/nodemailer": "^6.4.14",
     "@types/uuid": "^9.0.8",
     "@vercel/og": "^0.6.2",
-    "apexcharts": "^3.45.2",
+    "apexcharts": "^3.46.0",
     "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.0",
