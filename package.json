@@ -35,7 +35,7 @@
     "clsx": "^2.1.0",
     "exceljs": "^4.4.0",
     "file-type": "^19.0.0",
-    "framer-motion": "^11.0.3",
+    "framer-motion": "^11.0.5",
     "generate-password-ts": "^1.6.5",
     "ioredis": "^5.3.2",
     "loader-utils": "^3.2.1",
