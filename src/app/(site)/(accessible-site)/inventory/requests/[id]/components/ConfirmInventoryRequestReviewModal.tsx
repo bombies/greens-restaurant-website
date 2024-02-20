@@ -78,7 +78,7 @@ const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, 
                     return msg ?? "There was an error reviewing this request!";
                 }
             });
-    }, [mutate, onReview, optimisticRequest, setOpen, triggerRequestReview]);
+    }, [dateDelivered, mutate, onReview, optimisticRequest, setOpen, triggerRequestReview]);
 
     return (
         <GenericModal
