@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, FC, SetStateAction, useCallback } from "react";
+import { Dispatch, FC, SetStateAction, useCallback, useState } from "react";
 import GenericTextArea from "../../../../../../_components/inputs/GenericTextArea";
 import { Divider } from "@nextui-org/divider";
 import GenericCard from "../../../../../../_components/GenericCard";
@@ -38,16 +38,19 @@ type Props = {
 
 type FormProps = {
     review_notes?: string,
-    date_delivered?: string
 }
 
 const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, mutate, onReview, isOpen, setOpen }) => {
     const { register, handleSubmit } = useForm<FormProps>();
     const { trigger: triggerRequestReview, isMutating: isReviewing } = ReviewRequest(id);
+    const [dateDelivered, setDateDelivered] = useState<Date>();
 
     const onSubmit: SubmitHandler<FormProps> = useCallback(async (data) => {
-        const { review_notes: reviewNotes, date_delivered } = data;
-        optimisticRequest.deliveredAt = dateInputToDateObject(date_delivered)!.toISOString();
+        if (!dateDelivered)
+            return
+
+        const { review_notes: reviewNotes } = data;
+        optimisticRequest.deliveredAt = dateDelivered.toISOString();
 
         if (reviewNotes)
             optimisticRequest.reviewedNotes = reviewNotes;
@@ -92,10 +95,9 @@ const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, 
                 <div className="space-y-6">
                     <GenericDatePicker
                         isDisabled={isReviewing}
-                        id="date_delivered"
                         inputLabel="Date Delivered"
-                        register={register}
-                        
+                        value={dateDelivered}
+                        onDateChange={setDateDelivered}
                         isRequired
                     />
                     <GenericTextArea

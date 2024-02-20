@@ -73,17 +73,14 @@ html {
   transition: all 500ms ease;
 }
 
-.changes-made-exit {
-}
+.changes-made-exit {}
 
 .changes-made-exit-active {
   transform: translateY(200%);
   transition: all 500ms ease;
 }
 
-.changes-made-exit-done {
-
-}
+.changes-made-exit-done {}
 
 //
 
@@ -96,8 +93,7 @@ html {
   transition: all 200ms ease;
 }
 
-.stock-quantity-value-exit {
-}
+.stock-quantity-value-exit {}
 
 .stock-quantity-value-exit-active {
   opacity: 0;
@@ -127,6 +123,34 @@ html {
 .transition-fastest {
   transition: all ease-in-out $transition-fastest;
 }
+
+/* for change border color*/
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #00D61570 !important;
+  transition: all ease-in-out $transition-fast;
+}
+
+/*for change label color in focus state*/
+.MuiFormLabel-root.Mui-focused {
+  color: #00D615 !important;
+  background-color: #00D61520 !important;
+  border-radius: 8px !important;
+  padding: 4px !important;
+  transition: all ease-in-out $transition-fast;
+}
+
+.MuiFormLabel-root {
+  color: white !important;
+  font-size: 12px !important;
+}
+
+.MuiPaper-root {
+  background-color: transparent !important;
+  border-radius: 16px !important;
+  color: white !important;
+}
+
+
 
 ::-webkit-scrollbar {
   width: 0.25rem;

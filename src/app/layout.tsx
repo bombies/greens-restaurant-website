@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
 import React from "react";
-import Providers from "./_components/Providers";
+import Providers from "./_components/providers/Providers";
 import "./globals.scss";
 import clsx from "clsx";
 import { getServerSession } from "next-auth";

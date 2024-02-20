@@ -6,7 +6,6 @@ import { GenericDatePicker } from "../../../../../../_components/GenericDatePick
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import { SearchIcon } from "@nextui-org/shared-icons";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { dateInputToDateObject } from "../../../../../../../utils/GeneralUtils";
 import useSWRMutation from "swr/mutation";
 import { $getWithArgs, handleAxiosError } from "../../../../../../../utils/swr-utils";
 import { StockRequestWithOptionalExtras } from "../inventory-requests-utils";
@@ -24,10 +23,7 @@ const FetchRequests = () =>
         with_location?: string,
     }, StockRequestWithOptionalExtras[]>());
 
-type FormProps = {
-    start_date?: string,
-    end_date?: string
-}
+type FormProps = {}
 
 const InventoryRequestsReportDatePicker: FC = () => {
     const [
@@ -35,7 +31,7 @@ const InventoryRequestsReportDatePicker: FC = () => {
         dispatch
     ] = useInventoryRequestsReport();
     const { trigger: doFetch, isMutating: isFetching } = FetchRequests();
-    const { register, handleSubmit } = useForm<FormProps>();
+    const { handleSubmit } = useForm<FormProps>();
     const [currentStartDate, setCurrentStartDate] = useState<Date>();
     const [currentEndDate, setCurrentEndDate] = useState<Date>();
 
@@ -76,25 +72,29 @@ const InventoryRequestsReportDatePicker: FC = () => {
         });
     }, [dispatch, sortDescriptor, visibleData])
 
-    const onSubmit = useCallback<SubmitHandler<FormProps>>(({ start_date, end_date }) => {
-        const startDate = dateInputToDateObject(start_date);
-        const endDate = dateInputToDateObject(end_date);
+    const setStartDate = useCallback((date?: Date) => {
+        date?.setHours(0, 0, 0, 0);
+        setCurrentStartDate(date);
+    }, [setCurrentStartDate]);
 
-        startDate?.setHours(0, 0, 0, 0);
-        endDate?.setHours(23, 59, 59, 999);
+    const setEndDate = useCallback((date?: Date) => {
+        date?.setHours(23, 59, 59, 999);
+        setCurrentEndDate(date);
+    }, [setCurrentEndDate]);
 
+    const onSubmit = useCallback<SubmitHandler<FormProps>>(() => {
         dispatch({
             type: InventoryRequestsReportActions.UPDATE_QUERY,
             payload: {
-                startDate: startDate,
-                endDate: endDate
+                startDate: currentStartDate,
+                endDate: currentEndDate
             }
         });
 
         doFetch({
             body: {
-                from: startDate?.getTime().toString(),
-                to: endDate?.getTime().toString(),
+                from: currentStartDate?.getTime().toString(),
+                to: currentEndDate?.getTime().toString(),
                 with_items: "true",
                 with_users: "true",
                 with_assignees: "true",
@@ -121,7 +121,7 @@ const InventoryRequestsReportDatePicker: FC = () => {
                 payload: { data: items ?? [], visibleData: items ?? [] }
             });
         }).catch(handleAxiosError);
-    }, [dispatch, doFetch]);
+    }, [currentEndDate, currentStartDate, dispatch, doFetch]);
 
     return (
         <form
@@ -130,20 +130,18 @@ const InventoryRequestsReportDatePicker: FC = () => {
         >
             <GenericDatePicker
                 isDisabled={isFetching}
-                register={register}
-                id="start_date"
                 label="Start Date"
                 labelPlacement="above"
-                onDateChange={setCurrentStartDate}
+                value={currentStartDate}
+                onDateChange={setStartDate}
                 max={currentEndDate}
             />
             <GenericDatePicker
                 isDisabled={isFetching}
-                register={register}
-                id="end_date"
                 label="End Date"
                 labelPlacement="above"
-                onDateChange={setCurrentEndDate}
+                value={currentEndDate}
+                onDateChange={setEndDate}
                 min={currentStartDate}
             />
             <GenericButton

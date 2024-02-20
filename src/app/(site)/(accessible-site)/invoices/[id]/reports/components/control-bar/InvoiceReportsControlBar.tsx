@@ -26,12 +26,12 @@ interface Props {
 }
 
 export const InvoiceReportsControlBar: FC<Props> = ({
-                                                        id,
-                                                        customerName,
-                                                        currentItems,
-                                                        reportParams,
-                                                        dispatchReportParams
-                                                    }) => {
+    id,
+    customerName,
+    currentItems,
+    reportParams,
+    dispatchReportParams
+}) => {
     const {
         startDate,
         endDate,
@@ -49,21 +49,19 @@ export const InvoiceReportsControlBar: FC<Props> = ({
             <div className="grid place-content-center grid-cols-3 default-container p-6 tablet:grid-cols-1 gap-4">
                 <GenericDatePicker
                     isDisabled={spreadsheetIsExporting}
-                    id="start_date"
                     label="Start Date"
                     labelPlacement="above"
+                    value={startDate}
                     onDateChange={setStartDate}
                     max={endDate}
-                    isClearable
                 />
                 <GenericDatePicker
                     isDisabled={spreadsheetIsExporting}
-                    id="end_date"
                     label="End Date"
                     labelPlacement="above"
+                    value={endDate}
                     onDateChange={setEndDate}
                     min={startDate}
-                    isClearable
                 />
                 <ChangeInvoiceReportStatusButton
                     disabled={spreadsheetIsExporting}

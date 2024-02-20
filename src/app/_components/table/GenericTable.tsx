@@ -1,14 +1,13 @@
 "use client";
 
-import { Spinner, Table, TableBody, TableColumn, TableHeader, TableProps } from "@nextui-org/react";
+import { Table, TableBody, TableColumn, TableHeader, TableProps } from "@nextui-org/react";
 import clsx from "clsx";
 import { Column } from "../../(site)/(accessible-site)/invoices/[id]/[invoiceId]/components/table/InvoiceTable";
 import { RowElement } from "@react-types/table";
-import { JSX, useEffect, useMemo, useState } from "react";
-import { useAsyncList } from "@react-stately/data";
-import { chunk } from "@/utils/GeneralUtils";
+import { JSX } from "react";
 import GenericButton from "../inputs/GenericButton";
 import { LoaderIcon } from "lucide-react";
+import useLazyChunkedItems from "../hooks/useLazyChunkedItems";
 
 interface Props<T> extends Omit<TableProps, "children"> {
     columns: Column[],
@@ -32,25 +31,7 @@ export default function GenericTable<T>({
     maxItems,
     ...tableProps
 }: Props<T>) {
-    const [hasMoreToLoad, setHasMoreToLoad] = useState(false);
-    const startingChunkIndex = useMemo(() => 0, [])
-    const chunkedData = useMemo(() => maxItems ? chunk(items, maxItems) : [items], [items, maxItems])
-
-    let loadedItems = useAsyncList<T>({
-        load({ cursor }) {
-            const cursorAsNumber = cursor ? parseInt(cursor) : startingChunkIndex;
-            setHasMoreToLoad((cursorAsNumber + 1) < chunkedData.length);
-
-            return {
-                items: chunkedData[cursorAsNumber],
-                cursor: cursorAsNumber < chunkedData.length ? (cursorAsNumber + 1).toString() : undefined
-            }
-        }
-    })
-
-    useEffect(() => {
-        loadedItems.reload()
-    }, [items])
+    const { loadedItems, hasMoreToLoad } = useLazyChunkedItems(items, maxItems)
 
     // const [loaderRef, scrollerRef] = useInfiniteScroll({
     //     hasMore: hasMoreToLoad,

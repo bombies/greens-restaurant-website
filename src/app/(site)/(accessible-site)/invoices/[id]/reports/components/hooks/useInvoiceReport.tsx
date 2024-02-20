@@ -9,8 +9,8 @@ import {
 } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
 
 export type ReportParamsState = {
-    dateFrom?: Date | null,
-    dateTo?: Date | null,
+    dateFrom?: Date,
+    dateTo?: Date,
     status?: "paid" | "unpaid" | "overdue" | null
 }
 

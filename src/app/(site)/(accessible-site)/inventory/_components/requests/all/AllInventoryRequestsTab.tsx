@@ -11,6 +11,10 @@ import CardSkeleton from "../../../../../../_components/skeletons/CardSkeleton";
 import { useUserData } from "../../../../../../../utils/Hooks";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { useRouter } from "next/navigation";
+import useLazyChunkedItems from "@/app/_components/hooks/useLazyChunkedItems";
+import GenericButton from "@/app/_components/inputs/GenericButton";
+import { LoaderIcon } from "lucide-react";
+import { Spacer } from "@nextui-org/react";
 
 type FetchAllRequestArgs = {
     withAssignees?: boolean,
@@ -39,8 +43,10 @@ const AllInventoryRequestsTab: FC = () => {
         data, dataIsLoading: isLoading
     });
 
+    const { loadedItems: loadedRequests, hasMoreToLoad } = useLazyChunkedItems(visibleRequests ?? [], 20);
+
     const requestCards = useMemo(() => {
-        return visibleRequests
+        return loadedRequests.items
             ?.map(req => (
                 <InventoryRequestCard
                     key={req.id}
@@ -48,7 +54,7 @@ const AllInventoryRequestsTab: FC = () => {
                     showRequester
                 />
             )) ?? [];
-    }, [visibleRequests]);
+    }, [loadedRequests.items]);
 
     useEffect(() => {
         if (!userDataLoading && !canView)
@@ -76,9 +82,23 @@ const AllInventoryRequestsTab: FC = () => {
                         </div>
                         :
                         requestCards.length ?
-                            <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
-                                {requestCards}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
+                                    {requestCards}
+                                </div>
+                                {hasMoreToLoad && (
+                                    <>
+                                        <Spacer y={6} />
+                                        <div className="flex w-full justify-center">
+                                            <GenericButton
+                                                startContent={<LoaderIcon />}
+                                                onPress={loadedRequests.loadMore}
+                                                variant="flat"
+                                            >Load More</GenericButton>
+                                        </div>
+                                    </>
+                                )}
+                            </>
                             :
                             <GenericCard>
                                 <SubTitle>There are no requests</SubTitle>

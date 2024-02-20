@@ -97,12 +97,15 @@ export default function EditInvoiceButton({ customerId, invoice, disabled, mutat
                     />
                     <DataContainer label={`${invoiceTypeAsString(invoice)} Due At`} editAllowed={false}>
                         <GenericDatePicker
-                            id="invoice_due_at"
                             value={proposedChanges?.dueAt ?? fetchDueAt(invoice)}
-                            onDateChange={(date) => setProposedChanges(prev => ({
-                                ...prev,
-                                dueAt: date && new Date(date.toString())
-                            }))}
+                            onDateChange={(date) => setProposedChanges(prev => {
+                                const d = date
+                                d?.setHours(23, 59, 59, 999);
+                                return ({
+                                    ...prev,
+                                    dueAt: d
+                                })
+                            })}
                             min={invoice && new Date(invoice?.createdAt.toString())}
                         />
                     </DataContainer>
