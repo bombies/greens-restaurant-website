@@ -3,11 +3,10 @@
 import useSWR from "swr";
 import { fetcher } from "../../employees/_components/EmployeeGrid";
 import { InvoiceInformation } from "@prisma/client";
-import { Skeleton, Spacer } from "@nextui-org/react";
+import { Spacer } from "@nextui-org/react";
 import { Avatar } from "@nextui-org/avatar";
 import EditableField from "../../employees/[username]/_components/EditableField";
 import { COMPANY_NAME_REGEX } from "../../../../../utils/regex";
-import { CldUploadButton } from "next-cloudinary";
 import { UpdateCompanyInformationDto } from "../../../../api/invoices/company/route";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
@@ -15,12 +14,11 @@ import { useEffect, useState } from "react";
 import ChangesMadeBar from "../../../../_components/ChangesMadeBar";
 import SubTitle from "../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
-import clsx from "clsx";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../utils/Hooks";
-import { useAvatar, useCompanyAvatar } from "../../account/components/hooks/useAvatar";
-import { useS3Base64String } from "../../../../_components/hooks/useS3Base64String";
+import { useCompanyAvatar } from "../../account/components/hooks/useAvatar";
 import { compare } from "../../../../../utils/GeneralUtils";
+import { getCompanyAvatarString } from "../utils/invoice-utils";
 
 type Props = {
     controlsEnabled: boolean
@@ -47,10 +45,6 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
     const [proposedCompanyInfo, setProposedCompanyInfo] = useState<UpdateCompanyInformationDto>();
     const [changesMade, setChangesMade] = useState(false);
     const { component: avatarComponent } = useCompanyAvatar(proposedCompanyInfo, setProposedCompanyInfo);
-    const {
-        avatar: companyAvatar,
-        isLoading: companyAvatarIsLoading
-    } = useS3Base64String(data?.companyAvatar && `images/company/${data.companyAvatar}`);
 
     useEffect(() => {
         if (!isLoading && data)
@@ -61,7 +55,7 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
         if (isLoading || !data)
             return;
         setChangesMade(!compare(proposedCompanyInfo, data));
-    }, [companyAvatarIsLoading, data, isLoading, proposedCompanyInfo]);
+    }, [data, isLoading, proposedCompanyInfo]);
 
     return (
         <>
@@ -90,23 +84,15 @@ export default function CompanyInvoiceCard({ controlsEnabled }: Props) {
                         <Divider className="my-6" />
                         {
                             controlsEnabled ?
-                                <Skeleton isLoaded={!companyAvatarIsLoading} className={clsx(
-                                    "rounded-full p-1 w-40 h-40 mx-auto",
-                                    !companyAvatarIsLoading && "!bg-transparent"
-                                )}>
-                                    {avatarComponent}
-                                </Skeleton>
+                            <div className="flex justify-center">
+                                {avatarComponent}
+                            </div>
                                 :
-                                <Skeleton isLoaded={!isLoading && !companyAvatarIsLoading} className={clsx(
-                                    "rounded-full p-1 flex items-center justify-center w-40 h-40",
-                                    !isLoading && "!bg-transparent"
-                                )}>
-                                    <Avatar
-                                        isBordered
-                                        className="self-center mx-auto w-32 h-32"
-                                        src={companyAvatar || (data?.companyLogo || undefined)}
-                                    />
-                                </Skeleton>
+                                <Avatar
+                                    isBordered
+                                    className="self-center mx-auto w-32 h-32"
+                                    src={getCompanyAvatarString(data)}
+                                />
                         }
                         <Spacer y={6} />
                         <div className="w-full self-center">

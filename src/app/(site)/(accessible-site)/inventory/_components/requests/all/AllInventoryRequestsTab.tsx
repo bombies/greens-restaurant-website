@@ -1,4 +1,4 @@
-import React, { FC, Fragment, useEffect, useMemo } from "react";
+import React, { FC, Fragment, useCallback, useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 import { StockRequestWithOptionalCreator } from "../inventory-requests-utils";
@@ -12,8 +12,14 @@ import { useUserData } from "../../../../../../../utils/Hooks";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { useRouter } from "next/navigation";
 
-export const FetchAllRequests = (withAssignees?: boolean, doFetch: boolean = true) => {
-    return useSWR(doFetch && `/api/inventory/requests?with_users=true&with_assignees=${withAssignees ?? false}`, fetcher<StockRequestWithOptionalCreator[]>);
+type FetchAllRequestArgs = {
+    withAssignees?: boolean,
+    withLocation?: boolean,
+    doFetch?: boolean
+}
+
+export const FetchAllRequests = (args?: FetchAllRequestArgs) => {
+    return useSWR((args?.doFetch || args?.doFetch === undefined) && `/api/inventory/requests?with_users=true&with_assignees=${args?.withAssignees ?? false}&with_location=${args?.withLocation ?? false}`, fetcher<StockRequestWithOptionalCreator[]>);
 };
 
 const AllInventoryRequestsTab: FC = () => {
@@ -23,14 +29,19 @@ const AllInventoryRequestsTab: FC = () => {
         Permission.MANAGE_STOCK_REQUESTS, Permission.VIEW_STOCK_REQUESTS
     ]);
 
-    const { data, isLoading } = FetchAllRequests(true, canView);
+    const { data, isLoading } = FetchAllRequests({
+        withAssignees: true,
+        withLocation: true,
+        doFetch: true
+    });
+
     const { visibleRequests, sortButton, filterButton } = useMutableRequests({
         data, dataIsLoading: isLoading
     });
+
     const requestCards = useMemo(() => {
         return visibleRequests
-            ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .map(req => (
+            ?.map(req => (
                 <InventoryRequestCard
                     key={req.id}
                     request={req}

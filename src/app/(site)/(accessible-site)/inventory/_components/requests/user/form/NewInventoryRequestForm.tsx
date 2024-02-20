@@ -6,13 +6,13 @@ import GenericSelectMenu from "../../../../../../../_components/inputs/GenericSe
 import { Chip } from "@nextui-org/chip";
 import InventoryRequestedItemsContainer from "./InventoryRequestedItemsContainer";
 import { Avatar } from "@nextui-org/avatar";
-import { useS3AvatarUrls } from "../../../../../../../_components/hooks/useS3Base64String";
 import useSWR, { KeyedMutator } from "swr";
 import { StockRequestWithOptionalCreatorAndAssignees } from "../../inventory-requests-utils";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import { User } from "@prisma/client";
 import { FetchAllInventories } from "../../../InventoryGrid";
 import useLocations from "../../../../../locations/components/hooks/useLocations";
+import { getUserAvatarString, getUserAvatarStringHeadless } from "app/(site)/(accessible-site)/employees/employee-utils";
 
 type Props = {
     setModalOpen: Dispatch<SetStateAction<boolean>>
@@ -35,7 +35,6 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData
         data: availableAssignees,
         isLoading: isLoadingAvailableAssignees
     } = FetchValidAssignees();
-    const { avatars, isLoading: avatarsLoading } = useS3AvatarUrls(availableAssignees ?? []);
 
     return (
         <div className="space-y-6">
@@ -110,30 +109,26 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData
                     )}
                 </GenericSelectMenu>
                 {
-                    (avatarsLoading || isLoadingAvailableAssignees) ||
+                    (isLoadingAvailableAssignees) ||
                     <GenericSelectMenu
                         label="Assigned To"
                         selectionMode="multiple"
                         id="selected_assignees"
                         placeholder="Select assignees..."
                         variant="flat"
-                        disabled={snapshotsLoading || isLoadingAvailableAssignees || avatarsLoading}
+                        disabled={snapshotsLoading || isLoadingAvailableAssignees}
                         items={availableAssignees ?? []}
                         selectedKeys={selectedAssigneeIds}
                         onSelectionChange={selection => setSelectedAssigneeIds(Array.from(selection) as string[])}
                     >
                         {assignee => {
-                            const avatarSrc = avatars?.find(userAvatar =>
-                                    userAvatar.userId === assignee.id)?.avatar
-                                || (assignee.image || undefined);
+                            const avatarSrc = getUserAvatarStringHeadless(assignee.avatar ?? undefined, assignee.id, assignee.image ?? undefined);
 
                             return (
                                 <SelectItem
                                     key={assignee.id}
                                     className="capitalize"
-                                    startContent={<Avatar
-                                        src={avatarSrc}
-                                    />}
+                                    startContent={<Avatar src={avatarSrc} />}
                                 >
                                     {`${assignee.firstName} ${assignee.lastName}`}
                                 </SelectItem>

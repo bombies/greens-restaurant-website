@@ -17,6 +17,7 @@ export enum OptimisticRequestDataActionType {
      */
     SET,
     SET_NOTES,
+    SET_DELIVERED_AT,
     REJECT,
     APPROVE,
     PARTIALLY_APPROVE
@@ -37,18 +38,24 @@ type OptimisticRequestDataAction = {
 } | {
     type: OptimisticRequestDataActionType.RESET
     payload: StockRequestWithOptionalExtras
+} | {
+    type: OptimisticRequestDataActionType.SET_DELIVERED_AT,
+    payload: { deliveredAt: Date }
 }
 
 const reducer = (state: ReviewInventoryRequestDto, action: OptimisticRequestDataAction) => {
     let newState = { ...state };
     switch (action.type) {
         case OptimisticRequestDataActionType.RESET: {
+            const today = new Date()
+            today.setHours(0, 0, 0, 0);
             newState = {
+                deliveredAt: today.toISOString(),
                 items: action.payload.requestedItems?.map(item => ({
                     stock: item.stock,
                     id: item.id,
                     amountRequested: item.amountRequested,
-                    amountProvided: item.amountProvided ?? -1
+                    amountProvided: item.amountProvided ?? -1,
                 })) ?? []
             };
             break;
@@ -64,6 +71,15 @@ const reducer = (state: ReviewInventoryRequestDto, action: OptimisticRequestData
                 break;
             }
             newState.reviewedNotes = notes;
+            break;
+        }
+        case OptimisticRequestDataActionType.SET_DELIVERED_AT: {
+            const deliveredAt = action.payload.deliveredAt;
+            if (!deliveredAt) {
+                console.warn("Tried setting deliveredAt for inventory request with invalid payload!", action.payload);
+                break;
+            }
+            newState.deliveredAt = deliveredAt.toISOString();
             break;
         }
         case OptimisticRequestDataActionType.APPROVE: {
@@ -134,10 +150,13 @@ type Args = {
 const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, setChangesMade }: Args) => {
     const [optimisticRequest, dispatchOptimisticRequest] = useReducer(reducer, {
         reviewedNotes: undefined,
-        items: []
+        items: [],
+        deliveredAt: new Date().toISOString()
     });
 
     useEffect(() => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0);
         if (!requestIsLoading && request)
             dispatchOptimisticRequest({
                 type: OptimisticRequestDataActionType.SET,
@@ -147,7 +166,8 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
                         id: item.id,
                         amountRequested: item.amountRequested,
                         amountProvided: item.amountProvided ?? -1
-                    })) ?? []
+                    })) ?? [],
+                    deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : today.toISOString()
                 }
             });
     }, [request, request?.requestedItems, requestIsLoading]);
@@ -157,6 +177,8 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
             return;
 
         if (!requestIsLoading && request) {
+            const today = new Date()
+            today.setHours(0, 0, 0, 0);
             dispatchOptimisticRequest({
                 type: OptimisticRequestDataActionType.SET,
                 payload: {
@@ -165,7 +187,8 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
                         id: item.id,
                         amountRequested: item.amountRequested,
                         amountProvided: item.amountProvided ?? -1
-                    })) ?? []
+                    })) ?? [],
+                    deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : today.toISOString()
                 }
             });
         }
@@ -175,18 +198,21 @@ const useAdminInventoryRequestData = ({ isEnabled, request, requestIsLoading, se
         if (!isEnabled || requestIsLoading || !request || !optimisticRequest)
             return;
 
-        const initialRequestItems =  ({
+        const today = new Date()
+        today.setHours(0, 0, 0, 0);
+        const initialRequestItems = ({
             items: request.requestedItems?.map(item => ({
                 stock: item.stock,
                 id: item.id,
                 amountRequested: item.amountRequested,
                 amountProvided: item.amountProvided ?? -1
-            })) ?? []
+            })) ?? [],
+            deliveredAt: request.deliveredAt ? new Date(request.deliveredAt).toISOString() : today.toISOString()
         });
 
         setChangesMade(!compare(optimisticRequest, initialRequestItems));
     }, [optimisticRequest, request, requestIsLoading, setChangesMade, isEnabled]);
-    
+
     const resetOptimisticData = useCallback(() => {
         if (!request)
             return;

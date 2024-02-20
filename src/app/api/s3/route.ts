@@ -4,6 +4,7 @@ import * as process from "process";
 import s3Client from "../../../libs/s3-client";
 import { NextResponse } from "next/server";
 import { Buffer } from "buffer";
+import { fileTypeFromBuffer } from "file-type";
 
 export async function GET(req: Request) {
     return authenticated(req, async () => {
@@ -23,6 +24,8 @@ export async function GET(req: Request) {
         if (!objectData)
             return new NextResponse(undefined);
         const buf = Buffer.from(objectData);
-        return new NextResponse(buf.toString("base64"));
+        const response = new NextResponse(buf);
+        response.headers.set("Content-Type", (await fileTypeFromBuffer(buf))?.mime ?? "image/png");
+        return response;
     });
 }

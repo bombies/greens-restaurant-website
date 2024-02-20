@@ -6,6 +6,11 @@ import { useS3AvatarUrls } from "../../../../../_components/hooks/useS3Base64Str
 import { Tooltip } from "@nextui-org/react";
 import { Avatar } from "@nextui-org/avatar";
 
+/**
+ * @deprecated
+ * @param request
+ * @returns 
+ */
 const useAssigneeAvatars = (request?: StockRequestWithOptionalCreatorAndAssignees) => {
     const avatarsToLookup = useMemo(() => request?.assignedToUsers ?? [], [request?.assignedToUsers]);
     useEffect(() => {

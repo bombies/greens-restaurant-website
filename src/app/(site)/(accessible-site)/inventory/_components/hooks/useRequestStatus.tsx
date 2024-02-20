@@ -10,7 +10,6 @@ import PendingIcon from "../../../../../_components/icons/PendingIcon";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { Divider } from "@nextui-org/divider";
-import clsx from "clsx";
 
 export const getStatusChip = (status?: StockRequestStatus | "EXTRA_DELIVERED") => {
     switch (status) {

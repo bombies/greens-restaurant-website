@@ -2,8 +2,8 @@
 
 import { FC, useMemo } from "react";
 import { Avatar, AvatarProps, Tooltip } from "@nextui-org/react";
-import { useS3UserAvatarUrl } from "./hooks/useS3Base64String";
 import { User } from "@prisma/client";
+import { getUserAvatarString } from "app/(site)/(accessible-site)/employees/employee-utils";
 
 type Props = {
     showToolTip?: boolean,
@@ -12,15 +12,13 @@ type Props = {
 } & Omit<AvatarProps, "src">
 
 const UserAvatar: FC<Props> = ({ user, showToolTip, showName, ...props }) => {
-    const { url: avatarUrl } = useS3UserAvatarUrl(user.id, user.avatar);
-
     const avatar = useMemo(() => (
         <Avatar
-            src={avatarUrl || (user.image || undefined)}
+            src={getUserAvatarString(user)}
             showFallback
             {...props}
         />
-    ), [avatarUrl, props, user.image]);
+    ), [props, user]);
 
     return showToolTip ? (
         <Tooltip

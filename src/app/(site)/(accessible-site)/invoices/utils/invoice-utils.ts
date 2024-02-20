@@ -1,7 +1,8 @@
-import { Invoice, InvoiceType } from "@prisma/client";
+import { Invoice, InvoiceInformation, InvoiceType } from "@prisma/client";
 import {
     InvoiceWithOptionalItems
 } from "../../home/_components/widgets/invoice/InvoiceWidget";
+import { getS3String } from "app/api/s3/s3-utils";
 
 export const generateInvoiceTotal = (invoice?: InvoiceWithOptionalItems): number => {
     return invoice?.invoiceItems
@@ -64,4 +65,12 @@ export function formatDateDDMMYYYY(date: Date, join: string = "/") {
 
 export function formatInvoiceNumber(invoiceNumber: number): string {
     return invoiceNumber.toString().padStart(5, "0");
+}
+
+export const getCompanyAvatarString = (companyInfo?: InvoiceInformation) => {
+    return getCompanyAvatarStringHeadless(companyInfo?.companyAvatar, companyInfo?.companyLogo);
+}
+
+export const getCompanyAvatarStringHeadless = (avatar?: string | null, fallback?: string | null) => {
+    return avatar ? getS3String("images/company", avatar) : (fallback ?? undefined);
 }

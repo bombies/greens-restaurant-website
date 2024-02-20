@@ -1,30 +1,65 @@
 "use client";
 
-import { FC, Fragment } from "react";
+import { FC, Fragment, PropsWithChildren, useMemo } from "react";
 import LinkCard from "../../../../../_components/LinkCard";
 import { Divider } from "@nextui-org/divider";
 import SubTitle from "../../../../../_components/text/SubTitle";
-import { StockRequestWithOptionalCreatorAndAssignees } from "./inventory-requests-utils";
-import { AvatarGroup, User } from "@nextui-org/react";
-import useAssigneeAvatars from "../hooks/useAssigneeAvatars";
+import { StockRequestWithOptionalExtras } from "./inventory-requests-utils";
+import { AvatarGroup, Chip, Spacer, User } from "@nextui-org/react";
 import useRequestStatus from "../hooks/useRequestStatus";
+import { getInventoryRequestDisplayDate } from "../../utils/inventory-utils";
+import LocationIcon from "app/_components/icons/LocationIcon";
+import UserAvatar from "app/_components/UserAvatar";
+import { getUserAvatarString } from "app/(site)/(accessible-site)/employees/employee-utils";
 
 interface Props {
-    request: StockRequestWithOptionalCreatorAndAssignees;
+    request: StockRequestWithOptionalExtras;
     showRequester?: boolean,
 }
 
 const InventoryRequestCard: FC<Props> = ({ request, showRequester }) => {
-    const { assigneeAvatars, avatars } = useAssigneeAvatars(request);
-    const requestStatusChip = useRequestStatus(request);
     return (
         <LinkCard
             href={`/inventory/requests/${request.id}`}
             className="!block"
         >
+            <InventoryRequestDetails request={request} showRequester={showRequester} />
+        </LinkCard>
+    );
+};
+
+export const InventoryRequestDetails: FC<PropsWithChildren<Props>> = ({ request, showRequester, children }) => {
+    const requestStatusChip = useRequestStatus(request);
+    const displayDate = useMemo(() => getInventoryRequestDisplayDate(request), [request])
+
+    const assigneeAvatars = useMemo(() => request.assignedToUsers?.map(assignee => (
+        <UserAvatar
+            key={assignee.id}
+            user={assignee}
+        />
+    )) ?? [], [request.assignedToUsers])
+
+    return (
+        <div>
+            {request.assignedLocation && (
+                <>
+                    <Chip
+                        startContent={<LocationIcon width={14} />}
+                        color="primary"
+                        variant="flat"
+                        size="sm"
+                        classNames={{
+                            content: "font-semibold"
+                        }}
+                    >
+                        {request.assignedLocation.name.toUpperCase().replaceAll("-", " ")}
+                    </Chip>
+                    <Spacer y={1} />
+                </>
+            )}
             <SubTitle className="!text-medium tablet:!text-sm !break-all" thick>
                 {
-                    `Request for ${new Date(request.createdAt).toLocaleDateString("en-JM")} @ ${new Date(request.createdAt).toLocaleTimeString("en-JM", {
+                    `Request for ${new Date(displayDate).toLocaleDateString("en-JM")} @ ${new Date(displayDate).toLocaleTimeString("en-JM", {
                         timeZone: "EST",
                         timeStyle: "short"
                     })}`
@@ -44,8 +79,7 @@ const InventoryRequestCard: FC<Props> = ({ request, showRequester }) => {
                         }}
                         avatarProps={{
                             isBordered: true,
-                            src: avatars?.find(userAvatar => userAvatar.userId === request.requestedByUser?.id)?.avatar
-                                || (request.requestedByUser?.image || undefined)
+                            src: getUserAvatarString(request.requestedByUser)
                         }}
                     />
                 </div>
@@ -61,8 +95,10 @@ const InventoryRequestCard: FC<Props> = ({ request, showRequester }) => {
                     </Fragment>
                     : undefined
             }
-        </LinkCard>
-    );
-};
+            <Divider className="my-6" />
+            {children}
+        </div>
+    )
+}
 
 export default InventoryRequestCard;

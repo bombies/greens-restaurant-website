@@ -48,7 +48,7 @@ export const InvoiceReportsControlBar: FC<Props> = ({
             <Spacer y={6} />
             <div className="grid place-content-center grid-cols-3 default-container p-6 tablet:grid-cols-1 gap-4">
                 <GenericDatePicker
-                    disabled={spreadsheetIsExporting}
+                    isDisabled={spreadsheetIsExporting}
                     id="start_date"
                     label="Start Date"
                     labelPlacement="above"
@@ -57,7 +57,7 @@ export const InvoiceReportsControlBar: FC<Props> = ({
                     isClearable
                 />
                 <GenericDatePicker
-                    disabled={spreadsheetIsExporting}
+                    isDisabled={spreadsheetIsExporting}
                     id="end_date"
                     label="End Date"
                     labelPlacement="above"

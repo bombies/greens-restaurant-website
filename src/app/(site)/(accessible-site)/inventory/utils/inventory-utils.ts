@@ -1,5 +1,6 @@
-import { Config, StockSnapshot, StockType } from "@prisma/client";
+import { Config, StockRequestStatus, StockSnapshot, StockType } from "@prisma/client";
 import { DeepRequired } from "react-hook-form";
+import { StockRequestWithOptionalCreator } from "../_components/requests/inventory-requests-utils";
 
 export const LowStockThreshold = {
     flaskDrink: StockType.FLASK_DRINK,
@@ -58,3 +59,6 @@ export const stockTypeToValue = (stockType: StockType): number => {
             return 1
     }
 }
+
+export const getInventoryRequestDisplayDate = (req: StockRequestWithOptionalCreator) =>
+    (req.status !== StockRequestStatus.PENDING) ? (req.deliveredAt ?? req.createdAt) : req.createdAt

@@ -16,6 +16,7 @@ export async function GET(req: Request) {
             from, to,
             withStock,
             withReviewer,
+            withLocation
         } = selfUserService.getFetchStockRequestsSearchParams(req.url);
         let whereQuery: StockRequestWhereInput = {};
 
@@ -24,24 +25,62 @@ export async function GET(req: Request) {
                 status
             };
 
-        if (from)
+        if (from && to) {
             whereQuery = {
                 ...whereQuery,
-                createdAt: {
-                    gte: new Date(from)
-                }
+                OR: [
+                    {
+                        deliveredAt: { isSet: false },
+                        createdAt: {
+                            gte: new Date(from),
+                            lte: new Date(to)
+                        }
+                    },
+                    {
+                        deliveredAt: {
+                            gte: new Date(from),
+                            lte: new Date(to)
+                        }
+                    }
+                ]
             };
+        } else {
+            if (from)
+                whereQuery = {
+                    ...whereQuery,
+                    OR: [
+                        {
+                            deliveredAt: { isSet: false },
+                            createdAt: {
+                                gte: new Date(from)
+                            }
+                        },
+                        {
+                            deliveredAt: {
+                                gte: new Date(from)
+                            }
+                        }
+                    ]
+                };
 
-        if (to)
-            whereQuery = {
-                ...whereQuery,
-                createdAt: whereQuery.createdAt && typeof whereQuery.createdAt !== "string" && "gte" in whereQuery.createdAt ? {
-                    ...whereQuery.createdAt,
-                    lte: new Date(to)
-                } : {
-                    lte: new Date(to)
-                }
-            };
+            if (to)
+                whereQuery = {
+                    ...whereQuery,
+                    OR: [
+                        {
+                            deliveredAt: { isSet: false },
+                            createdAt: {
+                                lte: new Date(to)
+                            }
+                        },
+                        {
+                            deliveredAt: {
+                                lte: new Date(to)
+                            }
+                        }
+                    ]
+                };
+        }
 
         const requests = await prisma.stockRequest.findMany({
             where: whereQuery,
@@ -51,7 +90,7 @@ export async function GET(req: Request) {
                         stock: true
                     }
                 } : true),
-                assignedLocation: true,
+                assignedLocation: withLocation,
                 requestedByUser: withUsers,
                 assignedToUsers: withAssignees,
                 reviewedByUser: withReviewer

@@ -1,13 +1,11 @@
 "use client";
 
-import React, { FC, Fragment, useRef } from "react";
+import React, { FC } from "react";
 import { Avatar } from "@nextui-org/avatar";
-import { Input } from "@nextui-org/input";
-import { toast } from "react-hot-toast";
-import { useS3Base64String } from "../../../../_components/hooks/useS3Base64String";
-import clsx from "clsx";
-import { Skeleton } from "@nextui-org/react";
-import { UploadFileToS3 } from "../../../../../utils/client-utils";
+import { getS3String } from "app/api/s3/s3-utils";
+import S3FileUpload from "app/_components/S3FileUpload";
+import MediaType from "utils/MediaType";
+import { MegaBytes } from "utils/FileSize";
 
 export interface UploadAvatarComponentProps {
     data?: {
@@ -20,80 +18,40 @@ export interface UploadAvatarComponentProps {
     onUploadSuccess?: (key: string) => void,
     onUploadError?: (error: string) => void,
     onFileRemove?: () => void,
-    disabled?: boolean
+    isDisabled?: boolean
 }
 
 export const UploadAvatarComponent: FC<UploadAvatarComponentProps> = ({
-                                                                          data,
-                                                                          onUploadSuccess,
-                                                                          onFileRemove,
-                                                                          onUploadError,
-                                                                          onUploadStart,
-                                                                          disabled
-                                                                      }) => {
-    const inputRef = useRef<HTMLInputElement>(null);
-    const { avatar } = useS3Base64String(data?.path && data.key ? `${data.path}/${data.key}` : data?.key);
-    const { trigger: triggerUpload, isMutating: isUploading } = UploadFileToS3();
-
+    data,
+    onUploadSuccess,
+    onFileRemove,
+    onUploadError,
+    onUploadStart,
+    isDisabled
+}) => {
     return (
-        <Fragment>
-            <Input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={async (e) => {
-                    const upload = async () => {
-                        if (onUploadStart)
-                            onUploadStart();
-
-                        const allFiles = e.target.files;
-                        if (!allFiles || !allFiles.length) {
-                            if (onFileRemove)
-                                onFileRemove();
-                            return Promise.resolve();
-                        }
-                        const file = allFiles[0];
-                        return triggerUpload({
-                            file: file,
-                            key: data?.path && `${data.path}/${file.name}`
-                        }).then(() => {
-                                if (onUploadSuccess)
-                                    onUploadSuccess(`${file.name}`);
-                            }
-                        ).catch(e => {
-                            if (onUploadError)
-                                onUploadError(e.message);
-                        });
-                    };
-
-                    await toast.promise(
-                        upload(),
-                        {
-                            loading: "Uploading new avatar...",
-                            success: "Successfully updated new avatar!",
-                            error(msg: string) {
-                                return `There was an error uploading a new avatar: ${msg}`;
-                            }
-                        }
-                    );
-                }}
-            />
-            <Skeleton
-                isLoaded={!isUploading}
-                className={clsx(
-                    "rounded-full p-1 flex items-center justify-center",
-                    !isUploading && "!bg-transparent"
-                )}>
+        <S3FileUpload
+            isDisabled={isDisabled}
+            fileTypes={[MediaType.IMAGE]}
+            data={data}
+            maxFileSize={MegaBytes.from(20)}
+            lazyServerUpload
+            onUploadStart={onUploadStart}
+            onServerUploadSuccess={onUploadSuccess}
+            onUploadError={onUploadError}
+            onFileRemove={onFileRemove}
+            className="w-fit"
+        >
+            {(ref, currentFile) => (
                 <Avatar
-                    src={avatar || (data?.fallbackSrc || undefined)}
+                    src={currentFile || (data?.key ? getS3String(data.path ?? "", data.key) : (data?.fallbackSrc || undefined))}
                     as="button"
-                    onClick={() => inputRef.current?.click()}
+                    onClick={() => ref.current?.click()}
                     isBordered={true}
-                    isDisabled={disabled}
+                    isDisabled={isDisabled}
                     className="transition-fast hover:brightness-150 cursor-pointer w-36 phone:w-16 h-36 phone:h-16"
                 />
-            </Skeleton>
-        </Fragment>
+            )}
+        </S3FileUpload>
     );
 };
