@@ -9,7 +9,7 @@ import {
 import { Column } from "../../../../invoices/[id]/[invoiceId]/components/table/InvoiceTable";
 import { getStatusChip } from "../../hooks/useRequestStatus";
 import { StockRequestStatus } from ".prisma/client";
-import { AvatarGroup, TableCell, TableRow } from "@nextui-org/react";
+import { AvatarGroup, Spacer, TableCell, TableRow } from "@nextui-org/react";
 import UserAvatar from "../../../../../../_components/UserAvatar";
 import { Spinner } from "@nextui-org/spinner";
 import SubTitle from "../../../../../../_components/text/SubTitle";
@@ -151,7 +151,8 @@ const InventoryRequestsReportTable: FC = () => {
                         {/*        </Checkbox>*/}
                         {/*    ))}*/}
                         {/*</CheckboxMenu>*/}
-                        {/*<Spacer y={6} />*/}
+                        <SubTitle>{requests.length} Results</SubTitle>
+                        <Spacer y={6} />
                         <GenericTable
                             isHeaderSticky
                             isCompact
