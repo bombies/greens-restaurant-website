@@ -157,6 +157,7 @@ const InventoryRequestsReportTable: FC = () => {
                             isCompact
                             columns={visibleColumns}
                             items={requests}
+                            maxItems={50}
                             sortDescriptor={sortDescriptor}
                             sortableColumns={["date_requested"]}
                             onSortChange={sortDescriptor => {
