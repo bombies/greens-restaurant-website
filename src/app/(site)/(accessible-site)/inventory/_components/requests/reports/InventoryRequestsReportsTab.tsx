@@ -10,7 +10,7 @@ import InventoryRequestsReportProvider from "./InventoryRequestsReportProvider";
 import InventoryRequestsReportDatePicker from "./InventoryRequestsReportDatePicker";
 import InventoryRequestsReportTable from "./InventoryRequestsReportTable";
 
-const InventoryRequestsReportsTab: FC = () => {
+const InventoryRequestsReportsPage: FC = () => {
     const router = useRouter();
     const { data: userData, isLoading: userDataLoading } = useUserData();
     const canView = !userDataLoading && hasAnyPermission(userData?.permissions, [
@@ -36,4 +36,4 @@ const InventoryRequestsReportsTab: FC = () => {
     );
 };
 
-export default InventoryRequestsReportsTab;
+export default InventoryRequestsReportsPage;

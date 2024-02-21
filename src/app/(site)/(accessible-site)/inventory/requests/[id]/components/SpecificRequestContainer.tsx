@@ -25,9 +25,11 @@ import "../../../../../../../utils/GeneralUtils";
 import useCurrentInventoryRequestSnapshots from "./hooks/useCurrentInventoryRequestSnapshots";
 import { AnimatePresence, motion } from "framer-motion";
 import ChangesMadeContainer from "../../../../../../_components/ChangesMadeContainer";
+import { useSession } from "next-auth/react";
 
 type Props = {
     id: string,
+    isAdmin: boolean,
 }
 
 const FetchRequest = (id: string) => {
@@ -57,18 +59,12 @@ const DeleteItem = (id: string) => {
     return useSWRMutation(`/api/inventory/requests/me/${id}/{item_id}`, mutator);
 };
 
-const SpecificRequestContainer: FC<Props> = ({ id }) => {
-    const { data: userData } = useUserData([
-        Permission.CREATE_INVENTORY,
-        Permission.CREATE_STOCK_REQUEST,
-        Permission.VIEW_STOCK_REQUESTS,
-        Permission.MANAGE_STOCK_REQUESTS
-    ]);
+const SpecificRequestContainer: FC<Props> = ({ id, isAdmin }) => {
+    const { data: session } = useSession()
     const { data: request, isLoading: requestIsLoading, mutate } = FetchRequest(id);
     const { trigger: updateItem, isMutating: itemIsUpdating } = UpdateItem(id);
     const { trigger: deleteItem, isMutating: itemIsDeleting } = DeleteItem(id);
     const [changesMade, setChangesMade] = useState(false);
-    const isAdmin = hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MANAGE_STOCK_REQUESTS]);
     const { optimisticRequest, dispatchOptimisticRequest, resetOptimisticData } = useAdminInventoryRequestData({
         isEnabled: isAdmin,
         request,
@@ -84,15 +80,10 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
     });
 
     useEffect(() => {
-        if ((!requestIsLoading && !request)
-            || (!requestIsLoading && request && userData && !hasAnyPermission(userData.permissions, [
-                Permission.CREATE_INVENTORY,
-                Permission.VIEW_STOCK_REQUESTS,
-                Permission.MANAGE_STOCK_REQUESTS
-            ]) && request.requestedByUser?.id !== userData.id)
-        )
-            router.push("/inventory/requests");
-    }, [request, requestIsLoading, router, userData]);
+        if (!requestIsLoading && !request)
+            router.replace("/inventory/requests");
+    }, [request, requestIsLoading, router]);
+
 
     return (
         <div>
@@ -243,7 +234,7 @@ const SpecificRequestContainer: FC<Props> = ({ id }) => {
                             }
                         }
                     } : undefined}
-                    editAllowed={userData?.id === request?.requestedByUser?.id}
+                    editAllowed={session?.user?.id === request?.requestedByUser?.id}
                 />
                 <Spacer y={6} />
                 <AnimatePresence>

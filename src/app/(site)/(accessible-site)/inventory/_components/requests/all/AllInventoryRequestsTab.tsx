@@ -1,3 +1,5 @@
+"use client"
+
 import React, { FC, Fragment, useCallback, useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
@@ -26,7 +28,7 @@ export const FetchAllRequests = (args?: FetchAllRequestArgs) => {
     return useSWR((args?.doFetch || args?.doFetch === undefined) && `/api/inventory/requests?with_users=true&with_assignees=${args?.withAssignees ?? false}&with_location=${args?.withLocation ?? false}`, fetcher<StockRequestWithOptionalCreator[]>);
 };
 
-const AllInventoryRequestsTab: FC = () => {
+const AllInventoryRequestsPage: FC = () => {
     const router = useRouter()
     const { data: userData, isLoading: userDataLoading } = useUserData();
     const canView = !userDataLoading && hasAnyPermission(userData?.permissions, [
@@ -109,4 +111,4 @@ const AllInventoryRequestsTab: FC = () => {
     );
 };
 
-export default AllInventoryRequestsTab;
+export default AllInventoryRequestsPage;

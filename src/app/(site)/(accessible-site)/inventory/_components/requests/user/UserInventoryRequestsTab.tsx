@@ -19,7 +19,7 @@ const FetchUserRequests = (withAssignees?: boolean) => {
     return useSWR(`/api/inventory/requests/me?with_users=true&with_assignees=${withAssignees ?? false}`, fetcher<StockRequestWithOptionalCreatorAndAssignees[]>);
 };
 
-const UserInventoryRequestsTab: FC = () => {
+const UserInventoryRequestsPage: FC = () => {
     const { data, isLoading, mutate } = FetchUserRequests(true);
     const { visibleRequests, sortButton, filterButton } = useMutableRequests({
         data, dataIsLoading: isLoading
@@ -63,4 +63,4 @@ const UserInventoryRequestsTab: FC = () => {
     );
 };
 
-export default UserInventoryRequestsTab;
+export default UserInventoryRequestsPage;

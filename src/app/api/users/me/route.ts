@@ -5,18 +5,18 @@ import { EMAIL_REGEX, PASSWORD_REGEX } from "../../../../utils/regex";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import { Mailer } from "../../../../utils/api/mail/Mailer";
+import userService from "./service";
 
 export async function GET(req: Request) {
     return await authenticated(req, async (session) => {
-        const user = await prisma.user.findUnique({
-            where: { username: session.user?.username }
-        });
+        const user = await userService.getSelf(session);
 
         if (!user)
             return respond({
                 message: `There was no user with the username: ${session.user?.username}`,
                 init: { status: 404 }
             });
+            
         const { password, ...rest } = user;
         return NextResponse.json(rest);
     });
