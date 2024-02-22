@@ -36,6 +36,8 @@ import { AddLocationStockDto } from "../location/[name]/[sectionId]/stock/route"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import StockSnapshotCreateManyInput = Prisma.StockSnapshotCreateManyInput;
 import { Session } from "next-auth";
+import configService from "../../config/service";
+import { itemHasLowStock } from "@/app/(site)/(accessible-site)/inventory/utils/inventory-utils";
 
 export class Either<S, E> {
     constructor(public readonly success?: S, public readonly error?: E) {
@@ -117,28 +119,7 @@ class InventoryService {
             stock: boolean
         }
     }): Promise<Either<InventoryWithOptionalExtras, NextResponse>> {
-
-        let inventory = await prisma.inventory.findFirst({
-            where: {
-                name: name.toLowerCase(),
-                type: options?.location ? InventoryType.LOCATION : undefined
-            },
-            include: {
-                stock: options?.stock !== undefined ? (typeof options.stock === "boolean" ? options.stock : {
-                        include: {
-                            inventory: "inventory" in options.stock && options.stock.inventory,
-                            inventorySection: "inventorySection" in options.stock && options.stock.inventorySection
-                        }
-                    })
-                    : false,
-                snapshots: options?.snapshots ?? false,
-                inventorySections: options?.inventorySections !== undefined ? (typeof options.inventorySections === "boolean" ? options.inventorySections : {
-                    include: {
-                        stock: "stock" in options.inventorySections && options.inventorySections.stock
-                    }
-                }) : false
-            }
-        });
+        const inventory = await this.fetchInventoryHeadless(name, options);
 
         if (!inventory)
             return new Either<InventoryWithOptionalExtras, NextResponse>(undefined, respond({
@@ -150,6 +131,40 @@ class InventoryService {
 
         return new Either<InventoryWithOptionalExtras, NextResponse>(inventory, undefined);
     };
+
+    async fetchInventoryHeadless(name: string, options?: {
+        location?: boolean,
+        stock?: boolean | {
+            inventory?: boolean,
+            inventorySection?: boolean,
+        },
+        snapshots?: boolean,
+        inventorySections?: boolean | {
+            stock: boolean
+        }
+    }) {
+        return await prisma.inventory.findFirst({
+            where: {
+                name: name.toLowerCase(),
+                type: options?.location ? InventoryType.LOCATION : undefined
+            },
+            include: {
+                stock: options?.stock !== undefined ? (typeof options.stock === "boolean" ? options.stock : {
+                    include: {
+                        inventory: "inventory" in options.stock && options.stock.inventory,
+                        inventorySection: "inventorySection" in options.stock && options.stock.inventorySection
+                    }
+                })
+                    : false,
+                snapshots: options?.snapshots ?? false,
+                inventorySections: options?.inventorySections !== undefined ? (typeof options.inventorySections === "boolean" ? options.inventorySections : {
+                    include: {
+                        stock: "stock" in options.inventorySections && options.inventorySections.stock
+                    }
+                }) : false
+            }
+        });
+    }
 
     async fetchStockItem(inventoryName: string, itemId: string, inventoryType?: InventoryType): Promise<Either<Stock, NextResponse>> {
         const fetchedInventory = await this.fetchInventory(inventoryName, {
@@ -438,6 +453,18 @@ class InventoryService {
     };
 
     async fetchCurrentSnapshot(name: string, type: InventoryType | null = null): Promise<Either<InventorySnapshotWithOptionalExtras, NextResponse>> {
+        const currentSnapshot = await this.fetchCurrentSnapshotHeadless(name, type);
+        if (!currentSnapshot)
+            return new Either<InventorySnapshotWithOptionalExtras, NextResponse>(undefined, respond({
+                message: `There was no current inventory found with the name: ${name}`,
+                init: {
+                    status: 404
+                }
+            }));
+        return new Either<InventorySnapshotWithOptionalExtras, NextResponse>(currentSnapshot);
+    };
+
+    async fetchCurrentSnapshotHeadless(name: string, type: InventoryType | null = null) {
         let inventory = await prisma.inventory.findUnique({
             where: {
                 name: name.toLowerCase()
@@ -448,15 +475,7 @@ class InventoryService {
         });
 
         if (!inventory)
-            return new Either<InventorySnapshotWithOptionalExtras, NextResponse>(
-                undefined,
-                respond({
-                    message: `There was no inventory found with the name: ${name}`,
-                    init: {
-                        status: 404
-                    }
-                })
-            );
+            return undefined;
 
         const todaysDate = new Date();
         todaysDate.setHours(0, 0, 0, 0);
@@ -502,9 +521,9 @@ class InventoryService {
                     }
                 }
             });
-            return await this.generateWholesomeCurrentSnapshot(inventory, newSnapshot);
-        } else return await this.generateWholesomeCurrentSnapshot(inventory, snapshot);
-    };
+            return await this.generateWholesomeCurrentSnapshotHeadless(inventory, newSnapshot);
+        } else return await this.generateWholesomeCurrentSnapshotHeadless(inventory, snapshot);
+    }
 
     async fetchCurrentSnapshots(ids: string[]): Promise<Either<InventorySnapshotWithOptionalExtras[], NextResponse>> {
         const inventories = await prisma.inventory.findMany({
@@ -670,17 +689,12 @@ class InventoryService {
         );
     };
 
-    private async generateWholesomeCurrentSnapshot(inventory: InventoryWithOptionalExtras, snapshot: InventorySnapshot & {
+    private async generateWholesomeCurrentSnapshotHeadless(inventory: InventoryWithOptionalExtras, snapshot: InventorySnapshot & {
         inventory: Inventory & {
             stock: Stock[]
         };
         stockSnapshots: StockSnapshot[]
-    }): Promise<Either<InventorySnapshot & {
-        inventory: Inventory & {
-            stock: Stock[]
-        },
-        stockSnapshots: StockSnapshot[]
-    }, NextResponse>> {
+    }) {
         if (!snapshot.stockSnapshots.length) {
             // Fetch all the stock items and create a snapshot for each one based on the snapshot for the most recent date before today.
             // This will be done in-memory and not committed to the database to ensure speed.
@@ -741,24 +755,33 @@ class InventoryService {
                     }
                 }));
 
-                return new Either<InventorySnapshot & {
-                    inventory: Inventory & {
-                        stock: Stock[]
-                    };
-                    stockSnapshots: StockSnapshot[]
-                }, NextResponse>({
+                return ({
                     ...snapshot,
                     stockSnapshots: createdSnapshots
-                });
+                })
             }
         }
 
+        return snapshot;
+    }
+
+    private async generateWholesomeCurrentSnapshot(inventory: InventoryWithOptionalExtras, snapshot: InventorySnapshot & {
+        inventory: Inventory & {
+            stock: Stock[]
+        };
+        stockSnapshots: StockSnapshot[]
+    }): Promise<Either<InventorySnapshot & {
+        inventory: Inventory & {
+            stock: Stock[]
+        },
+        stockSnapshots: StockSnapshot[]
+    }, NextResponse>> {
         return new Either<InventorySnapshot & {
             inventory: Inventory & {
                 stock: Stock[]
             };
             stockSnapshots: StockSnapshot[]
-        }, NextResponse>(snapshot);
+        }, NextResponse>(await this.generateWholesomeCurrentSnapshotHeadless(inventory, snapshot));
     };
 
     async updateCurrentStockSnapshot(
@@ -807,6 +830,23 @@ class InventoryService {
             data: dto
         }));
     };
+
+    async fetchLowStock(inventoryName: string) {
+        const fetchedSnapshot = await this.fetchCurrentSnapshot(inventoryName);
+        if (fetchedSnapshot.error)
+            return [];
+
+        const snapshot = fetchedSnapshot.success!;
+        const config = await configService.getConfig();
+        const lowStockItems: StockSnapshot[] = [];
+
+        snapshot.stockSnapshots?.forEach((item) => {
+            if (itemHasLowStock(config, item))
+                lowStockItems.push(item);
+        });
+
+        return lowStockItems;
+    }
 
     async fetchInsightsData(inventoryName: string, location: boolean = false): Promise<Either<StockTimeSeries[], NextResponse>> {
         const inventory = await inventoryService.fetchInventory(inventoryName, {

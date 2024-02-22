@@ -12,7 +12,7 @@ export const LowStockThreshold = {
     default: StockType.DEFAULT
 }
 
-export const itemHasLowStock = async (config: DeepRequired<Config>, item: StockSnapshot): Promise<boolean> => {
+export const itemHasLowStock = (config: DeepRequired<Config>, item: StockSnapshot): boolean => {
     switch (item.type) {
         case StockType.FLASK_DRINK: {
             return item.quantity <= config.inventoryConfig.lowStockThresholds.flaskDrink;

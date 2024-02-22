@@ -1,19 +1,19 @@
 "use client";
 
-import { Inventory, InventorySnapshot, Stock } from "@prisma/client";
+import { Config, Inventory, InventorySnapshot, Stock, User } from "@prisma/client";
 import useSWR from "swr";
 import { fetcher } from "../../../employees/_components/EmployeeGrid";
-import { useEffect } from "react";
-import { notFound, useRouter } from "next/navigation";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
-import InventoryStockTable, { columns } from "./table/InventoryStockTable";
-import { useUserData } from "../../../../../../utils/Hooks";
-import TableSkeleton from "../../../../../_components/skeletons/TableSkeleton";
+import InventoryStockTable from "./table/InventoryStockTable";
 import { InventorySnapshotWithExtras } from "../../../../../api/inventory/[name]/types";
-import { AxiosError } from "axios";
+import { DeepRequired } from "react-hook-form";
+import useOptimistic from "@/app/hooks/useOptimistic";
 
 type Props = {
-    name: string
+    name: string,
+    config: DeepRequired<Config>,
+    snapshot: InventorySnapshotWithExtras,
+    userData: User
 }
 
 const useInventoryInfo = (name: string) => {
@@ -27,52 +27,28 @@ const useCurrentSnapshot = (name: string) => {
     return useSWR(`/api/inventory/${name}/currentsnapshot`, fetcher<InventorySnapshotWithExtras>);
 };
 
-export default function Inventory({ name }: Props) {
-    const { isLoading: userDataIsLoading, data: userData } = useUserData();
-    const { isLoading: inventoryDataLoading, error: inventoryDataError } = useInventoryInfo(name);
-    const {
-        data: currentSnapshotData,
-        isLoading: currentSnapshotDataLoading,
-        mutate: mutateCurrentSnapshot
-    } = useCurrentSnapshot(name);
-    const router = useRouter();
-
-    useEffect(() => {
-        if (!userDataIsLoading &&
-            (!userData || !hasAnyPermission(userData.permissions, [
-                Permission.VIEW_INVENTORY,
-                Permission.CREATE_INVENTORY,
-                Permission.MUTATE_STOCK
-            ]))
-        )
-            return router.push("/home");
-    }, [router, userData, userDataIsLoading]);
-
-    useEffect(() => {
-        if (!inventoryDataError || !(inventoryDataError instanceof AxiosError))
-            return;
-        const status = inventoryDataError.response!.status;
-        if (status === 404)
-            notFound();
-    }, [inventoryDataError]);
+export default function Inventory({ name, config, snapshot, userData }: Props) {
+    // const { isLoading: userDataIsLoading, data: userData } = useUserData();
+    // const { isLoading: inventoryDataLoading, error: inventoryDataError } = useInventoryInfo(name);
+    // const {
+    //     data: currentSnapshotData,
+    //     isLoading: currentSnapshotDataLoading,
+    //     mutate: mutateCurrentSnapshot
+    // } = useCurrentSnapshot(name);
+    const [currentSnapshotData, mutateCurrentSnapshot] = useOptimistic(
+        snapshot,
+        (state, newState: InventorySnapshotWithExtras) => (newState)
+    )
 
     return (
         <div className="default-container p-12 tablet:px-2">
-            {
-                inventoryDataLoading || currentSnapshotDataLoading ?
-                    <TableSkeleton columns={columns} contentRepeat={20} />
-                    :
-                    !inventoryDataError ?
-                        <InventoryStockTable
-                            inventoryName={name}
-                            currentSnapshot={currentSnapshotData}
-                            mutateCurrentSnapshot={mutateCurrentSnapshot}
-                            snapshotLoading={currentSnapshotDataLoading}
-                            mutationAllowed={hasAnyPermission(userData?.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
-                        />
-                        :
-                        <div>There was an error</div>
-            }
+            <InventoryStockTable
+                type="server-data"
+                inventoryName={name}
+                currentSnapshot={currentSnapshotData}
+                mutateCurrentSnapshot={mutateCurrentSnapshot}
+                mutationAllowed={hasAnyPermission(userData.permissions, [Permission.CREATE_INVENTORY, Permission.MUTATE_STOCK])}
+            />
         </div>
     );
 }

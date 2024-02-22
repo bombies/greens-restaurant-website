@@ -2,7 +2,7 @@ import {ZodError} from "zod";
 import {NextRequest, NextResponse} from "next/server";
 import RateLimiter, { RateLimiterGeoLimit } from "./rate-limiter";
 
-export type ApiRoute<Ctx = unknown> = (req: NextRequest, context?: {params: Ctx}) => Promise<NextResponse>
+export type ApiRoute<Ctx extends Record<string, string> | unknown = unknown> = (req: NextRequest, context: {params: Ctx}) => Promise<NextResponse>
 
 export type RouteResponseType<T> = {
     status?: number,

@@ -10,19 +10,22 @@ import GenericStockTable, { StockTableColumnKey } from "./generic/GenericStockTa
 import AddStockItemModal from "./generic/AddStockItemModal";
 import { InventorySnapshotWithExtras } from "../../../../../../api/inventory/[name]/types";
 import StockTextField from "./generic/StockTextField";
+import { Column } from "@/app/(site)/(accessible-site)/invoices/[id]/[invoiceId]/components/table/InvoiceTable";
 
-type Props = {
+type DefaultProps = {
     inventoryName: string,
     currentSnapshot?: InventorySnapshotWithExtras,
-    snapshotLoading: boolean,
-    mutateCurrentSnapshot: KeyedMutator<InventorySnapshotWithExtras | undefined>,
+    snapshotLoading?: boolean,
     mutationAllowed?: boolean
 }
 
-type Column = {
-    key: string,
-    value: string,
-}
+type Props = {
+    type?: "client-data"
+    mutateCurrentSnapshot: KeyedMutator<InventorySnapshotWithExtras | undefined>,
+} & DefaultProps | {
+    type: "server-data",
+    mutateCurrentSnapshot: (newState: InventorySnapshotWithExtras) => void,
+} & DefaultProps
 
 
 export const columns: Column[] = [
@@ -41,17 +44,19 @@ export const columns: Column[] = [
 ];
 
 export default function InventoryStockTable({
-                                                inventoryName,
-                                                currentSnapshot,
-                                                snapshotLoading,
-                                                mutateCurrentSnapshot,
-                                                mutationAllowed
-                                            }: Props) {
+    type,
+    inventoryName,
+    currentSnapshot,
+    snapshotLoading = false,
+    mutateCurrentSnapshot,
+    mutationAllowed
+}: Props) {
     const {
         addOptimisticStockItem,
         updateOptimisticStockSnapshot,
         removeOptimisticStockItems
-    } = useInventoryStockOptimisticUpdates({ inventoryName, currentSnapshot, mutateCurrentSnapshot });
+        // @ts-ignore
+    } = useInventoryStockOptimisticUpdates({ type, inventoryName, currentSnapshot, mutateCurrentSnapshot });
     const [addItemModalOpen, setAddItemModalOpen] = useState(false);
 
     return (
