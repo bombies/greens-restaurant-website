@@ -3,7 +3,7 @@
 import { KeyedMutator } from "swr";
 import useInventoryStockUpdate from "./useInventoryStockUpdate";
 import useInventoryStockDelete from "./useInventoryStockDelete";
-import { startTransition, useCallback } from "react";
+import { useCallback } from "react";
 import { errorToast } from "../../../../../../../../utils/Hooks";
 import {
     PartialStockSnapshotWithStock
@@ -11,19 +11,21 @@ import {
 import { StockSnapshot } from "@prisma/client";
 import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/[name]/types";
 import { revalidatePath } from "next/cache";
+import { OptimisticMutator } from "@/app/hooks/useOptimistic";
+import toast from "react-hot-toast";
 
 type DefaultProps = {
     inventoryName: string,
     currentSnapshot?: InventorySnapshotWithExtras,
 }
 
-type Props = {
+type Props = ({
     type?: "client-data"
     mutateCurrentSnapshot: KeyedMutator<InventorySnapshotWithExtras | undefined>
-} & DefaultProps | {
+} | {
     type: "server-data",
-    mutateCurrentSnapshot: (newState: InventorySnapshotWithExtras) => void
-} & DefaultProps
+    mutateCurrentSnapshot: OptimisticMutator<InventorySnapshotWithExtras>
+}) & DefaultProps
 
 const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapshot, mutateCurrentSnapshot }: Props) => {
     const { trigger: updateStock } = useInventoryStockUpdate(inventoryName);
@@ -33,21 +35,33 @@ const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapsh
         if (!currentSnapshot)
             return;
 
-        await mutateCurrentSnapshot({
-            ...currentSnapshot,
-            stockSnapshots: currentSnapshot?.stockSnapshots ? [...currentSnapshot.stockSnapshots, item] : [item]
-        });
-    }, [currentSnapshot, mutateCurrentSnapshot]);
+        if (!type || type === 'client-data')
+            await mutateCurrentSnapshot({
+                ...currentSnapshot,
+                stockSnapshots: currentSnapshot?.stockSnapshots ? [...currentSnapshot.stockSnapshots, item] : [item]
+            });
+        else if (type === 'server-data') {
+            mutateCurrentSnapshot({
+                ...currentSnapshot,
+                stockSnapshots: currentSnapshot?.stockSnapshots ? [...currentSnapshot.stockSnapshots, item] : [item]
+            })
+        }
+
+        toast.success(`Added ${item.name?.replaceAll("-", " ")} to inventory!`)
+    }, [currentSnapshot, mutateCurrentSnapshot, type]);
 
     const removeOptimisticStockItems = useCallback(async (itemUIDs: string[]) => {
         if (!currentSnapshot)
             return;
 
         const stockSnapshots = currentSnapshot.stockSnapshots.filter(item => !itemUIDs.includes(item.uid));
+        const deletedItems = currentSnapshot.stockSnapshots.filter(item => itemUIDs.includes(item.uid));
         if (!type || type === 'client-data')
             await mutateCurrentSnapshot(
                 deleteStock({
-                    uids: itemUIDs
+                    body: {
+                        ids: itemUIDs.toString()
+                    }
                 })
                     .then(() => {
                         return {
@@ -70,13 +84,21 @@ const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapsh
                     },
                     revalidate: false
                 });
-        else {
+        else if (type === 'server-data') {
             mutateCurrentSnapshot({
                 ...currentSnapshot,
                 stockSnapshots
             })
+
+            if (deletedItems.length === 1)
+                toast.success(`Deleted ${deletedItems[0].name?.replaceAll("-", " ")} from inventory!`)
+            else
+                toast.success(`Deleted ${itemUIDs.length} items from inventory!`)
+
             deleteStock({
-                uids: itemUIDs
+                body: {
+                    ids: itemUIDs.toString()
+                }
             })
         }
     }, [currentSnapshot, deleteStock, mutateCurrentSnapshot, type]);
@@ -124,11 +146,13 @@ const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapsh
                     },
                     revalidate: false
                 });
-        else {
+        else if (type === 'server-data') {
             mutateCurrentSnapshot({
                 ...currentSnapshot,
                 stockSnapshots: snapshots
             })
+
+            toast.success(`Updated ${item.name?.replaceAll("-", " ")}!`)
 
             updateStock({
                 stockUID: snapshot.uid,

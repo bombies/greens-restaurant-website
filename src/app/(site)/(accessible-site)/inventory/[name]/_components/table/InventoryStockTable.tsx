@@ -11,6 +11,7 @@ import AddStockItemModal from "./generic/AddStockItemModal";
 import { InventorySnapshotWithExtras } from "../../../../../../api/inventory/[name]/types";
 import StockTextField from "./generic/StockTextField";
 import { Column } from "@/app/(site)/(accessible-site)/invoices/[id]/[invoiceId]/components/table/InvoiceTable";
+import { AsyncMutator, OptimisticMutator } from "@/app/hooks/useOptimistic";
 
 type DefaultProps = {
     inventoryName: string,
@@ -24,7 +25,7 @@ type Props = {
     mutateCurrentSnapshot: KeyedMutator<InventorySnapshotWithExtras | undefined>,
 } & DefaultProps | {
     type: "server-data",
-    mutateCurrentSnapshot: (newState: InventorySnapshotWithExtras) => void,
+    mutateCurrentSnapshot: OptimisticMutator<InventorySnapshotWithExtras>,
 } & DefaultProps
 
 

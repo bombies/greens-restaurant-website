@@ -1,8 +1,6 @@
 "use client";
 
-import { Config, Inventory, InventorySnapshot, Stock, User } from "@prisma/client";
-import useSWR from "swr";
-import { fetcher } from "../../../employees/_components/EmployeeGrid";
+import { Config, Inventory, User } from "@prisma/client";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import InventoryStockTable from "./table/InventoryStockTable";
 import { InventorySnapshotWithExtras } from "../../../../../api/inventory/[name]/types";
@@ -16,25 +14,7 @@ type Props = {
     userData: User
 }
 
-const useInventoryInfo = (name: string) => {
-    return useSWR(`/api/inventory/${name}`, fetcher<Inventory & {
-        snapshots: InventorySnapshot[],
-        stock: Stock[]
-    }>);
-};
-
-const useCurrentSnapshot = (name: string) => {
-    return useSWR(`/api/inventory/${name}/currentsnapshot`, fetcher<InventorySnapshotWithExtras>);
-};
-
 export default function Inventory({ name, config, snapshot, userData }: Props) {
-    // const { isLoading: userDataIsLoading, data: userData } = useUserData();
-    // const { isLoading: inventoryDataLoading, error: inventoryDataError } = useInventoryInfo(name);
-    // const {
-    //     data: currentSnapshotData,
-    //     isLoading: currentSnapshotDataLoading,
-    //     mutate: mutateCurrentSnapshot
-    // } = useCurrentSnapshot(name);
     const [currentSnapshotData, mutateCurrentSnapshot] = useOptimistic(
         snapshot,
         (state, newState: InventorySnapshotWithExtras) => (newState)

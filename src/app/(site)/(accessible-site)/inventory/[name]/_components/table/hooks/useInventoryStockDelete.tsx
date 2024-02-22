@@ -1,17 +1,13 @@
 "use client";
 
-import axios from "axios";
+import { StockWithOptionalExtras } from "@/app/api/inventory/[name]/types";
+import { $deleteWithArgs } from "@/utils/swr-utils";
 import useSWRMutation from "swr/mutation";
 
-type DeleteStockItemsArgs = {
-    arg: {
-        uids: string[]
-    }
-}
+type DeleteStockItemsArgs = { ids: string }
 
 const DeleteStockItems = (inventoryName?: string) => {
-    const mutator = (url: string, { arg }: DeleteStockItemsArgs) => axios.delete(url.replaceAll("{uids}", arg.uids.toString()));
-    return useSWRMutation(`/api/inventory/${inventoryName}/stock?ids={uids}`, mutator);
+    return useSWRMutation(`/api/inventory/${inventoryName}/stock`, $deleteWithArgs<DeleteStockItemsArgs, StockWithOptionalExtras[]>());
 };
 
 const useInventoryStockDelete = (inventoryName?: string) => {
