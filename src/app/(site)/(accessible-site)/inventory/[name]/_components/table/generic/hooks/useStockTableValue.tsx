@@ -16,34 +16,36 @@ type Props = {
 }
 
 const useStockTableValue = ({
-                                getKeyValue,
-                                mutationAllowed,
-                                onQuantityDecrement,
-                                onQuantityIncrement,
-                                onStockDelete,
-                                onItemTypeEdit,
-                                showItemTypeEditAction
-                            }: Props) => {
+    getKeyValue,
+    mutationAllowed,
+    onQuantityDecrement,
+    onQuantityIncrement,
+    onStockDelete,
+    onItemTypeEdit,
+    showItemTypeEditAction
+}: Props) => {
 
     return useCallback((item: StockSnapshot, key: Key) => {
         switch (key) {
             case "stock_actions": {
                 return (
-                    <StockTableActions
-                        item={item}
-                        onQuantityDecrement={onQuantityDecrement}
-                        onQuantityIncrement={onQuantityIncrement}
-                        onStockDelete={onStockDelete}
-                        onItemTypeEdit={onItemTypeEdit}
-                        showItemTypeEditAction={showItemTypeEditAction}
-                    />
+                    mutationAllowed ? (
+                        <StockTableActions
+                            item={item}
+                            onQuantityDecrement={onQuantityDecrement}
+                            onQuantityIncrement={onQuantityIncrement}
+                            onStockDelete={onStockDelete}
+                            onItemTypeEdit={onItemTypeEdit}
+                            showItemTypeEditAction={showItemTypeEditAction}
+                        />
+                    ) : (<></>)
                 );
             }
             default: {
                 return getKeyValue(item, key as StockTableColumnKey);
             }
         }
-    }, [getKeyValue, onItemTypeEdit, onQuantityDecrement, onQuantityIncrement, onStockDelete, showItemTypeEditAction]);
+    }, [getKeyValue, mutationAllowed, onItemTypeEdit, onQuantityDecrement, onQuantityIncrement, onStockDelete, showItemTypeEditAction]);
 };
 
 export default useStockTableValue;

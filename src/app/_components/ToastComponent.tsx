@@ -7,7 +7,7 @@ import clsx from "clsx";
 import { JSX } from "react";
 
 type Props = {
-    toastObj: Toast
+    toastObj?: Toast
     data: ToastDataProps
 }
 
@@ -29,9 +29,11 @@ export default function ToastComponent(props: Props) {
                 flex
                 gap-4
                 justify-between`,
-                props.toastObj.visible ? "animate-enter" : "animate-leave"
+                props.toastObj && (props.toastObj.visible ? "animate-enter" : "animate-leave")
             )}
+            role="alert"
         >
+            {svgIcon && <div className="self-center">{svgIcon}</div>}
             {icon && <GenericImage className="self-center" src={icon} width={1.5} />}
             <div className="self-center">
                 {

@@ -20,13 +20,16 @@ type DefaultProps = {
     mutationAllowed?: boolean
 }
 
-type Props = {
+type Props = ({
     type?: "client-data"
     mutateCurrentSnapshot: KeyedMutator<InventorySnapshotWithExtras | undefined>,
-} & DefaultProps | {
+} | {
     type: "server-data",
     mutateCurrentSnapshot: OptimisticMutator<InventorySnapshotWithExtras>,
-} & DefaultProps
+} | {
+    type: "read-only",
+    mutateCurrentSnapshot?: undefined,
+}) & DefaultProps
 
 
 export const columns: Column[] = [
@@ -62,13 +65,17 @@ export default function InventoryStockTable({
 
     return (
         <Fragment>
-            <AddStockItemModal
-                inventoryName={inventoryName}
-                inventorySnapshot={currentSnapshot}
-                isOpen={addItemModalOpen}
-                setOpen={setAddItemModalOpen}
-                addOptimisticStockItem={addOptimisticStockItem}
-            />
+            {
+                mutationAllowed && (
+                    <AddStockItemModal
+                        inventoryName={inventoryName}
+                        inventorySnapshot={currentSnapshot}
+                        isOpen={addItemModalOpen}
+                        setOpen={setAddItemModalOpen}
+                        addOptimisticStockItem={addOptimisticStockItem}
+                    />
+                )
+            }
             <GenericStockTable
                 stock={currentSnapshot?.stockSnapshots ?? []}
                 stockLoading={snapshotLoading}
@@ -79,6 +86,7 @@ export default function InventoryStockTable({
                         case StockTableColumnKey.STOCK_NAME: {
                             return (
                                 <StockTextField
+                                    disabled={!mutationAllowed}
                                     stockSnapshot={item}
                                     field="name"
                                     onSet={async (text) => {
@@ -90,6 +98,7 @@ export default function InventoryStockTable({
                         case StockTableColumnKey.STOCK_QUANTITY: {
                             return (
                                 <StockNumericField
+                                    disabled={!mutationAllowed}
                                     stockSnapshot={item}
                                     onSet={async (quantity) => {
                                         await updateOptimisticStockSnapshot(item, quantity);
@@ -100,6 +109,7 @@ export default function InventoryStockTable({
                         case StockTableColumnKey.STOCK_PRICE: {
                             return (
                                 <StockNumericField
+                                    disabled={!mutationAllowed}
                                     stockSnapshot={item}
                                     onSet={async (quantity) => {
                                         await updateOptimisticStockSnapshot({ uid: item.uid, price: quantity });

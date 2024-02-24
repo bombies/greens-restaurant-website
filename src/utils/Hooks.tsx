@@ -3,8 +3,7 @@
 import { AppDispatch, AppState } from "./redux/GlobalStore";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { toast, ToastOptions } from "react-hot-toast";
-import ToastComponent, { ToastDataProps } from "../app/_components/ToastComponent";
-import React, {
+import {
     MutableRefObject,
     SetStateAction,
     useCallback,

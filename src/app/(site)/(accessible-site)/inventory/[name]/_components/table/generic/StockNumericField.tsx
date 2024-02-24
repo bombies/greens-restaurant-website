@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import GenericModal from "../../../../../../../_components/GenericModal";
 import StockNumericForm from "./forms/StockNumericForm";
 import { StockSnapshot } from "@prisma/client";
@@ -16,6 +16,12 @@ type Props = {
 
 export default function StockNumericField({ stockSnapshot, onSet, disabled, currency }: Props) {
     const [editModalOpen, setEditModalOpen] = useState(false);
+
+    const content = useMemo(() => (
+        <span className="text-sm">
+            {currency ? dollarFormat.format(currency === "cost" ? stockSnapshot.price : stockSnapshot.sellingPrice) : stockSnapshot.quantity}
+        </span>
+    ), [currency, stockSnapshot.price, stockSnapshot.quantity, stockSnapshot.sellingPrice])
 
     return (
         <Fragment>
@@ -38,20 +44,20 @@ export default function StockNumericField({ stockSnapshot, onSet, disabled, curr
                     isCurrency={!!currency}
                 />
             </GenericModal>
-            <GenericButton
-                className="tablet:!p-2"
-                color="default"
-                variant="light"
-                onPress={() => {
-                    if (disabled)
-                        return;
-                    setEditModalOpen(true);
-                }}
-            >
-              <span className="text-sm">
-                  {currency ? dollarFormat.format(currency === "cost" ? stockSnapshot.price : stockSnapshot.sellingPrice) : stockSnapshot.quantity}
-              </span>
-            </GenericButton>
+            {disabled ? (content) : (
+                <GenericButton
+                    className="tablet:!p-2"
+                    color="default"
+                    variant="light"
+                    onPress={() => {
+                        if (disabled)
+                            return;
+                        setEditModalOpen(true);
+                    }}
+                >
+                    {content}
+                </GenericButton>
+            )}
         </Fragment>
     );
 }
