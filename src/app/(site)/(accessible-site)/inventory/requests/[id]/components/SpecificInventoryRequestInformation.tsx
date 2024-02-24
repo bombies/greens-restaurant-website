@@ -1,12 +1,11 @@
 "use client";
 
-import { FC, Fragment, useMemo } from "react";
-import { StockRequestWithOptionalExtras } from "../../../_components/requests/inventory-requests-utils";
-import { Spinner } from "@nextui-org/spinner";
+import { FC, Fragment } from "react";
 import { Divider } from "@nextui-org/divider";
 import UserAvatar from "../../../../../../_components/UserAvatar";
 import { InventoryRequestDetails } from "../../../_components/requests/InventoryRequestCard";
 import ContainerSkeleton from "app/_components/skeletons/ContainerSkeleton";
+import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 
 type Props = {
     request?: StockRequestWithOptionalExtras,
