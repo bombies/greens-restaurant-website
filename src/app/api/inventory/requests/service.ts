@@ -16,6 +16,29 @@ import Permission, { hasAnyPermission } from "../../../../libs/types/permission"
 import StockRequestWhereInput = Prisma.StockRequestWhereInput;
 import { Mailer } from "../../../../utils/api/mail/Mailer";
 import { Session } from "next-auth";
+import { PaginatedResponse, buildResponse } from "../../utils/utils";
+
+type FetchStockRequestSearchParams = {
+    status: StockRequestStatus,
+    withItems: boolean,
+    withUsers: boolean,
+    withAssignees: boolean,
+    withReviewer: boolean,
+    withLocation: boolean,
+    withStock: boolean,
+    from?: number,
+    to?: number,
+
+    // Pagination
+    cursor?: string
+    limit?: number
+}
+
+type FetchRequestsArgs = Partial<{
+    userId: string,
+    userPermissions: number
+    strictySelf: boolean
+} & FetchStockRequestSearchParams>
 
 class InventoryRequestsService {
 
@@ -118,48 +141,153 @@ class InventoryRequestsService {
         }) as any;
     };
 
-    public fetchRequests = async (userId: string, userPermissions: number, {
+    getFetchStockRequestsSearchParams(url: string): FetchStockRequestSearchParams {
+        const { searchParams } = new URL(url);
+        const status = searchParams.get("status")?.toLowerCase() as StockRequestStatus;
+        const withItems = searchParams.get("with_items")?.toLowerCase() === "true" || false;
+        const withUsers = searchParams.get("with_users")?.toLowerCase() === "true" || false;
+        const withStock = searchParams.get("with_stock")?.toLowerCase() === "true" || false;
+        const withReviewer = searchParams.get("with_reviewer")?.toLowerCase() === "true" || false;
+        const withAssignees = searchParams.get("with_assignees")?.toLowerCase() === "true" || false;
+        const withLocation = searchParams.get("with_location")?.toLowerCase() === "true" || false;
+        const from: number | undefined = searchParams.get("from") ? Number(searchParams.get("from")) : undefined;
+        const to: number | undefined = searchParams.get("to") ? Number(searchParams.get("to")) : undefined;
+
+        /**
+         * Pagination
+         */
+        const cursor = searchParams.get("cursor") || undefined;
+        const limit = searchParams.get("limit") ? Number(searchParams.get("limit")) : undefined;
+
+        return {
+            status,
+            withItems,
+            withUsers,
+            withAssignees,
+            from,
+            to,
+            withStock,
+            withReviewer,
+            withLocation,
+            cursor,
+            limit
+        };
+    };
+
+    public fetchRequests = async ({
+        userId,
+        userPermissions,
         withUsers,
         withAssignees,
         withItems,
-        status
-    }: {
-        status?: StockRequestStatus,
-        withItems: boolean,
-        withUsers: boolean,
-        withAssignees: boolean,
-    }): Promise<StockRequestWithOptionalExtras[]> => {
-        let whereInput: StockRequestWhereInput = {};
+        status,
+        from,
+        to,
+        withStock,
+        withLocation,
+        withReviewer,
+        strictySelf = false,
+        cursor,
+        limit
+    }: FetchRequestsArgs): Promise<PaginatedResponse<StockRequestWithOptionalExtras> | StockRequestWithOptionalExtras[]> => {
+        let whereQuery: StockRequestWhereInput = {};
 
-        if (!hasAnyPermission(userPermissions, [
+        if ((strictySelf || !hasAnyPermission(userPermissions, [
             Permission.CREATE_INVENTORY,
             Permission.VIEW_STOCK_REQUESTS,
             Permission.MANAGE_STOCK_REQUESTS
-        ]))
-            whereInput = { requestedByUserId: userId };
+        ])) && userId)
+            whereQuery = { requestedByUserId: userId };
 
-        if (status !== undefined)
-            whereInput = {
-                ...whereInput,
+        if (status)
+            whereQuery = {
+                ...whereQuery,
                 status
             };
 
-        return prisma.stockRequest.findMany({
-            where: whereInput,
-            include: {
-                requestedItems: withItems && {
-                    include: {
-                        stock: {
-                            include: {
-                                inventory: true
-                            }
+        if (from && to) {
+            whereQuery = {
+                ...whereQuery,
+                OR: [
+                    {
+                        deliveredAt: { isSet: false },
+                        createdAt: {
+                            gte: new Date(from),
+                            lte: new Date(to)
+                        }
+                    },
+                    {
+                        deliveredAt: {
+                            gte: new Date(from),
+                            lte: new Date(to)
                         }
                     }
-                },
-                assignedLocation: true,
+                ]
+            };
+        } else {
+            if (from)
+                whereQuery = {
+                    ...whereQuery,
+                    OR: [
+                        {
+                            deliveredAt: { isSet: false },
+                            createdAt: {
+                                gte: new Date(from)
+                            }
+                        },
+                        {
+                            deliveredAt: {
+                                gte: new Date(from)
+                            }
+                        }
+                    ]
+                };
+
+            if (to)
+                whereQuery = {
+                    ...whereQuery,
+                    OR: [
+                        {
+                            deliveredAt: { isSet: false },
+                            createdAt: {
+                                lte: new Date(to)
+                            }
+                        },
+                        {
+                            deliveredAt: {
+                                lte: new Date(to)
+                            }
+                        }
+                    ]
+                };
+        }
+
+        const requests = await prisma.stockRequest.findMany({
+            cursor: cursor && cursor.length ? {
+                id: cursor,
+            } : undefined,
+            take: limit,
+            skip: cursor && cursor.length ? 1 : 0,
+            where: whereQuery,
+            include: {
+                requestedItems: withItems && (withStock ? {
+                    include: {
+                        stock: true
+                    }
+                } : true),
+                assignedLocation: withLocation,
                 requestedByUser: withUsers,
-                assignedToUsers: withAssignees
+                assignedToUsers: withAssignees,
+                reviewedByUser: withReviewer
+            },
+            orderBy: {
+                createdAt: "desc"
             }
+        })
+
+        return !limit ? requests : ({
+            data: requests,
+            nextCursor: requests.length > 1 ? requests[requests.length - 1]?.id ?? null : null
         });
     };
 

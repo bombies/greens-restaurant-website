@@ -1,25 +1,18 @@
 "use client";
 
 import React, { createContext, useContext } from "react";
-import axios, { AxiosResponse } from "axios";
 import useSWRMutation, { SWRMutationResponse } from "swr/mutation";
-import { CreateStockRequestDto } from "../../../../../../api/inventory/requests/types";
-
-type CreateNewRequestArgs = {
-    arg: {
-        dto: CreateStockRequestDto
-    }
-}
+import { CreateStockRequestDto, StockRequestWithOptionalExtras } from "../../../../../../api/inventory/requests/types";
+import { $post } from "@/utils/swr-utils";
 
 const CreateNewRequest = () => {
-    const mutator = (url: string, { arg }: CreateNewRequestArgs) => axios.post(url, arg.dto);
-    return useSWRMutation("/api/inventory/requests/me", mutator);
+    return useSWRMutation("/api/inventory/requests/me", $post<CreateStockRequestDto, StockRequestWithOptionalExtras>());
 };
 
 
-const TriggerRequestCreationContext = createContext<
-    SWRMutationResponse<AxiosResponse<any>, any, "/api/inventory/requests/me", { dto: CreateStockRequestDto }>
-    | undefined>(undefined);
+const TriggerRequestCreationContext = createContext<SWRMutationResponse<StockRequestWithOptionalExtras | undefined, any, "/api/inventory/requests/me", {
+    body: CreateStockRequestDto;
+}> | undefined>(undefined);
 
 export default function TriggerRequestCreationProvider({ children }: React.PropsWithChildren) {
     return (

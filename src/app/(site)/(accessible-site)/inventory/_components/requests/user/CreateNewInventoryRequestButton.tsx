@@ -4,16 +4,13 @@ import { FC, Fragment, useState } from "react";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import PlusIcon from "../../../../../../_components/icons/PlusIcon";
 import GenericModal from "../../../../../../_components/GenericModal";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import NewInventoryRequestForm from "./form/NewInventoryRequestForm";
-import { KeyedMutator } from "swr";
-import { StockRequestWithOptionalCreatorAndAssignees } from "../inventory-requests-utils";
+import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 
 type Props = {
-    visibleData?: StockRequestWithOptionalCreatorAndAssignees[],
-    mutator: KeyedMutator<StockRequestWithOptionalCreatorAndAssignees[] | undefined>
+    onRequestCreate: (request: StockRequestWithOptionalExtras) => void
 }
-const CreateNewInventoryRequestButton: FC<Props> = ({mutator, visibleData}) => {
+const CreateNewInventoryRequestButton: FC<Props> = ({ onRequestCreate }) => {
     const [modalOpen, setModalOpen] = useState(false);
 
     return (
@@ -26,8 +23,7 @@ const CreateNewInventoryRequestButton: FC<Props> = ({mutator, visibleData}) => {
                 isDismissable={false}
             >
                 <NewInventoryRequestForm
-                    mutator={mutator}
-                    visibleData={visibleData}
+                    onRequestCreate={onRequestCreate}
                     setModalOpen={setModalOpen}
                 />
             </GenericModal>

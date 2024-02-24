@@ -13,9 +13,10 @@ import DeliveredIcon from "../../../../../../_components/icons/DeliveredIcon";
 import DeniedIcon from "../../../../../../_components/icons/DeniedIcon";
 import CheckboxMenu from "../../../../../../_components/CheckboxMenu";
 import { getInventoryRequestDisplayDate } from "../../../utils/inventory-utils";
+import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 
 type Props = {
-    data?: StockRequestWithOptionalCreatorAndAssignees[],
+    data?: StockRequestWithOptionalExtras[],
     dataIsLoading: boolean,
 }
 

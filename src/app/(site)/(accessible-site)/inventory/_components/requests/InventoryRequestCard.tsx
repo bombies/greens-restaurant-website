@@ -4,13 +4,13 @@ import { FC, Fragment, PropsWithChildren, useMemo } from "react";
 import LinkCard from "../../../../../_components/LinkCard";
 import { Divider } from "@nextui-org/divider";
 import SubTitle from "../../../../../_components/text/SubTitle";
-import { StockRequestWithOptionalExtras } from "./inventory-requests-utils";
 import { AvatarGroup, Chip, Spacer, User } from "@nextui-org/react";
 import useRequestStatus from "../hooks/useRequestStatus";
 import { getInventoryRequestDisplayDate } from "../../utils/inventory-utils";
 import LocationIcon from "app/_components/icons/LocationIcon";
 import UserAvatar from "app/_components/UserAvatar";
 import { getUserAvatarString } from "app/(site)/(accessible-site)/employees/employee-utils";
+import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 
 interface Props {
     request: StockRequestWithOptionalExtras;

@@ -20,10 +20,10 @@ export type InventoryWithRequestedStockItems = {
 export type StockRequestWithOptionalExtras = StockRequestWithOptionalCreatorAndItems
     & Pick<StockRequestWithOptionalAssignees, "assignedToUsers">
     & {
-    reviewedByUser?: User,
-    assignedLocation?: InventoryWithOptionalExtras,
-    requestedItems: RequestedStockItemWithOptionalExtras[]
-}
+        reviewedByUser?: User | null,
+        assignedLocation?: InventoryWithOptionalExtras,
+        requestedItems: RequestedStockItemWithOptionalExtras[]
+    }
 
 export type RequestedStockItemWithOptionalExtras = RequestedStockItem & {
     stock?: Omit<StockWithOptionalExtras, "inventory"> & { inventory?: InventoryWithOptionalExtras | null },
@@ -64,10 +64,11 @@ export type CreateStockRequestDto = Pick<StockRequest, "assignedToUsersId" | "as
 
 export const createStockRequestSchemaDto = z.object({
     assignedToUsersId: z.array(z.string()).optional(),
-    assignedLocationId: z.string().nonempty("The location ID must be provided!"),
+    assignedLocationId: z.string().min(1, "The location ID must be provided!"),
     items: z.array(z.object({
         amountRequested: z.number(),
         stockId: z.string(),
         stockUID: z.string()
     }))
 }).strict();
+

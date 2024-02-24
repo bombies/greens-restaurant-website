@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { RequestedStockItem, StockRequest } from "@prisma/client";
 import { z } from "zod";
 import { StockRequestStatus } from ".prisma/client";
-import selfUserService from "../service";
+import inventoryRequestsService from "../../service";
 
 type Context = {
     params: {
@@ -15,7 +15,7 @@ type Context = {
 
 export async function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async (session) => {
-        const { withItems } = selfUserService.getFetchStockRequestsSearchParams(req.url);
+        const { withItems } = inventoryRequestsService.getFetchStockRequestsSearchParams(req.url);
         const request = await prisma.stockRequest.findFirst({
             where: {
                 AND: [

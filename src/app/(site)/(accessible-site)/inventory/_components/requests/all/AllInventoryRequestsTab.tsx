@@ -1,22 +1,22 @@
 "use client"
 
-import React, { FC, Fragment, useCallback, useEffect, useMemo } from "react";
+import React, { FC, Fragment, useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
-import { StockRequestWithOptionalCreator } from "../inventory-requests-utils";
 import InventoryRequestCard from "../InventoryRequestCard";
 import { Divider } from "@nextui-org/divider";
 import GenericCard from "../../../../../../_components/GenericCard";
 import SubTitle from "../../../../../../_components/text/SubTitle";
 import useMutableRequests from "../hooks/useMutableRequests";
-import CardSkeleton from "../../../../../../_components/skeletons/CardSkeleton";
 import { useUserData } from "../../../../../../../utils/Hooks";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { useRouter } from "next/navigation";
-import useLazyChunkedItems from "@/app/_components/hooks/useLazyChunkedItems";
 import GenericButton from "@/app/_components/inputs/GenericButton";
 import { LoaderIcon } from "lucide-react";
-import { Spacer } from "@nextui-org/react";
+import { Spacer, Spinner } from "@nextui-org/react";
+import useAsyncChunkedItems from "@/app/_components/hooks/useAsyncChunkedItems";
+import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
+import CardSkeleton from "@/app/_components/skeletons/CardSkeleton";
 
 type FetchAllRequestArgs = {
     withAssignees?: boolean,
@@ -25,7 +25,7 @@ type FetchAllRequestArgs = {
 }
 
 export const FetchAllRequests = (args?: FetchAllRequestArgs) => {
-    return useSWR((args?.doFetch || args?.doFetch === undefined) && `/api/inventory/requests?with_users=true&with_assignees=${args?.withAssignees ?? false}&with_location=${args?.withLocation ?? false}`, fetcher<StockRequestWithOptionalCreator[]>);
+    return useSWR((args?.doFetch || args?.doFetch === undefined) && `/api/inventory/requests?with_users=true&with_assignees=${args?.withAssignees ?? false}&with_location=${args?.withLocation ?? false}`, fetcher<StockRequestWithOptionalExtras[]>);
 };
 
 const AllInventoryRequestsPage: FC = () => {
@@ -35,20 +35,24 @@ const AllInventoryRequestsPage: FC = () => {
         Permission.MANAGE_STOCK_REQUESTS, Permission.VIEW_STOCK_REQUESTS
     ]);
 
-    const { data, isLoading } = FetchAllRequests({
-        withAssignees: true,
-        withLocation: true,
-        doFetch: true
+    const {
+        list: loadedRequests,
+        hasMoreToLoad,
+        isLoading: itemsLoading,
+        initialItemsLoading
+    } = useAsyncChunkedItems<StockRequestWithOptionalExtras>("/api/inventory/requests", 20, {
+        [`with_assignees`]: "true",
+        [`with_location`]: "true",
+        [`with_users`]: "true"
     });
 
     const { visibleRequests, sortButton, filterButton } = useMutableRequests({
-        data, dataIsLoading: isLoading
+        data: loadedRequests.items ?? [], dataIsLoading: itemsLoading
     });
 
-    const { loadedItems: loadedRequests, hasMoreToLoad } = useLazyChunkedItems(visibleRequests ?? [], 20);
 
     const requestCards = useMemo(() => {
-        return loadedRequests.items
+        return visibleRequests
             ?.map(req => (
                 <InventoryRequestCard
                     key={req.id}
@@ -56,7 +60,7 @@ const AllInventoryRequestsPage: FC = () => {
                     showRequester
                 />
             )) ?? [];
-    }, [loadedRequests.items]);
+    }, [visibleRequests]);
 
     useEffect(() => {
         if (!userDataLoading && !canView)
@@ -73,7 +77,7 @@ const AllInventoryRequestsPage: FC = () => {
                 </div>
                 <Divider className="my-6" />
                 {
-                    isLoading ?
+                    initialItemsLoading ? (
                         <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
                             <CardSkeleton contentRepeat={3} />
                             <CardSkeleton contentRepeat={3} />
@@ -82,24 +86,31 @@ const AllInventoryRequestsPage: FC = () => {
                             <CardSkeleton contentRepeat={3} />
                             <CardSkeleton contentRepeat={3} />
                         </div>
-                        :
+                    ) :
                         requestCards.length ?
                             <>
                                 <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
                                     {requestCards}
                                 </div>
-                                {hasMoreToLoad && (
+
+                                {itemsLoading ? (
+                                    <div className="flex justify-center">
+                                        <Spinner size="lg" />
+                                    </div>
+                                ) : (hasMoreToLoad && (
                                     <>
                                         <Spacer y={6} />
                                         <div className="flex w-full justify-center">
                                             <GenericButton
+                                                isLoading={itemsLoading}
+                                                isDisabled={itemsLoading}
                                                 startContent={<LoaderIcon />}
                                                 onPress={loadedRequests.loadMore}
                                                 variant="flat"
                                             >Load More</GenericButton>
                                         </div>
                                     </>
-                                )}
+                                ))}
                             </>
                             :
                             <GenericCard>

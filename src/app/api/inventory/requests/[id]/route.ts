@@ -3,7 +3,6 @@ import Permission from "../../../../../libs/types/permission";
 import { NextResponse } from "next/server";
 import inventoryRequestsService from "../service";
 import { AdminUpdateStockRequestDto } from "../types";
-import selfUserService from "../me/service";
 
 type Context = {
     params: {
@@ -13,7 +12,7 @@ type Context = {
 
 export async function GET(req: Request, { params }: Context) {
     return authenticatedAny(req, async (session, _, userPermissions) => {
-        const { withItems, withUsers, withAssignees, withReviewer } = selfUserService.getFetchStockRequestsSearchParams(req.url);
+        const { withItems, withUsers, withAssignees, withReviewer } = inventoryRequestsService.getFetchStockRequestsSearchParams(req.url);
         const fetchResult = await inventoryRequestsService.fetchRequest(params.id, session.user!.id, userPermissions, {
             withItems, withAssignees, withUsers, withReviewer
         });

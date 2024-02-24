@@ -6,25 +6,24 @@ import GenericSelectMenu from "../../../../../../../_components/inputs/GenericSe
 import { Chip } from "@nextui-org/chip";
 import InventoryRequestedItemsContainer from "./InventoryRequestedItemsContainer";
 import { Avatar } from "@nextui-org/avatar";
-import useSWR, { KeyedMutator } from "swr";
-import { StockRequestWithOptionalCreatorAndAssignees } from "../../inventory-requests-utils";
+import useSWR from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import { User } from "@prisma/client";
 import { FetchAllInventories } from "../../../InventoryGrid";
 import useLocations from "../../../../../locations/components/hooks/useLocations";
-import { getUserAvatarString, getUserAvatarStringHeadless } from "app/(site)/(accessible-site)/employees/employee-utils";
+import { getUserAvatarStringHeadless } from "app/(site)/(accessible-site)/employees/employee-utils";
+import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 
 type Props = {
     setModalOpen: Dispatch<SetStateAction<boolean>>
-    mutator: KeyedMutator<StockRequestWithOptionalCreatorAndAssignees[] | undefined>
-    visibleData?: StockRequestWithOptionalCreatorAndAssignees[],
+    onRequestCreate: (request: StockRequestWithOptionalExtras) => void
 }
 
 const FetchValidAssignees = () => {
     return useSWR("/api/inventory/requests/assignees", fetcher<Pick<User, "id" | "username" | "permissions" | "firstName" | "lastName" | "image" | "avatar">[]>);
 };
 
-const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData }) => {
+const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, onRequestCreate }) => {
     const { data, isLoading } = FetchAllInventories();
     const { data: locations, isLoading: locationsLoading } = useLocations();
     const [snapshotsLoading, setSnapshotsLoading] = useState(false);
@@ -139,8 +138,7 @@ const NewInventoryRequestForm: FC<Props> = ({ setModalOpen, mutator, visibleData
                 }
             </div>
             <InventoryRequestedItemsContainer
-                mutator={mutator}
-                visibleData={visibleData}
+                onRequestCreate={onRequestCreate}
                 setSnapshotsLoading={setSnapshotsLoading}
                 selectedIds={selectedInventoryIds}
                 selectedLocationId={selectedLocationId}

@@ -1,8 +1,8 @@
-import {ZodError} from "zod";
-import {NextRequest, NextResponse} from "next/server";
+import { ZodError } from "zod";
+import { NextRequest, NextResponse } from "next/server";
 import RateLimiter, { RateLimiterGeoLimit } from "./rate-limiter";
 
-export type ApiRoute<Ctx extends Record<string, string> | unknown = unknown> = (req: NextRequest, context: {params: Ctx}) => Promise<NextResponse>
+export type ApiRoute<Ctx extends Record<string, string> | unknown = unknown> = (req: NextRequest, context: { params: Ctx }) => Promise<NextResponse>
 
 export type RouteResponseType<T> = {
     status?: number,
@@ -38,6 +38,11 @@ export const buildFailedValidationResponse = <T>(error: ZodError): NextResponse<
         message: error.issues.map(issue => issue.message).join(", ") ?? "Something went wrong!",
         data: null
     }).toNextResponse()
+}
+
+export type PaginatedResponse<T> = {
+    data: T[],
+    nextCursor: string | null,
 }
 
 type RateLimiterOptions = {

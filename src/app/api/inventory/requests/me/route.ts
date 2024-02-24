@@ -4,13 +4,20 @@ import prisma from "../../../../../libs/prisma";
 import { NextResponse } from "next/server";
 import inventoryRequestsService from "../service";
 import { CreateStockRequestDto } from "../types";
-import selfUserService from "./service";
 
 export async function GET(req: Request) {
     return authenticatedAny(req, async (session, _, userPermissions) => {
-        const { status, withItems, withUsers, withAssignees } = selfUserService.getFetchStockRequestsSearchParams(req.url);
-        const fetchResults = await inventoryRequestsService.fetchRequests(session.user!.id, userPermissions, {
-            withUsers, withAssignees, withItems, status
+        const { status, withItems, withUsers, withAssignees, withLocation, cursor, limit } = inventoryRequestsService.getFetchStockRequestsSearchParams(req.url);
+        const fetchResults = await inventoryRequestsService.fetchRequests({
+            userId: session.user!.id,
+            userPermissions,
+            withUsers,
+            withAssignees,
+            withItems,
+            status,
+            withLocation,
+            cursor, limit,
+            strictySelf: true
         });
         return NextResponse.json(fetchResults);
     }, [
