@@ -119,6 +119,7 @@ const GenericStockTable: FC<Props> = ({
             </div>
             <Spacer y={6} />
             <GenericTable
+                isCompact
                 columns={columns}
                 items={visibleStockState}
                 sortableColumns={["stock_name", "stock_quantity", "stock_price"]}
