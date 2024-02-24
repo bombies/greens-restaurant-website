@@ -29,7 +29,7 @@ interface Props {
 }
 
 const FetchInventories = (ids: string[], withStock?: boolean) => {
-    return useSWR(`/api/inventory?${ids.length ? `ids=${ids.toString()}&` : ""}with_stock=${withStock ?? false}`, fetcher<InventoryWithOptionalExtras[]>);
+    return useSWR(ids.length ? `/api/inventory?ids=${ids.toString()}&with_stock=${withStock ?? false}` : undefined, fetcher<InventoryWithOptionalExtras[]>);
 };
 
 export enum ProposedStockRequestsAction {

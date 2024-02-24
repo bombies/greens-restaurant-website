@@ -58,7 +58,7 @@ const useMutableRequests = ({ data, dataIsLoading }: Props) => {
                     return filters.includes(request.status);
                 })
         );
-    }, [sortMode, filters, data, getInventoryRequestDisplayDate]);
+    }, [sortMode, filters, data]);
 
     const sortButton = useMemo(() => (
         <DropdownInput
