@@ -87,7 +87,7 @@ const SpecificLocationContext: FC<Props> = ({ locationName }) => {
             />
             <Divider className="my-6" />
         </Fragment>
-    )) ?? [], [locationInfo, mutateBarInfo, userData, mutationAllowed, currentWeekRequestedItems]);
+    )) ?? [], [locationInfo, loadingCurrentWeekendRequestedItems, userDataLoading, mutateBarInfo, userData, mutationAllowed, currentWeekRequestedItems]);
 
     const addSection = useCallback(async (newSection: InventorySectionWithOptionalExtras) => {
         if (!locationInfo)

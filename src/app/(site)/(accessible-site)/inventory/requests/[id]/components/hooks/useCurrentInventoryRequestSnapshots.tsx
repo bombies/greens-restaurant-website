@@ -2,9 +2,9 @@
 
 import useSWR from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
-import { StockRequestWithOptionalExtras } from "../../../../_components/requests/inventory-requests-utils";
 import { StockRequestStatus } from ".prisma/client";
 import { InventorySnapshotWithOptionalExtras } from "../../../../../../../api/inventory/[name]/types";
+import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 
 const FetchCurrentSnapshots = (isAdmin: boolean, requestIsLoading: boolean, request?: StockRequestWithOptionalExtras) => {
     const allIds = request?.requestedItems?.map(requestedStock =>

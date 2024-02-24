@@ -6,15 +6,13 @@ import { Divider } from "@nextui-org/divider";
 import GenericCard from "../../../../../../_components/GenericCard";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import GenericModal from "../../../../../../_components/GenericModal";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
 import useSWRMutation from "swr/mutation";
-import { StockRequestWithOptionalExtras } from "../../../_components/requests/inventory-requests-utils";
 import { toast } from "react-hot-toast";
 import { KeyedMutator } from "swr";
-import { ReviewInventoryRequestDto } from "../../../../../../api/inventory/requests/types";
+import { ReviewInventoryRequestDto, StockRequestWithOptionalExtras } from "../../../../../../api/inventory/requests/types";
 import { GenericDatePicker } from "app/_components/GenericDatePicker";
-import { dateInputToDateObject } from "utils/GeneralUtils";
 
 type ReviewRequestArgs = {
     arg: {

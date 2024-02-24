@@ -3,13 +3,10 @@
 import { FC, useEffect, useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
-import { StockRequestWithOptionalExtras } from "../../../_components/requests/inventory-requests-utils";
 import Title from "../../../../../../_components/text/Title";
 import { Spacer } from "@nextui-org/react";
 import { GoBackButton } from "../../../../invoices/[id]/components/control-bar/InvoiceCustomerControlBar";
 import { useRouter } from "next/navigation";
-import { useUserData } from "../../../../../../../utils/Hooks";
-import Permission, { hasAnyPermission } from "../../../../../../../libs/types/permission";
 import InventoryRequestedItemsTable from "../../../_components/requests/user/form/InventoryRequestedItemsTable";
 import { toast } from "react-hot-toast";
 import "../../../../../../../utils/GeneralUtils";
@@ -26,6 +23,7 @@ import useCurrentInventoryRequestSnapshots from "./hooks/useCurrentInventoryRequ
 import { AnimatePresence, motion } from "framer-motion";
 import ChangesMadeContainer from "../../../../../../_components/ChangesMadeContainer";
 import { useSession } from "next-auth/react";
+import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 
 type Props = {
     id: string,
