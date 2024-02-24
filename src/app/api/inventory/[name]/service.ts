@@ -477,10 +477,10 @@ class InventoryService {
         if (!inventory)
             return undefined;
 
-        const todaysDate = new Date();
-        todaysDate.setHours(0, 0, 0, 0);
-        const tommorowsDate = new Date();
-        tommorowsDate.setHours(24, 0, 0, 0);
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
 
         const snapshot = await prisma.inventorySnapshot.findFirst({
             where: {
@@ -490,8 +490,8 @@ class InventoryService {
                     },
                     {
                         createdAt: {
-                            lte: tommorowsDate,
-                            gte: todaysDate
+                            lte: endOfToday,
+                            gte: startOfToday
                         }
                     }
                 ]
@@ -548,10 +548,10 @@ class InventoryService {
                 })
             );
 
-        const todaysDate = new Date();
-        todaysDate.setHours(0, 0, 0, 0);
-        const tommorowsDate = new Date();
-        tommorowsDate.setHours(24, 0, 0, 0);
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
 
         const inventoryUids = inventories.map(inv => inv.uid);
         const snapshots = await prisma.inventorySnapshot.findMany({
@@ -564,8 +564,8 @@ class InventoryService {
                     },
                     {
                         createdAt: {
-                            lte: tommorowsDate,
-                            gte: todaysDate
+                            lte: endOfToday,
+                            gte: startOfToday
                         }
                     }
                 ]
@@ -696,7 +696,8 @@ class InventoryService {
         stockSnapshots: StockSnapshot[]
     }) {
         if (!snapshot.stockSnapshots.length) {
-            // Fetch all the stock items and create a snapshot for each one based on the snapshot for the most recent date before today.
+            // Fetch all the stock items and create a snapshot for each one 
+            // based on the snapshot for the most recent date before today.
             // This will be done in-memory and not committed to the database to ensure speed.
             const todaysDate = new Date();
             todaysDate.setHours(0, 0, 0, 0);
@@ -1202,10 +1203,10 @@ class InventoryService {
     }
 
     private async fetchCurrentSnapshotRaw(inventorySection: InventorySection): Promise<InventorySectionSnapshotWithOptionalExtras | null> {
-        const todaysDate = new Date();
-        todaysDate.setHours(0, 0, 0, 0);
-        const tommorowsDate = new Date();
-        tommorowsDate.setHours(24, 0, 0, 0);
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
 
         return prisma.inventorySectionSnapshot.findFirst({
             where: {
@@ -1215,8 +1216,8 @@ class InventoryService {
                     },
                     {
                         createdAt: {
-                            lte: tommorowsDate,
-                            gte: todaysDate
+                            lte: endOfToday,
+                            gte: startOfToday
                         }
                     }
                 ]
@@ -1235,10 +1236,10 @@ class InventoryService {
     }
 
     private async fetchCurrentSnapshotsRaw(inventorySections: InventorySection[]): Promise<InventorySectionSnapshotWithOptionalExtras[]> {
-        const todaysDate = new Date();
-        todaysDate.setHours(0, 0, 0, 0);
-        const tommorowsDate = new Date();
-        tommorowsDate.setHours(24, 0, 0, 0);
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
 
         return prisma.inventorySectionSnapshot.findMany({
             where: {
@@ -1250,8 +1251,8 @@ class InventoryService {
                     },
                     {
                         createdAt: {
-                            lte: tommorowsDate,
-                            gte: todaysDate
+                            lte: endOfToday,
+                            gte: startOfToday
                         }
                     }
                 ]
