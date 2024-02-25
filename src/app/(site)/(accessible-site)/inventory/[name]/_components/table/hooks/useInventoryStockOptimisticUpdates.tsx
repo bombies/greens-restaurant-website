@@ -13,6 +13,7 @@ import { InventorySnapshotWithExtras } from "../../../../../../../api/inventory/
 import { revalidatePath } from "next/cache";
 import { OptimisticMutator } from "@/app/hooks/useOptimistic";
 import toast from "react-hot-toast";
+import { OptimisticSnapshotAction, OptimisticSnapshotPayload } from "../../Inventory";
 
 type DefaultProps = {
     inventoryName: string,
@@ -24,7 +25,7 @@ type Props = ({
     mutateCurrentSnapshot: KeyedMutator<InventorySnapshotWithExtras | undefined>
 } | {
     type: "server-data",
-    mutateCurrentSnapshot: OptimisticMutator<InventorySnapshotWithExtras>
+    mutateCurrentSnapshot: OptimisticMutator<OptimisticSnapshotPayload>
 }) & DefaultProps
 
 const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapshot, mutateCurrentSnapshot }: Props) => {
@@ -42,8 +43,8 @@ const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapsh
             });
         else if (type === 'server-data') {
             mutateCurrentSnapshot({
-                ...currentSnapshot,
-                stockSnapshots: currentSnapshot?.stockSnapshots ? [...currentSnapshot.stockSnapshots, item] : [item]
+                type: OptimisticSnapshotAction.ADD_STOCK_ITEM,
+                payload: item
             })
         }
 
@@ -86,8 +87,8 @@ const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapsh
                 });
         else if (type === 'server-data') {
             mutateCurrentSnapshot({
-                ...currentSnapshot,
-                stockSnapshots
+                type: OptimisticSnapshotAction.DELETE_STOCK_ITEMS,
+                payload: itemUIDs
             })
 
             if (deletedItems.length === 1)
@@ -99,6 +100,13 @@ const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapsh
                 body: {
                     ids: itemUIDs.toString()
                 }
+            }).catch(e => {
+                console.error(e);
+                errorToast(e, "Could not delete items!");
+                mutateCurrentSnapshot({
+                    type: OptimisticSnapshotAction.ADD_STOCK_ITEMS,
+                    payload: deletedItems
+                })
             })
         }
     }, [currentSnapshot, deleteStock, mutateCurrentSnapshot, type]);
@@ -115,11 +123,13 @@ const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapsh
             return;
 
         const snapshot = snapshots[foundIndex];
-        snapshots[foundIndex] = {
+        const updatedStockSnapshot = {
             ...snapshot,
             ...item,
             quantity: (quantity ?? snapshot.quantity) ?? 0
-        };
+        }
+
+        snapshots[foundIndex] = updatedStockSnapshot;
 
         if (!type || type === 'client-data')
             await mutateCurrentSnapshot(
@@ -148,8 +158,8 @@ const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapsh
                 });
         else if (type === 'server-data') {
             mutateCurrentSnapshot({
-                ...currentSnapshot,
-                stockSnapshots: snapshots
+                type: OptimisticSnapshotAction.UPDATE_STOCK_ITEM,
+                payload: updatedStockSnapshot
             })
 
             toast.success(`Updated ${item.name?.replaceAll("-", " ")}!`)
@@ -160,7 +170,10 @@ const useInventoryStockOptimisticUpdates = ({ type, inventoryName, currentSnapsh
             }).catch(e => {
                 console.error(e);
                 errorToast(e, `Could not update ${item.name?.replaceAll("-", " ")}!`);
-                revalidatePath(`/inventory/[name]`)
+                mutateCurrentSnapshot({
+                    type: OptimisticSnapshotAction.UPDATE_STOCK_ITEM,
+                    payload: snapshot
+                })
             })
         }
     }, [currentSnapshot, mutateCurrentSnapshot, type, updateStock]);

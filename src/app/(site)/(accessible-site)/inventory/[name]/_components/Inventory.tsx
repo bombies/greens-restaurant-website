@@ -1,19 +1,15 @@
 "use client";
 
-import { Config, Inventory, User } from "@prisma/client";
+import { Config, Inventory, StockSnapshot, User } from "@prisma/client";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import InventoryStockTable from "./table/InventoryStockTable";
 import { InventorySnapshotWithExtras } from "../../../../../api/inventory/[name]/types";
 import { DeepRequired } from "react-hook-form";
 import useOptimistic from "@/app/hooks/useOptimistic";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useReducer } from "react";
 import { itemHasLowStock } from "../../utils/inventory-utils";
-import { AnimatePresence, motion } from "framer-motion";
-import { Tab, Tabs } from "@nextui-org/react";
+import { Tab } from "@nextui-org/react";
 import GenericTabs from "@/app/_components/GenericTabs";
-import ToastComponent from "@/app/_components/ToastComponent";
-import { AlertTriangleIcon } from "lucide-react";
-import toast from "react-hot-toast";
 
 type Props = {
     name: string,
@@ -22,12 +18,54 @@ type Props = {
     userData: User
 }
 
-export default function Inventory({ name, config, snapshot, userData }: Props) {
-    const [lowStockMessageShown, setLowStockMessageShown] = useState(false);
+export enum OptimisticSnapshotAction {
+    ADD_STOCK_ITEM,
+    ADD_STOCK_ITEMS,
+    DELETE_STOCK_ITEMS,
+    UPDATE_STOCK_ITEM
+}
 
-    const [currentSnapshotData, mutateCurrentSnapshot] = useOptimistic(
-        snapshot,
-        (state, newState: InventorySnapshotWithExtras) => (newState)
+export type OptimisticSnapshotPayload = {
+    type: OptimisticSnapshotAction.ADD_STOCK_ITEM,
+    payload: StockSnapshot
+} | {
+    type: OptimisticSnapshotAction.DELETE_STOCK_ITEMS,
+    payload: string[]
+} | {
+    type: OptimisticSnapshotAction.UPDATE_STOCK_ITEM,
+    payload: StockSnapshot
+} | {
+    type: OptimisticSnapshotAction.ADD_STOCK_ITEMS,
+    payload: StockSnapshot[]
+}
+
+export default function Inventory({ name, config, snapshot, userData }: Props) {
+    const [currentSnapshotData, mutateCurrentSnapshot] = useReducer(
+        (state: InventorySnapshotWithExtras, payload: OptimisticSnapshotPayload) => {
+            switch (payload.type) {
+                case OptimisticSnapshotAction.ADD_STOCK_ITEM:
+                    return {
+                        ...state,
+                        stockSnapshots: [...state.stockSnapshots, payload.payload]
+                    }
+                case OptimisticSnapshotAction.ADD_STOCK_ITEMS:
+                    return {
+                        ...state,
+                        stockSnapshots: state.stockSnapshots.concat(payload.payload)
+                    }
+                case OptimisticSnapshotAction.DELETE_STOCK_ITEMS:
+                    return {
+                        ...state,
+                        stockSnapshots: state.stockSnapshots.filter(item => !payload.payload.some(id => id === item.id))
+                    }
+                case OptimisticSnapshotAction.UPDATE_STOCK_ITEM:
+                    return {
+                        ...state,
+                        stockSnapshots: state.stockSnapshots.map(item => item.id === payload.payload.id ? payload.payload : item)
+                    }
+            }
+        },
+        snapshot
     )
 
     const lowStockSnapshot = useMemo(() => {
