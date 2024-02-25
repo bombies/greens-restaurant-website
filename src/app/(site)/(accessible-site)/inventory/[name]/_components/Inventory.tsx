@@ -56,7 +56,7 @@ export default function Inventory({ name, config, snapshot, userData }: Props) {
                 case OptimisticSnapshotAction.DELETE_STOCK_ITEMS:
                     return {
                         ...state,
-                        stockSnapshots: state.stockSnapshots.filter(item => !payload.payload.some(id => id === item.id))
+                        stockSnapshots: state.stockSnapshots.filter(item => !payload.payload.includes(item.uid))
                     }
                 case OptimisticSnapshotAction.UPDATE_STOCK_ITEM:
                     return {
