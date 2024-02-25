@@ -82,7 +82,7 @@ const ConfirmInventoryRequestReviewModal: FC<Props> = ({ id, optimisticRequest, 
         <GenericModal
             title="Confirm Review"
             isOpen={isOpen}
-            isDismissable={!isReviewing}
+            isDismissable={false}
             onClose={() => setOpen(false)}
             classNames={{
                 wrapper: "z-[202]",
