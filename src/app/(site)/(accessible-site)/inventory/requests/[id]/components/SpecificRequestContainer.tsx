@@ -100,7 +100,7 @@ const SpecificRequestContainer: FC<Props> = ({ id, isAdmin }) => {
             />
             <Spacer y={12} />
             <div className="default-container max-w-full p-12 phone:px-4">
-                <GoBackButton label="View All Requests" href="/inventory/requests?requests_tab=all_requests" />
+                <GoBackButton label="View All Requests" href="/inventory/requests/all" />
                 <Spacer y={6} />
                 <InventoryRequestedItemsTable
                     stickyHeader
