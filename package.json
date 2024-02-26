@@ -59,7 +59,7 @@
     "react-apexcharts": "^1.4.1",
     "react-date-picker": "^10.6.0",
     "react-dom": "18.2.0",
-    "react-email": "2.0.0",
+    "react-email": "2.1.0",
     "react-hook-form": "7.50.1",
     "react-hot-toast": "^2.4.1",
     "react-infinite-scroll-hook": "^4.1.1",
