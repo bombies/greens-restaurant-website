@@ -26,7 +26,7 @@ export default async function InventoryRequestsReports() {
                 visibleButtons={["my_requests", "all_requests"]}
             />
             <Container>
-                <GoBackButton label="View All Inventories" href="/inventory" />
+                <GoBackButton label="View All Requests" href="/inventory/requests/all" />
                 <Spacer y={6} />
                 <InventoryRequestsReportsPage />
             </Container>
