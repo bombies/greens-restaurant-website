@@ -14,6 +14,7 @@ import GenericButton from "@/app/_components/inputs/GenericButton";
 import { Spacer, Spinner } from "@nextui-org/react";
 import { LoaderIcon } from "lucide-react";
 import CardSkeleton from "@/app/_components/skeletons/CardSkeleton";
+import useInfiniteScroll from "react-infinite-scroll-hook";
 
 const UserInventoryRequestsPage: FC = () => {
     const {
@@ -44,6 +45,12 @@ const UserInventoryRequestsPage: FC = () => {
                 <InventoryRequestCard key={req.id} request={req} />
             )) ?? [];
     }, [data.items]);
+
+    const [scrollContainerRef] = useInfiniteScroll({
+        onLoadMore: data.loadMore,
+        loading: isLoading,
+        hasNextPage: hasMoreToLoad,
+    })
 
     return (
         <TriggerRequestCreationProvider>
@@ -79,14 +86,11 @@ const UserInventoryRequestsPage: FC = () => {
                             ) : (hasMoreToLoad && (
                                 <>
                                     <Spacer y={6} />
-                                    <div className="flex w-full justify-center">
-                                        <GenericButton
-                                            isLoading={isLoading}
-                                            isDisabled={isLoading}
-                                            startContent={<LoaderIcon />}
-                                            onPress={data.loadMore}
-                                            variant="flat"
-                                        >Load More</GenericButton>
+                                    <div
+                                        ref={scrollContainerRef}
+                                        className="flex w-full justify-center"
+                                    >
+                                        <Spinner size="lg" />
                                     </div>
                                 </>
                             ))}

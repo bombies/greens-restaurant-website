@@ -1,6 +1,6 @@
 "use client"
 
-import React, { FC, Fragment, useEffect, useMemo, useState } from "react";
+import React, { FC, Fragment, useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 import InventoryRequestCard from "../InventoryRequestCard";
@@ -8,17 +8,13 @@ import { Divider } from "@nextui-org/divider";
 import GenericCard from "../../../../../../_components/GenericCard";
 import SubTitle from "../../../../../../_components/text/SubTitle";
 import useMutableRequests, { RequestSortMode } from "../hooks/useMutableRequests";
-import { useUserData } from "../../../../../../../utils/Hooks";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { useRouter } from "next/navigation";
-import GenericButton from "@/app/_components/inputs/GenericButton";
-import { LoaderIcon } from "lucide-react";
 import { Spacer, Spinner } from "@nextui-org/react";
 import useAsyncChunkedItems from "@/app/_components/hooks/useAsyncChunkedItems";
 import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 import CardSkeleton from "@/app/_components/skeletons/CardSkeleton";
-import { StockRequestStatus } from "@prisma/client";
-import { list } from "postcss";
+import useInfiniteScroll from 'react-infinite-scroll-hook';
 
 type FetchAllRequestArgs = {
     withAssignees?: boolean,
@@ -82,6 +78,12 @@ const AllInventoryRequestsPage: FC<Props> = ({ userPermissions }) => {
             router.replace("/inventory/requests")
     }, [canView, router]);
 
+    const [scrollContainerRef] = useInfiniteScroll({
+        onLoadMore: loadedRequests.loadMore,
+        loading: itemsLoading,
+        hasNextPage: hasMoreToLoad,
+    })
+
     return (
         canView && (
             <Fragment>
@@ -115,14 +117,11 @@ const AllInventoryRequestsPage: FC<Props> = ({ userPermissions }) => {
                                 ) : (hasMoreToLoad && (
                                     <>
                                         <Spacer y={6} />
-                                        <div className="flex w-full justify-center">
-                                            <GenericButton
-                                                isLoading={itemsLoading}
-                                                isDisabled={itemsLoading}
-                                                startContent={<LoaderIcon />}
-                                                onPress={loadedRequests.loadMore}
-                                                variant="flat"
-                                            >Load More</GenericButton>
+                                        <div
+                                            ref={scrollContainerRef}
+                                            className="flex w-full justify-center"
+                                        >
+                                            <Spinner size="lg" />
                                         </div>
                                     </>
                                 ))}
