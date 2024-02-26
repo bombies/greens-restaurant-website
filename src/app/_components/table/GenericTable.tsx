@@ -1,13 +1,12 @@
 "use client";
 
-import { Table, TableBody, TableColumn, TableHeader, TableProps } from "@nextui-org/react";
+import { Spacer, Spinner, Table, TableBody, TableColumn, TableHeader, TableProps } from "@nextui-org/react";
 import clsx from "clsx";
 import { Column } from "../../(site)/(accessible-site)/invoices/[id]/[invoiceId]/components/table/InvoiceTable";
 import { RowElement } from "@react-types/table";
 import { JSX } from "react";
-import GenericButton from "../inputs/GenericButton";
-import { LoaderIcon } from "lucide-react";
 import useLazyChunkedItems from "../hooks/useLazyChunkedItems";
+import useInfiniteScroll from "react-infinite-scroll-hook";
 
 interface Props<T> extends Omit<TableProps, "children"> {
     columns: Column[],
@@ -33,24 +32,28 @@ export default function GenericTable<T>({
 }: Props<T>) {
     const { loadedItems, hasMoreToLoad } = useLazyChunkedItems(items, maxItems)
 
-    // const [loaderRef, scrollerRef] = useInfiniteScroll({
-    //     hasMore: hasMoreToLoad,
-    //     onLoadMore: loadedItems.loadMore
-    // })
+    const [loaderRef] = useInfiniteScroll({
+        hasNextPage: hasMoreToLoad,
+        onLoadMore: loadedItems.loadMore,
+        loading: isLoading ?? false
+    })
 
     return (
         <Table
             {...tableProps}
             // baseRef={maxItems ? scrollerRef : tableProps.baseRef}
-            bottomContent={maxItems && hasMoreToLoad ?
+            bottomContent={(maxItems && hasMoreToLoad) ?
                 (
-                    <div className="flex w-full justify-center">
-                        <GenericButton
-                            startContent={<LoaderIcon width={16} />}
-                            onPress={loadedItems.loadMore}
-                            variant="flat"
-                        >Load More</GenericButton>
-                    </div>
+                    <>
+                        <div
+                            ref={loaderRef}
+                            className="flex w-full justify-center"
+                        >
+                            <Spinner size="lg" />
+                        </div>
+                        <Spacer y={6} />
+                        {tableProps.bottomContent}
+                    </>
                 )
                 : tableProps.bottomContent
             }
