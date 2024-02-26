@@ -7,7 +7,7 @@ import TriggerRequestCreationProvider from "./TriggerRequestCreationProvider";
 import InventoryRequestCard from "../InventoryRequestCard";
 import GenericCard from "../../../../../../_components/GenericCard";
 import SubTitle from "../../../../../../_components/text/SubTitle";
-import useMutableRequests from "../hooks/useMutableRequests";
+import useMutableRequests, { RequestSortMode } from "../hooks/useMutableRequests";
 import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 import useAsyncChunkedItems from "@/app/_components/hooks/useAsyncChunkedItems";
 import GenericButton from "@/app/_components/inputs/GenericButton";
@@ -20,22 +20,30 @@ const UserInventoryRequestsPage: FC = () => {
         list: data,
         initialItemsLoading,
         hasMoreToLoad,
-        isLoading
+        isLoading,
+        reloadWithParams
     } = useAsyncChunkedItems<StockRequestWithOptionalExtras>("/api/inventory/requests/me", 20, {
         [`with_assignees`]: "true",
         [`with_location`]: "true",
-        [`with_users`]: "true"
+        [`with_users`]: "true",
+        'sort': "desc",
     });
 
-    const { visibleRequests, sortButton, filterButton } = useMutableRequests({
-        data: data.items ?? [], dataIsLoading: isLoading
+    const { sortButton, filterButton } = useMutableRequests({
+        dataIsLoading: isLoading,
+        onSortChange(sortMode) {
+            reloadWithParams({ sort: sortMode === RequestSortMode.NEWEST_OLDEST ? "desc" : "asc" });
+        },
+        onFilterChange(filters) {
+            reloadWithParams({ status: filters.join(",") });
+        }
     });
     const requestCards = useMemo(() => {
-        return visibleRequests
+        return data.items
             ?.map(req => (
                 <InventoryRequestCard key={req.id} request={req} />
             )) ?? [];
-    }, [visibleRequests]);
+    }, [data.items]);
 
     return (
         <TriggerRequestCreationProvider>
@@ -58,7 +66,7 @@ const UserInventoryRequestsPage: FC = () => {
                         <CardSkeleton contentRepeat={3} />
                     </div>
                 ) :
-                    requestCards.length ?
+                    requestCards.length || isLoading ?
                         <>
                             <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
                                 {requestCards}

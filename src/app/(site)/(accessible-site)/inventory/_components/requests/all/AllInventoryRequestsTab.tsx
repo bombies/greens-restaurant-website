@@ -1,13 +1,13 @@
 "use client"
 
-import React, { FC, Fragment, useEffect, useMemo } from "react";
+import React, { FC, Fragment, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 import InventoryRequestCard from "../InventoryRequestCard";
 import { Divider } from "@nextui-org/divider";
 import GenericCard from "../../../../../../_components/GenericCard";
 import SubTitle from "../../../../../../_components/text/SubTitle";
-import useMutableRequests from "../hooks/useMutableRequests";
+import useMutableRequests, { RequestSortMode } from "../hooks/useMutableRequests";
 import { useUserData } from "../../../../../../../utils/Hooks";
 import { hasAnyPermission, Permission } from "../../../../../../../libs/types/permission";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,8 @@ import { Spacer, Spinner } from "@nextui-org/react";
 import useAsyncChunkedItems from "@/app/_components/hooks/useAsyncChunkedItems";
 import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 import CardSkeleton from "@/app/_components/skeletons/CardSkeleton";
+import { StockRequestStatus } from "@prisma/client";
+import { list } from "postcss";
 
 type FetchAllRequestArgs = {
     withAssignees?: boolean,
@@ -28,31 +30,44 @@ export const FetchAllRequests = (args?: FetchAllRequestArgs) => {
     return useSWR((args?.doFetch || args?.doFetch === undefined) && `/api/inventory/requests?with_users=true&with_assignees=${args?.withAssignees ?? false}&with_location=${args?.withLocation ?? false}`, fetcher<StockRequestWithOptionalExtras[]>);
 };
 
-const AllInventoryRequestsPage: FC = () => {
+type Props = {
+    userPermissions: number
+}
+
+const AllInventoryRequestsPage: FC<Props> = ({ userPermissions }) => {
+
     const router = useRouter()
-    const { data: userData, isLoading: userDataLoading } = useUserData();
-    const canView = !userDataLoading && hasAnyPermission(userData?.permissions, [
+    const canView = useMemo(() => hasAnyPermission(userPermissions, [
         Permission.MANAGE_STOCK_REQUESTS, Permission.VIEW_STOCK_REQUESTS
-    ]);
+    ]), [userPermissions]);
 
     const {
         list: loadedRequests,
         hasMoreToLoad,
         isLoading: itemsLoading,
-        initialItemsLoading
+        initialItemsLoading,
+        reloadWithParams
     } = useAsyncChunkedItems<StockRequestWithOptionalExtras>("/api/inventory/requests", 20, {
-        [`with_assignees`]: "true",
-        [`with_location`]: "true",
-        [`with_users`]: "true"
+        'with_assignees': "true",
+        'with_location': "true",
+        'with_users': "true",
+        'sort': "desc",
     });
 
-    const { visibleRequests, sortButton, filterButton } = useMutableRequests({
-        data: loadedRequests.items ?? [], dataIsLoading: itemsLoading
+    const { sortButton, filterButton } = useMutableRequests({
+        data: loadedRequests.items ?? [],
+        dataIsLoading: itemsLoading,
+        onSortChange(sortMode) {
+            reloadWithParams({ sort: sortMode === RequestSortMode.NEWEST_OLDEST ? "desc" : "asc" });
+        },
+        onFilterChange(filters) {
+            reloadWithParams({ status: filters.join(",") });
+        }
     });
 
 
     const requestCards = useMemo(() => {
-        return visibleRequests
+        return loadedRequests.items
             ?.map(req => (
                 <InventoryRequestCard
                     key={req.id}
@@ -60,12 +75,12 @@ const AllInventoryRequestsPage: FC = () => {
                     showRequester
                 />
             )) ?? [];
-    }, [visibleRequests]);
+    }, [loadedRequests.items]);
 
     useEffect(() => {
-        if (!userDataLoading && !canView)
-            router.replace("/inventory/requests?requests_tab=my_requests")
-    }, [canView, router, userDataLoading]);
+        if (!canView)
+            router.replace("/inventory/requests")
+    }, [canView, router]);
 
     return (
         canView && (
@@ -87,7 +102,7 @@ const AllInventoryRequestsPage: FC = () => {
                             <CardSkeleton contentRepeat={3} />
                         </div>
                     ) :
-                        requestCards.length ?
+                        requestCards.length || itemsLoading ?
                             <>
                                 <div className="grid grid-cols-2 tablet:grid-cols-1 gap-4">
                                     {requestCards}

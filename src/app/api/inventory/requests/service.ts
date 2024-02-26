@@ -19,7 +19,7 @@ import { Session } from "next-auth";
 import { PaginatedResponse, buildResponse } from "../../utils/utils";
 
 type FetchStockRequestSearchParams = {
-    status: StockRequestStatus,
+    status: StockRequestStatus[],
     withItems: boolean,
     withUsers: boolean,
     withAssignees: boolean,
@@ -28,6 +28,7 @@ type FetchStockRequestSearchParams = {
     withStock: boolean,
     from?: number,
     to?: number,
+    sort?: "asc" | "desc",
 
     // Pagination
     cursor?: string
@@ -143,15 +144,23 @@ class InventoryRequestsService {
 
     getFetchStockRequestsSearchParams(url: string): FetchStockRequestSearchParams {
         const { searchParams } = new URL(url);
-        const status = searchParams.get("status")?.toLowerCase() as StockRequestStatus;
+
+        const status = searchParams.get("status")?.toUpperCase();
+        const statusArray: StockRequestStatus[] = status?.split(",").map(status => status as StockRequestStatus) ?? []
+
         const withItems = searchParams.get("with_items")?.toLowerCase() === "true" || false;
         const withUsers = searchParams.get("with_users")?.toLowerCase() === "true" || false;
         const withStock = searchParams.get("with_stock")?.toLowerCase() === "true" || false;
         const withReviewer = searchParams.get("with_reviewer")?.toLowerCase() === "true" || false;
         const withAssignees = searchParams.get("with_assignees")?.toLowerCase() === "true" || false;
         const withLocation = searchParams.get("with_location")?.toLowerCase() === "true" || false;
+
         const from: number | undefined = searchParams.get("from") ? Number(searchParams.get("from")) : undefined;
         const to: number | undefined = searchParams.get("to") ? Number(searchParams.get("to")) : undefined;
+
+        let sort = searchParams.get("sort") ?? undefined;
+        if (sort && sort !== "asc" && sort !== "desc")
+            sort = undefined
 
         /**
          * Pagination
@@ -160,7 +169,7 @@ class InventoryRequestsService {
         const limit = searchParams.get("limit") ? Number(searchParams.get("limit")) : undefined;
 
         return {
-            status,
+            status: statusArray,
             withItems,
             withUsers,
             withAssignees,
@@ -169,6 +178,7 @@ class InventoryRequestsService {
             withStock,
             withReviewer,
             withLocation,
+            sort: sort as "asc" | "desc" | undefined,
             cursor,
             limit
         };
@@ -187,6 +197,7 @@ class InventoryRequestsService {
         withLocation,
         withReviewer,
         strictySelf = false,
+        sort,
         cursor,
         limit
     }: FetchRequestsArgs): Promise<PaginatedResponse<StockRequestWithOptionalExtras> | StockRequestWithOptionalExtras[]> => {
@@ -199,10 +210,12 @@ class InventoryRequestsService {
         ])) && userId)
             whereQuery = { requestedByUserId: userId };
 
-        if (status)
+        if (status?.length)
             whereQuery = {
                 ...whereQuery,
-                status
+                status: {
+                    in: status
+                }
             };
 
         if (from && to) {
@@ -266,7 +279,7 @@ class InventoryRequestsService {
             cursor: cursor && cursor.length ? {
                 id: cursor,
             } : undefined,
-            take: limit,
+            take: limit ? limit + 1 : undefined,
             skip: cursor && cursor.length ? 1 : 0,
             where: whereQuery,
             include: {
@@ -280,14 +293,23 @@ class InventoryRequestsService {
                 assignedToUsers: withAssignees,
                 reviewedByUser: withReviewer
             },
-            orderBy: {
-                createdAt: "desc"
-            }
+            orderBy: [
+                {
+                    deliveredAt: sort
+                },
+                {
+                    createdAt: sort
+                }
+            ]
         })
+
+        let nextCursor: StockRequestWithOptionalExtras | undefined;
+        if (limit && requests.length > limit)
+            nextCursor = requests.pop();
 
         return !limit ? requests : ({
             data: requests,
-            nextCursor: requests.length > 1 ? requests[requests.length - 1]?.id ?? null : null
+            nextCursor: nextCursor?.id ?? null
         });
     };
 

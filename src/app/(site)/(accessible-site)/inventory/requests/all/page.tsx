@@ -29,7 +29,9 @@ export default async function InventoryRequestsPage() {
             <Container>
                 <GoBackButton label="View All Inventories" href="/inventory" />
                 <Spacer y={6} />
-                <AllInventoryRequestsPage />
+                <AllInventoryRequestsPage
+                    userPermissions={self?.permissions ?? 0}
+                />
             </Container>
         </>
     );

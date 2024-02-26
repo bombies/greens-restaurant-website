@@ -18,6 +18,8 @@ import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/typ
 type Props = {
     data?: StockRequestWithOptionalExtras[],
     dataIsLoading: boolean,
+    onSortChange?: (sortMode: RequestSortMode) => void,
+    onFilterChange?: (filters: StockRequestStatus[]) => void
 }
 
 export enum RequestSortMode {
@@ -25,10 +27,24 @@ export enum RequestSortMode {
     OLDEST_NEWEST = "Oldest - Newest"
 }
 
-const useMutableRequests = ({ data, dataIsLoading }: Props) => {
+export const parseRequestSortMode = (mode: string): RequestSortMode => {
+    switch (mode.toLowerCase().replaceAll(" ", "_")) {
+        case RequestSortMode.NEWEST_OLDEST.toLowerCase().replaceAll(" ", "_"): {
+            return RequestSortMode.NEWEST_OLDEST;
+        }
+        case RequestSortMode.OLDEST_NEWEST.toLowerCase().replaceAll(" ", "_"): {
+            return RequestSortMode.OLDEST_NEWEST;
+        }
+        default: {
+            return RequestSortMode.NEWEST_OLDEST;
+        }
+    }
+}
+
+const useMutableRequests = ({ data, dataIsLoading, onFilterChange, onSortChange }: Props) => {
     const [visibleRequests, setVisibleRequests] = useState(data);
-    const [sortMode, setSortMode] = useState<RequestSortMode>();
-    const [filters, setFilters] = useState<StockRequestStatus[]>();
+    const [sortMode, setSortMode] = useState<RequestSortMode>(RequestSortMode.NEWEST_OLDEST);
+    const [filters, setFilters] = useState<StockRequestStatus[]>([]);
 
     useEffect(() => {
         if (!dataIsLoading && data)
@@ -68,9 +84,13 @@ const useMutableRequests = ({ data, dataIsLoading }: Props) => {
             selectionRequired
             keys={[RequestSortMode.NEWEST_OLDEST, RequestSortMode.OLDEST_NEWEST]}
             selectedKeys={sortMode ? [sortMode] : []}
-            setSelectedKeys={(keys) => setSortMode((Array.from(keys)[0] as RequestSortMode))}
+            setSelectedKeys={(keys) => {
+                const newSortMode = parseRequestSortMode(Array.from(keys)[0] as string);
+                setSortMode(newSortMode)
+                onSortChange?.(newSortMode);
+            }}
         />
-    ), [sortMode]);
+    ), [onSortChange, sortMode]);
 
     const filterButton = useMemo(() => (
         <CheckboxMenu
@@ -81,7 +101,9 @@ const useMutableRequests = ({ data, dataIsLoading }: Props) => {
                 label: "Filter",
                 value: filters,
                 onValueChange(value) {
-                    setFilters(value as StockRequestStatus[]);
+                    const newFilters = value as StockRequestStatus[];
+                    setFilters(newFilters);
+                    onFilterChange?.(newFilters);
                 }
             }}
         >
@@ -106,7 +128,7 @@ const useMutableRequests = ({ data, dataIsLoading }: Props) => {
                 value={StockRequestStatus.REJECTED}
             >Rejected</Checkbox>
         </CheckboxMenu>
-    ), [filters]);
+    ), [filters, onFilterChange]);
 
     return { visibleRequests, sortMode, setSortMode, filters, setFilters, sortButton, filterButton };
 };

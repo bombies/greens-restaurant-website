@@ -7,7 +7,7 @@ import { CreateStockRequestDto } from "../types";
 
 export async function GET(req: Request) {
     return authenticatedAny(req, async (session, _, userPermissions) => {
-        const { status, withItems, withUsers, withAssignees, withLocation, cursor, limit } = inventoryRequestsService.getFetchStockRequestsSearchParams(req.url);
+        const { status, withItems, withUsers, withAssignees, withLocation, sort, cursor, limit } = inventoryRequestsService.getFetchStockRequestsSearchParams(req.url);
         const fetchResults = await inventoryRequestsService.fetchRequests({
             userId: session.user!.id,
             userPermissions,
@@ -16,6 +16,7 @@ export async function GET(req: Request) {
             withItems,
             status,
             withLocation,
+            sort,
             cursor, limit,
             strictySelf: true
         });

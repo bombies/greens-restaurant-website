@@ -14,6 +14,7 @@ export async function GET(req: Request) {
             withStock,
             withReviewer,
             withLocation,
+            sort,
             limit,
             cursor
         } = inventoryRequestsService.getFetchStockRequestsSearchParams(req.url);
@@ -28,6 +29,7 @@ export async function GET(req: Request) {
             withStock,
             withReviewer,
             withLocation,
+            sort,
             limit, cursor
         });
         return NextResponse.json(requests);
