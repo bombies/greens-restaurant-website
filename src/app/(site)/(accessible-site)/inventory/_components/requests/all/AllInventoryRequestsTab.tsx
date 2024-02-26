@@ -57,7 +57,7 @@ const AllInventoryRequestsPage: FC<Props> = ({ userPermissions }) => {
             reloadWithParams({ sort: sortMode === RequestSortMode.NEWEST_OLDEST ? "desc" : "asc" });
         },
         onFilterChange(filters) {
-            reloadWithParams({ status: filters.join(",") });
+            reloadWithParams({ status: filters.length ? filters.join(",") : undefined });
         }
     });
 

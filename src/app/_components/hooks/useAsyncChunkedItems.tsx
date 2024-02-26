@@ -1,7 +1,6 @@
 "use effect"
 
 import { PaginatedResponse } from "@/app/api/utils/utils";
-import { StockRequestStatus } from "@prisma/client";
 import { useAsyncList } from "@react-stately/data";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
