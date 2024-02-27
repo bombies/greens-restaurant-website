@@ -52,7 +52,6 @@ const LowStockWidget: FC = () => {
                         </div>
                     ) : (
                         <Accordion
-                            className="space-y-4"
                             variant="splitted"
                             itemClasses={{
                                 base: "!default-container !p-6 !rounded-2xl",
