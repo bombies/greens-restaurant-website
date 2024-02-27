@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { fetcher } from "../../../../../employees/_components/EmployeeGrid";
 import { useEffect } from "react";
 import { notFound, useRouter } from "next/navigation";
-import InventoryStockTable, { columns } from "../../../_components/table/InventoryStockTable";
+import InventoryStockTable, { inventoryColumns } from "../../../_components/table/InventoryStockTable";
 import TableSkeleton from "../../../../../../../_components/skeletons/TableSkeleton";
 import { Spacer } from "@nextui-org/react";
 import SubTitle from "../../../../../../../_components/text/SubTitle";
@@ -55,7 +55,7 @@ export default function SpecificSnapshotContainer({ inventoryName, snapshotId }:
             <div className="default-container p-12 phone:px-4">
                 {
                     isLoading ?
-                        <TableSkeleton columns={columns} contentRepeat={20} />
+                        <TableSkeleton columns={inventoryColumns} contentRepeat={20} />
                         :
                         data &&
                         <InventoryStockTable

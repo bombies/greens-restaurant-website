@@ -33,7 +33,7 @@ type Props = ({
 }) & DefaultProps
 
 
-export const columns: Column[] = [
+export const inventoryColumns: Column[] = [
     {
         key: "stock_name",
         value: "Name"
