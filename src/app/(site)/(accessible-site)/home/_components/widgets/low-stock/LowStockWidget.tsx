@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { $get } from "@/utils/swr-utils";
 import { InventoryWithOptionalExtras } from "@/app/api/inventory/[name]/types";
 import LowStockWidgetInventorySection from "./LowStockWidgetInventorySection";
-import { Spinner } from "@nextui-org/react";
+import { Accordion, AccordionItem, Chip, Spinner } from "@nextui-org/react";
 import SubTitle from "@/app/_components/text/SubTitle";
 
 const FetchInventories = () =>
@@ -14,6 +14,28 @@ const LowStockWidget: FC = () => {
     const { data: inventories, isLoading: inventoriesLoading } = FetchInventories()
 
     const lowStockCounts = useMemo(() => inventories?.reduce((acc, next) => acc + (next.lowStock?.length ?? 0), 0), [inventories])
+
+    const lowStockElements = useMemo(() => inventories?.filter(inventory => inventory.lowStock?.length)
+        ?.map(inventory => (
+            <AccordionItem
+                startContent={(
+                    <Chip
+                        variant="flat"
+                        color="primary"
+                        size="sm"
+                    >
+                        {inventory.lowStock?.length}
+                    </Chip>
+                )}
+                key={inventory.id}
+                title={inventory.name.replaceAll("-", " ")}
+                classNames={{
+                    title: "capitalize"
+                }}
+            >
+                <LowStockWidgetInventorySection inventory={inventory} />
+            </AccordionItem>
+        )) ?? [], [inventories])
 
     return (
         <WidgetContainer>
@@ -28,10 +50,19 @@ const LowStockWidget: FC = () => {
                         <div className="w-full h-full flex justify-center items-center">
                             <SubTitle>There are no low stock...</SubTitle>
                         </div>
-                    ) :
-                        inventories?.filter(inventory => inventory.lowStock?.length)?.map(inventory => (
-                            <LowStockWidgetInventorySection key={inventory.id} inventory={inventory} />
-                        ))
+                    ) : (
+                        <Accordion
+                            className="space-y-4"
+                            variant="splitted"
+                            itemClasses={{
+                                base: "!default-container !p-6 !rounded-2xl",
+                                title: "font-bold text-lg"
+                            }}
+                        >
+                            {lowStockElements}
+                        </Accordion>
+                    )
+
                 }
             </div>
         </WidgetContainer>

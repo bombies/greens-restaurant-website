@@ -3,7 +3,7 @@ import EyeIcon from "@/app/_components/icons/EyeIcon"
 import IconButton from "@/app/_components/inputs/IconButton"
 import { InventoryWithOptionalExtras } from "@/app/api/inventory/[name]/types"
 import { Chip, Divider } from "@nextui-org/react"
-import { FC } from "react"
+import { FC, Fragment } from "react"
 
 type Props = {
     inventory: InventoryWithOptionalExtras
@@ -12,26 +12,18 @@ type Props = {
 const LowStockWidgetInventorySection: FC<Props> = ({ inventory }) => {
     return (
         <>
-            <h3 className="text-lg font-semibold capitalize flex gap-2">
-                <span className="self-center">
-                    {inventory.name.replaceAll("-", " ")}
-                </span>
-                <IconButton
-                    variant="flat"
-                    size="sm"
-                    toolTip="View Inventory"
-                    href={`/inventory/${inventory.name}`}
-                >
-                    <EyeIcon width={16} />
-                </IconButton>
-            </h3>
+            <IconButton
+                variant="flat"
+                size="sm"
+                toolTip="View Inventory"
+                href={`/inventory/${inventory.name}`}
+            >
+                <EyeIcon width={16} />
+            </IconButton>
             <Divider className="my-3" />
-            <Container className="space-y-2 py-2 rounded-xl">
+            <div className="grid grid-cols-[minmax(0,_3fr)_minmax(0,_1fr)] gap-y-2">
                 {inventory.lowStock?.map(stock => (
-                    <div
-                        key={stock.id}
-                        className="grid grid-cols-2"
-                    >
+                    <Fragment key={stock.id}>
                         <p className="break-words capitalize">{stock.name.replaceAll("-", " ")}</p>
                         <Chip
                             variant="flat"
@@ -40,9 +32,9 @@ const LowStockWidgetInventorySection: FC<Props> = ({ inventory }) => {
                         >
                             {stock.quantity}
                         </Chip>
-                    </div>
+                    </Fragment>
                 ))}
-            </Container>
+            </div>
         </>
     )
 }
