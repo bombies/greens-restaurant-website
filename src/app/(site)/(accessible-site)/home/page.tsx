@@ -15,6 +15,7 @@ import InvoiceWidget from "./_components/widgets/InvoiceWidget";
 import CreateInventoryRequestQuickAction from "./_components/quick-actions/CreateInventoryRequestQuickAction";
 import InventoryRequestWidget from "./_components/widgets/InventoryRequestWidget";
 import ManageLocationsQuickAction from "./_components/quick-actions/ManageLocationsQuickAction";
+import LowStockWidget from "./_components/widgets/low-stock/LowStockWidget";
 
 export default function HomePage() {
     const session = useSession();
@@ -113,6 +114,14 @@ export default function HomePage() {
                         Permission.MUTATE_STOCK
                     ]) &&
                     <StockGraphWidget />
+                }
+                {
+                    hasAnyPermission(user?.permissions, [
+                        Permission.CREATE_INVENTORY,
+                        Permission.VIEW_INVENTORY,
+                        Permission.MUTATE_STOCK
+                    ]) &&
+                    <LowStockWidget />
                 }
                 {
                     hasAnyPermission(user?.permissions, [

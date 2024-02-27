@@ -8,6 +8,7 @@ import { Fragment, useMemo, useState } from "react";
 import { Pagination, Spacer, Spinner } from "@nextui-org/react";
 import GenericChart from "../../../../../_components/charts/GenericChart";
 import SubTitle from "../../../../../_components/text/SubTitle";
+import WidgetContainer from "./WidgetContainer";
 
 const FetchInventories = () => {
     return useSWR("/api/inventory", fetcher<Inventory[]>);
@@ -27,91 +28,90 @@ export default function StockGraphWidget() {
     })), [inventoryInsights]);
 
     return (
-        <div
-            className="default-container backdrop-blur-md text-primary pt-6 px-6 phone:px-3 pb-12 w-96 h-96 phone:w-full">
+        <WidgetContainer>
             {
                 inventoriesLoading ?
-                    <div className="flex justify-center items-center"><Spinner size="lg" /></div>
+                    <div className="flex justify-center items-center w-full h-full"><Spinner size="lg" /></div>
                     :
                     (!inventories?.length ?
-                            <div className="h-full">
-                                <h3 className="font-black text-lg capitalize px-3">
-                                    Current Stock
-                                </h3>
-                                <Spacer y={6} />
-                                <div className="flex justify-center h-full items-center">
-                                    <SubTitle>No Data...</SubTitle>
-                                </div>
+                        <div className="h-full">
+                            <h3 className="font-black text-lg capitalize px-3 text-primary">
+                                Current Stock
+                            </h3>
+                            <Spacer y={6} />
+                            <div className="flex justify-center h-full items-center">
+                                <SubTitle>No Data...</SubTitle>
                             </div>
-                            :
-                            <div className="h-full">
-                                <h3 className="font-black text-lg capitalize px-3">
-                                    Current Stock
-                                    - {inventories[currentPage - 1].name.replaceAll("-", " ")}
-                                </h3>
-                                <Spacer y={4} />
-                                {
-                                    inventoryInsightsLoading ?
-                                        <div className="flex justify-center items-center h-full w-full">
-                                            <Spinner size="lg" />
-                                        </div>
-                                        :
-                                        <Fragment>
-                                            {
-                                                mostRecentData?.length ?
-                                                    <div className="h-3/4">
-                                                        <GenericChart
-                                                            data={mostRecentData.map(data => data.data.value)}
-                                                            labels={mostRecentData.map(data => data.name)}
-                                                            type="donut"
-                                                            plotOptions={{
-                                                                pie: {
-                                                                    donut: {
-                                                                        size: "65%",
-                                                                        labels: {
-                                                                            show: true,
-                                                                            value: {
-                                                                                color: "#ffffff"
-                                                                            }
+                        </div>
+                        :
+                        <div className="h-full">
+                            <h3 className="font-black text-lg capitalize px-3 text-primary">
+                                Current Stock
+                                - {inventories[currentPage - 1].name.replaceAll("-", " ")}
+                            </h3>
+                            <Spacer y={4} />
+                            {
+                                inventoryInsightsLoading ?
+                                    <div className="flex justify-center items-center h-full w-full">
+                                        <Spinner size="lg" />
+                                    </div>
+                                    :
+                                    <Fragment>
+                                        {
+                                            mostRecentData?.length ?
+                                                <div className="h-3/4">
+                                                    <GenericChart
+                                                        data={mostRecentData.map(data => data.data.value)}
+                                                        labels={mostRecentData.map(data => data.name)}
+                                                        type="donut"
+                                                        plotOptions={{
+                                                            pie: {
+                                                                donut: {
+                                                                    size: "65%",
+                                                                    labels: {
+                                                                        show: true,
+                                                                        value: {
+                                                                            color: "#ffffff"
                                                                         }
                                                                     }
                                                                 }
-                                                            }}
-                                                            fill={{
-                                                                type: undefined
-                                                            }}
-                                                            dataLabels={{
-                                                                enabled: false
-                                                            }}
-                                                            legend={{
-                                                                show: false
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    :
-                                                    <div className="default-container p-6 my-6">
-                                                        <SubTitle>No Data...</SubTitle>
-                                                    </div>
-                                            }
-                                            {
-                                                (inventories.length > 1)
-                                                &&
-                                                <div className="flex justify-center">
-                                                    <Pagination
-                                                        variant="bordered"
-                                                        showShadow
-                                                        showControls
-                                                        total={inventories.length}
-                                                        page={currentPage}
-                                                        onChange={setCurrentPage}
+                                                            }
+                                                        }}
+                                                        fill={{
+                                                            type: undefined
+                                                        }}
+                                                        dataLabels={{
+                                                            enabled: false
+                                                        }}
+                                                        legend={{
+                                                            show: false
+                                                        }}
                                                     />
                                                 </div>
-                                            }
-                                        </Fragment>
-                                }
-                            </div>
+                                                :
+                                                <div className="default-container p-6 my-6">
+                                                    <SubTitle>No Data...</SubTitle>
+                                                </div>
+                                        }
+                                        {
+                                            (inventories.length > 1)
+                                            &&
+                                            <div className="flex justify-center">
+                                                <Pagination
+                                                    variant="bordered"
+                                                    showShadow
+                                                    showControls
+                                                    total={inventories.length}
+                                                    page={currentPage}
+                                                    onChange={setCurrentPage}
+                                                />
+                                            </div>
+                                        }
+                                    </Fragment>
+                            }
+                        </div>
                     )
             }
-        </div>
+        </WidgetContainer>
     );
 }

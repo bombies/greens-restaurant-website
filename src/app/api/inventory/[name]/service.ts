@@ -526,6 +526,20 @@ class InventoryService {
     }
 
     async fetchCurrentSnapshots(ids: string[]): Promise<Either<InventorySnapshotWithOptionalExtras[], NextResponse>> {
+        const result = await this.fetchCurrentSnapshotsHeadless(ids);
+
+        if (!result)
+            return new Either<InventorySnapshotWithOptionalExtras[], NextResponse>(undefined, respond({
+                message: "There were no inventories found with the given ids",
+                init: {
+                    status: 404
+                }
+            }));
+
+        return new Either<InventorySnapshotWithOptionalExtras[], NextResponse>(result);
+    };
+
+    async fetchCurrentSnapshotsHeadless(ids: string[]) {
         const inventories = await prisma.inventory.findMany({
             where: {
                 id: {
@@ -538,15 +552,7 @@ class InventoryService {
         });
 
         if (!inventories || !inventories.length)
-            return new Either<InventorySnapshotWithOptionalExtras[], NextResponse>(
-                undefined,
-                respond({
-                    message: `There were no inventories found with ids: ${ids.toString()}`,
-                    init: {
-                        status: 404
-                    }
-                })
-            );
+            return null;
 
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
@@ -613,10 +619,14 @@ class InventoryService {
             allSnapshots.push(...fetchedMissingInventories);
         }
 
-        return await this.generateWholesomeCurrentSnapshots(allSnapshots);
-    };
+        return await this.generateWholesomeCurrentSnapshotsHeadless(allSnapshots);
+    }
 
     private async generateWholesomeCurrentSnapshots(snapshots: InventorySnapshotWithOptionalExtras[]): Promise<Either<InventorySnapshotWithOptionalExtras[], NextResponse>> {
+        return new Either<InventorySnapshotWithOptionalExtras[], NextResponse>(await this.generateWholesomeCurrentSnapshotsHeadless(snapshots));
+    };
+
+    private async generateWholesomeCurrentSnapshotsHeadless(snapshots: InventorySnapshotWithOptionalExtras[]) {
         const todaysDate = new Date();
         todaysDate.setHours(0, 0, 0, 0);
 
@@ -681,13 +691,11 @@ class InventoryService {
             stockSnapshots: createdStockSnapshots.filter(stockSnapshot => stockSnapshot.inventorySnapshotId === snapshot.id)
         }));
 
-        return new Either<InventorySnapshotWithOptionalExtras[], NextResponse>(
-            [
-                ...nonEmptyStockSnapshots,
-                ...emptyStockSnapshots
-            ]
-        );
-    };
+        return [
+            ...nonEmptyStockSnapshots,
+            ...emptyStockSnapshots
+        ]
+    }
 
     private async generateWholesomeCurrentSnapshotHeadless(inventory: InventoryWithOptionalExtras, snapshot: InventorySnapshot & {
         inventory: Inventory & {

@@ -14,6 +14,7 @@ import EditCustomerButton from "../../../invoices/[id]/components/control-bar/Ed
 import DeleteCustomerButton from "../../../invoices/[id]/components/control-bar/DeleteCustomerButton";
 import { formatInvoiceNumber } from "../../../invoices/utils/invoice-utils";
 import { FetchInvoiceCustomers } from "../../../invoices/utils/invoice-client-utils";
+import WidgetContainer from "./WidgetContainer";
 
 enum CustomerAction {
     UPDATE,
@@ -158,10 +159,10 @@ export default function InvoiceWidget() {
     )), [invoiceCustomers]);
 
     return (
-        <div className="default-container backdrop-blur-md pt-6 px-6 pb-12 w-96 h-96 phone:w-full">
+        <WidgetContainer>
             {
                 invoiceCustomersLoading ?
-                    <div className="flex justify-center items-center"><Spinner size="lg" /></div>
+                    <div className="flex justify-center items-center w-full h-full"><Spinner size="lg" /></div>
                     :
                     (<Fragment>
                         <h3 className="font-black text-lg text-primary capitalize mb-4">
@@ -188,6 +189,6 @@ export default function InvoiceWidget() {
 
                     </Fragment>)
             }
-        </div>
+        </WidgetContainer>
     );
 }

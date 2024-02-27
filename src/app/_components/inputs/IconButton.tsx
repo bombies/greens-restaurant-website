@@ -26,17 +26,17 @@ type Props = {
 } & ButtonProps
 
 export default function IconButton({
-                                       toolTip,
-                                       toolTipProps,
-                                       icon,
-                                       color,
-                                       width,
-                                       withDropdown,
-                                       dropdownProps,
-                                       cooldown,
-                                       children,
-                                       ...buttonProps
-                                   }: Props) {
+    toolTip,
+    toolTipProps,
+    icon,
+    color = "primary",
+    width,
+    withDropdown,
+    dropdownProps,
+    cooldown,
+    children,
+    ...buttonProps
+}: Props) {
     const [lastClick, setLastClick] = useState<number>();
 
     const isOnCoolDown = useCallback((): boolean => {
@@ -54,7 +54,7 @@ export default function IconButton({
             {...buttonProps}
             isIconOnly
             variant={buttonProps.variant || "light"}
-            color={color || "primary"}
+            color={color}
             onPress={(e: PressEvent) => {
                 if (!isOnCoolDown()) {
                     if (buttonProps.onPress)

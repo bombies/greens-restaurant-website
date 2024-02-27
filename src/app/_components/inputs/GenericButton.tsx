@@ -2,9 +2,8 @@
 
 import React, { useCallback, useMemo, useState } from "react";
 import { StaticImageData } from "next/image";
-import clsx from "clsx";
 import GenericImage from "../GenericImage";
-import { Button, ButtonProps } from "@nextui-org/react";
+import { Button, ButtonProps, cn } from "@nextui-org/react";
 import { PressEvent } from "@react-types/shared";
 import { toast } from "react-hot-toast";
 
@@ -35,7 +34,7 @@ export default function GenericButton({ icon, cooldown, children, className, ...
             variant={props.variant || "shadow"}
             size={props.size || "lg"}
             startContent={icon ? <GenericImage src={icon} width={1.35} /> : props.startContent}
-            className={clsx(
+            className={cn(
                 "z-0 rounded-xl self-center cursor-pointer transition-fast hover:-translate-y-[.25rem] disabled:opacity-50 disabled:cursor-not-allowed p-6",
                 className
             )}

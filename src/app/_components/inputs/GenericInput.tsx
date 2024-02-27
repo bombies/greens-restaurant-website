@@ -4,10 +4,10 @@ import { StaticImageData } from "next/image";
 import GenericImage from "../GenericImage";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 import { Input, InputProps } from "@nextui-org/input";
-import clsx from "clsx";
 import { useMemo, useState } from "react";
 import lockIcon from "/public/icons/lock.svg";
 import unlockIcon from "/public/icons/unlocked.svg";
+import { cn } from "@nextui-org/react";
 
 interface Props extends InputProps {
     id: string;
@@ -24,7 +24,7 @@ export default function GenericInput({ id, register, errors, iconLeft, iconRight
     const defaultProps = useMemo<InputProps>(() => ({
         ...props,
         classNames: {
-            inputWrapper: clsx(
+            inputWrapper: cn(
                 "transition-fast ring-2 !default-container !h-fit ring-neutral-800 py-6 hover:ring-primary hover:-translate-y-[0.15rem]",
                 "group-data-[focused=true]:ring-primary",
                 errors && (errors[id] && "ring-danger"),

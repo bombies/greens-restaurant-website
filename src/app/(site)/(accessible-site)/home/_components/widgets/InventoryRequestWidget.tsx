@@ -12,6 +12,7 @@ import useAsyncChunkedItems from "@/app/_components/hooks/useAsyncChunkedItems";
 import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 import useInfiniteScroll from "react-infinite-scroll-hook";
 import { Spacer } from "@nextui-org/react";
+import WidgetContainer from "./WidgetContainer";
 
 const InventoryRequestWidget: FC = () => {
     const {
@@ -69,10 +70,10 @@ const InventoryRequestWidget: FC = () => {
     })
 
     return (
-        <div className="default-container backdrop-blur-md pt-6 px-6 pb-12 w-96 h-96 phone:w-full">
+        <WidgetContainer>
             {
                 initialItemsLoading ?
-                    <div className="flex justify-center items-center"><Spinner size="lg" /></div>
+                    <div className="flex justify-center items-center w-full h-full"><Spinner size="lg" /></div>
                     :
                     <Fragment>
                         <h3 className="font-black text-lg text-primary capitalize mb-4">
@@ -100,7 +101,7 @@ const InventoryRequestWidget: FC = () => {
                         </div>
                     </Fragment>
             }
-        </div>
+        </WidgetContainer>
     );
 };
 

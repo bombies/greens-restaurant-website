@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "@nextui-org/react";
 import { FC, PropsWithChildren } from "react";
 
 type Props = PropsWithChildren<{
@@ -8,7 +8,7 @@ type Props = PropsWithChildren<{
 const Container: FC<Props> = ({ className, children }) => {
     return (
         <div className={
-            clsx(
+            cn(
                 "default-container p-6 phone:px-4",
                 className
             )

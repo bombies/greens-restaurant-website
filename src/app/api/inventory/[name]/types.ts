@@ -23,7 +23,8 @@ export type InventoryWithSections = Inventory & {
 export type InventoryWithOptionalExtras = Inventory & {
     stock?: Stock[],
     snapshots?: InventorySnapshot[],
-    inventorySections?: (InventorySection & { assignedStock?: Stock[] })[]
+    inventorySections?: (InventorySection & { assignedStock?: Stock[] })[],
+    lowStock?: StockSnapshot[]
 }
 
 export type InventorySnapshotWithOptionalExtras = InventorySnapshot & {
