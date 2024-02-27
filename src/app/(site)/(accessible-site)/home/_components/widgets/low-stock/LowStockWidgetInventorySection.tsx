@@ -2,7 +2,7 @@ import Container from "@/app/_components/Container"
 import EyeIcon from "@/app/_components/icons/EyeIcon"
 import IconButton from "@/app/_components/inputs/IconButton"
 import { InventoryWithOptionalExtras } from "@/app/api/inventory/[name]/types"
-import { Chip, Divider, Spacer } from "@nextui-org/react"
+import { Chip, Divider } from "@nextui-org/react"
 import { FC } from "react"
 
 type Props = {

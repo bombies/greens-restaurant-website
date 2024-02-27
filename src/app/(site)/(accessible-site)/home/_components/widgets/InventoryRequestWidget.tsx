@@ -71,14 +71,14 @@ const InventoryRequestWidget: FC = () => {
 
     return (
         <WidgetContainer>
+            <h3 className="font-black text-lg text-primary capitalize mb-4">
+                Inventory Requests
+            </h3>
             {
                 initialItemsLoading ?
                     <div className="flex justify-center items-center w-full h-full"><Spinner size="lg" /></div>
                     :
                     <Fragment>
-                        <h3 className="font-black text-lg text-primary capitalize mb-4">
-                            Inventory Requests
-                        </h3>
                         <Divider className="mb-3" />
                         <div className="flex items-center gap-4">
                             {sortButton}

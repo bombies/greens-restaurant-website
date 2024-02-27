@@ -7,7 +7,7 @@ import LowStockWidgetInventorySection from "./LowStockWidgetInventorySection";
 import { Spinner } from "@nextui-org/react";
 
 const FetchInventories = () =>
-    useSWR('/api/inventory?with_low_stock=true', $get<InventoryWithOptionalExtras[]>())
+    useSWR('/api/inventory?with_low_stock=true&with_stock=false', $get<InventoryWithOptionalExtras[]>())
 
 const LowStockWidget: FC = () => {
     const { data: inventories, isLoading: inventoriesLoading } = FetchInventories()

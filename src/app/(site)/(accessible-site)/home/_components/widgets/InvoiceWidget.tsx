@@ -91,7 +91,7 @@ export default function InvoiceWidget() {
 
     const customerElements = useMemo(() => invoiceCustomers?.map(customer => (
         <AccordionItem key={customer.id} className="default-container p-6" title={customer.customerName}
-                       aria-label={customer.customerName}>
+            aria-label={customer.customerName}>
             <div className="flex gap-4">
                 <IconButton
                     icon={eyeIcon}
@@ -130,27 +130,27 @@ export default function InvoiceWidget() {
             <div className="flex flex-col gap-4">
                 {
                     customer.invoices?.length ? customer.invoices.map(invoice => (
-                            <LinkCard
-                                key={invoice.id}
-                                href={`/invoices/${customer.id}/${invoice.id}`}
-                            >
-                                <div>
-                                    <div className="flex gap-2">
-                                        <p className="text-medium max-w-[70%] overflow-hidden whitespace-nowrap overflow-ellipsis">Invoice
-                                            #{formatInvoiceNumber(invoice.number)}</p>
-                                        <Chip
-                                            variant="flat"
-                                            color={invoice.paid ? "success" : "danger"}
-                                            className="uppercase"
-                                        >
-                                            {invoice.paid ? "paid" : "unpaid"}
-                                        </Chip>
-                                    </div>
-                                    {invoice.description &&
-                                        <p className="text-neutral-500 text-sm max-w-[90%] break-all overflow-hidden whitespace-nowrap overflow-ellipsis">{invoice.description}</p>}
+                        <LinkCard
+                            key={invoice.id}
+                            href={`/invoices/${customer.id}/${invoice.id}`}
+                        >
+                            <div>
+                                <div className="flex gap-2">
+                                    <p className="text-medium max-w-[70%] overflow-hidden whitespace-nowrap overflow-ellipsis">Invoice
+                                        #{formatInvoiceNumber(invoice.number)}</p>
+                                    <Chip
+                                        variant="flat"
+                                        color={invoice.paid ? "success" : "danger"}
+                                        className="uppercase"
+                                    >
+                                        {invoice.paid ? "paid" : "unpaid"}
+                                    </Chip>
                                 </div>
-                            </LinkCard>
-                        ))
+                                {invoice.description &&
+                                    <p className="text-neutral-500 text-sm max-w-[90%] break-all overflow-hidden whitespace-nowrap overflow-ellipsis">{invoice.description}</p>}
+                            </div>
+                        </LinkCard>
+                    ))
                         :
                         <p className="default-container p-6">No Data...</p>
                 }
@@ -160,14 +160,14 @@ export default function InvoiceWidget() {
 
     return (
         <WidgetContainer>
+            <h3 className="font-black text-lg text-primary capitalize mb-4">
+                Invoices
+            </h3>
             {
                 invoiceCustomersLoading ?
                     <div className="flex justify-center items-center w-full h-full"><Spinner size="lg" /></div>
                     :
                     (<Fragment>
-                        <h3 className="font-black text-lg text-primary capitalize mb-4">
-                            Invoices
-                        </h3>
                         {
                             customerElements?.length ?
                                 <div className="h-full overflow-y-auto">
