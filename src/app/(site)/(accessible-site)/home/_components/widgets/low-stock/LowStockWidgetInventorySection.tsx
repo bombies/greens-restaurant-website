@@ -20,6 +20,7 @@ const LowStockWidgetInventorySection: FC<Props> = ({ inventory }) => {
                     variant="flat"
                     size="sm"
                     toolTip="View Inventory"
+                    href={`/inventory/${inventory.name}`}
                 >
                     <EyeIcon width={16} />
                 </IconButton>
