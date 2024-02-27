@@ -1,8 +1,6 @@
 "use client"
 
 import React, { FC, Fragment, useEffect, useMemo } from "react";
-import useSWR from "swr";
-import { fetcher } from "../../../../employees/_components/EmployeeGrid";
 import InventoryRequestCard from "../InventoryRequestCard";
 import { Divider } from "@nextui-org/divider";
 import GenericCard from "../../../../../../_components/GenericCard";
@@ -15,16 +13,6 @@ import useAsyncChunkedItems from "@/app/_components/hooks/useAsyncChunkedItems";
 import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
 import CardSkeleton from "@/app/_components/skeletons/CardSkeleton";
 import useInfiniteScroll from 'react-infinite-scroll-hook';
-
-type FetchAllRequestArgs = {
-    withAssignees?: boolean,
-    withLocation?: boolean,
-    doFetch?: boolean
-}
-
-export const FetchAllRequests = (args?: FetchAllRequestArgs) => {
-    return useSWR((args?.doFetch || args?.doFetch === undefined) && `/api/inventory/requests?with_users=true&with_assignees=${args?.withAssignees ?? false}&with_location=${args?.withLocation ?? false}`, fetcher<StockRequestWithOptionalExtras[]>);
-};
 
 type Props = {
     userPermissions: number

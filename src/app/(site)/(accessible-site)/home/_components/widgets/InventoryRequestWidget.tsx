@@ -1,25 +1,47 @@
 "use client";
 
 import React, { FC, Fragment, useMemo } from "react";
-import { FetchAllRequests } from "../../../inventory/_components/requests/all/AllInventoryRequestsTab";
 import { Spinner } from "@nextui-org/spinner";
 import { Divider } from "@nextui-org/divider";
-import useMutableRequests from "../../../inventory/_components/requests/hooks/useMutableRequests";
+import useMutableRequests, { RequestSortMode } from "../../../inventory/_components/requests/hooks/useMutableRequests";
 import LinkCard from "../../../../../_components/LinkCard";
 import SubTitle from "../../../../../_components/text/SubTitle";
 import { getStatusChip } from "../../../inventory/_components/hooks/useRequestStatus";
 import { getInventoryRequestDisplayDate } from "app/(site)/(accessible-site)/inventory/utils/inventory-utils";
+import useAsyncChunkedItems from "@/app/_components/hooks/useAsyncChunkedItems";
+import { StockRequestWithOptionalExtras } from "@/app/api/inventory/requests/types";
+import useInfiniteScroll from "react-infinite-scroll-hook";
+import { Spacer } from "@nextui-org/react";
 
 const InventoryRequestWidget: FC = () => {
-    const { data, isLoading } = FetchAllRequests();
     const {
-        visibleRequests,
-        sortButton, filterButton
-    } = useMutableRequests({
-        data, dataIsLoading: isLoading
+        list: loadedRequests,
+        hasMoreToLoad,
+        isLoading: itemsLoading,
+        initialItemsLoading,
+        reloadWithParams
+    } = useAsyncChunkedItems<StockRequestWithOptionalExtras>("/api/inventory/requests", 20, {
+        'with_assignees': "true",
+        'with_location': "true",
+        'with_users': "true",
+        'sort': "desc",
     });
 
-    const cards = useMemo(() => visibleRequests
+    const {
+        sortButton, filterButton
+    } = useMutableRequests({
+        data: loadedRequests.items ?? [],
+        dataIsLoading: itemsLoading,
+        onSortChange(sortMode) {
+            reloadWithParams({ sort: sortMode === RequestSortMode.NEWEST_OLDEST ? "desc" : "asc" });
+        },
+        onFilterChange(filters) {
+            reloadWithParams({ status: filters.length ? filters.join(",") : undefined });
+        }
+    });
+
+    const cards = useMemo(() => loadedRequests
+        .items
         ?.map(request => {
             const displayDate = getInventoryRequestDisplayDate(request)
             return (
@@ -38,12 +60,18 @@ const InventoryRequestWidget: FC = () => {
                     </div>
                 </LinkCard>
             )
-        }), [visibleRequests]);
+        }), [loadedRequests.items]);
+
+    const [scrollContainerRef] = useInfiniteScroll({
+        onLoadMore: loadedRequests.loadMore,
+        loading: itemsLoading,
+        hasNextPage: hasMoreToLoad,
+    })
 
     return (
         <div className="default-container backdrop-blur-md pt-6 px-6 pb-12 w-96 h-96 phone:w-full">
             {
-                isLoading ?
+                initialItemsLoading ?
                     <div className="flex justify-center items-center"><Spinner size="lg" /></div>
                     :
                     <Fragment>
@@ -58,6 +86,17 @@ const InventoryRequestWidget: FC = () => {
                         <Divider className="my-3" />
                         <div className="space-y-3 overflow-y-auto h-3/4 p-2">
                             {cards}
+                            {hasMoreToLoad && (
+                                <>
+                                    <Spacer y={6} />
+                                    <div
+                                        ref={scrollContainerRef}
+                                        className="flex w-full justify-center"
+                                    >
+                                        <Spinner size="sm" />
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </Fragment>
             }
