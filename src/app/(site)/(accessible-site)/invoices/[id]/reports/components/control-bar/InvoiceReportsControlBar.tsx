@@ -15,7 +15,7 @@ import Exceljs from "exceljs";
 import { useReportDateRange } from "../hooks/useReportDateRange";
 import { ReportParamsActionType, ReportParamsState } from "../hooks/useInvoiceReport";
 import { toast } from "react-hot-toast";
-import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/InvoiceWidget";
 
 interface Props {
     id: string,

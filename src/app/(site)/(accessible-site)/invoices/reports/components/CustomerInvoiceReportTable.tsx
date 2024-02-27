@@ -7,7 +7,7 @@ import { generateInvoicesTotal, generateInvoiceTotal, invoiceIsOverdue } from ".
 import { dollarFormat } from "../../../../../../utils/GeneralUtils";
 import EyeIcon from "../../../../../_components/icons/EyeIcon";
 import SubTitle from "../../../../../_components/text/SubTitle";
-import { InvoiceCustomerWithOptionalItems } from "../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceCustomerWithOptionalItems } from "../../../home/_components/widgets/InvoiceWidget";
 import { InvoiceType } from "@prisma/client";
 
 const columns: Column[] = [

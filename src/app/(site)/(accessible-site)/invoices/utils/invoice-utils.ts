@@ -1,7 +1,7 @@
 import { Invoice, InvoiceInformation, InvoiceType } from "@prisma/client";
 import {
     InvoiceWithOptionalItems
-} from "../../home/_components/widgets/invoice/InvoiceWidget";
+} from "../../home/_components/widgets/InvoiceWidget";
 import { getS3String } from "app/api/s3/s3-utils";
 
 export const generateInvoiceTotal = (invoice?: InvoiceWithOptionalItems): number => {

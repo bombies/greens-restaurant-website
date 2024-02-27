@@ -5,7 +5,7 @@ import GenericButton from "../../../../../_components/inputs/GenericButton";
 import { Link } from "@nextui-org/react";
 import ReportsIcon from "../../../../../_components/icons/ReportsIcon";
 import { SearchInvoiceButton } from "./SearchInvoiceButton";
-import { InvoiceCustomerWithOptionalItems } from "../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceCustomerWithOptionalItems } from "../../../home/_components/widgets/InvoiceWidget";
 import { KeyedMutator } from "swr";
 
 type Props = {

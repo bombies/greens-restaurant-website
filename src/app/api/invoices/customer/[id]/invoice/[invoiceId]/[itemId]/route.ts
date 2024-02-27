@@ -9,7 +9,7 @@ import specificInvoiceService from "../service";
 import { UpdateInvoiceItemDto, updateInvoiceItemDtoSchema } from "./types";
 import {
     InvoiceWithOptionalItems
-} from "../../../../../../../(site)/(accessible-site)/home/_components/widgets/invoice/InvoiceWidget";
+} from "../../../../../../../(site)/(accessible-site)/home/_components/widgets/InvoiceWidget";
 import { buildFailedValidationResponse, buildResponse } from "../../../../../../utils/utils";
 
 type Context = {

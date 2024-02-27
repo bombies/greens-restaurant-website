@@ -1,7 +1,7 @@
 import specificCustomerService from "../../service";
 import {
     InvoiceCustomerWithOptionalInvoices
-} from "../../../../../../(site)/(accessible-site)/home/_components/widgets/invoice/InvoiceWidget";
+} from "../../../../../../(site)/(accessible-site)/home/_components/widgets/InvoiceWidget";
 import { buildResponse } from "../../../../../utils/utils";
 
 class SpecificInvoiceService {

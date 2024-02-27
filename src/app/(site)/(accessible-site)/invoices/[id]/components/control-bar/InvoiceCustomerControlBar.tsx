@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Spacer } from "@nextui-org/react";
 import GenericButton from "../../../../../../_components/inputs/GenericButton";
 import ReportsIcon from "../../../../../../_components/icons/ReportsIcon";
-import { InvoiceCustomerWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceCustomerWithOptionalItems } from "../../../../home/_components/widgets/InvoiceWidget";
 import { KeyedMutator } from "swr";
 
 type Props = {

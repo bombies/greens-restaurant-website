@@ -22,7 +22,7 @@ import {
 import {
     InvoiceCustomerWithOptionalItems,
     InvoiceWithOptionalItems
-} from "../../../home/_components/widgets/invoice/InvoiceWidget";
+} from "../../../home/_components/widgets/InvoiceWidget";
 import SortIcon from "../../../../../_components/icons/SortIcon";
 import CheckboxMenu from "../../../../../_components/CheckboxMenu";
 import FilterIcon from "../../../../../_components/icons/FilterIcon";

@@ -21,7 +21,7 @@ import DeleteInvoiceItemButton from "./DeleteInvoiceItemButton";
 import DeleteInvoiceItemsButton from "./DeleteInvoiceItemsButton";
 import closeIcon from "/public/icons/close-gold-circled.svg";
 import GenericTable from "../../../../../../../_components/table/GenericTable";
-import { InvoiceCustomerWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceCustomerWithOptionalItems } from "../../../../../home/_components/widgets/InvoiceWidget";
 import { KeyedMutator } from "swr";
 
 

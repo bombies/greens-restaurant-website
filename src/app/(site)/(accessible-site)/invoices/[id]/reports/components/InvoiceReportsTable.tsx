@@ -15,7 +15,7 @@ import {
 import { Chip } from "@nextui-org/chip";
 import { dollarFormat } from "../../../../../../../utils/GeneralUtils";
 import SubTitle from "../../../../../../_components/text/SubTitle";
-import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/InvoiceWidget";
 
 interface Props {
     invoices?: InvoiceWithOptionalItems[]

@@ -8,7 +8,7 @@ import { fetcher } from "../../employees/_components/EmployeeGrid";
 import {
     InvoiceCustomerWithOptionalItems,
     InvoiceWithOptionalItems
-} from "../../home/_components/widgets/invoice/InvoiceWidget";
+} from "../../home/_components/widgets/InvoiceWidget";
 
 export type InvoiceWithCustomer = Invoice & {
     customer: InvoiceCustomer

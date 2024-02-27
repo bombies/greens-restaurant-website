@@ -2,7 +2,7 @@
 
 import React from "react";
 import { SWRResponse } from "swr";
-import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/InvoiceWidget";
 import { FetchInvoice } from "../../../utils/invoice-client-utils";
 
 const InvoiceContext = React.createContext<SWRResponse<InvoiceWithOptionalItems | undefined> | undefined>(undefined);

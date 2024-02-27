@@ -16,7 +16,7 @@ import { errorToast } from "../../../../../../../../utils/Hooks";
 import {
     InvoiceCustomerWithOptionalItems,
     InvoiceWithOptionalItems
-} from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+} from "../../../../../home/_components/widgets/InvoiceWidget";
 import { KeyedMutator } from "swr";
 import { InvoiceItem } from "@prisma/client";
 

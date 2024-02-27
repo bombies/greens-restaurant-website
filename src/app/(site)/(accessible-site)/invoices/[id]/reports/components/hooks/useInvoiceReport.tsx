@@ -6,7 +6,7 @@ import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import {
     InvoiceCustomerWithOptionalItems,
     InvoiceWithOptionalItems
-} from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+} from "../../../../../home/_components/widgets/InvoiceWidget";
 
 export type ReportParamsState = {
     dateFrom?: Date,

@@ -7,7 +7,7 @@ import EditInvoiceButton from "./EditInvoiceButton";
 import ExportInvoiceButton from "./export/ExportInvoiceButton";
 import DeleteInvoiceButton from "./DeleteInvoiceButton";
 import { KeyedMutator } from "swr";
-import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/InvoiceWidget";
 import PreviewInvoiceButton from "./PreviewInvoiceButton";
 
 type Props = {

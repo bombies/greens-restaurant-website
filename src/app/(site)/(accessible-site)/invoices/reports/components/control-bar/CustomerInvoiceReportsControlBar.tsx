@@ -6,7 +6,7 @@ import { GoBackButton } from "../../../[id]/components/control-bar/InvoiceCustom
 import { Divider } from "@nextui-org/divider";
 import {
     InvoiceCustomerWithOptionalItems
-} from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+} from "../../../../home/_components/widgets/InvoiceWidget";
 
 interface Props {
     customers?: InvoiceCustomerWithOptionalItems[],

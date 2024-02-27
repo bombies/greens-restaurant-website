@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { FetchInvoiceCustomers } from "../../../utils/invoice-client-utils";
-import { InvoiceCustomerWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceCustomerWithOptionalItems } from "../../../../home/_components/widgets/InvoiceWidget";
 
 export const useCustomerReports = () => {
     const { data: allCustomers, isLoading } = FetchInvoiceCustomers({

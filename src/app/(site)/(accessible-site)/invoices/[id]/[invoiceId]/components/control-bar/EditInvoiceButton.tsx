@@ -16,7 +16,7 @@ import { GenericDatePicker } from "../../../../../../../_components/GenericDateP
 import { fetchDueAt } from "../../../../utils/invoice-utils";
 import { toast } from "react-hot-toast";
 import { KeyedMutator } from "swr";
-import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceWithOptionalItems } from "../../../../../home/_components/widgets/InvoiceWidget";
 import { invoiceTypeAsString } from "../../../../utils";
 
 type Props = {

@@ -4,7 +4,7 @@ import prisma from "../../../../../libs/prisma";
 import { buildResponse } from "../../../utils/utils";
 import {
     InvoiceCustomerWithOptionalInvoices
-} from "../../../../(site)/(accessible-site)/home/_components/widgets/invoice/InvoiceWidget";
+} from "../../../../(site)/(accessible-site)/home/_components/widgets/InvoiceWidget";
 
 class SpecificCustomerService {
     constructor(private readonly customerId: string) {

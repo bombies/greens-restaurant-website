@@ -2,7 +2,7 @@
 
 import { FC, useEffect, useState } from "react";
 import DropdownInput from "../../../../../../_components/inputs/DropdownInput";
-import { InvoiceCustomerWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceCustomerWithOptionalItems } from "../../../../home/_components/widgets/InvoiceWidget";
 
 interface Props {
     customers?: InvoiceCustomerWithOptionalItems[],

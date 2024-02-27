@@ -6,7 +6,7 @@ import { errorToast } from "../../../../../../../utils/Hooks";
 import { KeyedMutator } from "swr";
 import {
     InvoiceCustomerWithOptionalItems
-} from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+} from "../../../../home/_components/widgets/InvoiceWidget";
 import GenericDropdown from "../../../../../../_components/GenericDropdown";
 import { useCallback } from "react";
 import { Invoice, InvoiceType } from "@prisma/client";

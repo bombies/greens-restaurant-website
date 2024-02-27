@@ -13,7 +13,7 @@ import GenericTextArea from "../../../../_components/inputs/GenericTextArea";
 import PlusIcon from "../../../../_components/icons/PlusIcon";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../utils/Hooks";
-import { InvoiceCustomerWithOptionalItems } from "../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceCustomerWithOptionalItems } from "../../home/_components/widgets/InvoiceWidget";
 import { KeyedMutator } from "swr";
 import { InvoiceCustomer } from "@prisma/client";
 

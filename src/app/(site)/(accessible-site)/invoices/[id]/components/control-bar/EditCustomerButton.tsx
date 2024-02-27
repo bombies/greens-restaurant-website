@@ -17,7 +17,7 @@ import IconButton from "../../../../../../_components/inputs/IconButton";
 import { toast } from "react-hot-toast";
 import { errorToast } from "../../../../../../../utils/Hooks";
 import { KeyedMutator } from "swr";
-import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/InvoiceWidget";
 
 type Props = {
     customer?: InvoiceCustomer,

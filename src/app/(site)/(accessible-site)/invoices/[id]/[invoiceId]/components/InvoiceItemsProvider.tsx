@@ -4,7 +4,7 @@ import React, { useEffect, useReducer } from "react";
 import { useInvoice } from "./InvoiceProvider";
 import { InvoiceItem } from "@prisma/client";
 import { UpdateInvoiceItemDto } from "../../../../../../api/invoices/customer/[id]/invoice/[invoiceId]/[itemId]/types";
-import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceWithOptionalItems } from "../../../../home/_components/widgets/InvoiceWidget";
 import { KeyedMutator } from "swr";
 
 export enum InvoiceItemChangeAction {

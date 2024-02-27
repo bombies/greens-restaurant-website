@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { FetchInvoiceCustomers } from "../../utils/invoice-client-utils";
-import { InvoiceCustomerWithOptionalItems } from "../../../home/_components/widgets/invoice/InvoiceWidget";
+import { InvoiceCustomerWithOptionalItems } from "../../../home/_components/widgets/InvoiceWidget";
 import { KeyedMutator } from "swr";
 
 export type InvoiceCustomerHook = {

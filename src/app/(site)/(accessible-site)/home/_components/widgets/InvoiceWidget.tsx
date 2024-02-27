@@ -4,16 +4,16 @@ import { Invoice, InvoiceCustomer, InvoiceItem } from "@prisma/client";
 import { Spinner } from "@nextui-org/spinner";
 import { Fragment, useEffect, useMemo, useReducer } from "react";
 import { Divider } from "@nextui-org/divider";
-import LinkCard from "../../../../../../_components/LinkCard";
+import LinkCard from "../../../../../_components/LinkCard";
 import { Chip } from "@nextui-org/chip";
-import SubTitle from "../../../../../../_components/text/SubTitle";
+import SubTitle from "../../../../../_components/text/SubTitle";
 import { Accordion, AccordionItem, Link } from "@nextui-org/react";
-import IconButton from "../../../../../../_components/inputs/IconButton";
+import IconButton from "../../../../../_components/inputs/IconButton";
 import eyeIcon from "/public/icons/green-eye.svg";
-import EditCustomerButton from "../../../../invoices/[id]/components/control-bar/EditCustomerButton";
-import DeleteCustomerButton from "../../../../invoices/[id]/components/control-bar/DeleteCustomerButton";
-import { formatInvoiceNumber } from "../../../../invoices/utils/invoice-utils";
-import { FetchInvoiceCustomers } from "../../../../invoices/utils/invoice-client-utils";
+import EditCustomerButton from "../../../invoices/[id]/components/control-bar/EditCustomerButton";
+import DeleteCustomerButton from "../../../invoices/[id]/components/control-bar/DeleteCustomerButton";
+import { formatInvoiceNumber } from "../../../invoices/utils/invoice-utils";
+import { FetchInvoiceCustomers } from "../../../invoices/utils/invoice-client-utils";
 
 enum CustomerAction {
     UPDATE,
