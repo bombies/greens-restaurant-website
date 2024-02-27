@@ -14,6 +14,7 @@ import { UseDropdownProps } from "@nextui-org/dropdown/dist/use-dropdown";
 import { DropdownInputProps } from "./DropdownInput";
 import { PressEvent } from "@react-types/shared";
 import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 type Props = {
     toolTip?: string,
@@ -52,6 +53,8 @@ export default function IconButton({
     const button = useMemo(() => (
         <Button
             {...buttonProps}
+            as={(buttonProps.href && buttonProps.href.length) ? Link : undefined}
+            href={buttonProps.href}
             isIconOnly
             variant={buttonProps.variant || "light"}
             color={color}
