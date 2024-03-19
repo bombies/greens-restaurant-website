@@ -1,6 +1,6 @@
 "use client";
 
-import { Config, Inventory, StockSnapshot, User } from "@prisma/client";
+import type { Config, Inventory, StockSnapshot, User } from "@prisma/client";
 import { hasAnyPermission, Permission } from "../../../../../../libs/types/permission";
 import InventoryStockTable from "./table/InventoryStockTable";
 import { InventorySnapshotWithExtras } from "../../../../../api/inventory/[name]/types";
