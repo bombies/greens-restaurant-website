@@ -28,7 +28,7 @@
     "@react-email/head": "0.0.7",
     "@react-email/html": "0.0.7",
     "@react-email/tailwind": "0.0.14",
-    "@react-pdf/layout": "^3.10.3",
+    "@react-pdf/layout": "^3.11.3",
     "@react-pdf/renderer": "^3.3.8",
     "@react-stately/data": "^3.11.2",
     "@reduxjs/toolkit": "^2.2.1",
